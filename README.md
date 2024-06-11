@@ -15,17 +15,17 @@
  
  
 ## Install
+  We prefer you use TamperMonkey or ViolentMonkey.
+  ### TamperMonkey or ViolentMonkey
   If you use [TamperMonkey](https://www.tampermonkey.net/) or [ViolentMonkey](https://violentmonkey.github.io): (available for several browsers: Chrome, Edge, Safari, Opera, Firefox)
     1. Visit and click on install [ABCL.user.js](https://github.com/zoe-64/ABCL/raw/main/ABCL.user.js)
 
-  
-  
-  **Alternative methode for Google Chrome, Microsoft Edge, similar browsers**
+  ### Alternative Option 1 (Extension)
   1. Download the Latest file on the Releases page
   2. Depending on browser, the .zip might have to be extracted. few browsers accept a .zip, a few requires a folder.
   3. Go to browser extensions. Enable developer mode.
   4. Load as Unpacked. Done. If the file can't be seen, see step 2.
-
+  
 ## Credits
 Special thanks to tetris245 for helping me get into modding!
 
