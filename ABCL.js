@@ -24,11 +24,11 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
         return;
     }
 
-    const abcl = null;
+    abcl = null;
     const ABCLversion = "1.0";
     const modApi = bcModSDK.registerMod({
-        name: 'ULTRAbc',
-        fullName: 'Ultra Bondage Club',
+        name: 'ABCL',
+        fullName: 'Adult Baby Club Lover',
         version: ABCLversion,
         repository: 'https://github.com/zoe-64/ABCL',
     });
@@ -58,7 +58,7 @@ function getJson(url) {
 
 
     //////////////////////////////////////////////////////////
-    // #region Ultrabdl                                     //
+    // #region Abcl                                     //
     // BC-Diaper-Wetter                                     //
     //////////////////////////////////////////////////////////	
 
@@ -71,7 +71,7 @@ function getJson(url) {
         "SelfWet": "#4F4B1B",
         "SelfMessy": "#3B2B17",
     }
-    // Table to store all the defaul values for Ultrabdl()
+    // Table to store all the defaul values for Abcl()
     const diaperDefaultValues = {
         messChance: .3,
         wetChance: .5,
@@ -167,7 +167,7 @@ function getJson(url) {
         }
 
         console.log(message);
-        if (ultrabdl.messageType === "descreet") {
+        if (abcl.messageType === "descreet") {
             ChatRoomSendLocal(
                 message,
                 false
@@ -182,21 +182,21 @@ function getJson(url) {
             }]
         });
         }
-    }
-    
+    } 
+    const ABCLdata = await getJson("https://raw.githubusercontent.com/zoe-64/ABCL/main/dictionary.json");
+   
     class ABCL {
         
-        data = getJson("https://zoe-64.github.io/ABCL.github.io/ABCL.json");
         
         getRegressionItems(items=Player.Appearance) {
             let inFilter = [];
             for (let item of items) {
-                if (this.UltrabdlData.Items[item.Asset.Description]) {
+                if (ABCLdata.Items[item.Asset.Description]) {
                     inFilter.push(item);
                 }
             }
             for (let item of items) {
-                for (let key in this.UltrabdlData.Regex) {
+                for (let key in ABCLdata.Regex) {
                     if (item.Asset.Description.toLowerCase().match(key.toLowerCase())) {
                         if (!inFilter.includes(item)) {
                             inFilter.push(item);
@@ -207,7 +207,10 @@ function getJson(url) {
             return inFilter;
         }
         constructor() {
-            const ultrabdl = this;
+           
+
+
+            const abcl = this;
             this.messageType = diaperDefaultValues.messageType || "default",
             this._wets = 0,
             this._messes = 0,
@@ -224,17 +227,17 @@ function getJson(url) {
             
             this.wet = {
                 set count(value) {
-                    ultrabdl._wets = value;
-                    ultrabdl.refreshDiaper();
+                    abcl._wets = value;
+                    abcl.refreshDiaper();
                 },
-                get count() {return ultrabdl._wets},
-                set base(value) {ultrabdl._wetChance = value},
-                get base() {return ultrabdl._wetChance},
+                get count() {return abcl._wets},
+                set base(value) {abcl._wetChance = value},
+                get base() {return abcl._wetChance},
                 get chance() {
-                    let chance = ultrabdl._wetChance;
-                    for (let item of ultrabdl.getRegressionItems()) {
-                        for (let key in ultrabdl.UltrabdlData.CraftingModifiers.wetChance) {
-                            chance += item?.Craft?.Description?.includes(key) ? ultrabdl.UltrabdlData.CraftingModifiers.wetChance[key] : 0;
+                    let chance = abcl._wetChance;
+                    for (let item of abcl.getRegressionItems()) {
+                        for (let key in ABCLdata.CraftingModifiers.wetChance) {
+                            chance += item?.Craft?.Description?.includes(key) ? ABCLdata.CraftingModifiers.wetChance[key] : 0;
                         }
                     }
                     return chance;
@@ -242,41 +245,41 @@ function getJson(url) {
             };
             this.mess = {
                 set count(value) {
-                    ultrabdl._messes = value;
-                    ultrabdl.refreshDiaper();
+                    abcl._messes = value;
+                    abcl.refreshDiaper();
                 },
-                get count() {return ultrabdl._messes},
-                set base(value) {ultrabdl._messChance = value},
-                get base() {return ultrabdl._messChance},
+                get count() {return abcl._messes},
+                set base(value) {abcl._messChance = value},
+                get base() {return abcl._messChance},
                 get chance() {
-                    let chance = ultrabdl._messChance;
-                    for (let item of ultrabdl.getRegressionItems()) {
-                        for (let key in ultrabdl.UltrabdlData.CraftingModifiers.messChance) {
-                            chance += item?.Craft?.Description?.includes(key) ? ultrabdl.UltrabdlData.CraftingModifiers.messChance[key] : 0;
+                    let chance = abcl._messChance;
+                    for (let item of abcl.getRegressionItems()) {
+                        for (let key in ABCLdata.CraftingModifiers.messChance) {
+                            chance += item?.Craft?.Description?.includes(key) ? ABCLdata.CraftingModifiers.messChance[key] : 0;
                         }
                     }
                     return chance;
                 }
             }
             this.regression = {
-                get base() {return ultrabdl._regression},
-                set base(value) {ultrabdl._regression = value},
+                get base() {return abcl._regression},
+                set base(value) {abcl._regression = value},
                 get modifier() {
                     let total = 0;
                     console.log()
                     for (let item of Player.Appearance) {
-                        if (ultrabdl.UltrabdlData.Items[item.Asset.Description]) {
-                            total += ultrabdl.UltrabdlData.Items[item.Asset.Description].modifier;
+                        if (ABCLdata.Items[item.Asset.Description]) {
+                            total += ABCLdata.Items[item.Asset.Description].modifier;
                         }
-                        for (let key in ultrabdl.UltrabdlData.Regex) {
+                        for (let key in ABCLdata.Regex) {
                             if (item.Asset.Description.toLowerCase().match(key.toLowerCase())) {
-                                total += ultrabdl.UltrabdlData.Regex[key].modifier;
+                                total += ABCLdata.Regex[key].modifier;
                             }
                         }
                     }
-                    for (let item of ultrabdl.getRegressionItems()) {
-                        for (let key in ultrabdl.UltrabdlData.CraftingModifiers.regression) {
-                            total += item?.Craft?.Description?.includes(key) ? ultrabdl.UltrabdlData.CraftingModifiers.regression[key] : 0;
+                    for (let item of abcl.getRegressionItems()) {
+                        for (let key in ABCLdata.CraftingModifiers.regression) {
+                            total += item?.Craft?.Description?.includes(key) ? ABCLdata.CraftingModifiers.regression[key] : 0;
                         }
                     }
                     return total;
@@ -287,23 +290,23 @@ function getJson(url) {
             }
 
             this.desperation = {
-                get base() { return ultrabdl._desperation },
-                set base(value) { ultrabdl._desperation = value },
+                get base() { return abcl._desperation },
+                set base(value) { abcl._desperation = value },
                 get modifier() {
-                    let total = ultrabdl._desperation;
-                    for (let item of ultrabdl.getRegressionItems()) {
-                        for (let key in ultrabdl.UltrabdlData.CraftingModifiers.desperation) {
-                            total += item?.Craft?.Description?.includes(key) ? ultrabdl.UltrabdlData.CraftingModifiers.regression[key] : 0;
+                    let total = abcl._desperation;
+                    for (let item of abcl.getRegressionItems()) {
+                        for (let key in ABCLdata.CraftingModifiers.desperation) {
+                            total += item?.Craft?.Description?.includes(key) ? ABCLdata.CraftingModifiers.regression[key] : 0;
                         }
                     };
                     
                     return total;
                 },
                 check() {
-                    if (ultrabdl.isMilk()) {
+                    if (abcl.isMilk()) {
                         this.base = 3;
                     }
-                    if (!ultrabdl.isMilk()) {
+                    if (!abcl.isMilk()) {
                         this.base = (this.base != 0) ? this.base - 1 : 0;
                     }
                 }
@@ -312,18 +315,18 @@ function getJson(url) {
             this.absorbancy = { 
                 get total() {
                     let total = 0;
-                    if (ultrabdl.PelvisItem) {
-                        total += ultrabdl.UltrabdlData["Diapers"][ultrabdl.PelvisItem.Asset.Description].absorbancy;
+                    if (abcl.PelvisItem) {
+                        total += ABCLdata["Diapers"][abcl.PelvisItem.Asset.Description].absorbancy;
                     }
                   
-                    if (ultrabdl.PantiesItem) {
-                        total += ultrabdl.UltrabdlData["Diapers"][ultrabdl.PantiesItem.Asset.Description].absorbancy;
+                    if (abcl.PantiesItem) {
+                        total += ABCLdata["Diapers"][abcl.PantiesItem.Asset.Description].absorbancy;
                     }
                     return total;
                 }
             }
             this.regression.base -= this.regression.modifier;
-            localStorage.getItem("Ultrabdl") ? this.load() : 0;
+            localStorage.getItem("Abcl") ? this.load() : 0;
             
             this.diaperTimerModifier = 1; // We will divide by the modifier (positive modifiers decrease the timer)
             this.diaperRunning = true; // Helps with the kill switch
@@ -370,7 +373,7 @@ function getJson(url) {
     
 
         load() {
-            let data = JSON.parse(localStorage.getItem("Ultrabdl"));
+            let data = JSON.parse(localStorage.getItem("Abcl"));
             this.wet.count = parseInt(data.wets) || 0;
             this.mess.count = parseInt(data.messes) || 0;
             this.regression.base = parseInt(data.regression) || 0;
@@ -381,7 +384,7 @@ function getJson(url) {
             this.refreshDiaper();
         }
         save() {
-            localStorage.setItem("Ultrabdl", JSON.stringify({
+            localStorage.setItem("Abcl", JSON.stringify({
                 wets: this.wet.count || 0,
                 messes: this.mess.count || 0,
                 regression: this.regression.base || 0,
@@ -421,7 +424,7 @@ function getJson(url) {
            
             this.updateDiaperColor("ItemPelvis");
             this.updateDiaperColor("Panties");
-            promptMessage(DiaperUseMessages[this.messageType].change)
+            promptMessage(ABCLdata.messages[this.messageType].change)
 
         }
         changePlayerDiaper(player) {
@@ -464,7 +467,7 @@ function getJson(url) {
             if (!this.isDiaper(item)) { 
                 return;
             }
-            let diaper = this.UltrabdlData["Diapers"][item.Asset.Description];
+            let diaper = ABCLdata["Diapers"][item.Asset.Description];
             if ((diaper.type === "primary" || diaper.type === "primary&secondary") && typeof item.Color == "string") {
                 item.Color = item.Asset.DefaultColor
             }
@@ -507,15 +510,15 @@ function getJson(url) {
             }
 
             else if (diaper.type === "primary") {
-                item.Color[this.UltrabdlData["Diapers"][item.Asset.Description].indexes[0]] = primary
+                item.Color[ABCLdata["Diapers"][item.Asset.Description].indexes[0]] = primary
             }
             else if (diaper.type === "primary&secondary") {
-                item.Color[this.UltrabdlData["Diapers"][item.Asset.Description].indexes[0]] = primary;
+                item.Color[ABCLdata["Diapers"][item.Asset.Description].indexes[0]] = primary;
                 
-                if (item.Color[this.UltrabdlData["Diapers"][item.Asset.Description].indexes[1]] == "Default") {
-                    item.Color[this.UltrabdlData["Diapers"][item.Asset.Description].indexes[1]] = "#FFFFFF";
+                if (item.Color[ABCLdata["Diapers"][item.Asset.Description].indexes[1]] == "Default") {
+                    item.Color[ABCLdata["Diapers"][item.Asset.Description].indexes[1]] = "#FFFFFF";
                 }
-                item.Color[this.UltrabdlData["Diapers"][item.Asset.Description].indexes[1]] = secondary
+                item.Color[ABCLdata["Diapers"][item.Asset.Description].indexes[1]] = secondary
             }
         
         }
@@ -550,7 +553,7 @@ function getJson(url) {
                 } 
                 }    
             }
-            isMess ? promptMessage(DiaperUseMessages[this.messageType]["SelfMess"]) : promptMessage(DiaperUseMessages[this.messageType]["SelfWet"]);
+            isMess ? promptMessage(ABCLdata.messages[this.messageType]["SelfMess"]) : promptMessage(ABCLdata.messages[this.messageType]["SelfWet"]);
             this.refreshDiaper();
         }
         stop() {
@@ -593,22 +596,22 @@ function getJson(url) {
             if (randomValue < messChance) {
                 this.mess.count++;
                 if (this.absorbancy.total > this.mess.count) {
-                    promptMessage(DiaperUseMessages[this.messageType]["Mess"])
+                    promptMessage(ABCLdata.messages[this.messageType]["Mess"])
                 } else if (this.absorbancy.total == this.mess.count) {
-                    promptMessage(DiaperUseMessages[this.messageType]["FullyMess"])
+                    promptMessage(ABCLdata.messages[this.messageType]["FullyMess"])
                 } else {
-                    promptMessage(DiaperUseMessages[this.messageType]["Immergency"])
+                    promptMessage(ABCLdata.messages[this.messageType]["Immergency"])
                 }
             } else if (randomValue < wetChance + chanceForNothing) {
             } else {
                 this.wet.count++;
                 if (this.absorbancy.total > this.mess.count) {
-                    promptMessage(DiaperUseMessages[this.messageType]["Wet"])
+                    promptMessage(ABCLdata.messages[this.messageType]["Wet"])
                 }
                 else if (this.absorbancy.total == this.wet.count) {
-                    promptMessage(DiaperUseMessages[this.messageType]["FullyWet"])
+                    promptMessage(ABCLdata.messages[this.messageType]["FullyWet"])
                 } else {
-                    promptMessage(DiaperUseMessages[this.messageType]["Immergency"])
+                    promptMessage(ABCLdata.messages[this.messageType]["Immergency"])
                 }
             }
          
@@ -695,27 +698,27 @@ function getJson(url) {
                 case "stats":
                     ChatRoomSendLocal(
                         "<p style='background-color:#5fbd7a'>ULTRAbc: Your current diaper stats are: \n" +
-                        "Desperation: " + ultrabdl.desperation.modifier + ", \n" +
-                        "Regression: " + ultrabdl.regression.total + ", \n" +
-                        "Regressive change: " + ultrabdl.regression.modifier + ", \n" +
-                        "Wet Chance: " + ultrabdl.wet.chance *100 + "%, \n" +
-                        "Mess Chance: " + ultrabdl.mess.chance *100+ "%, \n" +
-                        "Wets: " + ultrabdl.wet.count + ", \n" +
-                        "Messes: " + ultrabdl.mess.count + ", \n" +
-                        "Padding: " + ultrabdl.padding.total + ", \n" +
-                        "Aproximate timer: " + Math.floor(ultrabdl.diaperTimer) + " minutes.</p>\n"
+                        "Desperation: " + abcl.desperation.modifier + ", \n" +
+                        "Regression: " + abcl.regression.total + ", \n" +
+                        "Regressive change: " + abcl.regression.modifier + ", \n" +
+                        "Wet Chance: " + abcl.wet.chance *100 + "%, \n" +
+                        "Mess Chance: " + abcl.mess.chance *100+ "%, \n" +
+                        "Wets: " + abcl.wet.count + ", \n" +
+                        "Messes: " + abcl.mess.count + ", \n" +
+                        "Padding: " + abcl.padding.total + ", \n" +
+                        "Aproximate timer: " + Math.floor(abcl.diaperTimer) + " minutes.</p>\n"
                     );
                     break;
             //-------------------- this should be a setting ------------------------------------------------------
                 case "start": 
-                    if (ultrabdl == null) {
-                        ultrabdl = new Ultrabdl();
+                    if (abcl == null) {
+                        abcl = new Abcl();
                     } else {
-                        ultrabdl.start();
+                        abcl.start();
                     }
                 case "stop":
-                    if (ultrabdl != null) { 
-                        ultrabdl.stop();
+                    if (abcl != null) { 
+                        abcl.stop();
                         
                         ChatRoomSendLocal(
                             "<p style='background-color:#5fbd7a'>ULTRAbc: The diaper script has been disabled.</p>"
@@ -723,15 +726,15 @@ function getJson(url) {
                     }
                     break;
                 case "messageType":
-                    ultrabdl.messageType = change.toLowerCase()
+                    abcl.messageType = change.toLowerCase()
                     ChatRoomSendLocal(
-                        `<p style='background-color:#5fbd7a'>ULTRAbc: Your message type has been changed to ${ultrabdl.messageType}.</p>`
+                        `<p style='background-color:#5fbd7a'>ULTRAbc: Your message type has been changed to ${abcl.messageType}.</p>`
                     );
-                    ultrabdl.save();
+                    abcl.save();
             //---------------------------------------------------------------------------------------------------- 
                 case "tick":
-                    if (ultrabdl != null) {
-                        ultrabdl.tick();
+                    if (abcl != null) {
+                        abcl.tick();
 
                         ChatRoomSendLocal(
                             `<p style='background-color:#5fbd7a'>ULTRAbc: ${tmpname} uses ${Pronoun("dependent")} timemachine.</p>`
@@ -742,12 +745,12 @@ function getJson(url) {
                     // 1. Changing yourself
                     // 2. Changing someone else
                         if (playerName == null) {
-                            if (!ultrabdl.PelvisItem || !ultrabdl.PantiesItem) {
+                            if (!abcl.PelvisItem || !abcl.PantiesItem) {
                                 ChatRoomSendLocal(
                                     "<p style='background-color:#5fbd7a'>ULTRAbc: You don't have a diaper!</p>"
                                 );
                             } else 
-                                ultrabdl.changeDiaper();
+                                abcl.changeDiaper();
                             } else {
                                 // inputs: Player.Name, Player.MemberNumber, Player.Nickname
                                 let player = ChatRoomCharacter.filter(A => (A.Name.toLowerCase().startsWith(playerName.toLowerCase())))[0];
@@ -761,12 +764,12 @@ function getJson(url) {
                                     } else {
                                         tgpname = player.Nickname;
                                     }
-                                    if (!ultrabdl.isDiaper(InventoryGet(player, "Panties")) && !ultrabdl.isDiaper(InventoryGet(player, "ItemPelvis"))) {
+                                    if (!abcl.isDiaper(InventoryGet(player, "Panties")) && !abcl.isDiaper(InventoryGet(player, "ItemPelvis"))) {
                                         ChatRoomSendLocal(
                                             "<p style='background-color:#5fbd7a'>ULTRAbc: " + ChatRoomHTMLEntities(tgpname) + " does not have normal diapers!</p>"
                                         );
                                     } else {
-                                        ultrabdl.changePlayerDiaper(player);
+                                        abcl.changePlayerDiaper(player);
                                         ChatRoomTargetMemberNumber = player.MemberNumber;
                                         var msg = "" + tmpname + " changed your diaper!";
                                         targetNumber = ChatRoomTargetMemberNumber; 
@@ -777,51 +780,51 @@ function getJson(url) {
                             } 
                         break;
                     case "desperation":
-                        ultrabdl.desperation.base = change
+                        abcl.desperation.base = change
                         ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your desperation level has been changed to ${ultrabdl.desperation.modifier}.</p>`
+                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your desperation level has been changed to ${abcl.desperation.modifier}.</p>`
                         );
                         break;
                     case "messchance": // this could be a setting         
-                            ultrabdl.mess.chance = change
+                            abcl.mess.chance = change
                         ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your chance to mess diapers has been changed to ${ultrabdl.mess.chance*100}%.</p>`
+                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your chance to mess diapers has been changed to ${abcl.mess.chance*100}%.</p>`
                         );
-                        ultrabdl.save();
+                        abcl.save();
                         break;
                     case "messes":
-                        if (ultrabdl.PelvisItem || ultrabdl.PantiesItem) {
-                            ultrabdl.mess.count = change
+                        if (abcl.PelvisItem || abcl.PantiesItem) {
+                            abcl.mess.count = change
                             ChatRoomSendLocal(
-                                `<p style='background-color:#5fbd7a'>ULTRAbc: Your messes in your diaper has been changed to ${ultrabdl.mess.count} messes.</p>`
+                                `<p style='background-color:#5fbd7a'>ULTRAbc: Your messes in your diaper has been changed to ${abcl.mess.count} messes.</p>`
                             );
                         }
                         break;
                     case "regression": 
-                        ultrabdl.regression.base = change
+                        abcl.regression.base = change
                         ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your regression level has been changed to ${ultrabdl.regression.total}.</p>`
+                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your regression level has been changed to ${abcl.regression.total}.</p>`
                         );
                         break;
                     case "timer":
-                        ultrabdl.diaperTimer = change
+                        abcl.diaperTimer = change
                         ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your wet/mess timer has been changed to ${ultrabdl.diaperTimer} minutes.</p>`
+                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your wet/mess timer has been changed to ${abcl.diaperTimer} minutes.</p>`
                         );
                         break;
                     case "wetchance": // this could be a setting            
-                        ultrabdl.wet.chance = change
+                        abcl.wet.chance = change
                         ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your chance to wet diapers has been changed to ${ultrabdl.wet.chance*100}%.</p>`
+                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your chance to wet diapers has been changed to ${abcl.wet.chance*100}%.</p>`
                         );
-                        ultrabdl.save();
+                        abcl.save();
                         break;
                     case "wettings":
-                        if (ultrabdl.PelvisItem || ultrabdl.PantiesItem) {
+                        if (abcl.PelvisItem || abcl.PantiesItem) {
                             let [change,..._] = input
-                            ultrabdl.wet.count = change
+                            abcl.wet.count = change
                             ChatRoomSendLocal(
-                                `<p style='background-color:#5fbd7a'>ULTRAbc: Your wettings in your diaper has been changed to ${ultrabdl.wet.count} wettings.</p>`
+                                `<p style='background-color:#5fbd7a'>ULTRAbc: Your wettings in your diaper has been changed to ${abcl.wet.count} wettings.</p>`
                             );
                         }
                         break;
