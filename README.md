@@ -16,7 +16,7 @@
  
 ## Install
   If you use [TamperMonkey](https://www.tampermonkey.net/) or [ViolentMonkey](https://violentmonkey.github.io): (available for several browsers: Chrome, Edge, Safari, Opera, Firefox)
-    1. Visit and click on install [ABCL.user.js](zoe-64/ABCL/raw/main/ABCL.user.js)
+    1. Visit and click on install [ABCL.user.js](https://github.com/zoe-64/ABCL/raw/main/ABCL.user.js)
 
   
   
