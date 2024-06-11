@@ -25,7 +25,9 @@
   2. Depending on browser, the .zip might have to be extracted. few browsers accept a .zip, a few requires a folder.
   3. Go to browser extensions. Enable developer mode.
   4. Load as Unpacked. Done. If the file can't be seen, see step 2.
-  
+## Contact
+Discord: cute.zoey
+
 ## Credits
 Special thanks to tetris245 for helping me get into modding!
 
