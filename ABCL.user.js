@@ -16,16 +16,8 @@
 
 const scriptSrc = "https://zoe-64.github.io/ABCL/ABCL.js?_=" + Date.now();
 
-if (window.location.href.startsWith("javascript:")) {
-	let script = document.createElement("script");
-	script.setAttribute("language", "JavaScript");
-	script.setAttribute("crossorigin", "anonymous");
-	script.setAttribute("src", scriptSrc);
-	document.head.appendChild(script);
-} else {
-	let script = document.createElement("script");
-	script.setAttribute("language", "JavaScript");
-	script.setAttribute("crossorigin", "anonymous");
-	script.setAttribute("src", scriptSrc);
-	script.onload = () => script.remove();
-}
+let script = document.createElement("script");
+script.setAttribute("language", "JavaScript");
+script.setAttribute("crossorigin", "anonymous");
+script.setAttribute("src", scriptSrc);
+document.head.appendChild(script);
