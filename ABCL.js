@@ -23,8 +23,8 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
         console.warn("ABCL already loaded. No double loading");
         return;
     }
-
     abcl = null;
+    
     const ABCLversion = "1.0";
     const modApi = bcModSDK.registerMod({
         name: 'ABCL',
@@ -34,7 +34,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
     });
 
     window.ABCLversion = ABCLversion;
-    let tmpname;
+
 // general functions
 const pronounMap = {
         "HeHim": {"subjective": "he", "objective": "him", "dependent": "his", "independent": "his", "reflexive": "himself"},
@@ -54,13 +54,9 @@ function Pronoun(shape) {
 function getJson(url) {
     return fetch(url).then(response => response.json());
 }
-// 
-
-
-    //////////////////////////////////////////////////////////
-    // #region Abcl                                     //
-    // BC-Diaper-Wetter                                     //
-    //////////////////////////////////////////////////////////	
+ 
+//#region Abcl                                  
+  
 
     DiaperUseLevels = {
         "Clean": "#8F8F8F",
@@ -156,7 +152,7 @@ function getJson(url) {
     function promptMessage(messageOptions) {
         let message = messageOptions[Math.floor(Math.random() * messageOptions.length)];
         currentDiaper = InventoryGet(Player, "ItemPelvis")?.Asset?.Description || InventoryGet(Player, "Panties")?.Asset?.Description || "diaper";
-        message = message.replace(/%name%/g, tmpname)
+        message = message.replace(/%name%/g, Player.Nickname != '' ? Player.Nickname : Player.Name)
                          .replace(/%dependent%/g, Pronoun("Dependent"))
                          .replace(/%objective%/g, Pronoun("Objective"))
                          .replace(/%subjective%/g, Pronoun("Subjective"))
@@ -207,8 +203,6 @@ function getJson(url) {
             return inFilter;
         }
         constructor() {
-           
-
 
             const abcl = this;
             this.messageType = diaperDefaultValues.messageType || "default",
@@ -327,7 +321,6 @@ function getJson(url) {
             }
             this.regression.base -= this.regression.modifier;
             localStorage.getItem("Abcl") ? this.load() : 0;
-            
             this.diaperTimerModifier = 1; // We will divide by the modifier (positive modifiers decrease the timer)
             this.diaperRunning = true; // Helps with the kill switch
             this.loop();
@@ -647,7 +640,7 @@ function getJson(url) {
     }
 
     CommandCombine([{
-        Tag: 'diaper',
+        Tag: 'abcl',
         Description: "(action) (target or value) = plays with diapers (ABDL game).",
         Action: (args) => {
             let [command, ...input] = args.split(/[ ,]+/);
@@ -655,49 +648,38 @@ function getJson(url) {
             let change = parseFloat(input[0]); 
 
             switch (command) {
-                case "":
-                    let help = fetch("https://raw.githubusercontent.com/zoe-64/ULTRAbc/main/UBCcommands.html").then((response) => response.text());
-                    console.log(help);
-                    // turn into html
-                    help.then((html) => {
-                        let parser = new DOMParser();
-                        let doc = parser.parseFromString(html, 'text/html');
-                        let element = doc.documentElement;
-                        // Use the 'element' variable as needed
-                    });
+                case "": 
                     ChatRoomSendLocal(
-                        "<p style='background-color:#5fbd7a'><b>ULTRAbc</b>: Welcome to Bondage Club Diaper Wetter! Where we make sure babies use their diapers!\n" +
+                        "<p style='background-color:#5fbd7a'><b>ABCL</b>: Welcome to Adult Baby Club Lover! Where we make sure babies use their diapers!\n" +
                         " \n" +
-                        "The diaper command must include an action.\n" +
-                        " \n" +
-                        "<b>/diaper start</b> to enable the script\n" +
-                        "<b>/diaper stop</b> to disable the script\n" +
-                        "<b>/diaper tick</b> to force a tick\n" +
+                        "<b>/abcl start</b> to enable the script\n" +
+                        "<b>/abcl stop</b> to disable the script\n" +
+                        "<b>/abcl tick</b> to force a tick\n" +
                         " \n" +
                         "To get new clean diapers:\n" +
-                        "<b>/diaper change</b> to change your diaper\n" +
-                        "<b>/diaper change (target)</b> to change someone else's diaper\n" +
+                        "<b>/abcl change</b> to change your diaper\n" +
+                        "<b>/abcl change (target)</b> to change someone else's diaper\n" +
                         " \n" +
                         "Customisation:\n" +
-                        "Use <b>/diaper custom</b> for detailed info</p>"
+                        "Use <b>/abcl custom</b> for detailed info</p>"
                     );
                     break;
                 case "custom":
                     ChatRoomSendLocal(
-                        "<p style='background-color:#5fbd7a'><b>ULTRAbc</b>: Diaper customisation:\n" +
-                        //"<b>/diaper desperation</b> (value between 0 and 3) for desperation level, normally controlled by having a milk bottle used on you\n" +
-                        "<b>/diaper regression</b> (value between 0 and 3) for regression level, normally controlled by wearing Nursery Milk for an extended period of time\n" +
-                        "<b>/diaper timer</b> (minutes) to change the wet/mess timer\n" +
-                        "<b>/diaper wetchance</b> (value between 0 and 1) to control how often you will wet\n" +
-                        "<b>/diaper messchance</b> (value between 0 and 1) to control how often you will mess. Make sure this is lower than wetchance.\n" +
-                        "<b>/diaper wettings</b> (value) for wet level of normal diapers\n" +
-                        "<b>/diaper messes</b> (value) for mess level of normal diapers\n"+
-                        "<b>/diaper messageType</b> (descreet|embarressed|default) to change the message type\n"
+                        "<p style='background-color:#5fbd7a'><b>ABCL</b>: Diaper customisation:\n" +
+                        //"<b>/abcl desperation</b> (value between 0 and 3) for desperation level, normally controlled by having a milk bottle used on you\n" +
+                        "<b>/abcl regression</b> (value between 0 and 3) for regression level, normally controlled by wearing Nursery Milk for an extended period of time\n" +
+                        "<b>/abcl timer</b> (minutes) to change the wet/mess timer\n" +
+                        "<b>/abcl wetchance</b> (value between 0 and 1) to control how often you will wet\n" +
+                        "<b>/abcl messchance</b> (value between 0 and 1) to control how often you will mess. Make sure this is lower than wetchance.\n" +
+                        "<b>/abcl wettings</b> (value) for wet level of normal diapers\n" +
+                        "<b>/abcl messes</b> (value) for mess level of normal diapers\n"+
+                        "<b>/abcl messageType</b> (descreet|embarressed|default) to change the message type\n"
                     );
                     break;
                 case "stats":
                     ChatRoomSendLocal(
-                        "<p style='background-color:#5fbd7a'>ULTRAbc: Your current diaper stats are: \n" +
+                        "<p style='background-color:#5fbd7a'>ABCL: Your current diaper stats are: \n" +
                         "Desperation: " + abcl.desperation.modifier + ", \n" +
                         "Regression: " + abcl.regression.total + ", \n" +
                         "Regressive change: " + abcl.regression.modifier + ", \n" +
@@ -721,14 +703,14 @@ function getJson(url) {
                         abcl.stop();
                         
                         ChatRoomSendLocal(
-                            "<p style='background-color:#5fbd7a'>ULTRAbc: The diaper script has been disabled.</p>"
+                            "<p style='background-color:#5fbd7a'>ABCL: The diaper script has been disabled.</p>"
                         );
                     }
                     break;
                 case "messageType":
                     abcl.messageType = change.toLowerCase()
                     ChatRoomSendLocal(
-                        `<p style='background-color:#5fbd7a'>ULTRAbc: Your message type has been changed to ${abcl.messageType}.</p>`
+                        `<p style='background-color:#5fbd7a'>ABCL: Your message type has been changed to ${abcl.messageType}.</p>`
                     );
                     abcl.save();
             //---------------------------------------------------------------------------------------------------- 
@@ -737,7 +719,7 @@ function getJson(url) {
                         abcl.tick();
 
                         ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ULTRAbc: ${tmpname} uses ${Pronoun("dependent")} timemachine.</p>`
+                            `<p style='background-color:#5fbd7a'>ABCL: ${tmpname} uses ${Pronoun("dependent")} timemachine.</p>`
                         );
                     }
                     break;
@@ -747,7 +729,7 @@ function getJson(url) {
                         if (playerName == null) {
                             if (!abcl.PelvisItem || !abcl.PantiesItem) {
                                 ChatRoomSendLocal(
-                                    "<p style='background-color:#5fbd7a'>ULTRAbc: You don't have a diaper!</p>"
+                                    "<p style='background-color:#5fbd7a'>ABCL: You don't have a diaper!</p>"
                                 );
                             } else 
                                 abcl.changeDiaper();
@@ -766,7 +748,7 @@ function getJson(url) {
                                     }
                                     if (!abcl.isDiaper(InventoryGet(player, "Panties")) && !abcl.isDiaper(InventoryGet(player, "ItemPelvis"))) {
                                         ChatRoomSendLocal(
-                                            "<p style='background-color:#5fbd7a'>ULTRAbc: " + ChatRoomHTMLEntities(tgpname) + " does not have normal diapers!</p>"
+                                            "<p style='background-color:#5fbd7a'>ABCL: " + ChatRoomHTMLEntities(tgpname) + " does not have normal diapers!</p>"
                                         );
                                     } else {
                                         abcl.changePlayerDiaper(player);
@@ -782,13 +764,13 @@ function getJson(url) {
                     case "desperation":
                         abcl.desperation.base = change
                         ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your desperation level has been changed to ${abcl.desperation.modifier}.</p>`
+                            `<p style='background-color:#5fbd7a'>ABCL: Your desperation level has been changed to ${abcl.desperation.modifier}.</p>`
                         );
                         break;
                     case "messchance": // this could be a setting         
                             abcl.mess.chance = change
                         ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your chance to mess diapers has been changed to ${abcl.mess.chance*100}%.</p>`
+                            `<p style='background-color:#5fbd7a'>ABCL: Your chance to mess diapers has been changed to ${abcl.mess.chance*100}%.</p>`
                         );
                         abcl.save();
                         break;
@@ -796,26 +778,26 @@ function getJson(url) {
                         if (abcl.PelvisItem || abcl.PantiesItem) {
                             abcl.mess.count = change
                             ChatRoomSendLocal(
-                                `<p style='background-color:#5fbd7a'>ULTRAbc: Your messes in your diaper has been changed to ${abcl.mess.count} messes.</p>`
+                                `<p style='background-color:#5fbd7a'>ABCL: Your messes in your diaper has been changed to ${abcl.mess.count} messes.</p>`
                             );
                         }
                         break;
                     case "regression": 
                         abcl.regression.base = change
                         ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your regression level has been changed to ${abcl.regression.total}.</p>`
+                            `<p style='background-color:#5fbd7a'>ABCL: Your regression level has been changed to ${abcl.regression.total}.</p>`
                         );
                         break;
                     case "timer":
                         abcl.diaperTimer = change
                         ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your wet/mess timer has been changed to ${abcl.diaperTimer} minutes.</p>`
+                            `<p style='background-color:#5fbd7a'>ABCL: Your wet/mess timer has been changed to ${abcl.diaperTimer} minutes.</p>`
                         );
                         break;
                     case "wetchance": // this could be a setting            
                         abcl.wet.chance = change
                         ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ULTRAbc: Your chance to wet diapers has been changed to ${abcl.wet.chance*100}%.</p>`
+                            `<p style='background-color:#5fbd7a'>ABCL: Your chance to wet diapers has been changed to ${abcl.wet.chance*100}%.</p>`
                         );
                         abcl.save();
                         break;
@@ -824,13 +806,13 @@ function getJson(url) {
                             let [change,..._] = input
                             abcl.wet.count = change
                             ChatRoomSendLocal(
-                                `<p style='background-color:#5fbd7a'>ULTRAbc: Your wettings in your diaper has been changed to ${abcl.wet.count} wettings.</p>`
+                                `<p style='background-color:#5fbd7a'>ABCL: Your wettings in your diaper has been changed to ${abcl.wet.count} wettings.</p>`
                             );
                         }
                         break;
                     default:
                         ChatRoomSendLocal(
-                            "<p style='background-color:#5fbd7a'>ULTRAbc: The diaper command must include an action.</p>"
+                            "<p style='background-color:#5fbd7a'>ABCL: The diaper command must include an action.</p>"
                         );
                         break;
                 }
