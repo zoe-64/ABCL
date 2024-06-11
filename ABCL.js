@@ -319,8 +319,7 @@ function getJson(url) {
                     return total;
                 }
             }
-            this.regression.base -= this.regression.modifier;
-            localStorage.getItem("Abcl") ? this.load() : 0;
+            localStorage.getItem(`abcl-${Player.MemberNumber}`) ? this.load() : null;
             this.diaperTimerModifier = 1; // We will divide by the modifier (positive modifiers decrease the timer)
             this.diaperRunning = true; // Helps with the kill switch
             this.loop();
@@ -366,10 +365,11 @@ function getJson(url) {
     
 
         load() {
-            let data = JSON.parse(localStorage.getItem("Abcl"));
+            let data = JSON.parse(localStorage.getItem(`Abcl-${Player.MemberNumber}`));
             this.wet.count = parseInt(data.wets) || 0;
             this.mess.count = parseInt(data.messes) || 0;
             this.regression.base = parseInt(data.regression) || 0;
+    
             this.mess.base = parseFloat(data.messChance) || diaperDefaultValues.messChance;
             this.wet.base = parseFloat(data.wetChance) || diaperDefaultValues.wetChance;
             this.messageType = data.messageType  || diaperDefaultValues.messageType;
@@ -377,7 +377,7 @@ function getJson(url) {
             this.refreshDiaper();
         }
         save() {
-            localStorage.setItem("Abcl", JSON.stringify({
+            localStorage.setItem(`Abcl-${Player.MemberNumber}`, JSON.stringify({
                 wets: this.wet.count || 0,
                 messes: this.mess.count || 0,
                 regression: this.regression.base || 0,
@@ -549,24 +549,17 @@ function getJson(url) {
             isMess ? promptMessage(ABCLdata.messages[this.messageType]["SelfMess"]) : promptMessage(ABCLdata.messages[this.messageType]["SelfWet"]);
             this.refreshDiaper();
         }
-        stop() {
-            this.diaperRunning = false;
-        }
-        restart() {
-            this.diaperRunning = true;
-        }
 
         async loop() {
-            while (this.diaperRunning) {
+            while (true) {
                 if (!this.enabled) {
                     await new Promise(r => setTimeout(r, this.diaperTimer * 60 * 1000));
-
                     continue;
                 }
-                this.regression.step();
-                this.desperation.check();
                 this.loopTimestamp = Date.now();
                 await new Promise(r => setTimeout(r, this.diaperTimer * 60 * 1000));
+                this.regression.step();
+                this.desperation.check();
                 let pelvis = InventoryGet(Player, "ItemPelvis");
                 let panties = InventoryGet(Player, "Panties");
                 if ((this.isDiaper(pelvis) || this.isDiaper(panties)) && this.diaperRunning === true) {
@@ -693,41 +686,29 @@ function getJson(url) {
                     break;
             //-------------------- this should be a setting ------------------------------------------------------
                 case "start": 
-                    if (abcl == null) {
-                        abcl = new Abcl();
-                    } else {
-                        abcl.start();
-                    }
+                    abcl.enabled = true;
+                    ChatRoomSendLocal("<p style='background-color:#5fbd7a'>ABCL: The diaper script has been enabled.</p>");
+                    break;
                 case "stop":
-                    if (abcl != null) { 
-                        abcl.stop();
-                        
-                        ChatRoomSendLocal(
-                            "<p style='background-color:#5fbd7a'>ABCL: The diaper script has been disabled.</p>"
-                        );
-                    }
+                    abcl.enabled = false;
+                    ChatRoomSendLocal("<p style='background-color:#5fbd7a'>ABCL: The diaper script has been disabled.</p>")
                     break;
                 case "messageType":
                     abcl.messageType = change.toLowerCase()
-                    ChatRoomSendLocal(
-                        `<p style='background-color:#5fbd7a'>ABCL: Your message type has been changed to ${abcl.messageType}.</p>`
-                    );
+                    ChatRoomSendLocal(`<p style='background-color:#5fbd7a'>ABCL: Your message type has been changed to ${abcl.messageType}.</p>`);
                     abcl.save();
+                    break;
             //---------------------------------------------------------------------------------------------------- 
                 case "tick":
-                    if (abcl != null) {
-                        abcl.tick();
-
-                        ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ABCL: ${tmpname} uses ${Pronoun("dependent")} timemachine.</p>`
-                        );
-                    }
+                    abcl.tick();
+                    ChatRoomSendLocal(`<p style='background-color:#5fbd7a'>ABCL: ${Player.Nickname == '' ? Player.name : Player.Nickname} uses ${Pronoun("dependent")} timemachine.</p>`);
                     break;
                 case "change":
+                    let target;
                     // 1. Changing yourself
                     // 2. Changing someone else
                         if (playerName == null) {
-                            if (!abcl.PelvisItem || !abcl.PantiesItem) {
+                            if (!(abcl.PelvisItem || abcl.PantiesItem)) {
                                 ChatRoomSendLocal(
                                     "<p style='background-color:#5fbd7a'>ABCL: You don't have a diaper!</p>"
                                 );
@@ -747,13 +728,11 @@ function getJson(url) {
                                         tgpname = player.Nickname;
                                     }
                                     if (!abcl.isDiaper(InventoryGet(player, "Panties")) && !abcl.isDiaper(InventoryGet(player, "ItemPelvis"))) {
-                                        ChatRoomSendLocal(
-                                            "<p style='background-color:#5fbd7a'>ABCL: " + ChatRoomHTMLEntities(tgpname) + " does not have normal diapers!</p>"
-                                        );
+                                        ChatRoomSendLocal("<p style='background-color:#5fbd7a'>ABCL: " + ChatRoomHTMLEntities(tgpname) + " does not have normal diapers!</p>");
                                     } else {
                                         abcl.changePlayerDiaper(player);
                                         ChatRoomTargetMemberNumber = player.MemberNumber;
-                                        var msg = "" + tmpname + " changed your diaper!";
+                                        var msg = "" + Player.Nickname == '' ? Player.name : Player.Nickname + " changed your diaper!";
                                         targetNumber = ChatRoomTargetMemberNumber; 
                                         ChatRoomSendWhisper(targetNumber, msg);
                                     }
@@ -763,57 +742,43 @@ function getJson(url) {
                         break;
                     case "desperation":
                         abcl.desperation.base = change
-                        ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ABCL: Your desperation level has been changed to ${abcl.desperation.modifier}.</p>`
-                        );
+                        ChatRoomSendLocal(`<p style='background-color:#5fbd7a'>ABCL: Your desperation level has been changed to ${abcl.desperation.modifier}.</p>`);
                         break;
                     case "messchance": // this could be a setting         
                             abcl.mess.chance = change
-                        ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ABCL: Your chance to mess diapers has been changed to ${abcl.mess.chance*100}%.</p>`
+                        ChatRoomSendLocal(`<p style='background-color:#5fbd7a'>ABCL: Your chance to mess diapers has been changed to ${abcl.mess.chance*100}%.</p>`
                         );
                         abcl.save();
                         break;
                     case "messes":
-                        if (abcl.PelvisItem || abcl.PantiesItem) {
-                            abcl.mess.count = change
-                            ChatRoomSendLocal(
-                                `<p style='background-color:#5fbd7a'>ABCL: Your messes in your diaper has been changed to ${abcl.mess.count} messes.</p>`
-                            );
-                        }
+                        if (!abcl.PelvisItem || !abcl.PantiesItem) {
+                            return;
+                        } 
+                        abcl.mess.count = change
+                        ChatRoomSendLocal( `<p style='background-color:#5fbd7a'>ABCL: Your messes in your diaper has been changed to ${abcl.mess.count} messes.</p>`);
                         break;
                     case "regression": 
                         abcl.regression.base = change
-                        ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ABCL: Your regression level has been changed to ${abcl.regression.total}.</p>`
-                        );
+                        ChatRoomSendLocal(`<p style='background-color:#5fbd7a'>ABCL: Your regression level has been changed to ${abcl.regression.total}.</p>`);
                         break;
                     case "timer":
                         abcl.diaperTimer = change
-                        ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ABCL: Your wet/mess timer has been changed to ${abcl.diaperTimer} minutes.</p>`
-                        );
+                        ChatRoomSendLocal(`<p style='background-color:#5fbd7a'>ABCL: Your wet/mess timer has been changed to ${abcl.diaperTimer} minutes.</p>`);
                         break;
                     case "wetchance": // this could be a setting            
                         abcl.wet.chance = change
-                        ChatRoomSendLocal(
-                            `<p style='background-color:#5fbd7a'>ABCL: Your chance to wet diapers has been changed to ${abcl.wet.chance*100}%.</p>`
-                        );
+                        ChatRoomSendLocal(`<p style='background-color:#5fbd7a'>ABCL: Your chance to wet diapers has been changed to ${abcl.wet.chance*100}%.</p>`);
                         abcl.save();
                         break;
                     case "wettings":
                         if (abcl.PelvisItem || abcl.PantiesItem) {
                             let [change,..._] = input
                             abcl.wet.count = change
-                            ChatRoomSendLocal(
-                                `<p style='background-color:#5fbd7a'>ABCL: Your wettings in your diaper has been changed to ${abcl.wet.count} wettings.</p>`
-                            );
+                            ChatRoomSendLocal(`<p style='background-color:#5fbd7a'>ABCL: Your wettings in your diaper has been changed to ${abcl.wet.count} wettings.</p>`);
                         }
                         break;
                     default:
-                        ChatRoomSendLocal(
-                            "<p style='background-color:#5fbd7a'>ABCL: The diaper command must include an action.</p>"
-                        );
+                        ChatRoomSendLocal("<p style='background-color:#5fbd7a'>ABCL: The diaper command must include an action.</p>");
                         break;
                 }
             }
