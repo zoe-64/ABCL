@@ -1,0 +1,170 @@
+{ 
+    "Diapers": {
+        "Diaper Patterned": {
+            "indexes": [1],
+            "type": "primary",
+            "absorbancy": 1
+            },
+            "Bulky Diaper": {
+            "indexes": [1,0],
+            "type": "primary&secondary",
+            "absorbancy": 2
+            },
+            "Poofy Diaper": {
+            "indexes": [1,0],
+            "type": "primary&secondary",
+            "absorbancy": 2
+            },
+            "Bulky Chastity Diaper": {
+            "indexes": [1,0],
+            "type": "primary&secondary",
+            "absorbancy": 2
+            },
+            "Poofy Chastity Diaper": {
+            "indexes": [1,0],
+            "type": "primary&secondary",
+            "absorbancy": 2
+            },
+            "Plastic Covered Diaper": {
+            "indexes": [0],
+            "type": "primary",
+            "absorbancy": 2
+            },
+            "Satin Covered Diaper": {
+                "indexes": [0],
+                "type": "primary",
+                "absorbancy": 3
+            },
+            "Diaper": {
+                "type": "mono",
+                "absorbancy": 1 
+            }
+    },
+    "Items": {
+        "Adult Baby Harness": {"modifier": 0.2},
+        "Shiny Dress": {"modifier": 0.4},
+        "Bows Dress": {"modifier": 0.3},
+        "Puffy Dress" : { "modifier": 0.2}, 
+        "Sumer flower dress" : {"modifier": 0.2},
+        "Bib": {"modifier": 0.3},
+        "Bonnet Style 1": {"modifier": 0.2},
+        "Bonnet Style 2": {"modifier": 0.2},
+        "Rose Tiara": {"modifier": 0.2},
+        "Tutu": {"modifier": 0.2},
+        "Hollow Butt Plug": {"modifier": 0.2},
+
+        "Cow Printed Socks": {"modifier": 0.1},
+        "Striped Socks": {"modifier": 0.1},
+        "Vinyl Socks": {"modifier": 0.1},
+        "Style 4": {"Modifier": 0.1},
+
+        "Halo": {"modifier": 0.1},       
+        "Unicorn Horn": {"modifier": 0.1},
+        "Reindeer Hairband": {"modifier": 0.1},
+
+        "Piercing Set": {"modifier": -0.1},
+        "Harem Stockings": {"modifier": -0.1},
+        "ID Card": {"modifier": -0.1}, 
+        "Key Necklace": {"modifier": -0.1}
+        },
+    "Regex": {
+        "Cute": {"modifier": 0.1},
+        "Frill": {"modifier": 0.2},
+        "Panties": {"modifier": -0.1},
+        "Bra": {"modifier": -0.1},
+        "Bikini": {"modifier": -0.1},
+        "Business": {"modifier": -0.1},
+        "Cheerleader": {"modifier": 0.1},
+        "Fur": {"modifier": 0.1},
+        "Fishnet": {"modifier": -0.1},
+        "Latex": {"modifier": -0.05},
+        "Flower": {"modifier": 0.1},
+        "Leather": {"modifier": -0.1},
+        "Puff": {"modifier": 0.1},
+        "Shiny": {"modifier": 0.1},
+        "Satin": {"modifier": 0.1},
+        "Ears": {"modifier": 0.1},
+        "Horns": {"modifier": -0.1},
+        "Crown": {"modifier": 0.1},
+        "Briefs": {"modifier": -0.1},
+        "Thong": {"modifier": -0.1},
+        "Crotch": {"modifier": -0.1},
+        "Heels": {"modifier": -0.1},
+        "Angel": {"modifier": 0.1},
+        "Pet": {"modifier": 0.1},
+        "Ribbons": {"modifier": 0.1},
+        "Plush": {"modifier": 0.1},
+        "Crib": {"modifier": 0.5},
+        "Cushion": {"modifier": 0.1},
+        "Teddy": {"modifier": 0.1},
+        "Bow": {"modifier": 0.1},
+        "Mittes": {"modifier": 0.1},
+        "Mits": {"modifier": 0.1},
+        "Pacifier": {"modifier": 0.3},
+        "Milk": {"modifier": 0.1},
+        "Nursery": {"modifier": 3},
+        "Heart": {"modifier": 0.1},
+        "Doll": {"modifier": 0.1},
+        "Baby": {"modifier": 0.1}
+    },
+    "CraftingModifiers": {
+        "absorbancy": {
+            "massive": 3,
+            "big": 2,
+            "large": 1
+        },
+        "messChance": {
+            "special laxative": 0.8,
+            "laxative": 0.4,
+            "weak laxative": 0.2,
+            "stinkies": 0.4,
+            "messy": 0.2
+        },
+        "wetChance": {
+            "special diuretic": 0.8,
+            "diuretic": 0.4,
+            "weak diuretic": 0.2
+        },
+        "regression": {
+            "hypnotic": 5
+        },
+        "desperation": {
+            "hypnotic": 5
+        }
+    },
+    "descreet": {
+        "Mess": "You have made a mess in your %diaper%.",
+        "FullyMess": "You have fully soiled your %diaper%.",
+        "Wet": "You have wet your %diaper%.",
+        "FullyWet": "You have fully soiled your %diaper%.",
+        "Immergency": "You are really in need of a diaper change!",
+        "SelfWet": "You have wet your clothing. Get a %diaper% on you before You make another mess!",
+        "SelfMess": "You have soiled your clothing. Get a %diaper% on you before You make another mess!",
+        "noDiaper": "You do not have a %diaper%! Get one on before You make a mess!",
+        "change": "You have changed your %diaper%."
+    },
+    "default": {
+        "Mess": ["%name% has made a mess in %dependent% %current-diaper%."],
+        "FullyMess": ["%name% has fully soiled %dependent% %current-diaper%."],
+       "Wet": ["%name% has wet %dependent% %current-diaper%."],
+       "FullyWet": ["%name% has fully wet %dependent% %current-diaper%."],
+       "Immergency": ["%name% is really in need of a diaper change!"],
+       "SelfWet": ["%name% has wet %dependent% clothes. Get a %diaper% on %objective% before %subjective% makes another mess!",
+                "%name% does not have a %diaper%! Get one on %objective% before %subjective% makes a another mess~"],
+        "SelfMess": ["%name% has soiled %dependent% clothes. Get a %diaper% on %objective% before %subjective% makes another mess!"],
+        "noDiaper": ["%name% does not have a %diaper%! Get one on %objective% before %subjective% makes a mess~"],
+       "change": ["%name% has changed %dependent% %current-diaper%."]
+    },
+    "hidding": {
+        "Mess": ["%name% %trembles% as %dependent% diaper filled, trying desperately to remain discreet.."],
+        "ullyMess": ["%name% diaper %quickly% fills, %name%'s %trembles% intensifies, %subjective%'s desperate to remain inconspicuous"],
+        "We": ["%name% %desperately% %trembles% to conceal %dependent% embarrassment as %dependent% diaper %quickly% soaks."],
+        "FullWet": ["%name% %burns% with %embarrassment% as %dependent% diaper is completely saturated, %subjective% can't bear to imagine how %obvious% the soggy bulge peeks"],
+        "Immergency": ["%name% silently %trembles%, as %dependent% diaper saggs heavily down %dependent% legs, %subjective% is in dire need of a change~"],
+        "SelfWet": ["%name% freezes as %warm% liquid trickles down %dependent% legs, quickly creating a puddle beneath %dependent%; %dependent% %items-below% visibly damp.",
+                  "%name% %trembles% as %warm% liquid spreads across %dependent% bottom, %dependent% %items-below% are now visibly damp.",
+                  "%name% %trembles% as %subjective% %quickly% realizes %subjective% %has-wet% %dependent% clothes"],
+        "SelfMess": ["%name% %shudders% as %warm% and %wet% mess spreads across %dependent% bottom, %dependent% %items-below% are now visibly soiled."],
+        "change": ["%name% %quickly% %trembling% changes %dependent% %current-diaper%."]
+    }
+}
