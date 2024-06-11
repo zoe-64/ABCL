@@ -28,5 +28,4 @@ if (window.location.href.startsWith("javascript:")) {
 	script.setAttribute("crossorigin", "anonymous");
 	script.setAttribute("src", scriptSrc);
 	script.onload = () => script.remove();
-	setTimeout(() => document.head.appendChild(script), 10000);
 }
