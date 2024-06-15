@@ -51,6 +51,7 @@ function Pronoun(shape) {
     return pronounMap[pronouns][shape.toLowerCase()]
 }
 
+
 function getJson(url) {
     return fetch(url).then(response => response.json());
 }
@@ -161,7 +162,10 @@ function getJson(url) {
         return result;
     } 
     function promptMessage(messageOptions) {
-        let message = messageOptions[Math.floor(Math.random() * messageOptions.length)];
+        let message = messageOptions;
+        if (typeof messageOptions == "list") {
+            message = messageOptions[Math.floor(Math.random() * messageOptions.length)];
+        } 
         currentDiaper = InventoryGet(Player, "ItemPelvis")?.Asset?.Description || InventoryGet(Player, "Panties")?.Asset?.Description || "diaper";
         message = message.replace(/%name%/g, Player.Nickname != '' ? Player.Nickname : Player.Name)
                          .replace(/%dependent%/g, Pronoun("Dependent"))
@@ -584,9 +588,8 @@ function getJson(url) {
                 } 
                 }    
             }
-            if (this.messageType != "discreet") {
-                isMess ? promptMessage(ABCLdata.messages[this.messageType]["SelfMess"]) : promptMessage(ABCLdata.messages[this.messageType]["SelfWet"]);
-            }
+            isMess ? promptMessage(ABCLdata.messages[this.messageType]["SelfMess"]) : promptMessage(ABCLdata.messages[this.messageType]["SelfWet"]);
+            
             this.refreshDiaper();
         }
 
@@ -849,7 +852,7 @@ function getJson(url) {
                     } else {
                         abcl.accident();
                     }
-                    ChatRoomSendLocal(`<p style='background-color:#5fbd7a'>ABCL: ${Player.Nickname == '' ? Player.name : Player.Nickname} uses ${Pronoun("dependent")} timemachine.</p>`);
+                    ChatRoomSendLocal(`<p style='background-color:#5fbd7a'>ABCL: ${Player.Nickname == '' ? Player.Name : Player.Nickname} uses ${Pronoun("dependent")} timemachine.</p>`);
                     break;
                 case "change":
                     let target;
