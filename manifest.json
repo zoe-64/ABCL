@@ -44,7 +44,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["ABCL.js"],
+      "resources": ["ABCL.js", "UILib.js", "settings.html", "abcl.png", "abcl.html"],
       "matches": [
         "https://bondage-europe.com/*",
         "https://www.bondage-europe.com/*",

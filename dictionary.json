@@ -133,7 +133,7 @@
         }
     },
     "messages":{
-        "descreet": {
+        "discreet": {
             "Mess": "You have made a mess in your %diaper%.",
             "FullyMess": "You have fully soiled your %diaper%.",
             "Wet": "You have wet your %diaper%.",

@@ -75,12 +75,23 @@ function getJson(url) {
         regressionLevel: 0,
         desperationLevel: 0,
         messageType: "default",
+        wetting: true,
+        messing: true,
+        accidents: false,
+        visual: true,
+        enabled: true,
     };
 
     // Convert the hex color to an RGB array
     function hexToRgb(hex) {
         if (hex == "Default" || hex == "#") {
             hex = "#808080";
+        }
+        try {
+            hex.replace(/^#/, '').match(/.{2}/g).map(x => parseInt(x, 16));
+        } catch (e) {
+            console.error(e);
+            return [128, 128, 128];
         }
         return hex.replace(/^#/, '').match(/.{2}/g).map(x => parseInt(x, 16));
     }
@@ -163,7 +174,7 @@ function getJson(url) {
         }
 
         console.log(message);
-        if (abcl.messageType === "descreet") {
+        if (abcl.messageType === "discreet") {
             ChatRoomSendLocal(
                 message,
                 false
@@ -182,6 +193,16 @@ function getJson(url) {
     const ABCLdata = await getJson("https://raw.githubusercontent.com/zoe-64/ABCL/main/dictionary.json");
    
     class ABCL {
+        // localstorage save values
+        // enabled -> this.enabled
+        // wet_count -> this.wet.count
+        // mess_count -> this.mess.count
+        // mess_enabled -> this.mess.enabled
+        // wet_enabled -> this.wet.enabled
+        // regression -> this.regression.base
+        // mess_base -> this.mess.base
+        // wet_base -> this.wet.base
+        // messageType -> this.messageType
         
         
         getRegressionItems(items=Player.Appearance) {
@@ -202,65 +223,108 @@ function getJson(url) {
             }       
             return inFilter;
         }
+        getSaved(property, defaultValue = null) {
+            let data = JSON.parse(localStorage.getItem(`Abcl-${Player.MemberNumber}`)) || {};
+            return (typeof data[property] != 'undefined' &&  data[property] != null) ? data[property] : defaultValue;
+        } 
+        saveProperty(property, value) {
+            let data = JSON.parse(localStorage.getItem(`Abcl-${Player.MemberNumber}`)) || {};
+            data[property] = value;
+            localStorage.setItem(`Abcl-${Player.MemberNumber}`, JSON.stringify(data));
+        }
         constructor() {
-
             const abcl = this;
-            this.messageType = diaperDefaultValues.messageType || "default",
-            this._wets = 0,
-            this._messes = 0,
+            this.runtime = document.getElementById('ABCLruntimeID').innerText;
             this._PelvisItem = false,
             this._PantiesItem = false,
-            this._messChance = diaperDefaultValues.messChance,
-            this._wetChance = diaperDefaultValues.wetChance,
-            this._regression = diaperDefaultValues.regressionLevel,
-            this._desperation = diaperDefaultValues.desperationLevel
-            this.enabled = true;
+            // options
+            this.enabled = this.getSaved("enabled", diaperDefaultValues.enabled);
+            console.log(this.getSaved("enabled", false));
+            this.visual = this.getSaved("visual", diaperDefaultValues.visual);
+            this.accidents = this.getSaved("accidents", diaperDefaultValues.accidents);
+            // wetting chance : this.wet.base
+            // messing chance : this.mess.base
+            // wetting : this.wet.enabled   
+            // messing : this.mess.enabled
+            this.messageType = this.getSaved("messageType", diaperDefaultValues.messageType);
 
             this.loopTimestamp = Date.now();
             // Handle modifiers
             
             this.wet = {
+                _enabled: abcl.getSaved("wet_enabled", diaperDefaultValues.wetting),
+                _wets: abcl.getSaved("wet_count", 0),
+                _wetChance: abcl.getSaved("wet_base", diaperDefaultValues.wetChance),
                 set count(value) {
-                    abcl._wets = value;
+                    this._wets = value;
+                    abcl.saveProperty("wet_count", value);
                     abcl.refreshDiaper();
                 },
-                get count() {return abcl._wets},
-                set base(value) {abcl._wetChance = value},
-                get base() {return abcl._wetChance},
+                get count() {return this._wets},
+                set base(value) {
+                    this._wetChance = value
+                    abcl.saveProperty("wet_base", value);
+                },
+                get base() {return this._wetChance},
                 get chance() {
-                    let chance = abcl._wetChance;
+                    let chance = this._wetChance;
                     for (let item of abcl.getRegressionItems()) {
                         for (let key in ABCLdata.CraftingModifiers.wetChance) {
                             chance += item?.Craft?.Description?.includes(key) ? ABCLdata.CraftingModifiers.wetChance[key] : 0;
                         }
                     }
                     return chance;
+                },
+                get enabled() {
+                    return this._enabled;
+                },
+                set enabled(value) {
+                    console.log(value);
+                    this._enabled = value
+                    abcl.saveProperty("wet_enabled", value);
                 }
             };
             this.mess = {
+                _enabled: abcl.getSaved("mess_enabled", diaperDefaultValues.messing) ,
+                _messes: abcl.getSaved("mess_count", 0),
+                _messChance: abcl.getSaved("mess_base", diaperDefaultValues.messChance),
                 set count(value) {
-                    abcl._messes = value;
+                    this._messes = value;
+                    abcl.saveProperty("mess_count", value);
                     abcl.refreshDiaper();
                 },
-                get count() {return abcl._messes},
-                set base(value) {abcl._messChance = value},
-                get base() {return abcl._messChance},
+                get count() {return this._messes},
+                set base(value) {
+                    this._messChance = value
+                    abcl.saveProperty("mess_base", value);
+                },
+                get base() {return this._messChance},
                 get chance() {
-                    let chance = abcl._messChance;
+                    let chance = this._messChance;
                     for (let item of abcl.getRegressionItems()) {
                         for (let key in ABCLdata.CraftingModifiers.messChance) {
                             chance += item?.Craft?.Description?.includes(key) ? ABCLdata.CraftingModifiers.messChance[key] : 0;
                         }
                     }
                     return chance;
+                },
+                get enabled() {
+                    return this._enabled;
+                },
+                set enabled(value) {
+                    this._enabled = value;
+                    abcl.saveProperty("mess_enabled", value);
                 }
             }
             this.regression = {
-                get base() {return abcl._regression},
-                set base(value) {abcl._regression = value},
+                _regression: abcl.getSaved("regression", diaperDefaultValues.regressionLevel),
+                get base() {return this._regression},
+                set base(value) {
+                    this._regression = value
+                    abcl.saveProperty("regression", value);
+                },
                 get modifier() {
                     let total = 0;
-                    console.log()
                     for (let item of Player.Appearance) {
                         if (ABCLdata.Items[item.Asset.Description]) {
                             total += ABCLdata.Items[item.Asset.Description].modifier;
@@ -284,10 +348,14 @@ function getJson(url) {
             }
 
             this.desperation = {
-                get base() { return abcl._desperation },
-                set base(value) { abcl._desperation = value },
+                _desperation: abcl.getSaved("desperation", diaperDefaultValues.desperationLevel),
+                get base() { return this._desperation },
+                set base(value) { 
+                    this._desperation = value
+                    abcl.saveProperty("desperation", value);
+                },
                 get modifier() {
-                    let total = abcl._desperation;
+                    let total = this._desperation;
                     for (let item of abcl.getRegressionItems()) {
                         for (let key in ABCLdata.CraftingModifiers.desperation) {
                             total += item?.Craft?.Description?.includes(key) ? ABCLdata.CraftingModifiers.regression[key] : 0;
@@ -319,7 +387,7 @@ function getJson(url) {
                     return total;
                 }
             }
-            localStorage.getItem(`abcl-${Player.MemberNumber}`) ? this.load() : null;
+           
             this.diaperTimerModifier = 1; // We will divide by the modifier (positive modifiers decrease the timer)
             this.diaperRunning = true; // Helps with the kill switch
             this.loop();
@@ -362,40 +430,11 @@ function getJson(url) {
             this._PantiesItem = InventoryGet(Player, 'Panties');
             return this.isDiaper(this._PantiesItem) ? this._PantiesItem: false;
         }
-    
-
-        load() {
-            let data = JSON.parse(localStorage.getItem(`Abcl-${Player.MemberNumber}`));
-            this.wet.count = parseInt(data.wets) || 0;
-            this.mess.count = parseInt(data.messes) || 0;
-            this.regression.base = parseInt(data.regression) || 0;
-    
-            this.mess.base = parseFloat(data.messChance) || diaperDefaultValues.messChance;
-            this.wet.base = parseFloat(data.wetChance) || diaperDefaultValues.wetChance;
-            this.messageType = data.messageType  || diaperDefaultValues.messageType;
-            this.enabled = data.enabled;
-            this.refreshDiaper();
-        }
-        save() {
-            localStorage.setItem(`Abcl-${Player.MemberNumber}`, JSON.stringify({
-                wets: this.wet.count || 0,
-                messes: this.mess.count || 0,
-                regression: this.regression.base || 0,
-                messChance: this.mess.base || diaperDefaultValues.messChance,
-                wetChance: this.mess.base || diaperDefaultValues.wetChance,
-                messageType: this.messageType || diaperDefaultValues.messageType,
-                enabled: this.enabled
-            }));
-        }
+  
+        
         reset () {
-            this.wet.count = 0;
-            this.mess.count = 0;
-            this.regression.base = diaperDefaultValues.regressionLevel;
-            this.mess.base = diaperDefaultValues.messChance;
-            this.wet.base = diaperDefaultValues.wetChance;
-            this.messageType = diaperDefaultValues.messageType;
-            this.enabled = true;
-            this.save();
+            localStorage.removeItem(`Abcl-${Player.MemberNumber}`);
+            location.reload();
         }
         refreshDiaper() { 
             if (!this.enabled) {
@@ -405,7 +444,6 @@ function getJson(url) {
             this.updateDiaperColor("Panties");
             CharacterRefresh(Player, true);
             ChatRoomCharacterUpdate(Player);
-            this.save();
         }
 
         changeDiaper() {
@@ -517,7 +555,7 @@ function getJson(url) {
         }
 
         accident(isMess = false) {
-            if (!this.enabled) {
+            if (!this.enabled || !this.accidents) {
                 return;
             }
             // color shoes, socks, panties, and pelvis, suitlower, bottom, right leg, left leg, and suit, garters, socks
@@ -546,7 +584,9 @@ function getJson(url) {
                 } 
                 }    
             }
-            isMess ? promptMessage(ABCLdata.messages[this.messageType]["SelfMess"]) : promptMessage(ABCLdata.messages[this.messageType]["SelfWet"]);
+            if (this.messageType != "discreet") {
+                isMess ? promptMessage(ABCLdata.messages[this.messageType]["SelfMess"]) : promptMessage(ABCLdata.messages[this.messageType]["SelfWet"]);
+            }
             this.refreshDiaper();
         }
 
@@ -570,10 +610,8 @@ function getJson(url) {
             }
         }
         tick() {
-            let rngMess = Math.random();
-            let rngWet = Math.random();
             let chanceForNothing = 0.1;
-            let total = this.mess.chance + this.wet.chance;
+            let total = this.mess.chance*parseInt(this.mess.enabled) + this.wet.chance*parseInt(this.wet.enabled) + chanceForNothing;
             let messChance = this.mess.chance / total;
             let wetChance = this.wet.chance / total;
             const randomValue = Math.random();
@@ -606,32 +644,136 @@ function getJson(url) {
             this.updateDiaperColor("Panties");
             ChatRoomCharacterUpdate(Player);
         }
+        setupSettings() {
+            PreferenceSubscreenList.push("Abcl")
+            // ABCL settings
+            const abcl_settings = document.querySelector('#abcl');
+            const inspect = document.querySelector('.inspect');
+
+            // on hover change inspect
+            const abcl_descriptions = {
+                'abcl-visual': 'The visibility of wetting and soiling diapers including accidents.',
+                'abcl-wetting': 'The wetting of diapers.',
+                'abcl-messing': 'The soiling of diapers.',
+                'abcl-accidents': 'Controls having accidents accidents.',
+                'abcl-wetting-rate': 'The chance of wetting diapers.',
+                'abcl-messing-rate': 'The chance of soiling diapers.',
+                'abcl-message-type': 'The style of messages that happen after an event.',
+                'abcl-toggle': 'If the ABCL system is enabled or disabled.',
+                'abcl-toggle-text': 'If the ABCL system is enabled or disabled.'
+            };
+            abcl_settings.addEventListener('mouseover', (e) => {
+                if (e.target.id in abcl_descriptions) {
+                    inspect.querySelector('p').textContent = abcl_descriptions[e.target.id];
+                
+                }
+            });
+            document.querySelector("#abcl-visual input").checked = abcl.visual;
+            document.querySelector("#abcl-wetting input").checked = abcl.wet.enabled;
+            document.querySelector("#abcl-messing input").checked = abcl.mess.enabled;
+            document.querySelector("#abcl-accidents input").checked = abcl.accidents;
+            document.querySelector("#abcl-wetting-rate input").value = Math.floor(abcl.mess.base*100);
+            document.querySelector("#abcl-messing-rate input").value = Math.floor(abcl.wet.base*100);
+            document.querySelector("#abcl-message-type select").value = abcl.messageType;
+            document.querySelector("#abcl-toggle").checked = abcl.enabled;
+            const settingsMap = {
+                '#abcl-visual input': { property: 'visual', event: 'change', handler: (e) => { 
+                    this.visual = e.target.checked; 
+                    this.saveProperty("visual", e.target.checked);
+                    this.refreshDiaper(); 
+                }},
+                '#abcl-wetting input': {event: 'change', handler: (e) => { 
+                    this.wet.enabled = e.target.checked; 
+                 } },
+                '#abcl-messing input': {event: 'change', handler: (e) => { 
+                    this.mess.enabled = e.target.checked; 
+                } },
+                '#abcl-accidents input': {event: 'change', handler: (e) => { 
+                    this.accidents = e.target.checked; 
+                    this.saveProperty("accidents", e.target.checked);
+                } },
+                '#abcl-wetting-rate input':{event: 'change', handler: (e) => {
+                    this.wet.base = e.target.value / 100; 
+                } },
+                '#abcl-messing-rate input': {event: 'change', handler: (e) => {
+                    this.mess.base = e.target.value / 100; 
+                    
+                } },
+                '#abcl-message-type select': {event: 'change', handler: (e) => {
+                    this.messageType = e.target.value; 
+                    this.saveProperty("messageType", e.target.value);
+            } },
+                '#abcl-toggle': {event: 'change', handler: (e) => {
+                    this.enabled = e.target.checked;
+                    this.saveProperty("enabled", e.target.checked);
+                    console.log(this.enabled);
+            } }
+            };
+
+            for (const key of Object.keys(settingsMap)) {
+                const {event, handler } = settingsMap[key];
+                document.querySelector(key).addEventListener(event, handler);
+            }
+        }
 
     }
    
     //hooks
     ABCLLoginDoLogin();
     ABCLCharacterAppearanceSetItem();
+    ABCLTextGet();
+    ABCLDrawButton();
+
     async function ABCLLoginDoLogin() {
         modApi.hookFunction('LoginDoLogin', 1, (args, next) => {
-            if (abcl == null) {
-                abcl = new ABCL();
-            }
             next(args);
+            setTimeout(() => {
+                if (abcl == null) {
+                    abcl = new ABCL();
+                    abcl.setupSettings();
+                }
+            }, 1000); // Player.MemberNumber takes a while to get set
         }
         );
     }
     async function ABCLCharacterAppearanceSetItem() {
-        modApi.hookFunction('PlatformAttack', 4, (args, next) => {
-            if (MagiccheatOn == true) {
-                PlatformPlayer.Health = 100;
-                PlatformPlayer.Magic = 100;
-                PlatformPlayer.Projectile = 100;
+        modApi.hookFunction('CharacterAppearanceSetItem', 2, (args, next) => {
+            let [_character, slot, _asset] = args;
+            if (typeof ultrabdl !== 'undefined') {
+                let item = {"Asset":_asset}
+                if (slot == "ItemPelvis") {
+                    ultrabdl.PelvisItem = ultrabdl.isDiaper(item) ? false : item;
+                }
+                if (slot == "Panties") {
+                    ultrabdl.PantiesItem = ultrabdl.isDiaper(item) ? false : item;
+                } 
             }
             next(args);
         });
     }
-
+    async function ABCLTextGet() {
+        modAPI.hookFunction("TextGet", 2, (args, next) => {
+            if(args[0] == "HomepageAbcl") return "ABCL";
+            else return next(args);
+        });
+    }
+    async function ABCLDrawButton() {
+        modAPI.hookFunction("DrawButton", 2, (args, next) => {
+			// 7th argument is the image url
+			if(args[6] == "Icons/Abcl.png") args[6] = abcl.runtime + "abcl.png";
+			return next(args);
+		});
+    }
+    PreferenceSubscreenAbclLoad = () => {
+        document.getElementById("abcl").classList.remove("hidden");
+    }
+    PreferenceSubscreenAbclRun = () => {}
+    PreferenceSubscreenAbclExit= () => {
+        document.getElementById("abcl").classList.add("hidden");
+        PreferenceSubscreen = "";
+        PreferenceMessage = "";
+    }
+    
     CommandCombine([{
         Tag: 'abcl',
         Description: "(action) (target or value) = plays with diapers (ABDL game).",
@@ -667,7 +809,7 @@ function getJson(url) {
                         "<b>/abcl messchance</b> (value between 0 and 1) to control how often you will mess. Make sure this is lower than wetchance.\n" +
                         "<b>/abcl wettings</b> (value) for wet level of normal diapers\n" +
                         "<b>/abcl messes</b> (value) for mess level of normal diapers\n"+
-                        "<b>/abcl messageType</b> (descreet|embarressed|default) to change the message type\n"
+                        "<b>/abcl messageType</b> (discreet|embarressed|default) to change the message type\n"
                     );
                     break;
                 case "stats":
@@ -700,7 +842,13 @@ function getJson(url) {
                     break;
             //---------------------------------------------------------------------------------------------------- 
                 case "tick":
-                    abcl.tick();
+                    let pelvis = InventoryGet(Player, "ItemPelvis");
+                    let panties = InventoryGet(Player, "Panties");
+                    if ((abcl.isDiaper(pelvis) || abcl.isDiaper(panties)) && abcl.diaperRunning === true) {
+                        abcl.tick();
+                    } else {
+                        abcl.accident();
+                    }
                     ChatRoomSendLocal(`<p style='background-color:#5fbd7a'>ABCL: ${Player.Nickname == '' ? Player.name : Player.Nickname} uses ${Pronoun("dependent")} timemachine.</p>`);
                     break;
                 case "change":
@@ -785,3 +933,4 @@ function getJson(url) {
     }]);
 
 })();
+
