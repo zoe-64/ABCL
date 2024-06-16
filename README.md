@@ -1,4 +1,4 @@
-# ABCL
+# ABCL (WIP expect some bugs) 
  ABCL is an addon for [Bondage Club](https://www.bondageprojects.com/club_game/)
  Stands for "Adult baby club lover"~
  
@@ -11,8 +11,10 @@
  - functions on all diapers, even with locks.
  - other users can change your diapers
  
- *certain words inside the description change your gameplay
+ *certain words inside the description change your gameplay <- I'll make a wiki some day 
+ but for now you may look inside [dictionary.json](https://github.com/zoe-64/ABCL/blob/main/Data/dictionary.json)
  
+ Feel free to contact me at @cute.zoey on discord if you encounter any bugs or have thoughts!
  
 ## Install
   We prefer you use TamperMonkey or ViolentMonkey.
@@ -25,9 +27,7 @@
   2. Depending on browser, the .zip might have to be extracted. few browsers accept a .zip, a few requires a folder.
   3. Go to browser extensions. Enable developer mode.
   4. Load as Unpacked. Done. If the file can't be seen, see step 2.
-## Contact
-Discord: cute.zoey
-
+     
 ## Credits
 Special thanks to tetris245 for helping me get into modding!
 
