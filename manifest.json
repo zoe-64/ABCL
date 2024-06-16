@@ -4,9 +4,9 @@
   "version": "1.0",
   "manifest_version": 3,
   "icons": {
-    "128": "icon128.png",
-    "48": "icon48.png",
-    "16": "icon16.png"
+    "128": "Assets/icon128.png",
+    "48": "Assets/icon48.png",
+    "16": "Assets/icon16.png"
   },
   "permissions": [
     "tabs",
@@ -44,7 +44,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["ABCL.js", "UILib.js", "settings.html", "abcl.png", "abcl.html"],
+      "resources": ["Zoelib.js","ABCL.js", "Assets/abcl.png", "Data/abcl.html", "Data/abcl.css", "Data/dictionary.json"],
       "matches": [
         "https://bondage-europe.com/*",
         "https://www.bondage-europe.com/*",
