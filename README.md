@@ -7,13 +7,14 @@
  Well now you can much easier!
 
  ABCL is an improvement based on Firefly's BC-Diaper-Wetter script, 
- - adds support for Crafted items*
- - functions on all diapers, even with locks.
- - other users can change your diapers
+ - adds support for Crafted items *
+ - functions on all diapers big and small, even with locks.
+ - other users can change your diaper
+ - accidents when not wearing a diaper
  
- *certain words inside the description change your gameplay <- I'll make a wiki some day 
- but for now you may look inside [dictionary.json](https://github.com/zoe-64/ABCL/blob/main/Data/dictionary.json)
- 
+ [*] certain words inside the description change your gameplay <- I'll make a wiki some day 
+ but for now, look inside [dictionary.json](https://github.com/zoe-64/ABCL/blob/main/Data/dictionary.json)
+
  Feel free to contact me at @cute.zoey on discord if you encounter any bugs or have thoughts!
  
 ## Install
