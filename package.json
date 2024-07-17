@@ -1,0 +1,17 @@
+{
+  "name": "abcl",
+  "version": "1.0.0",
+  "description": "ABCL is an addon for [Bondage Club](https://www.bondageprojects.com/club_game/)\r  Stands for \"Adult baby club lover\"~",
+  "main": "ABCL.js",
+  "scripts": {
+    "test": "esbuild --bundle ABCL.ts --outfile=ABCL.js --sourcemap"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bc-stubs": "^106.0.0",
+    "esbuild": "^0.23.0",
+    "typescript": "^5.5.3"
+  }
+}
