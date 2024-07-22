@@ -174,6 +174,7 @@
   var require_ABCL = __commonJS({
     "src/ABCL.ts"(exports) {
       init_zoelib();
+      var local = false;
       var bcModSDK = function() {
         "use strict";
         const o = "1.2.0";
@@ -337,12 +338,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
           return;
         }
         var abcl = null;
-        const runtimeElement = document.getElementById("ABCLruntimeID");
-        if (!runtimeElement?.innerText) {
-          console.error("Runtime element not found");
-          return;
+        let runtime = "";
+        if (local) {
+          const runtimeElement = document.getElementById("ABCLruntimeID");
+          if (!runtimeElement?.innerText) {
+            console.error("Runtime element not found");
+            return;
+          }
+          runtime = runtimeElement.innerText;
+        } else {
+          runtime = "https://raw.githubusercontent.com/zoe-64/ABCL/main/";
         }
-        const runtime = runtimeElement.innerText;
         const ABCLversion = "1.0";
         const modApi = bcModSDK.registerMod({
           name: "ABCL",
