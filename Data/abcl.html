@@ -97,7 +97,21 @@
         content: "No";
     }
    
-    
+    #abcl button {
+        font-size: 2vw;
+        font-family: sans-serif;
+        cursor: pointer;
+        border: none;
+        background-color: #b9b9b9;
+        color: #000;
+        padding: 1vw;
+        margin: 1vw;
+    }
+    #abcl-reset-button {
+        background-color: #ff3f3f !important;
+        color: #ffffff !important;
+        border: #000 1px solid !important;
+    }
     .setting input[type="number"] {
         font-size: 2vw;
         font-family: sans-serif;
@@ -152,10 +166,13 @@
     background-position: center;
     background-size: 5vw;
     }
+    
     #abcl-exit {
         position: absolute;
-        top: 2vw;
-        right: 2vw;
+        top: 2vw !important;
+        right: 2vw !important;
+        background-color: transparent !important;
+        border: 1px solid black !important;
     }
     .hidden {
         display: none;
@@ -197,7 +214,7 @@
     <input type="checkbox" checked>
 </p>
 <p class="setting" id="abcl-wetting-rate">
-    <label>Wetting chance:</label>
+    <label>Wet chance:</label>
     <input type="number" value="50" min="0" max="100"><span>%</span>
 </p>
 <p class="setting" id="abcl-messing-rate">
@@ -212,11 +229,16 @@
         <option value="embarrassment">Embarressment</option>
     </select>
 </p>
+<button id="abcl-reset-button" onclick="document.getElementById('reset-confirm-abcl').showModal()">Reset data</button>
 </div>
 <div class="inspect" id="abcl-inspect">
 <p id="abcl-inspect-description"></p>
 
-
 <button class="exit-button" id="abcl-exit" onclick="PreferenceSubscreenAbclExit()">
 </button>
+<dialog id="reset-confirm-abcl">
+    <p>Are you sure you want to reset all ABCL data?</p>
+    <button onclick="Abcl.reset()">Yes</button>
+    <button onclick="document.getElementById('reset-confirm-abcl').close()">No</button>
+</dialog>
 </div>

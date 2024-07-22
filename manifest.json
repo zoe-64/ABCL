@@ -44,7 +44,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["Zoelib.js","ABCL.js", "Assets/abcl.png", "Data/abcl.html", "Data/abcl.css", "Data/dictionary.json"],
+      "resources": ["ABCL.js", "Assets/abcl.png", "Data/abcl.html", "Data/abcl.css", "Data/dictionary.json"],
       "matches": [
         "https://bondage-europe.com/*",
         "https://www.bondage-europe.com/*",

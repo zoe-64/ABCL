@@ -5,7 +5,7 @@ runtimeID.innerHTML = "chrome-extension://"+chrome.runtime.id+"/";
 runtimeID.id = 'ABCLruntimeID';
 document.body.appendChild(runtimeID);
 
-for (let src of ['Zoelib.js','ABCL.js','Data/abcl.html']) {
+for (let src of ['ABCL.js','Data/abcl.html']) {
   switch (src.split('.').pop()) {
     case 'js':
       let script = document.createElement('script');
