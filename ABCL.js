@@ -8,7 +8,7 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
 
-  // ../Zoelib/zoelib.ts
+  // node_modules/zoelib/dist/zoelib.mjs
   function GetName(player) {
     return player.Nickname || player.Name || "Unknown";
   }
@@ -54,22 +54,17 @@
   }
   var Pronoun, Messager, LocalCache, SentenceBuilder;
   var init_zoelib = __esm({
-    "../Zoelib/zoelib.ts"() {
-      "use strict";
+    "node_modules/zoelib/dist/zoelib.mjs"() {
       Pronoun = class _Pronoun {
-        static {
-          this.pronouns = {
-            "HeHim": { "subjective": "he", "objective": "him", "dependent": "his", "independent": "his", "reflexive": "himself" },
-            "SheHer": { "subjective": "she", "objective": "her", "dependent": "her", "independent": "hers", "reflexive": "herself" },
-            "TheyThem": { "subjective": "they", "objective": "them", "dependent": "their", "independent": "theirs", "reflexive": "themself" },
-            // not used by bc
-            "ItIt": { "subjective": "it", "objective": "it", "dependent": "its", "independent": "its", "reflexive": "itself" }
-            // not used by bc
-          };
-        }
-        static {
-          this.shapes = ["subjective", "objective", "dependent", "independent", "reflexive"];
-        }
+        static pronouns = {
+          "HeHim": { "subjective": "he", "objective": "him", "dependent": "his", "independent": "his", "reflexive": "himself" },
+          "SheHer": { "subjective": "she", "objective": "her", "dependent": "her", "independent": "hers", "reflexive": "herself" },
+          "TheyThem": { "subjective": "they", "objective": "them", "dependent": "their", "independent": "theirs", "reflexive": "themself" },
+          // not used by bc
+          "ItIt": { "subjective": "it", "objective": "it", "dependent": "its", "independent": "its", "reflexive": "itself" }
+          // not used by bc
+        };
+        static shapes = ["subjective", "objective", "dependent", "independent", "reflexive"];
         static get(shape, player) {
           let pronouns = player.GetPronouns();
           return _Pronoun.pronouns[pronouns][shape];
@@ -105,6 +100,7 @@
       };
       globalThis.Messager = Messager;
       LocalCache = class {
+        prefix;
         constructor(prefix) {
           this.prefix = prefix;
         }
@@ -120,31 +116,30 @@
         }
       };
       SentenceBuilder = class _SentenceBuilder {
+        static target;
         set target(player) {
           _SentenceBuilder.target = player;
         }
         get target() {
           return _SentenceBuilder.target;
         }
-        static {
-          this.data = {
-            "\xA7dependent\xA7": { get neutral() {
-              return [Pronoun.get("dependent", _SentenceBuilder.target)];
-            } },
-            "\xA7subjective\xA7": { get neutral() {
-              return [Pronoun.get("subjective", _SentenceBuilder.target)];
-            } },
-            "\xA7objective\xA7": { get neutral() {
-              return [Pronoun.get("objective", _SentenceBuilder.target)];
-            } },
-            "\xA7independent\xA7": { get neutral() {
-              return [Pronoun.get("independent", _SentenceBuilder.target)];
-            } },
-            "\xA7reflexive\xA7": { get neutral() {
-              return [Pronoun.get("reflexive", _SentenceBuilder.target)];
-            } }
-          };
-        }
+        static data = {
+          "\xA7dependent\xA7": { get neutral() {
+            return [Pronoun.get("dependent", _SentenceBuilder.target)];
+          } },
+          "\xA7subjective\xA7": { get neutral() {
+            return [Pronoun.get("subjective", _SentenceBuilder.target)];
+          } },
+          "\xA7objective\xA7": { get neutral() {
+            return [Pronoun.get("objective", _SentenceBuilder.target)];
+          } },
+          "\xA7independent\xA7": { get neutral() {
+            return [Pronoun.get("independent", _SentenceBuilder.target)];
+          } },
+          "\xA7reflexive\xA7": { get neutral() {
+            return [Pronoun.get("reflexive", _SentenceBuilder.target)];
+          } }
+        };
         static prompt(sentence, player = Player) {
           let pronoun = { "SheHer": "female", "HeHim": "male" }[player.GetPronouns()];
           let sentenceKeys = sentence.match(/§[a-zA-Z-]*§/g);
@@ -1085,4 +1080,3 @@ One of mods you are using is using an old version of SDK. It will work for now b
   });
   require_ABCL();
 })();
-//# sourceMappingURL=ABCL.js.map
