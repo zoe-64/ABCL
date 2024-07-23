@@ -52,6 +52,9 @@
   async function GetJson(url) {
     return fetch(url).then((response) => response.json());
   }
+  async function GetText(url) {
+    return fetch(url).then((response) => response.text());
+  }
   var Pronoun, Messager, LocalCache, SentenceBuilder;
   var init_zoelib = __esm({
     "node_modules/zoelib/dist/zoelib.mjs"() {
@@ -332,6 +335,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           console.warn("ABCL already loaded. No double loading");
           return;
         }
+        const abclHtml = await GetText("https://raw.githubusercontent.com/zoe-64/ABCL/main/Data/abcl.html");
+        document.body.insertAdjacentHTML("beforeend", abclHtml);
         var abcl = null;
         let runtime = "";
         if (local) {
