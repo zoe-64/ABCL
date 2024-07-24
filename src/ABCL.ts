@@ -488,7 +488,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
        
         // ItemPelvis or Panties as slot
         updateDiaperColor(slot: AssetGroupName) {
-            if (!this.enabled) {
+            if (!this.enabled || !this.visual) {
                 return;
             }
             let item = InventoryGet(Player, slot);
@@ -544,8 +544,8 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 item.Color = primary; 
             }
             
-            else if (diaper.type === "primary") {
-                item.Color = primary;
+            else if (diaper.type === "primary" && typeof item.Color != "string") {
+                item.Color[ABCLdata["Diapers"][item.Asset.Description].indexes[0]] = primary;
             }
             
             else if (diaper.type === "primary&secondary" && typeof item.Color != "string") {     
@@ -567,28 +567,29 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 ...(["Shoes", "Socks", "Panties", "ItemPelvis", "ItemBoots", "Garters", "RightAnklet", "LeftAnklet", "SuitLower", "ClothLower"] as AssetGroupName[])
                     .map(slot => InventoryGet(Player, slot))
             );
-
-            for (let item of itemsBelow) {
-                if (item) {
-                    if (typeof item.Color === "string") {
-                        if (isMess) {
-                            item.Color = AverageColor(item.Color, DiaperUseLevels["SelfMessy"], 0.2);
+            if (this.visual) {
+                for (let item of itemsBelow) {
+                    if (item) {
+                        if (typeof item.Color === "string") {
+                            if (isMess) {
+                                item.Color = AverageColor(item.Color, DiaperUseLevels["SelfMessy"], 0.2);
+                            } else {
+                                item.Color = AverageColor(item.Color, DiaperUseLevels["SelfWet"], 0.2);
+                            }
                         } else {
-                            item.Color = AverageColor(item.Color, DiaperUseLevels["SelfWet"], 0.2);
+                        if (!item.Color) { 
+                            continue;
                         }
-                    } else {
-                    if (!item.Color) { 
-                        continue;
-                    }
-                    for(let index = 0; index < item.Color.length; index++) {
-                        if (isMess) {
-                            item.Color[index] = AverageColor(item.Color[index], DiaperUseLevels["SelfMessy"], 0.2);
-                        } else {
-                            item.Color[index] = AverageColor(item.Color[index], DiaperUseLevels["SelfWet"], 0.2);
+                        for(let index = 0; index < item.Color.length; index++) {
+                            if (isMess) {
+                                item.Color[index] = AverageColor(item.Color[index], DiaperUseLevels["SelfMessy"], 0.2);
+                            } else {
+                                item.Color[index] = AverageColor(item.Color[index], DiaperUseLevels["SelfWet"], 0.2);
+                            }
                         }
-                    }
-                } 
-                }    
+                    } 
+                    }    
+                }
             }
             isMess ? promptMessage(ABCLdata.messages[this.messageType]["selfMess"]) : promptMessage(ABCLdata.messages[this.messageType]["selfWet"]);
             

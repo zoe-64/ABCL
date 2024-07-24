@@ -732,7 +732,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
           // ItemPelvis or Panties as slot
           updateDiaperColor(slot) {
-            if (!this.enabled) {
+            if (!this.enabled || !this.visual) {
               return;
             }
             let item = InventoryGet(Player, slot);
@@ -783,8 +783,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
             let secondary = AverageColor(color.messy, color.wet, 0.9);
             if (diaper.type == "mono") {
               item.Color = primary;
-            } else if (diaper.type === "primary") {
-              item.Color = primary;
+            } else if (diaper.type === "primary" && typeof item.Color != "string") {
+              item.Color[ABCLdata["Diapers"][item.Asset.Description].indexes[0]] = primary;
             } else if (diaper.type === "primary&secondary" && typeof item.Color != "string") {
               let primary_index = ABCLdata["Diapers"][item.Asset.Description].indexes[0];
               let secondary_index = ABCLdata["Diapers"][item.Asset.Description].indexes[1];
@@ -800,23 +800,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
             itemsBelow.push(
               ...["Shoes", "Socks", "Panties", "ItemPelvis", "ItemBoots", "Garters", "RightAnklet", "LeftAnklet", "SuitLower", "ClothLower"].map((slot) => InventoryGet(Player, slot))
             );
-            for (let item of itemsBelow) {
-              if (item) {
-                if (typeof item.Color === "string") {
-                  if (isMess) {
-                    item.Color = AverageColor(item.Color, DiaperUseLevels["SelfMessy"], 0.2);
-                  } else {
-                    item.Color = AverageColor(item.Color, DiaperUseLevels["SelfWet"], 0.2);
-                  }
-                } else {
-                  if (!item.Color) {
-                    continue;
-                  }
-                  for (let index = 0; index < item.Color.length; index++) {
+            if (this.visual) {
+              for (let item of itemsBelow) {
+                if (item) {
+                  if (typeof item.Color === "string") {
                     if (isMess) {
-                      item.Color[index] = AverageColor(item.Color[index], DiaperUseLevels["SelfMessy"], 0.2);
+                      item.Color = AverageColor(item.Color, DiaperUseLevels["SelfMessy"], 0.2);
                     } else {
-                      item.Color[index] = AverageColor(item.Color[index], DiaperUseLevels["SelfWet"], 0.2);
+                      item.Color = AverageColor(item.Color, DiaperUseLevels["SelfWet"], 0.2);
+                    }
+                  } else {
+                    if (!item.Color) {
+                      continue;
+                    }
+                    for (let index = 0; index < item.Color.length; index++) {
+                      if (isMess) {
+                        item.Color[index] = AverageColor(item.Color[index], DiaperUseLevels["SelfMessy"], 0.2);
+                      } else {
+                        item.Color[index] = AverageColor(item.Color[index], DiaperUseLevels["SelfWet"], 0.2);
+                      }
                     }
                   }
                 }
