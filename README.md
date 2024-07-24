@@ -1,4 +1,4 @@
-# ABCL (WIP expect some bugs) Broken!
+# ABCL
  ABCL is an addon for [Bondage Club](https://www.bondageprojects.com/club_game/)
  Stands for "Adult baby club lover"~
  
@@ -13,7 +13,7 @@
  - accidents when not wearing a diaper
  - A [Wiki](https://github.com/zoe-64/ABCL/wiki)! (brief) 
 
- Feel free to contact me at @cute.zoey on discord if you encounter any bugs or have thoughts!
+ Feel free to contact me at @cute.zoey on discord or [my server](https://discord.gg/V9rNpRQqtZ) if you encounter any bugs or have thoughts!
  
 ## Install
   We prefer you use TamperMonkey or ViolentMonkey.
