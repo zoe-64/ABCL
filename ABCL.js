@@ -335,8 +335,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
           console.warn("ABCL already loaded. No double loading");
           return;
         }
-        const abclHtml = await GetText("https://raw.githubusercontent.com/zoe-64/ABCL/main/Data/abcl.html");
-        document.body.insertAdjacentHTML("beforeend", abclHtml);
         var abcl = null;
         let runtime = "";
         if (local) {
@@ -346,8 +344,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
             return;
           }
           runtime = runtimeElement.innerText;
+          const abclHtml = await GetText(runtime + "Data/abcl.html");
+          document.body.insertAdjacentHTML("beforeend", abclHtml);
         } else {
           runtime = "https://raw.githubusercontent.com/zoe-64/ABCL/main/";
+          const abclHtml = await GetText("https://raw.githubusercontent.com/zoe-64/ABCL/main/Data/abcl.html");
+          document.body.insertAdjacentHTML("beforeend", abclHtml);
         }
         const ABCLversion = "1.0";
         const modApi = bcModSDK.registerMod({
@@ -370,7 +372,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const diaperDefaultValues = {
           messChance: 0.3,
           wetChance: 0.5,
-          baseTimer: 30,
+          timer: 30,
           regressionLevel: 0,
           desperationLevel: 0,
           messageType: "internalMonologue",
@@ -427,7 +429,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
           if (abcl.messageType == "internalMonologue") {
             Messager.localSend(message);
           } else {
-            Messager.send(message, void 0, "Chat");
+            ServerSend("ChatRoomChat", { Content: "Beep", Type: "Action", Dictionary: [
+              // EN
+              { Tag: "Beep", Text: "msg" },
+              { Tag: "msg", Text: message }
+            ] });
           }
         }
         class ABCL {
@@ -489,6 +495,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             this.visual = this.cache.get("visual", diaperDefaultValues.visual);
             this.accidents = this.cache.get("accidents", diaperDefaultValues.accidents);
             this.messageType = this.cache.get("messageType", diaperDefaultValues.messageType);
+            this.timer = this.cache.get("timer", diaperDefaultValues.timer);
             this.loopTimestamp = Date.now();
             this.wet = {
               _enabled: abcl2.cache.get("wet_enabled", diaperDefaultValues.wetting),
@@ -634,20 +641,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 return total;
               }
             };
-            this.diaperTimerModifier = 1;
             this.diaperRunning = true;
             this.loop();
           }
           get diaperTimer() {
-            let modifier = this.diaperTimerModifier * Math.pow(0.5, this.regression.base + 1) * (this.desperation.modifier + 1);
+            let modifier = Math.pow(0.5, this.regression.base + 1) * (this.desperation.modifier + 1);
             if (this.mess.chance + this.wet.chance > 1) {
               modifier *= this.mess.chance + this.wet.chance;
             }
-            return diaperDefaultValues.baseTimer / (1 + modifier);
+            return Math.floor(this.timer / (1 + modifier) * 100) / 100;
           }
           get nextEncounter() {
-            let nextEncounter = (this.loopTimestamp + this.diaperTimer * 60 * 1e3 - Date.now()) / 1e3;
-            return nextEncounter;
+            let encounter = (this.loopTimestamp + this.diaperTimer * 60 * 1e3 - Date.now()) / 1e3;
+            return encounter;
           }
           set PelvisItem(item) {
             this._PelvisItem = item;
@@ -835,13 +841,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
               }
               this.loopTimestamp = Date.now();
               await new Promise((r) => setTimeout(r, this.diaperTimer * 60 * 1e3));
-              this.regression.step();
-              this.desperation.check();
               let pelvis = InventoryGet(Player, "ItemPelvis");
               let panties = InventoryGet(Player, "Panties");
               if (this.diaperRunning && (pelvis && this.isDiaper(pelvis) || panties && this.isDiaper(panties))) {
                 this.tick();
               } else {
+                this.regression.step();
+                this.desperation.check();
                 this.accident();
               }
             }
@@ -852,6 +858,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
             let messChance = this.mess.chance / total;
             let wetChance = this.wet.chance / total;
             const randomValue = Math.random();
+            this.regression.step();
+            this.desperation.check();
             if (randomValue < messChance) {
               this.mess.count++;
               if (this.absorbancy.total > this.mess.count) {
@@ -893,7 +901,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               "abcl-messing-rate": "The chance of soiling diapers.",
               "abcl-message-type": "The style of messages that happen after an event.",
               "abcl-toggle": "If the ABCL system is enabled or disabled.",
-              "abcl-toggle-text": "If the ABCL system is enabled or disabled."
+              "abcl-toggle-text": "If the ABCL system is enabled or disabled.",
+              "timer-duration": "The time in minutes between accidents."
             };
             abcl_settings.addEventListener("mouseover", (e) => {
               if (e.target.id in abcl_descriptions) {
@@ -913,6 +922,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             assertQuerySelector("#abcl-messing-rate input").value = String(Math.floor(abcl.wet.base * 100));
             assertQuerySelector("#abcl-message-type select").value = abcl.messageType;
             assertQuerySelector("#abcl-toggle").checked = abcl.enabled;
+            assertQuerySelector("#abcl-timer-duration input").value = String(abcl.timer);
             const settingsMap = {
               "#abcl-visual input": { property: "visual", event: "change", handler: (e) => {
                 this.visual = e.target.checked;
@@ -942,6 +952,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
               "#abcl-toggle": { event: "change", handler: (e) => {
                 this.enabled = e.target.checked;
                 this.cache.set("enabled", this.enabled);
+              } },
+              "#abcl-timer-duration input": { event: "change", handler: (e) => {
+                this.timer = +e.target.value;
+                this.cache.set("timer", this.timer);
               } }
             };
             for (const key of Object.keys(settingsMap)) {
@@ -971,6 +985,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ABCLCharacterAppearanceSetItem();
         ABCLTextGet();
         ABCLDrawButton();
+        if (CurrentScreen && CurrentScreen != "Login" && globalThis.Abcl == null) {
+          globalThis.Abcl = new ABCL();
+          abcl = globalThis.Abcl;
+          globalThis.Abcl.setupSettings();
+        }
         async function ABCLLoginDoLogin() {
           modApi.hookFunction(
             "LoginDoLogin",
@@ -978,9 +997,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
             (args, next) => {
               next(args);
               setTimeout(() => {
-                if (abcl == null) {
-                  abcl = new ABCL();
-                  abcl.setupSettings();
+                if (globalThis.Abcl == null) {
+                  globalThis.Abcl = new ABCL();
+                  abcl = globalThis.Abcl;
+                  globalThis.Abcl.setupSettings();
                 }
               }, 1e3);
             }
@@ -1025,7 +1045,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         };
         CommandCombine([{
           Tag: "abcl",
-          Description: "(action) (target or value) = plays with diapers (ABDL game).",
+          Description: "Type /abcl help for a list of commands.",
           Action: (args) => {
             let [command, ...input] = args.split(/[ ,]+/);
             let identifier = input[0];
@@ -1033,14 +1053,28 @@ One of mods you are using is using an old version of SDK. It will work for now b
               return;
             }
             switch (command) {
-              case "":
+              case "help":
                 ChatRoomSendLocal(
-                  "<p style='background-color:#5fbd7a'><b>ABCL</b>: Welcome to Adult Baby Club Lover! Where we make sure babies use their diapers!\n \n<b>/abcl tick</b> to force a tick\n \nTo get new clean diapers:\n<b>/abcl change</b> to change your diaper\n<b>/abcl change (target)</b> to change someone else's diaper\n"
+                  "<p style='background-color:#5fbd7a'><b>ABCL</b>: Welcome to Adult Baby Club Lover! Where we make sure babies use their diapers!\n \n<b>/abcl tick</b> to force a tick\n<b>/abcl stats</b> to see your current diaper stats\n<b>/abcl help</b> to see this message\n \nTo get new clean diapers:\n<b>/abcl change</b> to change your diaper\n<b>/abcl change (target)</b> to change someone else's diaper\n"
                 );
                 break;
               case "stats":
+                const seconds = abcl.nextEncounter;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = Math.floor(seconds % 60);
+                const total = abcl.mess.chance + abcl.wet.chance + 0.1;
+                const wetChance = abcl.wet.chance / total;
+                const messChance = abcl.mess.chance / total;
                 ChatRoomSendLocal(
-                  "<p style='background-color:#5fbd7a'>ABCL: Your current diaper stats are: \nDesperation: " + abcl.desperation.modifier + ", \nRegression: " + (abcl.regression.modifier + abcl.regression.base) + ", \nRegressive change: " + abcl.regression.modifier + ", \nWet Chance: " + abcl.wet.chance * 100 + "%, \nMess Chance: " + abcl.mess.chance * 100 + "%, \nWets: " + abcl.wet.count + ", \nMesses: " + abcl.mess.count + ", \nPadding: " + abcl.absorbancy.total + ", \nAproximate timer: " + Math.floor(abcl.diaperTimer) + " minutes.</p>\n"
+                  `<p style='background-color:#5fbd7a'>ABCL: Your current diaper stats are: 
+Desperation For Milk: ${Math.floor(abcl.desperation.base * 10) / 10}, 
+Regression: ${Math.floor((abcl.regression.modifier + abcl.regression.base) * 10) / 10}, adds: ${Math.floor(abcl.regression.modifier * 10) / 10} next tick
+Wet Chance: ${Math.floor(wetChance * 100)}%, 
+Mess Chance: ${Math.floor(messChance * 100)}%, 
+Wet amount: ${abcl.wet.count * 60}/${abcl.absorbancy.total * 60}ml 
+Messes: ${abcl.mess.count * 30}/${abcl.absorbancy.total * 30}ml  
+Next tick: ${minutes} minutes and ${remainingSeconds} seconds.</p>
+`
                 );
                 break;
               case "tick":
@@ -1077,7 +1111,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 }
                 break;
               default:
-                ChatRoomSendLocal("<p style='background-color:#5fbd7a'>ABCL: The diaper command must include an action.</p>");
+                ChatRoomSendLocal("<p style='background-color:#5fbd7a'>ABCL: Unknown command. Type /abcl help for a list of commands.</p>");
                 break;
             }
           }

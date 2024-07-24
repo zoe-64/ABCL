@@ -26,8 +26,6 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
         console.warn("ABCL already loaded. No double loading");
         return;
     }
-    const abclHtml = await GetText("https://raw.githubusercontent.com/zoe-64/ABCL/main/Data/abcl.html");
-    document.body.insertAdjacentHTML('beforeend', abclHtml);
     var abcl:ABCL | null = null;
     let runtime = "";
     if (local) {
@@ -37,8 +35,12 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
             return;
         }
         runtime = runtimeElement.innerText;
+        const abclHtml = await GetText(runtime+"Data/abcl.html");
+        document.body.insertAdjacentHTML('beforeend', abclHtml);
     } else {
         runtime = "https://raw.githubusercontent.com/zoe-64/ABCL/main/"; 
+        const abclHtml = await GetText("https://raw.githubusercontent.com/zoe-64/ABCL/main/Data/abcl.html");
+        document.body.insertAdjacentHTML('beforeend', abclHtml);
     }
     const ABCLversion = "1.0";
     const modApi = bcModSDK.registerMod({
@@ -67,7 +69,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
     const diaperDefaultValues = {
         messChance: .3,
         wetChance: .5,
-        baseTimer: 30,
+        timer: 30,
         regressionLevel: 0,
         desperationLevel: 0,
         messageType: "internalMonologue",
@@ -125,7 +127,14 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
         if (abcl.messageType == "internalMonologue") {
             Messager.localSend(message);
         } else {
-            Messager.send(message, undefined, "Chat");
+            //ChatRoomSendEmote("/action "+ message)
+            ServerSend("ChatRoomChat", {Content: "Beep", Type: "Action", Dictionary: [
+                // EN
+                { Tag: "Beep", Text: "msg" },
+                { Tag: "msg", Text: message},
+        
+            ]});        
+            //Messager.send(message, undefined,);
         }
     } 
    
@@ -222,7 +231,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
         absorbancy: {
             total:number
         };
-        diaperTimerModifier:number;
+        timer:number;
         diaperRunning:boolean;
         _PelvisItem:Item | null;
         _PantiesItem:Item | null;
@@ -238,7 +247,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
             this.visual = this.cache.get("visual", diaperDefaultValues.visual);
             this.accidents = this.cache.get("accidents", diaperDefaultValues.accidents);
             this.messageType = this.cache.get("messageType", diaperDefaultValues.messageType);
-
+            this.timer = this.cache.get("timer", diaperDefaultValues.timer);
             this.loopTimestamp = Date.now();
             // Handle modifiers
             
@@ -378,23 +387,22 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 }
             }
            
-            this.diaperTimerModifier = 1; // We will divide by the modifier (positive modifiers decrease the timer)
             this.diaperRunning = true; // Helps with the kill switch
             this.loop();
             
         }
       
         get diaperTimer() {
-            let modifier = this.diaperTimerModifier * Math.pow(0.5, (this.regression.base+1)) * (this.desperation.modifier + 1);
+            let modifier = Math.pow(0.5, (this.regression.base+1)) * (this.desperation.modifier + 1);
 
             if (this.mess.chance + this.wet.chance > 1) {
                 modifier *= (this.mess.chance + this.wet.chance); 
             }
-            return diaperDefaultValues.baseTimer / (1 + modifier);
+            return Math.floor((this.timer / (1 + modifier))*100)/100;
         }
         get nextEncounter() {
-            let nextEncounter = ((this.loopTimestamp + this.diaperTimer * 60 * 1000)- Date.now())/1000 // bruh I spent 30 minutes on this mang.. I should start sleeping
-            return nextEncounter;
+            let encounter = ((this.loopTimestamp + this.diaperTimer * 60 * 1000)- Date.now())/1000 // bruh I spent 30 minutes on this mang.. I should start sleeping
+            return encounter;
         }
         
         set PelvisItem(item:Item | null) { 
@@ -604,13 +612,14 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 }
                 this.loopTimestamp = Date.now();
                 await new Promise(r => setTimeout(r, this.diaperTimer * 60 * 1000));
-                this.regression.step();
-                this.desperation.check();
+          
                 let pelvis = InventoryGet(Player, "ItemPelvis");
                 let panties = InventoryGet(Player, "Panties");
                 if (this.diaperRunning && (pelvis && this.isDiaper(pelvis) || panties && this.isDiaper(panties))) {
                     this.tick();
                 } else {
+                    this.regression.step();
+                    this.desperation.check();
                     this.accident();
                 }
             }
@@ -621,7 +630,8 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
             let messChance = this.mess.chance / total;
             let wetChance = this.wet.chance / total;
             const randomValue = Math.random();
-
+            this.regression.step();
+            this.desperation.check();
             if (randomValue < messChance) {
                 this.mess.count++;
                 if (this.absorbancy.total > this.mess.count) {
@@ -669,7 +679,8 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 'abcl-messing-rate': 'The chance of soiling diapers.',
                 'abcl-message-type': 'The style of messages that happen after an event.',
                 'abcl-toggle': 'If the ABCL system is enabled or disabled.',
-                'abcl-toggle-text': 'If the ABCL system is enabled or disabled.'
+                'abcl-toggle-text': 'If the ABCL system is enabled or disabled.',
+                'timer-duration': 'The time in minutes between accidents.'
             };
             abcl_settings.addEventListener('mouseover', (e:Event) => {
                 if ((e.target as HTMLElement).id in abcl_descriptions) {
@@ -690,6 +701,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
             (assertQuerySelector("#abcl-messing-rate input") as HTMLInputElement).value = String(Math.floor(abcl.wet.base*100));
             (assertQuerySelector("#abcl-message-type select") as HTMLInputElement).value = abcl.messageType;
             (assertQuerySelector("#abcl-toggle") as HTMLInputElement).checked = abcl.enabled;
+            (assertQuerySelector("#abcl-timer-duration input") as HTMLInputElement).value = String(abcl.timer);
             const settingsMap: Record<string, {property?: string, event: string, handler: (e:Event) => void}> = {
                 '#abcl-visual input': { property: 'visual', event: 'change', handler: (e:Event) => { 
                     this.visual = (e.target as HTMLInputElement).checked; 
@@ -720,7 +732,11 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 '#abcl-toggle': {event: 'change', handler: (e:Event) => {
                     this.enabled = (e.target as HTMLInputElement).checked;
                     this.cache.set("enabled", this.enabled);
-            } }
+            } }, 
+                '#abcl-timer-duration input': {event: 'change', handler: (e:Event) => {
+                    this.timer = +(e.target as HTMLInputElement).value;
+                    this.cache.set("timer", this.timer);
+                } }
             };
 
             for (const key of Object.keys(settingsMap)) {
@@ -753,14 +769,19 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
     ABCLCharacterAppearanceSetItem();
     ABCLTextGet();
     ABCLDrawButton();
-    
+    if (CurrentScreen && CurrentScreen != "Login" && (globalThis as any).Abcl == null) {
+        (globalThis as any).Abcl = new ABCL();
+        abcl = (globalThis as any).Abcl;
+        (globalThis as any).Abcl.setupSettings();
+    }
     async function ABCLLoginDoLogin() {
         modApi.hookFunction('LoginDoLogin', 1, (args:any, next:Function) => {
             next(args);
             setTimeout(() => {
-                if (abcl == null) {
-                    abcl = new ABCL();
-                    abcl.setupSettings();
+                if ((globalThis as any).Abcl == null) {
+                    (globalThis as any).Abcl = new ABCL();
+                    abcl = (globalThis as any).Abcl;
+                    (globalThis as any).Abcl.setupSettings();
                 }
             }, 1000); // Player.MemberNumber takes a while to get set
         }
@@ -806,7 +827,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
     
     CommandCombine([{
         Tag: 'abcl',
-        Description: "(action) (target or value) = plays with diapers (ABDL game).",
+        Description: "Type /abcl help for a list of commands.",
         Action: (args) => {
             let [command, ...input] = args.split(/[ ,]+/);
             let identifier = input[0]
@@ -814,11 +835,13 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 return;
             }
             switch (command) {
-                case "": 
+                case "" || "help": 
                     ChatRoomSendLocal(
                         "<p style='background-color:#5fbd7a'><b>ABCL</b>: Welcome to Adult Baby Club Lover! Where we make sure babies use their diapers!\n" +
                         " \n" +
                         "<b>/abcl tick</b> to force a tick\n" +
+                        "<b>/abcl stats</b> to see your current diaper stats\n" +
+                        "<b>/abcl help</b> to see this message\n" +
                         " \n" +
                         "To get new clean diapers:\n" +
                         "<b>/abcl change</b> to change your diaper\n" +
@@ -826,17 +849,24 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                     );
                 break;
                 case "stats":
+                    const seconds = abcl.nextEncounter
+                    const minutes = Math.floor(seconds / 60);
+                    const remainingSeconds = Math.floor(seconds % 60);
+                    // if wetchance is 100% and messchance is 100% then both are 50%
+                    const total = abcl.mess.chance + abcl.wet.chance + 0.1;
+                    const wetChance = abcl.wet.chance / total;
+                    const messChance = abcl.mess.chance / total;
+
+                    
                     ChatRoomSendLocal(
-                        "<p style='background-color:#5fbd7a'>ABCL: Your current diaper stats are: \n" +
-                        "Desperation: " + abcl.desperation.modifier + ", \n" +
-                        "Regression: " + (abcl.regression.modifier + abcl.regression.base) + ", \n" +
-                        "Regressive change: " + abcl.regression.modifier + ", \n" +
-                        "Wet Chance: " + abcl.wet.chance *100 + "%, \n" +
-                        "Mess Chance: " + abcl.mess.chance *100+ "%, \n" +
-                        "Wets: " + abcl.wet.count + ", \n" +
-                        "Messes: " + abcl.mess.count + ", \n" +
-                        "Padding: " + abcl.absorbancy.total + ", \n" +
-                        "Aproximate timer: " + Math.floor(abcl.diaperTimer) + " minutes.</p>\n"
+                        `<p style='background-color:#5fbd7a'>ABCL: Your current diaper stats are: \n` +
+                        `Desperation For Milk: ${Math.floor(abcl.desperation.base * 10) / 10}, \n` +
+                        `Regression: ${Math.floor((abcl.regression.modifier + abcl.regression.base) * 10) / 10}, adds: ${Math.floor(abcl.regression.modifier * 10) / 10} next tick\n` +
+                        `Wet Chance: ${Math.floor(wetChance * 100)}%, \n` +
+                        `Mess Chance: ${Math.floor(messChance * 100)}%, \n` +
+                        `Wet amount: ${abcl.wet.count * 60}/${abcl.absorbancy.total * 60}ml \n` +
+                        `Messes: ${abcl.mess.count * 30}/${abcl.absorbancy.total * 30}ml  \n` +
+                        `Next tick: ${minutes} minutes and ${remainingSeconds} seconds.</p>\n`
                     );
                 break;
                 case "tick":
@@ -876,7 +906,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                         } 
                 break;
                 default:
-                    ChatRoomSendLocal("<p style='background-color:#5fbd7a'>ABCL: The diaper command must include an action.</p>");
+                    ChatRoomSendLocal("<p style='background-color:#5fbd7a'>ABCL: Unknown command. Type /abcl help for a list of commands.</p>");
                 break;
             }
         }
