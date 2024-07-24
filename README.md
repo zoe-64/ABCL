@@ -13,6 +13,7 @@
  - accidents when not wearing a diaper
  - A [Wiki](https://github.com/zoe-64/ABCL/wiki)! (brief) 
 
+ 
  Feel free to contact me at @cute.zoey on discord or [my server](https://discord.gg/V9rNpRQqtZ) if you encounter any bugs or have thoughts!
  
 ## Install
@@ -26,6 +27,12 @@
   2. Depending on browser, the .zip might have to be extracted. few browsers accept a .zip, a few requires a folder.
   3. Go to browser extensions. Enable developer mode.
   4. Load as Unpacked. Done. If the file can't be seen, see step 2.
+
+  ### Bookmark (must be used before login)
+  1. Go to [bookmark.js](https://github.com/zoe-64/ABCL/blob/main/bookmark.js)
+  2. Use the code to set as bookmark
+  3. Before login, activate the bookmark
+  4. Login!
      
 ## Credits
 Special thanks to tetris245 for helping me get into modding!
