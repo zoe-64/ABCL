@@ -1,6 +1,6 @@
 { 
     "Diapers": {
-        "Diaper Patterned": {
+            "Patterned Diaper": {
             "indexes": [1],
             "type": "primary",
             "absorbancy": 1
