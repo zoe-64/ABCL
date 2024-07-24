@@ -109,14 +109,8 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
         }
         return result;
     } 
-    SentenceBuilder.data["§name§"] = {get neutral() {return [GetName(Player)]}};
-    SentenceBuilder.data["§items-below§"] = {get neutral() {return [getItemsBelow()]}};
-    SentenceBuilder.data["§current-diaper§"] = {get neutral() {return [InventoryGet(Player, "ItemPelvis")?.Asset?.Description || InventoryGet(Player, "Panties")?.Asset?.Description || "diaper"]}};
-    SentenceBuilder.data["§by-player§"] = {"neutral":[Pronoun.get("Reflexive", Player)]};
-    SentenceBuilder.data = {...ABCLdata.verbs, ...SentenceBuilder.data};
 
     function promptMessage(unformatedMessage:string) {
-        console.log(unformatedMessage);
         SentenceBuilder.target = Player;
         let message = SentenceBuilder.prompt(unformatedMessage, Player);
 
@@ -171,7 +165,6 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
         }
         // message calls
         ABCLMessagerListener(response:ServerChatRoomMessage):boolean {
-            console.log(response, response.Type == "Hidden");
             if (response.Type == "Hidden") {   
                 try {
                     JSON.parse(response.Content);
@@ -236,6 +229,12 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
         _PelvisItem:Item | null;
         _PantiesItem:Item | null;
         constructor() {
+            SentenceBuilder.data["§name§"] = {get neutral() {return [GetName(Player)]}};
+            SentenceBuilder.data["§items-below§"] = {get neutral() {return [getItemsBelow()]}};
+            SentenceBuilder.data["§current-diaper§"] = {get neutral() {return [InventoryGet(Player, "ItemPelvis")?.Asset?.Description || InventoryGet(Player, "Panties")?.Asset?.Description || "diaper"]}};
+            SentenceBuilder.data["§by-player§"] = {"neutral":[Pronoun.get("Reflexive", Player)]};
+            SentenceBuilder.data = {...ABCLdata.verbs, ...SentenceBuilder.data};
+
             (globalThis as any).Abcl = this;
             const abcl = this;
             this.cache = new LocalCache(`Abcl-${Player.MemberNumber}`);
@@ -248,6 +247,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
             this.accidents = this.cache.get("accidents", diaperDefaultValues.accidents);
             this.messageType = this.cache.get("messageType", diaperDefaultValues.messageType);
             this.timer = this.cache.get("timer", diaperDefaultValues.timer);
+            this.automatic_accidents = this.cache.get("automatic_accidents", true);
             this.loopTimestamp = Date.now();
             // Handle modifiers
             
@@ -454,6 +454,11 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 Messager.send({"Action": "ChangeDiaper", "MemberNumber": player.MemberNumber}, player.MemberNumber, "Hidden");
                 return;
             }
+            if ((globalThis as any).BCC_LOADED) { // @ts-ignore
+                if (!hasPermissionToChangeDiaper(Player, Player)) {
+                    return;
+                }
+            }
             this.PelvisItem = InventoryGet(Player, "ItemPelvis");
             this.PantiesItem = InventoryGet(Player, "Panties");
             
@@ -565,9 +570,13 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
         
         }
 
-        accident(isMess = false) {
+        accident(isMess:boolean | null = null) {
             if (!this.enabled || !this.accidents) {
                 return;
+            }
+            if (isMess == null) {
+                let chance = this.calculateChance();
+                isMess = chance.value < chance.mess;
             }
             // color shoes, socks, panties, and pelvis, suitlower, bottom, right leg, left leg, and suit, garters, socks
             let itemsBelow = []
@@ -606,7 +615,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
 
         async loop() {
             while (true) {
-                if (!this.enabled) {
+                if (!this.enabled || !this.automatic_accidents) {
                     await new Promise(r => setTimeout(r, this.diaperTimer * 60 * 1000));
                     continue;
                 }
@@ -624,12 +633,16 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 }
             }
         }
-        tick() {
+        calculateChance() {
             let chanceForNothing = 0.1;
             let total = this.mess.chance*(+this.mess.enabled) + this.wet.chance*(+this.wet.enabled) + chanceForNothing;
             let messChance = this.mess.chance / total;
             let wetChance = this.wet.chance / total;
             const randomValue = Math.random();
+            return {mess:messChance, wet:wetChance, value:randomValue, nothing:chanceForNothing};
+        }
+        tick() {
+            let [messChance, wetChance, randomValue, chanceForNothing] = Object.values(this.calculateChance());
             this.regression.step();
             this.desperation.check();
             if (randomValue < messChance) {
@@ -680,7 +693,8 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 'abcl-message-type': 'The style of messages that happen after an event.',
                 'abcl-toggle': 'If the ABCL system is enabled or disabled.',
                 'abcl-toggle-text': 'If the ABCL system is enabled or disabled.',
-                'timer-duration': 'The time in minutes between accidents.'
+                'abcl-timer-duration': 'The time in minutes between accidents.',
+                'abcl-automatic-accidents': 'If the system should automatically have accidents'
             };
             abcl_settings.addEventListener('mouseover', (e:Event) => {
                 if ((e.target as HTMLElement).id in abcl_descriptions) {
@@ -702,6 +716,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
             (assertQuerySelector("#abcl-message-type select") as HTMLInputElement).value = abcl.messageType;
             (assertQuerySelector("#abcl-toggle") as HTMLInputElement).checked = abcl.enabled;
             (assertQuerySelector("#abcl-timer-duration input") as HTMLInputElement).value = String(abcl.timer);
+            (assertQuerySelector("#abcl-automatic-accidents") as HTMLInputElement).checked = abcl.automatic_accidents;
             const settingsMap: Record<string, {property?: string, event: string, handler: (e:Event) => void}> = {
                 '#abcl-visual input': { property: 'visual', event: 'change', handler: (e:Event) => { 
                     this.visual = (e.target as HTMLInputElement).checked; 
@@ -736,7 +751,11 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 '#abcl-timer-duration input': {event: 'change', handler: (e:Event) => {
                     this.timer = +(e.target as HTMLInputElement).value;
                     this.cache.set("timer", this.timer);
-                } }
+                } },
+                '#abcl-automatic-accidents': {event: 'change', handler: (e:Event) => {
+                    this.automatic_accidents = (e.target as HTMLInputElement).checked;
+                    this.cache.set("automatic_accidents", this.automatic_accidents); 
+                }}
             };
 
             for (const key of Object.keys(settingsMap)) {

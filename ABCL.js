@@ -407,19 +407,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
           return result;
         }
-        SentenceBuilder.data["\xA7name\xA7"] = { get neutral() {
-          return [GetName(Player)];
-        } };
-        SentenceBuilder.data["\xA7items-below\xA7"] = { get neutral() {
-          return [getItemsBelow()];
-        } };
-        SentenceBuilder.data["\xA7current-diaper\xA7"] = { get neutral() {
-          return [InventoryGet(Player, "ItemPelvis")?.Asset?.Description || InventoryGet(Player, "Panties")?.Asset?.Description || "diaper"];
-        } };
-        SentenceBuilder.data["\xA7by-player\xA7"] = { "neutral": [Pronoun.get("Reflexive", Player)] };
-        SentenceBuilder.data = { ...ABCLdata.verbs, ...SentenceBuilder.data };
         function promptMessage(unformatedMessage) {
-          console.log(unformatedMessage);
           SentenceBuilder.target = Player;
           let message = SentenceBuilder.prompt(unformatedMessage, Player);
           if (typeof abcl == "undefined" || abcl == null) {
@@ -467,7 +455,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
           // message calls
           ABCLMessagerListener(response) {
-            console.log(response, response.Type == "Hidden");
             if (response.Type == "Hidden") {
               try {
                 JSON.parse(response.Content);
@@ -475,8 +462,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 return false;
               }
               let content = JSON.parse(response.Content);
-              console.log(content.Action, "ChangeDiaper", content.MemberNumber, Player.MemberNumber);
               if (content.Action == "ChangeDiaper" && content.MemberNumber == Player.MemberNumber) {
+                if (globalThis.BCC_LOADED) {
+                  if (hasPermissionToChangeDiaper(content.Sender)) {
+                    this.changeDiaper(Player, GetName(Player));
+                  }
+                }
                 let player = GetPlayer(content.MemberNumber);
                 let responder = GetPlayer(response.Sender);
                 if (player) {
@@ -487,6 +478,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
             return false;
           }
           constructor() {
+            SentenceBuilder.data["\xA7name\xA7"] = { get neutral() {
+              return [GetName(Player)];
+            } };
+            SentenceBuilder.data["\xA7items-below\xA7"] = { get neutral() {
+              return [getItemsBelow()];
+            } };
+            SentenceBuilder.data["\xA7current-diaper\xA7"] = { get neutral() {
+              return [InventoryGet(Player, "ItemPelvis")?.Asset?.Description || InventoryGet(Player, "Panties")?.Asset?.Description || "diaper"];
+            } };
+            SentenceBuilder.data["\xA7by-player\xA7"] = { "neutral": [Pronoun.get("Reflexive", Player)] };
+            SentenceBuilder.data = { ...ABCLdata.verbs, ...SentenceBuilder.data };
             globalThis.Abcl = this;
             const abcl2 = this;
             this.cache = new LocalCache(`Abcl-${Player.MemberNumber}`);
@@ -496,6 +498,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             this.accidents = this.cache.get("accidents", diaperDefaultValues.accidents);
             this.messageType = this.cache.get("messageType", diaperDefaultValues.messageType);
             this.timer = this.cache.get("timer", diaperDefaultValues.timer);
+            this.automatic_accidents = this.cache.get("automatic_accidents", true);
             this.loopTimestamp = Date.now();
             this.wet = {
               _enabled: abcl2.cache.get("wet_enabled", diaperDefaultValues.wetting),
@@ -703,6 +706,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
               Messager.send({ "Action": "ChangeDiaper", "MemberNumber": player.MemberNumber }, player.MemberNumber, "Hidden");
               return;
             }
+            if (globalThis.BCC_LOADED) {
+              if (!hasPermissionToChangeDiaper(Player, Player)) {
+                return;
+              }
+            }
             this.PelvisItem = InventoryGet(Player, "ItemPelvis");
             this.PantiesItem = InventoryGet(Player, "Panties");
             this.wet.count = 0;
@@ -798,9 +806,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
               item.Color[secondary_index] = secondary;
             }
           }
-          accident(isMess = false) {
+          accident(isMess = null) {
             if (!this.enabled || !this.accidents) {
               return;
+            }
+            if (isMess == null) {
+              let chance = this.calculateChance();
+              isMess = chance.value < chance.mess;
             }
             let itemsBelow = [];
             itemsBelow.push(
@@ -835,7 +847,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
           async loop() {
             while (true) {
-              if (!this.enabled) {
+              if (!this.enabled || !this.automatic_accidents) {
                 await new Promise((r) => setTimeout(r, this.diaperTimer * 60 * 1e3));
                 continue;
               }
@@ -852,12 +864,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
               }
             }
           }
-          tick() {
+          calculateChance() {
             let chanceForNothing = 0.1;
             let total = this.mess.chance * +this.mess.enabled + this.wet.chance * +this.wet.enabled + chanceForNothing;
             let messChance = this.mess.chance / total;
             let wetChance = this.wet.chance / total;
             const randomValue = Math.random();
+            return { mess: messChance, wet: wetChance, value: randomValue, nothing: chanceForNothing };
+          }
+          tick() {
+            let [messChance, wetChance, randomValue, chanceForNothing] = Object.values(this.calculateChance());
             this.regression.step();
             this.desperation.check();
             if (randomValue < messChance) {
@@ -902,7 +918,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               "abcl-message-type": "The style of messages that happen after an event.",
               "abcl-toggle": "If the ABCL system is enabled or disabled.",
               "abcl-toggle-text": "If the ABCL system is enabled or disabled.",
-              "timer-duration": "The time in minutes between accidents."
+              "abcl-timer-duration": "The time in minutes between accidents.",
+              "abcl-automatic-accidents": "If the system should automatically have accidents"
             };
             abcl_settings.addEventListener("mouseover", (e) => {
               if (e.target.id in abcl_descriptions) {
@@ -923,6 +940,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             assertQuerySelector("#abcl-message-type select").value = abcl.messageType;
             assertQuerySelector("#abcl-toggle").checked = abcl.enabled;
             assertQuerySelector("#abcl-timer-duration input").value = String(abcl.timer);
+            assertQuerySelector("#abcl-automatic-accidents").checked = abcl.automatic_accidents;
             const settingsMap = {
               "#abcl-visual input": { property: "visual", event: "change", handler: (e) => {
                 this.visual = e.target.checked;
@@ -956,6 +974,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
               "#abcl-timer-duration input": { event: "change", handler: (e) => {
                 this.timer = +e.target.value;
                 this.cache.set("timer", this.timer);
+              } },
+              "#abcl-automatic-accidents": { event: "change", handler: (e) => {
+                this.automatic_accidents = e.target.checked;
+                this.cache.set("automatic_accidents", this.automatic_accidents);
               } }
             };
             for (const key of Object.keys(settingsMap)) {
