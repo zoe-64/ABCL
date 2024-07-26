@@ -173,6 +173,30 @@
     "src/ABCL.ts"(exports) {
       init_zoelib();
       var local = false;
+      async function statUpdateLoop() {
+        if (globalThis.Abcl != null) {
+          let statBoxes = document.querySelectorAll(".stats-box");
+          let seconds = globalThis.Abcl.nextEncounter;
+          let minutes = Math.floor(seconds / 60);
+          let remainingSeconds = Math.floor(seconds % 60);
+          let chance = globalThis.Abcl.calculateChance();
+          for (let statbox of statBoxes) {
+            statbox.querySelector(".wetCount").textContent = globalThis.Abcl.wet.count * 60;
+            statbox.querySelector(".messCount").textContent = globalThis.Abcl.mess.count * 60;
+            statbox.querySelector(".wetChance").textContent = Math.floor(chance.wet * 100) + "%";
+            statbox.querySelector(".messChance").textContent = Math.floor(chance.mess * 100) + "%";
+            statbox.querySelector(".tickMinutes").textContent = minutes;
+            statbox.querySelector(".tickSeconds").textContent = remainingSeconds;
+            statbox.querySelector(".bar").style.width = seconds / (globalThis.Abcl.diaperTimer * 60) * 100 + "%";
+            statbox.querySelector(".absorbancyTotal").textContent = globalThis.Abcl.absorbancy.total * 60;
+            statbox.querySelector(".desperationBase").textContent = Math.floor(globalThis.Abcl.desperation.base * 10) / 10;
+            statbox.querySelector(".regressionbase").textContent = Math.floor((globalThis.Abcl.regression.modifier + globalThis.Abcl.regression.base) * 10) / 10;
+            statbox.querySelector(".regressionModifier").textContent = Math.floor(globalThis.Abcl.regression.modifier * 10) / 10;
+          }
+        }
+        console.log("Updated stats");
+      }
+      setInterval(statUpdateLoop, 1e3);
       var bcModSDK = function() {
         "use strict";
         const o = "1.2.0";
@@ -359,11 +383,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           repository: "https://github.com/zoe-64/ABCL"
         });
         globalThis.ABCLversion = ABCLversion;
-        let script = document.createElement("script");
-        script.src = runtime + "data/stats.js";
-        document.body.appendChild(script);
         let templates = {
-          statsjs: await GetText(runtime + "data/stats.js"),
           stats: await GetText(runtime + "data/stats.html"),
           settings: await GetText(runtime + "data/settings.html")
         };
