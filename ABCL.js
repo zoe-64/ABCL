@@ -172,7 +172,7 @@
   var require_ABCL = __commonJS({
     "src/ABCL.ts"(exports) {
       init_zoelib();
-      var local = true;
+      var local = false;
       var bcModSDK = function() {
         "use strict";
         const o = "1.2.0";

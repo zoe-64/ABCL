@@ -14,7 +14,7 @@
 // @run-at document-end
 // ==/UserScript==
 import { RandomInt, GetText, GetJson, SentenceBuilder, GetName, Pronoun, LocalCache, Messager, GetPlayer, AverageColor } from "../node_modules/zoelib/dist/zoelib.mjs";
-const local = true;
+const local = false;
 // get the html from this url and paste it into game
 // https://github.com/zoe-64/ABCL/blob/main/data/settings.html
 
