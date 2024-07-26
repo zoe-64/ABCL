@@ -3,41 +3,41 @@
             "Patterned Diaper": {
             "indexes": [1],
             "type": "primary",
-            "absorbancy": 1
+            "absorbancy": 2
             },
             "Bulky Diaper": {
             "indexes": [1,0],
             "type": "primary&secondary",
-            "absorbancy": 2
+            "absorbancy": 4
             },
             "Poofy Diaper": {
             "indexes": [1,0],
             "type": "primary&secondary",
-            "absorbancy": 2
+            "absorbancy": 4
             },
             "Bulky Chastity Diaper": {
             "indexes": [1,0],
             "type": "primary&secondary",
-            "absorbancy": 2
+            "absorbancy": 5
             },
             "Poofy Chastity Diaper": {
             "indexes": [1,0],
             "type": "primary&secondary",
-            "absorbancy": 2
+            "absorbancy": 4
             },
             "Plastic Covered Diaper": {
             "indexes": [0],
             "type": "primary",
-            "absorbancy": 2
+            "absorbancy": 4
             },
             "Satin Covered Diaper": {
                 "indexes": [0],
                 "type": "primary",
-                "absorbancy": 3
+                "absorbancy": 6
             },
             "Diaper": {
                 "type": "mono",
-                "absorbancy": 1 
+                "absorbancy": 2
             }
     },
     "Items": {
@@ -135,36 +135,36 @@
     "messages":{
         "internalMonologue": {
             "mess": "You have made a mess in your §diaper§.",
-            "fullyMess": "You have fully soiled your §diaper§.",
+            "fullymess": "You have fully soiled your §diaper§.",
             "wet": "You have wet your §diaper§.",
-            "fullyWet": "You have fully soiled your §diaper§.",
+            "fullywet": "You have fully soiled your §diaper§.",
             "immergency": "You are really in need of a diaper change!",
-            "selfWet": "You have wet your clothing. Get a §diaper§ on you before You make another mess!",
-            "selfMess": "You have soiled your clothing. Get a §diaper§ on you before You make another mess!",
+            "selfwet": "You have wet your clothing. Get a §diaper§ on you before You make another mess!",
+            "selfmess": "You have soiled your clothing. Get a §diaper§ on you before You make another mess!",
             "noDiaper": "You do not have a §diaper§! Get one on before You make a mess!",
             "changeSelf": "You have changed your §diaper§.",
             "changeBy": "§by-player§ has changed your §diaper§."
         },
         "default": {
             "mess": "§name§ has made a mess in §dependent§ §current-diaper§.",
-            "fullyMess": "§name§ has fully soiled §dependent§ §current-diaper§.",
+            "fullymess": "§name§ has fully soiled §dependent§ §current-diaper§.",
             "wet": "§name§ has wet §dependent§ §current-diaper§.",
-            "fullyWet": "§name§ has fully wet §dependent§ §current-diaper§.",
+            "fullywet": "§name§ has fully wet §dependent§ §current-diaper§.",
             "immergency": "§name§ is really in need of a diaper change!",
-            "selfWet": "§name§ has wet §dependent§ clothes. Get a §diaper§ on §objective§ before §subjective§ makes another mess!",
-            "selfMess": "§name§ has soiled §dependent§ clothes. Get a §diaper§ on §objective§ before §subjective§ makes another mess!",
+            "selfwet": "§name§ has wet §dependent§ clothes. Get a §diaper§ on §objective§ before §subjective§ makes another mess!",
+            "selfwess": "§name§ has soiled §dependent§ clothes. Get a §diaper§ on §objective§ before §subjective§ makes another mess!",
             "noDiaper": "§name§ does not have a §diaper§! Get one on §objective§ before §subjective§ makes a mess~",
             "changeSelf": "§name§ has changed §dependent§ §current-diaper§.",
             "changeBy": "§by-player§ has changed §name§ §current-diaper§. §name§ is now clean and dry~"
         },
         "embarrassment": {
             "mess": "§name§ §trembles§ as §dependent§ diaper filled, trying desperately to remain discreet..",
-            "fullyMess": "§name§ diaper §quickly§ fills, §name§'s §trembles§ intensifies, §subjective§'s desperate to remain inconspicuous",
+            "fullymess": "§name§ diaper §quickly§ fills, §name§'s §trembles§ intensifies, §subjective§'s desperate to remain inconspicuous",
             "wet": "§name§ §desperately§ §trembles§ to conceal §dependent§ embarrassment as §dependent§ diaper §quickly§ soaks.",
-            "fullyWet": "§name§ §burns§ with §embarrassment§ as §dependent§ diaper is completely saturated, §subjective§ can't bear to imagine how §obvious§ the soggy bulge peeks",
+            "fullywet": "§name§ §burns§ with §embarrassment§ as §dependent§ diaper is completely saturated, §subjective§ can't bear to imagine how §obvious§ the soggy bulge peeks",
             "immergency": "§name§ silently §trembles§, as §dependent§ diaper saggs heavily down §dependent§ legs, §subjective§ is in dire need of a change~",
-            "selfWet": "§name§ freezes as §warm§ liquid trickles down §dependent§ legs, quickly creating a puddle beneath §dependent§; §dependent§ §items-below§ visibly damp.",
-            "selfMess": "§name§ §shudders§ as §warm§ and §wet§ mess spreads across §dependent§ bottom, §dependent§ §items-below§ are now visibly soiled.",
+            "selfwet": "§name§ freezes as §warm§ liquid trickles down §dependent§ legs, quickly creating a puddle beneath §dependent§; §dependent§ §items-below§ visibly damp.",
+            "selfmess": "§name§ §shudders§ as §warm§ and §wet§ mess spreads across §dependent§ bottom, §dependent§ §items-below§ are now visibly soiled.",
             "changeSelf": "§name§ §quickly§ §trembling§ changes §dependent§ §current-diaper§.",
             "changeBy": "§name§ §trembles§ as §by-player§ changes §name§ §current-diaper§.",
             "noDiaper": "§name§ §trembles§ as §subjective§ realizes §dependent§ §current-diaper§ is missing, §subjective§ is in dire need of a change~"

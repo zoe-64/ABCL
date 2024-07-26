@@ -172,7 +172,7 @@
   var require_ABCL = __commonJS({
     "src/ABCL.ts"(exports) {
       init_zoelib();
-      var local = false;
+      var local = true;
       var bcModSDK = function() {
         "use strict";
         const o = "1.2.0";
@@ -344,11 +344,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
             return;
           }
           runtime = runtimeElement.innerText;
-          const abclHtml = await GetText(runtime + "Data/abcl.html");
+          const abclHtml = await GetText(runtime + "data/settings.html");
           document.body.insertAdjacentHTML("beforeend", abclHtml);
         } else {
           runtime = "https://raw.githubusercontent.com/zoe-64/ABCL/main/";
-          const abclHtml = await GetText("https://raw.githubusercontent.com/zoe-64/ABCL/main/Data/abcl.html");
+          const abclHtml = await GetText("https://raw.githubusercontent.com/zoe-64/ABCL/main/data/settings.html");
           document.body.insertAdjacentHTML("beforeend", abclHtml);
         }
         const ABCLversion = "1.0";
@@ -359,15 +359,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           repository: "https://github.com/zoe-64/ABCL"
         });
         globalThis.ABCLversion = ABCLversion;
-        const ABCLdata = await GetJson(runtime + "Data/dictionary.json");
+        let script = document.createElement("script");
+        script.src = runtime + "data/stats.js";
+        document.body.appendChild(script);
+        let templates = {
+          statsjs: await GetText(runtime + "data/stats.js"),
+          stats: await GetText(runtime + "data/stats.html"),
+          settings: await GetText(runtime + "data/settings.html")
+        };
+        const ABCLdata = await GetJson(runtime + "data/dictionary.json");
         const DiaperUseLevels = {
           "Clean": "#8F8F8F",
-          "MiddleWet": "#ffe58b",
-          "MaximumWet": "#ffd33e",
-          "MiddleMessy": "#423019",
-          "MaximumMessy": "#3C302C",
-          "SelfWet": "#4F4B1B",
-          "SelfMessy": "#3B2B17"
+          "Middlewet": "#ffe58b",
+          "Maximumwet": "#ffd33e",
+          "Middlemess": "#423019",
+          "Maximummess": "#3C302C",
+          "Selfwet": "#4F4B1B",
+          "Selfmess": "#3B2B17"
         };
         const diaperDefaultValues = {
           messChance: 0.3,
@@ -425,16 +433,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
         }
         class ABCL {
-          // localstorage save values
-          // enabled -> this.enabled
-          // wet_count -> this.wet.count
-          // mess_count -> this.mess.count
-          // mess_enabled -> this.mess.enabled
-          // wet_enabled -> this.wet.enabled
-          // regression -> this.regression.base
-          // mess_base -> this.mess.base
-          // wet_base -> this.wet.base
-          // messageType -> this.messageType
           getRegressionItems(items = Player.Appearance) {
             let inFilter = [];
             for (let item of items) {
@@ -493,13 +491,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
             const abcl2 = this;
             this.cache = new LocalCache(`Abcl-${Player.MemberNumber}`);
             this._PelvisItem = null, this._PantiesItem = null, Messager.listener(this.ABCLMessagerListener.bind(this), -5, "ABCL Message Processor");
+            this.loopTimestamp = Date.now();
             this.enabled = this.cache.get("enabled", diaperDefaultValues.enabled);
             this.visual = this.cache.get("visual", diaperDefaultValues.visual);
             this.accidents = this.cache.get("accidents", diaperDefaultValues.accidents);
             this.messageType = this.cache.get("messageType", diaperDefaultValues.messageType);
             this.timer = this.cache.get("timer", diaperDefaultValues.timer);
             this.automatic_accidents = this.cache.get("automatic_accidents", true);
-            this.loopTimestamp = Date.now();
             this.wet = {
               _enabled: abcl2.cache.get("wet_enabled", diaperDefaultValues.wetting),
               _wets: abcl2.cache.get("wet_count", 0),
@@ -637,6 +635,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 let total = 0;
                 if (abcl2.PelvisItem) {
                   total += ABCLdata["Diapers"][abcl2.PelvisItem.Asset.Description].absorbancy;
+                  for (let key in ABCLdata.CraftingModifiers.absorbancy) {
+                    if (abcl2.PelvisItem?.Craft?.Description?.includes(key)) {
+                      total += ABCLdata.CraftingModifiers.absorbancy[key];
+                    }
+                  }
                 }
                 if (abcl2.PantiesItem) {
                   total += ABCLdata["Diapers"][abcl2.PantiesItem.Asset.Description].absorbancy;
@@ -644,15 +647,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 return total;
               }
             };
-            this.diaperRunning = true;
             this.loop();
           }
           get diaperTimer() {
-            let modifier = Math.pow(0.5, this.regression.base + 1) * (this.desperation.modifier + 1);
-            if (this.mess.chance + this.wet.chance > 1) {
-              modifier *= this.mess.chance + this.wet.chance;
-            }
-            return Math.floor(this.timer / (1 + modifier) * 100) / 100;
+            let modifier = Math.pow(1.02, this.regression.base + 1) * (this.desperation.modifier + 1);
+            return Math.floor(this.timer / modifier * 100) / 100;
           }
           get nextEncounter() {
             let encounter = (this.loopTimestamp + this.diaperTimer * 60 * 1e3 - Date.now()) / 1e3;
@@ -660,11 +659,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
           set PelvisItem(item) {
             this._PelvisItem = item;
-            if (!this.PelvisItem && !this.PantiesItem) {
+            if (!this._PelvisItem && !this._PantiesItem) {
               this.mess.count = 0;
               this.wet.count = 0;
             }
-            setTimeout(() => this.refreshDiaper(), 5e3);
           }
           get PelvisItem() {
             this._PelvisItem = InventoryGet(Player, "ItemPelvis");
@@ -675,7 +673,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
           set PantiesItem(item) {
             this._PantiesItem = item;
-            if (!this.PelvisItem && !this.PantiesItem) {
+            if (!this._PelvisItem && !this._PantiesItem) {
               this.mess.count = 0;
               this.wet.count = 0;
             }
@@ -728,7 +726,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
           // Check for if a diaper is in the Panties or ItemPelvies slot
           isDiaper(item) {
-            return item?.Asset?.Name.toLowerCase().includes("diaper");
+            return item?.Asset?.Description.toLowerCase().includes("diaper");
           }
           // Checks to see if the user has a nursery milk equiped
           hasMilk() {
@@ -750,7 +748,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               return;
             }
             let item = InventoryGet(Player, slot);
-            if (item == null || item.Color == null || !this.isDiaper(item)) {
+            if (!item || !item.Color || !this.isDiaper(item)) {
               return;
             }
             if (typeof item.Color == "object") {
@@ -777,21 +775,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
             };
             if (delta.messy > 0.75) {
               if (delta.messy > 0.9) {
-                color.messy = DiaperUseLevels["MaximumMessy"];
+                color.messy = DiaperUseLevels["Maximummess"];
               } else {
-                color.messy = AverageColor(DiaperUseLevels["MaximumMessy"], DiaperUseLevels["MiddleMessy"], delta.messy - 0.75);
+                color.messy = AverageColor(DiaperUseLevels["Maximummess"], DiaperUseLevels["Middlemess"], delta.messy - 0.75);
               }
             } else {
-              color.messy = AverageColor(DiaperUseLevels["MiddleMessy"], DiaperUseLevels["Clean"], delta.messy);
+              color.messy = AverageColor(DiaperUseLevels["Middlemess"], DiaperUseLevels["Clean"], delta.messy);
             }
             if (delta.wet > 0.75) {
               if (delta.wet > 0.9) {
-                color.wet = DiaperUseLevels["MaximumWet"];
+                color.wet = DiaperUseLevels["Maximumwet"];
               } else {
-                color.wet = AverageColor(DiaperUseLevels["MaximumWet"], DiaperUseLevels["MiddleWet"], delta.wet - 0.75);
+                color.wet = AverageColor(DiaperUseLevels["Maximumwet"], DiaperUseLevels["Middlewet"], delta.wet - 0.75);
               }
             } else {
-              color.wet = AverageColor(DiaperUseLevels["MiddleWet"], DiaperUseLevels["Clean"], delta.wet);
+              color.wet = AverageColor(DiaperUseLevels["Middlewet"], DiaperUseLevels["Clean"], delta.wet);
             }
             let primary = AverageColor(color.messy, color.wet, 0.7);
             let secondary = AverageColor(color.messy, color.wet, 0.9);
@@ -806,56 +804,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
               item.Color[secondary_index] = secondary;
             }
           }
-          accident(isMess = null) {
+          accident(result = null) {
             if (!this.enabled || !this.accidents) {
               return;
             }
-            if (isMess == null) {
-              let chance = this.calculateChance();
-              isMess = chance.value < chance.mess;
+            if (result == null) {
+              result = "self" + this.calculateChance()["result"];
+              if (result == "nothing") return;
             }
+            promptMessage(ABCLdata.messages[this.messageType][result]);
+            if (!this.visual) return;
             let itemsBelow = [];
             itemsBelow.push(
               ...["Shoes", "Socks", "Panties", "ItemPelvis", "ItemBoots", "Garters", "RightAnklet", "LeftAnklet", "SuitLower", "ClothLower"].map((slot) => InventoryGet(Player, slot))
             );
-            if (this.visual) {
-              for (let item of itemsBelow) {
-                if (item) {
-                  if (typeof item.Color === "string") {
-                    if (isMess) {
-                      item.Color = AverageColor(item.Color, DiaperUseLevels["SelfMessy"], 0.2);
-                    } else {
-                      item.Color = AverageColor(item.Color, DiaperUseLevels["SelfWet"], 0.2);
-                    }
-                  } else {
-                    if (!item.Color) {
-                      continue;
-                    }
-                    for (let index = 0; index < item.Color.length; index++) {
-                      if (isMess) {
-                        item.Color[index] = AverageColor(item.Color[index], DiaperUseLevels["SelfMessy"], 0.2);
-                      } else {
-                        item.Color[index] = AverageColor(item.Color[index], DiaperUseLevels["SelfWet"], 0.2);
-                      }
-                    }
-                  }
+            itemsBelow = itemsBelow.filter((item) => item != null);
+            for (let item of itemsBelow) {
+              if (!item.Color) continue;
+              if (typeof item.Color === "string") {
+                item.Color = AverageColor(item.Color, DiaperUseLevels[result], 0.2);
+              } else {
+                for (let index = 0; index < item.Color.length; index++) {
+                  item.Color[index] = AverageColor(item.Color[index], DiaperUseLevels[result], 0.2);
                 }
               }
             }
-            isMess ? promptMessage(ABCLdata.messages[this.messageType]["selfMess"]) : promptMessage(ABCLdata.messages[this.messageType]["selfWet"]);
             this.refreshDiaper();
           }
           async loop() {
             while (true) {
-              if (!this.enabled || !this.automatic_accidents) {
-                await new Promise((r) => setTimeout(r, this.diaperTimer * 60 * 1e3));
+              if (!this.enabled || !this.automatic_accidents || this.nextEncounter > 0) {
+                await new Promise((r) => setTimeout(r, this.diaperTimer * 1e3));
                 continue;
               }
               this.loopTimestamp = Date.now();
-              await new Promise((r) => setTimeout(r, this.diaperTimer * 60 * 1e3));
-              let pelvis = InventoryGet(Player, "ItemPelvis");
-              let panties = InventoryGet(Player, "Panties");
-              if (this.diaperRunning && (pelvis && this.isDiaper(pelvis) || panties && this.isDiaper(panties))) {
+              const pelvis = InventoryGet(Player, "ItemPelvis");
+              const panties = InventoryGet(Player, "Panties");
+              if (pelvis && this.isDiaper(pelvis) || panties && this.isDiaper(panties)) {
                 this.tick();
               } else {
                 this.regression.step();
@@ -865,37 +850,36 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
           }
           calculateChance() {
-            let chanceForNothing = 0.1;
-            let total = this.mess.chance * +this.mess.enabled + this.wet.chance * +this.wet.enabled + chanceForNothing;
-            let messChance = this.mess.chance / total;
-            let wetChance = this.wet.chance / total;
-            const randomValue = Math.random();
-            return { mess: messChance, wet: wetChance, value: randomValue, nothing: chanceForNothing };
+            const chanceForNothing = 0.1;
+            const total = this.mess.chance + this.wet.chance + chanceForNothing;
+            const messChance = this.mess.chance / total * +this.mess.enabled;
+            const wetChance = this.wet.chance / total * +this.wet.enabled;
+            const result = ["mess", "wet", "nothing"][+("0".repeat(messChance * 100) + "1".repeat(wetChance * 100) + "2".repeat(chanceForNothing * 100))[RandomInt(0, total * 100)]];
+            return { result, mess: messChance, wet: wetChance, nothing: chanceForNothing };
           }
           tick() {
-            let [messChance, wetChance, randomValue, chanceForNothing] = Object.values(this.calculateChance());
+            const result = this.calculateChance()["result"];
+            if (result == "nothing") {
+              return;
+            }
             this.regression.step();
             this.desperation.check();
-            if (randomValue < messChance) {
-              this.mess.count++;
-              if (this.absorbancy.total > this.mess.count) {
-                promptMessage(ABCLdata.messages[this.messageType]["mess"]);
-              } else if (this.absorbancy.total == this.mess.count) {
-                promptMessage(ABCLdata.messages[this.messageType]["fullyMess"]);
-              } else {
-                promptMessage(ABCLdata.messages[this.messageType]["immergency"]);
-              }
-            } else if (randomValue < wetChance + chanceForNothing) {
-            } else {
-              this.wet.count++;
-              if (this.absorbancy.total > this.wet.count) {
-                promptMessage(ABCLdata.messages[this.messageType]["wet"]);
-              } else if (this.absorbancy.total == this.wet.count) {
-                promptMessage(ABCLdata.messages[this.messageType]["fullyWet"]);
-              } else {
-                promptMessage(ABCLdata.messages[this.messageType]["immergency"]);
-              }
+            let property = { "mess": () => {
+              return this.mess;
+            }, "wet": () => {
+              return this.wet;
+            } }[result];
+            if (property == null) {
+              return;
             }
+            property().count += 1;
+            let message = "immergency";
+            if (this.absorbancy.total > this.mess.count + this.wet.count) {
+              message = result;
+            } else if (this.absorbancy.total == this.mess.count + this.wet.count) {
+              message = "fully" + result;
+            }
+            promptMessage(ABCLdata.messages[this.messageType][message]);
             this.updateDiaperColor("ItemPelvis");
             this.updateDiaperColor("Panties");
             ChatRoomCharacterUpdate(Player);
@@ -991,8 +975,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               return;
             }
             abcl.changeDiaper(Player);
-            abcl.accident();
-            abcl.accident(true);
+            abcl.accident("selfwet");
+            abcl.accident("selfmess");
             abcl.tick();
             abcl.regression.step();
             abcl.desperation.check();
@@ -1034,10 +1018,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
             if (abcl) {
               let item = { "Asset": _asset };
               if (slot == "ItemPelvis") {
-                abcl.PelvisItem = abcl.isDiaper(item) ? null : item;
+                console.log("Pelvis", item, abcl.isDiaper(item));
+                abcl.PelvisItem = abcl.isDiaper(item) ? item : null;
               }
               if (slot == "Panties") {
-                abcl.PantiesItem = abcl.isDiaper(item) ? null : item;
+                abcl.PantiesItem = abcl.isDiaper(item) ? item : null;
               }
             }
             return next(args);
@@ -1051,7 +1036,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         async function ABCLDrawButton() {
           modApi.hookFunction("DrawButton", 2, (args, next) => {
-            if (args[6] == "Icons/Abcl.png") args[6] = runtime + "Assets/abcl.png";
+            if (args[6] == "Icons/Abcl.png") args[6] = runtime + "images/abcl.png";
             return next(args);
           });
         }
@@ -1077,50 +1062,34 @@ One of mods you are using is using an old version of SDK. It will work for now b
             switch (command) {
               case "help":
                 ChatRoomSendLocal(
-                  "<p style='background-color:#5fbd7a'><b>ABCL</b>: Welcome to Adult Baby Club Lover! Where we make sure babies use their diapers!\n \n<b>/abcl tick</b> to force a tick\n<b>/abcl stats</b> to see your current diaper stats\n<b>/abcl help</b> to see this message\n \nTo get new clean diapers:\n<b>/abcl change</b> to change your diaper\n<b>/abcl change (target)</b> to change someone else's diaper\n"
+                  "<p style='background-color:#ecc826'><b>ABCL</b>: Welcome to Adult Baby Club Lover! Where we make sure babies use their diapers!\n \n<b>/abcl tick</b> to force a tick\n<b>/abcl stats</b> to see your current diaper stats\n<b>/abcl help</b> to see this message\n \nTo get new clean diapers:\n<b>/abcl change</b> to change your diaper\n<b>/abcl change (target)</b> to change someone else's diaper\n \nIf you have any issues or suggestions then please join https://discord.gg/V9rNpRQqtZ</p>"
                 );
                 break;
               case "stats":
-                const seconds = abcl.nextEncounter;
-                const minutes = Math.floor(seconds / 60);
-                const remainingSeconds = Math.floor(seconds % 60);
-                const total = abcl.mess.chance + abcl.wet.chance + 0.1;
-                const wetChance = abcl.wet.chance / total;
-                const messChance = abcl.mess.chance / total;
-                ChatRoomSendLocal(
-                  `<p style='background-color:#5fbd7a'>ABCL: Your current diaper stats are: 
-Desperation For Milk: ${Math.floor(abcl.desperation.base * 10) / 10}, 
-Regression: ${Math.floor((abcl.regression.modifier + abcl.regression.base) * 10) / 10}, adds: ${Math.floor(abcl.regression.modifier * 10) / 10} next tick
-Wet Chance: ${Math.floor(wetChance * 100)}%, 
-Mess Chance: ${Math.floor(messChance * 100)}%, 
-Wet amount: ${abcl.wet.count * 60}/${abcl.absorbancy.total * 60}ml 
-Messes: ${abcl.mess.count * 30}/${abcl.absorbancy.total * 30}ml  
-Next tick: ${minutes} minutes and ${remainingSeconds} seconds.</p>
-`
-                );
+                ChatRoomSendLocal(templates.stats);
                 break;
               case "tick":
                 let pelvis = InventoryGet(Player, "ItemPelvis");
                 let panties = InventoryGet(Player, "Panties");
-                if ((pelvis && abcl.isDiaper(pelvis) || panties && abcl.isDiaper(panties)) && abcl.diaperRunning === true) {
+                if (pelvis && abcl.isDiaper(pelvis) || panties && abcl.isDiaper(panties)) {
                   abcl.tick();
                 } else {
                   abcl.accident();
                 }
-                ChatRoomSendLocal(`<p style='background-color:#5fbd7a'>ABCL: ${Player.Nickname == "" ? Player.Name : Player.Nickname} uses ${Pronoun.get("dependent", Player)} timemachine.</p>`);
+                ChatRoomSendLocal(`<p style='background-color:#ecc826'>ABCL: ${Player.Nickname == "" ? Player.Name : Player.Nickname} uses ${Pronoun.get("dependent", Player)} timemachine.</p>`);
                 break;
               case "change":
                 if (identifier == null) {
                   if (!(abcl.PelvisItem || abcl.PantiesItem)) {
                     ChatRoomSendLocal(
-                      "<p style='background-color:#5fbd7a'>ABCL: You don't have a diaper!</p>"
+                      "<p style='background-color:#ecc826'>ABCL: You don't have a diaper!</p>"
                     );
                   } else
                     abcl.changeDiaper(Player);
                 } else {
                   let player = GetPlayer(identifier);
                   if (player == null) {
-                    ChatRoomSendLocal("<p style='background-color:#5fbd7a'>ABCL: Player not found!</p>");
+                    ChatRoomSendLocal("<p style='background-color:#ecc826'>ABCL: Player not found!</p>");
                     break;
                   }
                   let pelvis2 = InventoryGet(player, "ItemPelvis");
@@ -1128,12 +1097,12 @@ Next tick: ${minutes} minutes and ${remainingSeconds} seconds.</p>
                   if (pelvis2 && abcl.isDiaper(pelvis2) || panties2 && abcl.isDiaper(panties2)) {
                     abcl.changeDiaper(player);
                   } else {
-                    ChatRoomSendLocal("<p style='background-color:#5fbd7a'>ABCL: " + ChatRoomHTMLEntities(GetName(player)) + " does not have a diaper!</p>");
+                    ChatRoomSendLocal("<p style='background-color:#ecc826'>ABCL: " + ChatRoomHTMLEntities(GetName(player)) + " does not have a diaper!</p>");
                   }
                 }
                 break;
               default:
-                ChatRoomSendLocal("<p style='background-color:#5fbd7a'>ABCL: Unknown command. Type /abcl help for a list of commands.</p>");
+                ChatRoomSendLocal("<p style='background-color:#ecc826'>ABCL: Unknown command. Type /abcl help for a list of commands.</p>");
                 break;
             }
           }
