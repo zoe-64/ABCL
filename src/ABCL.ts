@@ -43,7 +43,6 @@ async function statUpdateLoop() {
 
         }
 	}
-	console.log('Updated stats');
 }
 setInterval(statUpdateLoop, 1000);
 // @ts-ignore

@@ -38,6 +38,10 @@
             "Diaper": {
                 "type": "mono",
                 "absorbancy": 2
+            },
+            "Diaper Harness": {
+                "type": "mono",
+                "absorbancy": 0
             }
     },
     "Items": {

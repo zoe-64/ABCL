@@ -194,7 +194,6 @@
             statbox.querySelector(".regressionModifier").textContent = Math.floor(globalThis.Abcl.regression.modifier * 10) / 10;
           }
         }
-        console.log("Updated stats");
       }
       setInterval(statUpdateLoop, 1e3);
       var bcModSDK = function() {
