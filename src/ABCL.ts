@@ -191,9 +191,9 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 let content = JSON.parse(response.Content);                
                 if (content.Action == "ChangeDiaper" && content.MemberNumber == Player.MemberNumber) {
                     if ((globalThis as any).BCC_LOADED) { // @ts-ignore
-                        if (hasPermissionToChangeDiaper(content.Sender)) { 
-                            this.changeDiaper(Player, GetName(Player));
-                        }
+                        //if (hasPermissionToChangeDiaper(content.Sender)) { 
+                	//	this.changeDiaper(Player, GetName(Player));
+                        //}
                     }
                     let player = GetPlayer(content.MemberNumber);
                     let responder:typeof Player = GetPlayer(response.Sender) as typeof Player;
