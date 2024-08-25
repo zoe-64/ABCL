@@ -480,11 +480,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
               }
               let content = JSON.parse(response.Content);
               if (content.Action == "ChangeDiaper" && content.MemberNumber == Player.MemberNumber) {
-                if (globalThis.BCC_LOADED) {
-                  if (hasPermissionToChangeDiaper(content.Sender)) {
-                    this.changeDiaper(Player, GetName(Player));
-                  }
-                }
                 let player = GetPlayer(content.MemberNumber);
                 let responder = GetPlayer(response.Sender);
                 if (player) {
