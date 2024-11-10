@@ -1,0 +1,124 @@
+
+#abcl .page {
+	background-color: #ffffff;
+	border: 1px solid #000;
+	z-index: 100;
+	padding: 0;
+	margin: auto;
+	outline: none;
+	display: block;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	position: absolute;
+	aspect-ratio: auto 2000 / 1000;
+	font-family: sans-serif;
+
+}
+
+#page-abcl-1:not(.hidden) {
+	display: grid;
+	grid-template-rows: 1fr 1fr 1fr;
+	grid-template-columns:repeat(6, min-content);
+	gap: 5px;
+	background-color: rgb(240, 240, 240);
+	width: unset;
+    height: 100%;
+}
+.tooltip {
+	position: relative;
+}
+#abcl label, #abcl input, #abcl button {
+	display: block;
+	text-align: center;
+	margin: auto;
+
+}
+#abcl-mess {grid-area: a;}
+#abcl-visual {grid-area: b;}
+#abcl-wet {grid-area: c;}
+#abcl-mess-wet-chance {grid-area: d;
+	width: 95%;
+	margin: auto;
+}
+
+#abcl-clothing-accidents {grid-area: e;}
+#abcl-automatic-accidents {grid-area: f;}
+#abcl-timer-duration {grid-area: g;}
+#wettings-messes-category {
+	display: grid;
+
+
+	grid-template-areas: 
+		"a b c"
+		"d d d"
+		"e e e"
+		"f g .";
+	width: 250px;
+	grid-template-columns: 1fr 1fr 1fr;
+	
+}
+.settings-category {
+	background-color: gainsboro;
+	box-shadow: 0 0 5px 1px #c7c7c7 inset;
+	border-radius: 2px;
+	width: fit-content;
+	padding: 10px;
+}
+.abcl-exit-button {
+    background-image: url("Icons/Exit.png");
+    aspect-ratio: 1;
+    width: 6vw;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 5vw;
+    }
+#abcl-exit {
+	position: absolute;
+	top: 2vw;
+	right: 2vw;
+}
+
+.tooltip:before, .tooltip::after {
+	--scale: 0;
+	content: attr(data-tooltip);
+	top: -0.25rem;
+	color: #ffffff;
+	padding: 0.5rem;
+	left: 50%;
+	background-color: #000;
+	position: absolute;
+
+	transform:  translateX(-50%) translateY(-100%) scale(var(--scale));
+	
+	transition: transform 0.1s;
+}
+.tooltip:hover:before, .tooltip:hover::after {
+	--scale: 1;
+}
+
+
+#abcl input[type="number"]:focus {
+	outline: none;
+}
+#abcl input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+}
+.ABCLstyle-interactable {
+	background-color: rgb(238, 238, 238);
+	border: rgb(175, 175, 175) 1px solid;
+	text-align: center;
+	margin: auto;
+	display: block;
+	padding: 3px;
+	border-radius: 1px;
+}
+.ABCLstyle-interactable option {
+	text-align: center;
+}
+
+
+.hidden {
+	display: none !important;
+}

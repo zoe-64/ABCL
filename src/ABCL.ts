@@ -15,152 +15,77 @@
 // ==/UserScript==
 
 import { RandomInt, GetText, GetJson, SentenceBuilder, GetName, Pronoun, LocalCache, Messager, GetPlayer, AverageColor } from "../node_modules/zoelib/dist/zoelib.mjs";
-const local = false;
-// get the html from this url and paste it into game
-// https://github.com/zoe-64/ABCL/blob/main/data/settings.html
+import { runtime, createABCLHtml, DiaperUseLevels, ABCLdata, templates, diaperDefaultValues, MessageType } from "./data"
+import { getItemsBelow, promptMessage } from "./message"
+import { Diaper } from "./objects";
+import bcModSdk, {ModSDKModAPI} from "bondage-club-mod-sdk"
 
 async function statUpdateLoop() {
-	if ((globalThis as any).Abcl != null) {
-        let statBoxes = document.querySelectorAll('.stats-box');
-        let seconds = (globalThis as any).Abcl.nextEncounter
-        let minutes = Math.floor(seconds / 60);
-        let remainingSeconds = Math.floor(seconds % 60);
-        let chance = (globalThis as any).Abcl.calculateChance(); 
-        for (let statbox of statBoxes) { // @ts-ignore
-            statbox.querySelector('.wetCount').textContent = (globalThis as any).Abcl.wet.count * 60; // @ts-ignore
-            statbox.querySelector('.messCount').textContent = (globalThis as any).Abcl.mess.count * 60; // @ts-ignore
-            statbox.querySelector('.wetChance').textContent = Math.floor(chance.wet * 100) + '%'; // @ts-ignore
-            statbox.querySelector('.messChance').textContent = Math.floor(chance.mess * 100) + '%'; // @ts-ignore
-            
-            statbox.querySelector('.tickMinutes').textContent = minutes; // @ts-ignore 
-            statbox.querySelector('.tickSeconds').textContent = remainingSeconds; // @ts-ignore
-            statbox.querySelector('.bar').style.width = (seconds/((globalThis as any).Abcl.diaperTimer*60)) * 100 + '%'; // @ts-ignore
-            statbox.querySelector('.absorbancyTotal').textContent =  (globalThis as any).Abcl.absorbancy.total*60; // @ts-ignore
+    const abcl = (globalThis as any).Abcl as ABCL;
+    if (abcl != null) {
+        const statBoxes = document.querySelectorAll('.stats-box');
+        const seconds = abcl.nextEncounter;
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        const chance = abcl.calculateChance();
+        const totalAbsorbancy = (abcl.topLayer?.absorbancy ?? 0) + (abcl.bottomLayer?.absorbancy ?? 0)
+        const totalMesses = (abcl.topLayer?.messes ?? 0) + (abcl.bottomLayer?.messes ?? 0)
+        const totalWettings = (abcl.topLayer?.wettings ?? 0) + (abcl.bottomLayer?.wettings ?? 0)
 
-            statbox.querySelector('.desperationBase').textContent = Math.floor((globalThis as any).Abcl.desperation.base * 10) / 10; // @ts-ignore
-            statbox.querySelector('.regressionbase').textContent = Math.floor(((globalThis as any).Abcl.regression.modifier + (globalThis as any).Abcl.regression.base) * 10) / 10;// @ts-ignore
-            statbox.querySelector('.regressionModifier').textContent = Math.floor((globalThis as any).Abcl.regression.modifier * 10) / 10;// @ts-ignore 
+        statBoxes.forEach(statbox => {
+            const wetCount = statbox.querySelector('.wetCount');
+            const messCount = statbox.querySelector('.messCount');
+            const wetChance = statbox.querySelector('.wetChance');
+            const messChance = statbox.querySelector('.messChance');
+            const tickMinutes = statbox.querySelector('.tickMinutes');
+            const tickSeconds = statbox.querySelector('.tickSeconds');
+            const bar = statbox.querySelector('.bar') as HTMLElement; 
+            const absorbancyTotal = statbox.querySelector('.absorbancyTotal');
+            const desperationBase = statbox.querySelector('.desperationBase');
+            const regressionBase = statbox.querySelector('.regressionbase');
+            const regressionModifier = statbox.querySelector('.regressionModifier');
 
-        }
-	}
+            if (wetCount) wetCount.textContent = (totalWettings * 60).toString();
+            if (messCount) messCount.textContent = (totalMesses * 60).toString();
+            if (wetChance) wetChance.textContent = Math.floor(chance.wet * 100) + '%';
+            if (messChance) messChance.textContent = Math.floor(chance.mess * 100) + '%';
+            if (tickMinutes) tickMinutes.textContent = minutes.toString();
+            if (tickSeconds) tickSeconds.textContent = remainingSeconds.toString();
+            if (bar) bar.style.width = (seconds / (abcl.diaperTimer * 60)) * 100 + '%';
+            if (absorbancyTotal) absorbancyTotal.textContent = (totalAbsorbancy * 60).toString();
+            if (desperationBase) desperationBase.textContent = (Math.floor(abcl.desperation.base * 10) / 10).toString();
+            if (regressionBase) regressionBase.textContent = (Math.floor((abcl.regression.modifier + abcl.regression.base) * 10) / 10).toString();
+            if (regressionModifier) regressionModifier.textContent = (Math.floor(abcl.regression.modifier * 10) / 10).toString();
+        });
+    }
 }
+const ABCLversion = "1.1.0";
+
+export const modAPI: ModSDKModAPI = bcModSdk.registerMod({
+    name: "ABCL",
+    version: ABCLversion,
+    fullName: "Adult Baby Club Lover",
+    repository: 'https://github.com/zoe-64/ABCL'
+}, {
+    allowReplace: false
+});
+
+if (typeof (globalThis as any).ABCLversion != 'undefined') {
+    throw new Error("ABCL already loaded. No double loading");
+}
+var abcl:ABCL | null = null;
+
+(globalThis as any).ABCLversion = ABCLversion;
+(globalThis as any).ABCLLOADED = true;
+
+await createABCLHtml(runtime)
+
 setInterval(statUpdateLoop, 1000);
-// @ts-ignore
-var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ERROR:\n"+o);const e=new Error(o);throw console.error(e),e}const t=new TextEncoder;function n(o){return!!o&&"object"==typeof o&&!Array.isArray(o)}function r(o){const e=new Set;return o.filter((o=>!e.has(o)&&e.add(o)))}const i=new Map,a=new Set;function c(o){a.has(o)||(a.add(o),console.warn(o))}function s(o){const e=[],t=new Map,n=new Set;for(const r of f.values()){const i=r.patching.get(o.name);if(i){e.push(...i.hooks);for(const[e,a]of i.patches.entries())t.has(e)&&t.get(e)!==a&&c(`ModSDK: Mod '${r.name}' is patching function ${o.name} with same pattern that is already applied by different mod, but with different pattern:\nPattern:\n${e}\nPatch1:\n${t.get(e)||""}\nPatch2:\n${a}`),t.set(e,a),n.add(r.name)}}e.sort(((o,e)=>e.priority-o.priority));const r=function(o,e){if(0===e.size)return o;let t=o.toString().replaceAll("\r\n","\n");for(const[n,r]of e.entries())t.includes(n)||c(`ModSDK: Patching ${o.name}: Patch ${n} not applied`),t=t.replaceAll(n,r);return(0,eval)(`(${t})`)}(o.original,t);let i=function(e){var t,i;const a=null===(i=(t=m.errorReporterHooks).hookChainExit)||void 0===i?void 0:i.call(t,o.name,n),c=r.apply(this,e);return null==a||a(),c};for(let t=e.length-1;t>=0;t--){const n=e[t],r=i;i=function(e){var t,i;const a=null===(i=(t=m.errorReporterHooks).hookEnter)||void 0===i?void 0:i.call(t,o.name,n.mod),c=n.hook.apply(this,[e,o=>{if(1!==arguments.length||!Array.isArray(e))throw new Error(`Mod ${n.mod} failed to call next hook: Expected args to be array, got ${typeof o}`);return r.call(this,o)}]);return null==a||a(),c}}return{hooks:e,patches:t,patchesSources:n,enter:i,final:r}}function l(o,e=!1){let r=i.get(o);if(r)e&&(r.precomputed=s(r));else{let e=window;const a=o.split(".");for(let t=0;t<a.length-1;t++)if(e=e[a[t]],!n(e))throw new Error(`ModSDK: Function ${o} to be patched not found; ${a.slice(0,t+1).join(".")} is not object`);const c=e[a[a.length-1]];if("function"!=typeof c)throw new Error(`ModSDK: Function ${o} to be patched not found`);const l=function(o){let e=-1;for(const n of t.encode(o)){let o=255&(e^n);for(let e=0;e<8;e++)o=1&o?-306674912^o>>>1:o>>>1;e=e>>>8^o}return((-1^e)>>>0).toString(16).padStart(8,"0").toUpperCase()}(c.toString().replaceAll("\r\n","\n")),d={name:o,original:c,originalHash:l};r=Object.assign(Object.assign({},d),{precomputed:s(d),router:()=>{},context:e,contextProperty:a[a.length-1]}),r.router=function(o){return function(...e){return o.precomputed.enter.apply(this,[e])}}(r),i.set(o,r),e[r.contextProperty]=r.router}return r}function d(){for(const o of i.values())o.precomputed=s(o)}function p(){const o=new Map;for(const[e,t]of i)o.set(e,{name:e,original:t.original,originalHash:t.originalHash,sdkEntrypoint:t.router,currentEntrypoint:t.context[t.contextProperty],hookedByMods:r(t.precomputed.hooks.map((o=>o.mod))),patchedByMods:Array.from(t.precomputed.patchesSources)});return o}const f=new Map;function u(o){f.get(o.name)!==o&&e(`Failed to unload mod '${o.name}': Not registered`),f.delete(o.name),o.loaded=!1,d()}function g(o,t){o&&"object"==typeof o||e("Failed to register mod: Expected info object, got "+typeof o),"string"==typeof o.name&&o.name||e("Failed to register mod: Expected name to be non-empty string, got "+typeof o.name);let r=`'${o.name}'`;"string"==typeof o.fullName&&o.fullName||e(`Failed to register mod ${r}: Expected fullName to be non-empty string, got ${typeof o.fullName}`),r=`'${o.fullName} (${o.name})'`,"string"!=typeof o.version&&e(`Failed to register mod ${r}: Expected version to be string, got ${typeof o.version}`),o.repository||(o.repository=void 0),void 0!==o.repository&&"string"!=typeof o.repository&&e(`Failed to register mod ${r}: Expected repository to be undefined or string, got ${typeof o.version}`),null==t&&(t={}),t&&"object"==typeof t||e(`Failed to register mod ${r}: Expected options to be undefined or object, got ${typeof t}`);const i=!0===t.allowReplace,a=f.get(o.name);a&&(a.allowReplace&&i||e(`Refusing to load mod ${r}: it is already loaded and doesn't allow being replaced.\nWas the mod loaded multiple times?`),u(a));const c=o=>{let e=g.patching.get(o.name);return e||(e={hooks:[],patches:new Map},g.patching.set(o.name,e)),e},s=(o,t)=>(...n)=>{var i,a;const c=null===(a=(i=m.errorReporterHooks).apiEndpointEnter)||void 0===a?void 0:a.call(i,o,g.name);g.loaded||e(`Mod ${r} attempted to call SDK function after being unloaded`);const s=t(...n);return null==c||c(),s},p={unload:s("unload",(()=>u(g))),hookFunction:s("hookFunction",((o,t,n)=>{"string"==typeof o&&o||e(`Mod ${r} failed to patch a function: Expected function name string, got ${typeof o}`);const i=l(o),a=c(i);"number"!=typeof t&&e(`Mod ${r} failed to hook function '${o}': Expected priority number, got ${typeof t}`),"function"!=typeof n&&e(`Mod ${r} failed to hook function '${o}': Expected hook function, got ${typeof n}`);const s={mod:g.name,priority:t,hook:n};return a.hooks.push(s),d(),()=>{const o=a.hooks.indexOf(s);o>=0&&(a.hooks.splice(o,1),d())}})),patchFunction:s("patchFunction",((o,t)=>{"string"==typeof o&&o||e(`Mod ${r} failed to patch a function: Expected function name string, got ${typeof o}`);const i=l(o),a=c(i);n(t)||e(`Mod ${r} failed to patch function '${o}': Expected patches object, got ${typeof t}`);for(const[n,i]of Object.entries(t))"string"==typeof i?a.patches.set(n,i):null===i?a.patches.delete(n):e(`Mod ${r} failed to patch function '${o}': Invalid format of patch '${n}'`);d()})),removePatches:s("removePatches",(o=>{"string"==typeof o&&o||e(`Mod ${r} failed to patch a function: Expected function name string, got ${typeof o}`);const t=l(o);c(t).patches.clear(),d()})),callOriginal:s("callOriginal",((o,t,n)=>{"string"==typeof o&&o||e(`Mod ${r} failed to call a function: Expected function name string, got ${typeof o}`);const i=l(o);return Array.isArray(t)||e(`Mod ${r} failed to call a function: Expected args array, got ${typeof t}`),i.original.apply(null!=n?n:globalThis,t)})),getOriginalHash:s("getOriginalHash",(o=>{"string"==typeof o&&o||e(`Mod ${r} failed to get hash: Expected function name string, got ${typeof o}`);return l(o).originalHash}))},g={name:o.name,fullName:o.fullName,version:o.version,repository:o.repository,allowReplace:i,api:p,loaded:!0,patching:new Map};return f.set(o.name,g),Object.freeze(p)}function h(){const o=[];for(const e of f.values())o.push({name:e.name,fullName:e.fullName,version:e.version,repository:e.repository});return o}let m;const y=void 0===window.bcModSdk?window.bcModSdk=function(){const e={version:o,apiVersion:1,registerMod:g,getModsInfo:h,getPatchingInfo:p,errorReporterHooks:Object.seal({apiEndpointEnter:null,hookEnter:null,hookChainExit:null})};return m=e,Object.freeze(e)}():(n(window.bcModSdk)||e("Failed to init Mod SDK: Name already in use"),1!==window.bcModSdk.apiVersion&&e(`Failed to init Mod SDK: Different version already loaded ('1.2.0' vs '${window.bcModSdk.version}')`),window.bcModSdk.version!==o&&alert(`Mod SDK warning: Loading different but compatible versions ('1.2.0' vs '${window.bcModSdk.version}')\nOne of mods you are using is using an old version of SDK. It will work for now but please inform author to update`),window.bcModSdk);return"undefined"!=typeof exports&&(Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=y),y}();
-(async function() {
-    if (typeof (globalThis as any).ABCLversion != 'undefined') {
-        console.warn("ABCL already loaded. No double loading");
-        return;
-    }
-    var abcl:ABCL | null = null;
-    let runtime = "";
-    if (local) {
-        const runtimeElement = document.getElementById('ABCLruntimeID');
-        if (!runtimeElement?.innerText) {
-            console.error("Runtime element not found");
-            return;
-        }
-        runtime = runtimeElement.innerText;
-        const abclHtml = await GetText(runtime+"data/settings.html");
-        document.body.insertAdjacentHTML('beforeend', abclHtml);
-    } else {
-        runtime = "https://raw.githubusercontent.com/zoe-64/ABCL/main/"; 
-        const abclHtml = await GetText("https://raw.githubusercontent.com/zoe-64/ABCL/main/data/settings.html");
-        document.body.insertAdjacentHTML('beforeend', abclHtml);
-    }
-    const ABCLversion = "1.0";
-    const modApi = bcModSDK.registerMod({
-        name: 'ABCL',
-        fullName: 'Adult Baby Club Lover',
-        version: ABCLversion,
-        repository: 'https://github.com/zoe-64/ABCL',
-    });
-    (globalThis as any).ABCLversion = ABCLversion;
-    
- 
-    
-//#region Abcl                                  
-    let templates = {
-        stats: await GetText(runtime + "data/stats.html"),
-        settings: await GetText(runtime + "data/settings.html"),
-    }
-    const ABCLdata = await GetJson(runtime+"data/dictionary.json");
-    const DiaperUseLevels:Record<string, string> = {
-        "Clean": "#8F8F8F",
-        "Middlewet": "#ffe58b",
-        "Maximumwet": "#ffd33e",
-        "Middlemess": "#423019",
-        "Maximummess": "#3C302C",
-        "Selfwet": "#4F4B1B",
-        "Selfmess": "#3B2B17",
-    }
-    // Table to store all the defaul values for Abcl()
-    const diaperDefaultValues = {
-        messChance: .3,
-        wetChance: .5,
-        timer: 30,
-        regressionLevel: 0,
-        desperationLevel: 0,
-        messageType: "internalMonologue",
-        wetting: true,
-        messing: true,
-        accidents: false,
-        visual: true,
-        enabled: true,
-    };
-    
 
-    // Initializer function
-    function getItemsBelow() {
-        // if wearing stockings, socks, or shoes, skirt, they should be damp
-        let socks = InventoryGet(Player, "Socks")?.Asset?.Description?.toLowerCase();
-        let cloth = InventoryGet(Player, "Cloth")?.Asset?.Description?.toLowerCase();
-        let panties = InventoryGet(Player, "Panties")?.Asset?.Description?.toLowerCase();
-        let itemsBelow = [socks, cloth, panties];
-        let itemsToLookFor = ["stockings", "socks", "shoes", "skirt", "panties", "dress"];
-
-        let options = [];
-        for (let word of itemsToLookFor) {
-            for (let item of itemsBelow)
-            if (item?.includes(word)) {
-                options.push(item);
-            }
-        }
-        let result = "";
-        if (options.length > 1) {
-            options = options.slice(0, 2);
-            result = options.join(" and ");
-            result += " gets"
-        } else if (options.length === 1) {
-            result = options[0] + " get";
-        } else {
-            result = "legs are";
-        }
-        return result;
-    } 
-
-    function promptMessage(unformatedMessage:string) {
-        SentenceBuilder.target = Player;
-        let message = SentenceBuilder.prompt(unformatedMessage, Player);
-
-        if (typeof abcl == 'undefined' || abcl == null) {
-            console.error("ABCL not loaded");
-            return;
-        }
-        if (abcl.messageType == "internalMonologue") {
-            Messager.localSend(message);
-        } else {
-            //ChatRoomSendEmote("/action "+ message)
-            ServerSend("ChatRoomChat", {Content: "Beep", Type: "Action", Dictionary: [
-                // EN
-                { Tag: "Beep", Text: "msg" },
-                { Tag: "msg", Text: message},
-        
-            ]});        
-            //Messager.send(message, undefined,);
-        }
-    } 
    
+
+//#region Abcl                                  
+  
     class ABCL {
         getRegressionItems(items=Player.Appearance) {
             let inFilter = [];
@@ -209,22 +134,18 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
         enabled:boolean;
         visual:boolean;
         accidents:boolean;
-        messageType:string;
+        messageType:MessageType;
         loopTimestamp:number;
         wet: {
             _enabled:boolean,
-            _wets:number,
             _wetChance:number,
-            count:number,
             base:number,
             chance:number,
             enabled:boolean
         };
         mess: {
             _enabled:boolean,
-            _messes:number,
             _messChance:number,
-            count:number,
             base:number,
             chance:number,
             enabled:boolean
@@ -241,27 +162,30 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
             modifier:number,
             check:()=>void
         };
-        absorbancy: {
-            total:number
-        };
+
         timer:number;
-        _PelvisItem:Item | null;
-        _PantiesItem:Item | null;
         automatic_accidents:boolean;
+        permissions: ABCLPermissions
+        topLayer: Diaper | null
+        bottomLayer: Diaper | null
         constructor() {
             SentenceBuilder.data["§name§"] = {get neutral() {return [GetName(Player)]}};
             SentenceBuilder.data["§items-below§"] = {get neutral() {return [getItemsBelow()]}};
             SentenceBuilder.data["§current-diaper§"] = {get neutral() {return [InventoryGet(Player, "ItemPelvis")?.Asset?.Description || InventoryGet(Player, "Panties")?.Asset?.Description || "diaper"]}};
             SentenceBuilder.data["§by-player§"] = {"neutral":[Pronoun.get("Reflexive", Player)]};
             SentenceBuilder.data = {...ABCLdata.verbs, ...SentenceBuilder.data};
-
-           
+    
             (globalThis as any).Abcl = this;
             const abcl = this;
+            this.permissions = new ABCLPermissions(this);
             this.cache = new LocalCache(`Abcl-${Player.MemberNumber}`);
-            this._PelvisItem = null,
-            this._PantiesItem = null,
-            Messager.listener(this.ABCLMessagerListener.bind(this), -5, "ABCL Message Processor");
+ 
+            Messager.addListener(this.ABCLMessagerListener.bind(this), -5, "ABCL Message Processor");
+
+
+            this.topLayer = null
+            this.bottomLayer = null
+       
             this.loopTimestamp = Date.now();
 
             // options
@@ -275,14 +199,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
             
             this.wet = {
                 _enabled: abcl.cache.get("wet_enabled", diaperDefaultValues.wetting),
-                _wets: abcl.cache.get("wet_count", 0),
                 _wetChance: abcl.cache.get("wet_base", diaperDefaultValues.wetChance),
-                set count(value) {
-                    this._wets = value;
-                    abcl.cache.set("wet_count", value);
-                    abcl.refreshDiaper();
-                },
-                get count() {return this._wets},
                 set base(value) {
                     this._wetChance = value
                     abcl.cache.set("wet_base", value);
@@ -307,14 +224,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
             };
             this.mess = {
                 _enabled: abcl.cache.get("mess_enabled", diaperDefaultValues.messing) ,
-                _messes: abcl.cache.get("mess_count", 0),
                 _messChance: abcl.cache.get("mess_base", diaperDefaultValues.messChance),
-                set count(value) {
-                    this._messes = value;
-                    abcl.cache.set("mess_count", value);
-                    abcl.refreshDiaper();
-                },
-                get count() {return this._messes},
                 set base(value) {
                     this._messChance = value
                     abcl.cache.set("mess_base", value);
@@ -395,31 +305,8 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 }
             }
             
-            this.absorbancy = { 
-                get total() {
-                    let total = 0;
-                    if (abcl.PelvisItem) {
-                        total += ABCLdata["Diapers"][abcl.PelvisItem.Asset.Description].absorbancy;
-                        for (let key in ABCLdata.CraftingModifiers.absorbancy) {
-                            if (abcl.PelvisItem?.Craft?.Description?.includes(key)) {
-                                total += ABCLdata.CraftingModifiers.absorbancy[key];
-                            }
-                        }
-                    }
-                  
-                    if (abcl.PantiesItem) {
-                        total += ABCLdata["Diapers"][abcl.PantiesItem.Asset.Description].absorbancy;
-                    }
-                    
-                        
-                    return total;
-                }
-            }
-           
             this.loop();
-            
         }
-      
         get diaperTimer() {
             
             let modifier = Math.pow(1.02, (this.regression.base+1)) * (this.desperation.modifier + 1)
@@ -432,49 +319,12 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
             return encounter;
         }
         
-        set PelvisItem(item:Item | null) { 
-            this._PelvisItem = item;
-            if (!this._PelvisItem && !this._PantiesItem) {
-                this.mess.count = 0;
-                this.wet.count = 0;
-            }
-            //setTimeout(() => this.refreshDiaper(), 5000);
-        }
-        get PelvisItem(): Item | null {
-            this._PelvisItem = InventoryGet(Player, 'ItemPelvis');
-            if (this._PelvisItem == null) {
-                return null;
-            }
-            return this.isDiaper(this._PelvisItem) ? this._PelvisItem: null;
-        }
-        set PantiesItem(item: Item | null) {
-            this._PantiesItem = item;
-            if (!this._PelvisItem && !this._PantiesItem) {
-                this.mess.count = 0;
-                this.wet.count = 0;
-            }
-            setTimeout(() => this.refreshDiaper(), 5000);
-        }
-        get PantiesItem(): Item | null {
-            this._PantiesItem = InventoryGet(Player, 'Panties');
-            if (this._PantiesItem == null) {
-                return null;
-            }
-            return this.isDiaper(this._PantiesItem) ? this._PantiesItem: null;
-        }
+
         reset() {
             localStorage.removeItem(`Abcl-${Player.MemberNumber}`);
             setTimeout(() => location.reload(), 2000);
         }
-        refreshDiaper() { 
-            if (!this.enabled) {
-                return;
-            }
-            this.updateDiaperColor("ItemPelvis");
-            this.updateDiaperColor("Panties");
-            CharacterRefresh(Player, true);
-            ChatRoomCharacterUpdate(Player);
-        }
+
 
         changeDiaper(player:typeof Player, by="self") {
             if (player != Player && player != null) { // change another player's diaper
@@ -486,14 +336,10 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                     return;
                 }
             }
-            this.PelvisItem = InventoryGet(Player, "ItemPelvis");
-            this.PantiesItem = InventoryGet(Player, "Panties");
+            this.topLayer?.change()
+            this.bottomLayer?.change()
             
-            this.wet.count = 0;
-            this.mess.count = 0;
-           
-            this.updateDiaperColor("ItemPelvis");
-            this.updateDiaperColor("Panties");
+            this.updateDiapers();
               // being changed by someone else
             if (by != "self") {
                 SentenceBuilder.data["§by-player§"] = {"neutral":[by]};
@@ -504,11 +350,6 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 SentenceBuilder.data["§by-player§"] = {"neutral":[Pronoun.get("Reflexive", Player)]};
             }
            
-        }
-            
-        // Check for if a diaper is in the Panties or ItemPelvies slot
-        isDiaper(item:Item) {
-            return item?.Asset?.Description.toLowerCase().includes('diaper');
         }
         // Checks to see if the user has a nursery milk equiped
         hasMilk() {
@@ -527,76 +368,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
 
        
         // ItemPelvis or Panties as slot
-        updateDiaperColor(slot: AssetGroupName) { // this section is a bit more messy than the other
-            if (!this.enabled || !this.visual) {
-                return;
-            }
-            let item = InventoryGet(Player, slot);
-            if (!item || !item.Color || !this.isDiaper(item)) { 
-                return;
-            }
-            
-            if (typeof item.Color == "object") {
-                for (let index in item.Color) {
-                    if (item.Color[index] == "Default") {
-                        item.Color[index] = item.Asset.DefaultColor[index];
-                    }
-                }
-            } else if (item.Color == "Default" && typeof item.Color == "string") {
-                item.Color = item.Asset.DefaultColor as ItemColor;
-            }
-
-            let diaper = ABCLdata["Diapers"][item.Asset.Description];
-            if ((diaper.type === "primary" || diaper.type === "primary&secondary") && typeof item.Color == "string") {
-                item.Color = item.Asset.DefaultColor as ItemColor;
-            }
-            let color = {
-                messy: DiaperUseLevels["Clean"],
-                wet: DiaperUseLevels["Clean"] // in the end we just mix these together but messy is 50% stronger
-            }
-            let delta = {
-                "messy": this.mess.count / this.absorbancy.total,
-                "wet": this.wet.count / this.absorbancy.total,
-            }
-            // between clean and middle messy
-            if (delta.messy > 0.75) {
-                // between middle and maximum messy
-                if (delta.messy > 0.9) {
-                    color.messy = DiaperUseLevels["Maximummess"];
-                } else {
-                    color.messy = AverageColor(DiaperUseLevels["Maximummess"], DiaperUseLevels["Middlemess"], delta.messy - 0.75);
-                }
-            } else {
-                color.messy = AverageColor(DiaperUseLevels["Middlemess"], DiaperUseLevels["Clean"], delta.messy);
-            }
-            if (delta.wet > 0.75) {
-                // between clean and middle wet
-                if (delta.wet > 0.9) {
-                    color.wet = DiaperUseLevels["Maximumwet"];
-                } else {
-                    color.wet = AverageColor(DiaperUseLevels["Maximumwet"], DiaperUseLevels["Middlewet"], delta.wet - 0.75);
-                }
-            } else {
-                color.wet = AverageColor(DiaperUseLevels["Middlewet"], DiaperUseLevels["Clean"], delta.wet);
-            }
-            let primary = AverageColor(color.messy, color.wet, 0.7);
-            let secondary = AverageColor(color.messy, color.wet, 0.9);
-            if (diaper.type == "mono") {
-                item.Color = primary; 
-            }
-            
-            else if (diaper.type === "primary" && typeof item.Color != "string") {
-                item.Color[ABCLdata["Diapers"][item.Asset.Description].indexes[0]] = primary;
-            }
-            
-            else if (diaper.type === "primary&secondary" && typeof item.Color != "string") {     
-                let primary_index = ABCLdata["Diapers"][item.Asset.Description].indexes[0]
-                let secondary_index = ABCLdata["Diapers"][item.Asset.Description].indexes[1]
-                item.Color[primary_index] = primary
-                item.Color[secondary_index] = secondary
-            }
         
-        }
 
         accident(result:string | null = null) {
             if (!this.enabled || !this.accidents) {
@@ -626,9 +398,42 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 }    
             }
             
-            this.refreshDiaper();
+            this.updateDiapers();
+        }
+        updateDiapers(refresh=true) {
+            if (!this.bottomLayer || this.bottomLayer.isReplaced()) {
+                const item = InventoryGet(Player, "Panties");
+                if (item && Diaper.isDiaper(item)) {
+                    this.bottomLayer = new Diaper(item)
+                }
+            }
+            if (!this.topLayer || this.topLayer.isReplaced()) {
+                const item = InventoryGet(Player, "ItemPelvis");
+                if (item && Diaper.isDiaper(item)) {
+                    this.topLayer = new Diaper(item)
+                }
+            }
+            if (!this.enabled || !this.visual) {
+                return;
+            }            
+            const topItem = InventoryGet(Player, "ItemPelvis");
+            if (this.topLayer && topItem) {
+                this.topLayer.item.Color = this.topLayer.getColor()
+                topItem.Color = this.topLayer.item.Color
+            }
+
+            const bottomItem = InventoryGet(Player, "Panties");
+            if (this.bottomLayer && bottomItem) {
+                this.bottomLayer.item.Color = this.bottomLayer.getColor()
+                bottomItem.Color = this.bottomLayer.item.Color
+            }
+            if (refresh) {
+                CharacterRefresh(Player, true);
+                ChatRoomCharacterUpdate(Player);
+            }
         }
         async loop() {
+            this.updateDiapers()
             while (true) {
                 if (!this.enabled || !this.automatic_accidents || this.nextEncounter > 0) {
                     await new Promise(r => setTimeout(r, this.diaperTimer * 1000));
@@ -636,10 +441,8 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 }
                 this.loopTimestamp = Date.now();
 
-                
-                const pelvis = InventoryGet(Player, "ItemPelvis");
-                const panties = InventoryGet(Player, "Panties");
-                if (pelvis && this.isDiaper(pelvis) || panties && this.isDiaper(panties)) {
+             
+                if (this.topLayer || this.bottomLayer) {
                     this.tick();
                 } else {
                     this.regression.step();
@@ -661,114 +464,138 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
             if (result == "nothing") {
                 return;
             }
+            switch (result) {
+                case "nothing":
+                    return;
+                break
+                // panties item -> pelvis item
+                // bottomLayer -> topLayer
+                case "wet": 
+                    if (this.bottomLayer && this.bottomLayer.wettings + this.bottomLayer.messes < this.bottomLayer.absorbancy) {
+                        this.bottomLayer.wettings += 1
+                        break
+                    }
+                    if (this.topLayer /*&& this.topLayer.wettings + this.topLayer.messes < this.topLayer.absorbancy*/) { // leaks
+                        this.topLayer.wettings += 1
+                        break
+                    }
+                break;
+                case "mess": {
+                    if (this.bottomLayer && this.bottomLayer.wettings + this.bottomLayer.messes < this.bottomLayer.absorbancy) {
+                        this.bottomLayer.messes += 1
+                        break
+                    }
+                    
+                    if (this.topLayer /*&& this.topLayer.wettings + this.topLayer.messes < this.topLayer.absorbancy*/) { // leaks
+                        this.topLayer.messes += 1
+                        break
+                    }
+                    
+                    
+                break;
+                }
+            }
             this.regression.step();
             this.desperation.check();
-            let property = {"mess":()=>{return this.mess}, "wet":()=>{return this.wet}}[result] // I know how unusual this looks but it's short and effective
-            if (property == null) {
-                return;
-            }
-            property().count += 1;
             let message = "immergency";
-            if (this.absorbancy.total > this.mess.count + this.wet.count) {
+            let absorbancy = 0
+            let total = 0
+            if (this.topLayer) {
+                absorbancy += this.topLayer.absorbancy
+                total += this.topLayer.messes + this.topLayer.wettings
+            }
+            if (this.bottomLayer) {
+                absorbancy += this.bottomLayer.absorbancy
+                total += this.bottomLayer.messes + this.bottomLayer.wettings
+            }
+            if (absorbancy > total) {
                 message = result 
-            } else if (this.absorbancy.total == this.mess.count + this.wet.count)  {
+            } else if (total == absorbancy)  {
                 message = "fully"+result;
             } 
             promptMessage(ABCLdata.messages[this.messageType][message]);
             
-            this.updateDiaperColor("ItemPelvis");
-            this.updateDiaperColor("Panties");
-            ChatRoomCharacterUpdate(Player);
+            this.updateDiapers()
         }
         setupSettings() {
             
             PreferenceSubscreenList.push("Abcl" as PreferenceSubscreenName);
             // ABCL settings
-            const abcl_settings = document.querySelector('#abcl');
-            const inspect = document.querySelector('.inspect');
-            if (!abcl_settings || !inspect) {
+            const abclSettings = document.querySelector('#abcl');
+            if (!abclSettings) {
                 console.error("ABCL settings not found");
                 return;
             }
-            // on hover change inspect
-            const abcl_descriptions:Record<string, string> = {
-                'abcl-visual': 'The visibility of wetting and soiling diapers including accidents.',
-                'abcl-wetting': 'The wetting of diapers.',
-                'abcl-messing': 'The soiling of diapers.',
-                'abcl-accidents': 'Controls having accidents accidents when not wearing protection.',
-                'abcl-wetting-rate': 'The chance of wetting diapers.',
-                'abcl-messing-rate': 'The chance of soiling diapers.',
-                'abcl-message-type': 'The style of messages that happen after an event.',
-                'abcl-toggle': 'If the ABCL system is enabled or disabled.',
-                'abcl-toggle-text': 'If the ABCL system is enabled or disabled.',
-                'abcl-timer-duration': 'The time in minutes between accidents.',
-                'abcl-automatic-accidents': 'If the system should automatically have accidents'
-            };
-            abcl_settings.addEventListener('mouseover', (e:Event) => {
-                if ((e.target as HTMLElement).id in abcl_descriptions) {
-                    if (inspect.querySelector('p') != null) {
-                        (inspect.querySelector('p') as HTMLElement).textContent = abcl_descriptions[(e.target as HTMLElement).id];
-                    }
-                
-                }
-            });
+        
             if (!abcl) {
                 return;
             }
-            (assertQuerySelector("#abcl-visual input") as HTMLInputElement).checked = abcl.visual;
-            (assertQuerySelector("#abcl-wetting input") as HTMLInputElement).checked = abcl.wet.enabled;
-            (assertQuerySelector("#abcl-messing input") as HTMLInputElement).checked = abcl.mess.enabled;
-            (assertQuerySelector("#abcl-accidents input") as HTMLInputElement).checked = abcl.accidents;
-            (assertQuerySelector("#abcl-wetting-rate input") as HTMLInputElement).value = String(Math.floor(abcl.mess.base*100));
-            (assertQuerySelector("#abcl-messing-rate input") as HTMLInputElement).value = String(Math.floor(abcl.wet.base*100));
-            (assertQuerySelector("#abcl-message-type select") as HTMLInputElement).value = abcl.messageType;
-            (assertQuerySelector("#abcl-toggle") as HTMLInputElement).checked = abcl.enabled;
-            (assertQuerySelector("#abcl-timer-duration input") as HTMLInputElement).value = String(abcl.timer);
-            (assertQuerySelector("#abcl-automatic-accidents") as HTMLInputElement).checked = abcl.automatic_accidents;
-            const settingsMap: Record<string, {property?: string, event: string, handler: (e:Event) => void}> = {
-                '#abcl-visual input': { property: 'visual', event: 'change', handler: (e:Event) => { 
-                    this.visual = (e.target as HTMLInputElement).checked; 
-                    this.cache.set("visual", this.visual);
-                    this.refreshDiaper(); 
-                }},
-                '#abcl-wetting input': {event: 'change', handler: (e:Event) => { 
-                    this.wet.enabled = (e.target as HTMLInputElement).checked; 
-                 } },
-                '#abcl-messing input': {event: 'change', handler: (e:Event) => { 
-                    this.mess.enabled = (e.target as HTMLInputElement).checked; 
-                } },
-                '#abcl-accidents input': {event: 'change', handler: (e:Event) => { 
-                    this.accidents = (e.target as HTMLInputElement).checked; 
-                    this.cache.set("accidents", (e.target as HTMLInputElement).checked);
-                } },
-                '#abcl-wetting-rate input':{event: 'change', handler: (e:Event) => {
-                    this.wet.base = +(e.target as HTMLInputElement).value / 100; 
-                } },
-                '#abcl-messing-rate input': {event: 'change', handler: (e:Event) => {
-                    this.mess.base = +(e.target as HTMLInputElement).value / 100; 
-                    
-                } },
-                '#abcl-message-type select': {event: 'change', handler: (e:Event) => {
-                    this.messageType = (e.target as HTMLInputElement).value
-                    this.cache.set("messageType",  this.messageType);
-            } },
-                '#abcl-toggle': {event: 'change', handler: (e:Event) => {
-                    this.enabled = (e.target as HTMLInputElement).checked;
-                    this.cache.set("enabled", this.enabled);
-            } }, 
-                '#abcl-timer-duration input': {event: 'change', handler: (e:Event) => {
-                    this.timer = +(e.target as HTMLInputElement).value;
-                    this.cache.set("timer", this.timer);
-                } },
-                '#abcl-automatic-accidents': {event: 'change', handler: (e:Event) => {
-                    this.automatic_accidents = (e.target as HTMLInputElement).checked;
-                    this.cache.set("automatic_accidents", this.automatic_accidents); 
-                }}
+        
+            const setInputValue = (selector: string, value: any) => {
+                const input = assertQuerySelector(selector) as HTMLInputElement;
+                if (input.type === 'checkbox') {
+                    input.checked = value;
+                } else {
+                    input.value = String(value);
+                }
             };
+          
+        
+            setInputValue("#abcl-visual input", abcl.visual);
+            setInputValue("#abcl-wet input", abcl.wet.enabled);
+            setInputValue("#abcl-mess input", abcl.mess.enabled);
+            setInputValue("#abcl-clothing-accidents input", abcl.accidents);
+            setInputValue("#abcl-mess-wet-chance input", Math.floor((1 - abcl.mess.chance) * 100));
+            setInputValue("#abcl-message-type select", abcl.messageType);
+            setInputValue("#abcl-timer-duration input", abcl.timer);
 
-            for (const key of Object.keys(settingsMap)) {
-                const {event, handler } = settingsMap[key];
-                assertQuerySelector(key).addEventListener(event, handler);
+            const settingsMap: Record<string, { event: string, handler: (e: Event) => void }> = {
+                '#abcl-visual input': {
+                    event: 'change', handler: (e: Event) => {
+                        this.visual = (e.target as HTMLInputElement).checked;
+                        this.cache.set("visual", this.visual);
+                        this.updateDiapers();
+                    }
+                },
+                '#abcl-wet input': {
+                    event: 'change', handler: (e: Event) => {
+                        this.wet.enabled = (e.target as HTMLInputElement).checked;
+                    }
+                },
+                '#abcl-mess input': {
+                    event: 'change', handler: (e: Event) => {
+                        this.mess.enabled = (e.target as HTMLInputElement).checked;
+                    }
+                },
+                '#abcl-clothing-accidents input': {
+                    event: 'change', handler: (e: Event) => {
+                        this.accidents = (e.target as HTMLInputElement).checked;
+                        this.cache.set("accidents", this.accidents);
+                    }
+                },
+                '#abcl-mess-wet-chance input': {
+                    event: 'change', handler: (e: Event) => {
+                        const value = +(e.target as HTMLInputElement).value / 100;
+                        this.wet.base = value;
+                        this.mess.base = 1 - value;
+                    }
+                },
+                '#abcl-message-type select': {
+                    event: 'change', handler: (e: Event) => {
+                        this.messageType = (e.target as HTMLInputElement).value as MessageType;
+                        this.cache.set("messageType", this.messageType);
+                    }
+                },
+                '#abcl-timer-duration input': {
+                    event: 'change', handler: (e: Event) => {
+                        this.timer = +(e.target as HTMLInputElement).value;
+                        this.cache.set("timer", this.timer);
+                    }
+                }
+            };
+        
+            for (const [selector, { event, handler }] of Object.entries(settingsMap)) {
+                assertQuerySelector(selector).addEventListener(event, handler);
             }
         }
         test() {
@@ -802,7 +629,7 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
         (globalThis as any).Abcl.setupSettings();
     }
     async function ABCLLoginDoLogin() {
-        modApi.hookFunction('LoginDoLogin', 1, (args:any, next:Function) => {
+        modAPI.hookFunction('LoginDoLogin', 1, (args:any, next:Function) => {
             next(args);
             setTimeout(() => {
                 if ((globalThis as any).Abcl == null) {
@@ -815,31 +642,26 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
         );
     }
     async function ABCLCharacterAppearanceSetItem() {
-        modApi.hookFunction('CharacterAppearanceSetItem', 2, (args:any, next:Function) => {
+        modAPI.hookFunction('CharacterAppearanceSetItem', 2, (args:any, next:Function) => {
             let [_character, slot, _asset] = args;
       
-            if (abcl) {
-                let item = {"Asset":_asset}
-                if (slot == "ItemPelvis") {
-                    console.log("Pelvis", item, abcl.isDiaper(item));
-                    abcl.PelvisItem = abcl.isDiaper(item) ? item : null;
+            if (abcl) {                
+                if (slot == "ItemPelvis" || slot == "Panties") {
+                    abcl.updateDiapers(false) 
                 }
-                if (slot == "Panties") {
-                    abcl.PantiesItem = abcl.isDiaper(item) ? item : null;
-                } 
             }
           
             return next(args);
         });
     }
     async function ABCLTextGet() {
-        modApi.hookFunction('TextGet', 2,  (args:any, next:Function) => {
+        modAPI.hookFunction('TextGet', 2,  (args:any, next:Function) => {
             if(args[0] == "HomepageAbcl") return "ABCL";
             else return next(args);
         });
     }
     async function ABCLDrawButton() {
-        modApi.hookFunction("DrawButton", 2,  (args:any, next:Function) => {
+        modAPI.hookFunction("DrawButton", 2,  (args:any, next:Function) => {
 			// 7th argument is the image url
 			if(args[6] == "Icons/Abcl.png") args[6] = runtime + "images/abcl.png";
 			return next(args);
@@ -865,7 +687,8 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 return;
             }
             switch (command) {
-                case "" || "help": 
+                case "help":
+                case "": 
                     ChatRoomSendLocal(
                         "<p style='background-color:#ecc826'><b>ABCL</b>: Welcome to Adult Baby Club Lover! Where we make sure babies use their diapers!\n" +
                         " \n" +
@@ -886,16 +709,16 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                 case "tick":
                     let pelvis = InventoryGet(Player, "ItemPelvis");
                     let panties = InventoryGet(Player, "Panties");
-                    if (pelvis && abcl.isDiaper(pelvis) || panties && abcl.isDiaper(panties)) {
+                    if (abcl.topLayer || abcl.bottomLayer) {
                         abcl.tick();
                     } else {
                         abcl.accident();
                     }
-                    ChatRoomSendLocal(`<p style='background-color:#ecc826'>ABCL: ${Player.Nickname == '' ? Player.Name : Player.Nickname} uses ${Pronoun.get("dependent", Player)} timemachine.</p>`);
+                    ChatRoomSendLocal(`<p style='background-color:#ecc826'>ABCL: ${Player.Nickname == '' ? Player.Name : Player.Nickname} squeezes ${Pronoun.get("dependent", Player)} abdomen trying to get it all out. (only you can see this).</p>`);
                 break;
                 case "change":
                     if (identifier == null) {
-                        if (!(abcl.PelvisItem || abcl.PantiesItem)) {
+                        if (!(abcl.topLayer || abcl.bottomLayer)) {
                             ChatRoomSendLocal(
                                 "<p style='background-color:#ecc826'>ABCL: You don't have a diaper!</p>"
                             );
@@ -908,10 +731,8 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
                                 ChatRoomSendLocal("<p style='background-color:#ecc826'>ABCL: Player not found!</p>");
                                 break;
                             }
-                            let pelvis = InventoryGet(player, "ItemPelvis");
-                            let panties = InventoryGet(player, "Panties");
 
-                            if (pelvis && abcl.isDiaper(pelvis) || panties && abcl.isDiaper(panties)) {
+                            if (abcl.topLayer || abcl.bottomLayer) {
                                 abcl.changeDiaper(player);
                             } else {
                                 ChatRoomSendLocal("<p style='background-color:#ecc826'>ABCL: " + ChatRoomHTMLEntities(GetName(player)) + " does not have a diaper!</p>");
@@ -925,6 +746,67 @@ var bcModSDK=function(){"use strict";const o="1.2.0";function e(o){alert("Mod ER
             }
         }
     }]);
+    class ABCLPermissions {
+        abcl:ABCL
+        trusted: (string | number)[]
+        constructor(abcl:ABCL) {
+            this.trusted = []
+            this.abcl = abcl
+            Messager.addBeepListener("getTrusted", 
+                (json:string, sender:typeof Player.MemberNumber) => {
+                    const msg = JSON.parse(json) as { "content": { "method"?: string }, "id"?: string };
+                    const response = msg.content;
+                    if (!response?.method || response.method !== "getTrusted") {
+                        return;
+                    }
+                    const isTrusted = sender != null && this.trusted.includes(sender);
+                    Messager.send({ "isTrusted": isTrusted, "id": msg.id }, sender, "HiddenBeep");
+                })
+            Messager.addBeepListener("addTrusted", 
+                (json:string, sender:typeof Player.MemberNumber) => {
+                    const msg = JSON.parse(json) as { "content": { "method"?: string }, "id"?: string };
+                    const response = msg.content;
+                    if (!response?.method || response.method !== "addTrusted") {
+                        return;
+                    }
+                    if (!sender) {
+                        return;
+                    }
+                    if (false) { // denied
+                        Messager.send({ "success": false, "id": msg.id }, sender, "HiddenBeep");
+                        return;
+                    }
+                    this.trusted.push(sender);
+                    Messager.send({ "success": true, "id": msg.id }, sender, "HiddenBeep");
+            })
+    
+        }
+        async getTrusted(MemberNumber: typeof Player.MemberNumber): Promise<boolean> {
+            try {
+                const promise = Messager.request({ "method": "getTrusted" }, MemberNumber, "HiddenBeep");
+                const response = await promise;
+                if (response && typeof response.isTrusted === 'boolean') {
+                    return response.isTrusted;
+                } else {
+                    console.error("Unexpected response structure:", response);
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error in getTrusted:", error);
+                return false; 
+            }
+        }
+        async addTrusted(MemberNumber: typeof Player.MemberNumber): Promise<boolean> {
+            try {
+                const promise = Messager.request({ "method": "addTrusted" }, MemberNumber, "HiddenBeep");
+                const response = await promise;
+                return response.success;
+            } catch (error) {
+                console.error("Error in addTrusted:", error);
+                return false; 
+            }
+        }
+    }
+   
 
-})();
 
