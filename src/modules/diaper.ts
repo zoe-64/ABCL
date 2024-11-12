@@ -44,7 +44,7 @@ export function savedDiaperToDiaper(savedDiaper:TSavedDiaper): Diaper | null {
 	let diaper = null
 
 	if (savedDiaper.Layer == 0) {
-		diaper = new Diaper(replaceSlotWithSavedItem("ItemPelvis",savedDiaper.SavedItem,false));
+		diaper = new Diaper(replaceSlotWithSavedItem("Panties",savedDiaper.SavedItem,false));
 	}
 	if (savedDiaper.Layer == 1) {
 		diaper = new Diaper(replaceSlotWithSavedItem("ItemPelvis",savedDiaper.SavedItem,false));
@@ -54,8 +54,8 @@ export function savedDiaperToDiaper(savedDiaper:TSavedDiaper): Diaper | null {
 	return diaper
 }
 export function compareItemToSavedItem(item:Item, savedItem:TSavedItem) {
-	return item.Asset.Name === savedItem.Asset.Name && item.Color === savedItem.Color 
-		&& item.Craft === savedItem.Craft && item.Property === savedItem.Property	
+	return item.Asset.Name === savedItem.Asset.Name && JSON.stringify(item.Color) === JSON.stringify(savedItem.Color)
+		&& JSON.stringify(item.Craft) === JSON.stringify(savedItem.Craft) && JSON.stringify(item.Property) === JSON.stringify(savedItem.Property)	
 }
 
 export function replaceSlotWithSavedItem(slot:AssetGroupName,savedItem: TSavedItem, push=true): Item {
@@ -66,16 +66,18 @@ export function replaceSlotWithSavedItem(slot:AssetGroupName,savedItem: TSavedIt
 	InventoryWear(Player, savedItem.Asset.Name, slot, savedItem.Color, 10, Player.MemberNumber, savedItem.Craft, false)
 	const newItem = InventoryGet(Player, slot) as Item 
 	
-	/*if (savedItem.Property && savedItem.Property.hasOwnProperty("LockedBy")) {
+	if (savedItem.Property && savedItem.Property.hasOwnProperty("LockedBy")) {
 		const lockName = savedItem.Property["LockedBy"]
 		const asset = lockName ? AssetGet(Player.AssetFamily, "ItemMisc", lockName) : null 
 		
+		console.log("new lock")
 		if (asset) {
-			InventoryLock(Player, newItem, {Asset:asset})
+			InventoryLock(Player, slot, {Asset:asset}, savedItem.Property.LockMemberNumber)
+			
 		}
-	}*/
-	newItem.Property = savedItem.Property
-
+		
+	}
+	console.log(newItem, savedItem)
 	if (push) ServerPlayerInventorySync()
 	return newItem
 }
@@ -90,7 +92,16 @@ export function loadDiaperLayers(): void {
 		}
 		return next(args);
 	});
-
+	hookFunction('InventoryLock', 2, (args:any, next:Function) => {
+		let [_C, _Item, _Lock, _MemberNumber] = args;
+		// @ts-ignore
+		if (typeof _Item === 'string') _Item = InventoryGet(_C, _Item) as Item;
+		const _slot: "bottomLayer" | "topLayer" = _Item.Asset.DynamicGroupName == "Panties" ? "bottomLayer" : "topLayer" 
+		if (Diaper.isDiaper(_Item) && modSession[_slot]?.item) {	
+			modSession[_slot].item = _Item
+		}
+		return next(args);
+	});
 }
 
 export class Diaper {

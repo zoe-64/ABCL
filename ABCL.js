@@ -1052,7 +1052,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function savedDiaperToDiaper(savedDiaper) {
     let diaper = null;
     if (savedDiaper.Layer == 0) {
-      diaper = new Diaper(replaceSlotWithSavedItem("ItemPelvis", savedDiaper.SavedItem, false));
+      diaper = new Diaper(replaceSlotWithSavedItem("Panties", savedDiaper.SavedItem, false));
     }
     if (savedDiaper.Layer == 1) {
       diaper = new Diaper(replaceSlotWithSavedItem("ItemPelvis", savedDiaper.SavedItem, false));
@@ -1062,7 +1062,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return diaper;
   }
   function compareItemToSavedItem(item, savedItem) {
-    return item.Asset.Name === savedItem.Asset.Name && item.Color === savedItem.Color && item.Craft === savedItem.Craft && item.Property === savedItem.Property;
+    return item.Asset.Name === savedItem.Asset.Name && JSON.stringify(item.Color) === JSON.stringify(savedItem.Color) && JSON.stringify(item.Craft) === JSON.stringify(savedItem.Craft) && JSON.stringify(item.Property) === JSON.stringify(savedItem.Property);
   }
   function replaceSlotWithSavedItem(slot, savedItem, push = true) {
     const item = InventoryGet(Player, slot);
@@ -1070,7 +1070,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (item) InventoryRemove(Player, slot, false);
     InventoryWear(Player, savedItem.Asset.Name, slot, savedItem.Color, 10, Player.MemberNumber, savedItem.Craft, false);
     const newItem = InventoryGet(Player, slot);
-    newItem.Property = savedItem.Property;
+    if (savedItem.Property && savedItem.Property.hasOwnProperty("LockedBy")) {
+      const lockName = savedItem.Property["LockedBy"];
+      const asset = lockName ? AssetGet(Player.AssetFamily, "ItemMisc", lockName) : null;
+      console.log("new lock");
+      if (asset) {
+        InventoryLock(Player, slot, { Asset: asset }, savedItem.Property.LockMemberNumber);
+      }
+    }
+    console.log(newItem, savedItem);
     if (push) ServerPlayerInventorySync();
     return newItem;
   }
@@ -1079,6 +1087,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
       let [_character, slot, _asset] = args;
       if (slot == "ItemPelvis" || slot == "Panties") {
         updateDiaper(false);
+      }
+      return next(args);
+    });
+    hookFunction("InventoryLock", 2, (args, next) => {
+      let [_C, _Item, _Lock, _MemberNumber] = args;
+      if (typeof _Item === "string") _Item = InventoryGet(_C, _Item);
+      const _slot = _Item.Asset.DynamicGroupName == "Panties" ? "bottomLayer" : "topLayer";
+      if (Diaper.isDiaper(_Item) && modSession[_slot]?.item) {
+        modSession[_slot].item = _Item;
       }
       return next(args);
     });
