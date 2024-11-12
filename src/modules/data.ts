@@ -35,37 +35,50 @@ export const DiaperUseLevels:Record<string, string> = {
 } 
 export const runtime = getRuntime()
 export type MessageType = "mess" | "fullymess" | "wet" | "fullywet" | "immergency" | "selfwet" | "selfmess" | "noDiaper" | "changeSelf" | "changeBy";
+import data from "../../data/dictionary.json"
+export interface IModData {
+    Diapers: Record<string, IDiaperData>;
+    Items: Record<string, TItemModifier>;
+    Regex: Record<string, TItemModifier>;
+    CraftingModifiers: ICraftingModifiers;
+    messages: IMessages;
+    verbs: {[key: string]: {
+        [values: string]: string[]
+    };}
+}
 
-export type ABCLdataType = {
-    "Diapers": {[key: string]: {"indexes": number[], "type": string, "absorbancy": number}}
-    "Items": {[key: string]:{"modifier": number}}
-    "Regex": {[key: string]:{"modifier": number}}
-    "CraftingModifiers": {
-        "absorbancy": {
-            [key: string]: number
-        },
-        "messChance": {
-            [key: string]: number
-        },
-        "wetChance": {
-            [key: string]: number
-        },
-        "regression": {
-            [key: string]: number
-        },
-        "desperation": {
-            [key: string]: number
-        }
-    }
-    "messages": Record<MessageType, Record<string, string>>
-    "verbs": {
-        [key: string]: {"neutral"?:string[], "female"?:string[], "male"?:string[]},
-    }
-};
-export const ABCLdata = await GetJson(runtime+"data/dictionary.json") as ABCLdataType
+interface IDiaperData {
+    indexes?: number[];
+    type: string;
+    absorbancy: number;
+}
+// Shared ItemModifier type for Items and Regex
+type TItemModifier = { modifier: number };
+
+// CraftingModifiers interface with each category's modifiers as key-value pairs
+interface ICraftingModifiers {
+    [key: string]: Record<string, number>;
+}
+
+// Messages interface with different message categories
+interface IMessages {
+    [key: string]: TMessageVariants;
+}
+
+// Reusable MessageVariants type for different message structures
+type TMessageVariants = Record<
+    "mess" | "fullymess" | "wet" | "fullywet" | "immergency" |
+    "selfwet" | "selfmess" | "noDiaper" | "changeSelf" | "changeBy",
+    string
+>;
+
+
+//export const ABCLdata = await GetJson(runtime+"data/dictionary.json") as IModData
+import settings from "../../data/settings.html"
+import stats from "../../data/stats.html"
 export const templates = {
-    stats: await GetText(runtime + "data/stats.html"),
-    settings: await GetText(runtime + "data/settings.html"),
+    stats: stats,
+    settings: settings
 }
 export const diaperDefaultValues = {
     messChance: .3,
@@ -80,3 +93,4 @@ export const diaperDefaultValues = {
     visual: true,
     enabled: true,
 };
+

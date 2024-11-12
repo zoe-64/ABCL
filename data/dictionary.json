@@ -60,7 +60,7 @@
         "Cow Printed Socks": {"modifier": 0.1},
         "Striped Socks": {"modifier": 0.1},
         "Vinyl Socks": {"modifier": 0.1},
-        "Style 4": {"Modifier": 0.1},
+        "Style 4": {"modifier": 0.1},
 
         "Halo": {"modifier": 0.1},       
         "Unicorn Horn": {"modifier": 0.1},
@@ -156,7 +156,7 @@
             "fullywet": "§name§ has fully wet §dependent§ §current-diaper§.",
             "immergency": "§name§ is really in need of a diaper change!",
             "selfwet": "§name§ has wet §dependent§ clothes. Get a §diaper§ on §objective§ before §subjective§ makes another mess!",
-            "selfwess": "§name§ has soiled §dependent§ clothes. Get a §diaper§ on §objective§ before §subjective§ makes another mess!",
+            "selfmess": "§name§ has soiled §dependent§ clothes. Get a §diaper§ on §objective§ before §subjective§ makes another mess!",
             "noDiaper": "§name§ does not have a §diaper§! Get one on §objective§ before §subjective§ makes a mess~",
             "changeSelf": "§name§ has changed §dependent§ §current-diaper§.",
             "changeBy": "§by-player§ has changed §name§ §current-diaper§. §name§ is now clean and dry~"

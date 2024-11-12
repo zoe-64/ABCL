@@ -1,15 +1,25 @@
 {
   "compilerOptions": {
-    "target": "esnext",                              
+    "target": "ESNext",                              
     "module": "ESNext",               
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "esModuleInterop": true, 
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    
+    "baseUrl": "src",
+    "paths": {
+        "@/*": ["*"]
+    }
   },
   "include": [
     "node_modules/bc-stubs/bc/**/*.d.ts",
     "./src/**/*",
-  ]
-}
+    "./data/*.css",
+    "./data/*.html",
+    "./data/*.json"
+
+  ],
+
+} 
