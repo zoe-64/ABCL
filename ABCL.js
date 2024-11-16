@@ -190,45 +190,65 @@ One of mods you are using is using an old version of SDK. It will work for now b
   });
 
   // data/abcl.css
-  var abcl_default = '\r\n#abcl .page {\r\n	background-color: #ffffff;\r\n	border: 1px solid #000;\r\n	z-index: 100;\r\n	padding: 0;\r\n	margin: auto;\r\n	outline: none;\r\n	display: block;\r\n	top: 0;\r\n	bottom: 0;\r\n	left: 0;\r\n	right: 0;\r\n	position: absolute;\r\n	aspect-ratio: auto 2000 / 1000;\r\n	font-family: sans-serif;\r\n\r\n}\r\n\r\n#page-abcl-1:not(.hidden) {\r\n	display: grid;\r\n	grid-template-rows: 1fr 1fr 1fr;\r\n	grid-template-columns:repeat(6, min-content);\r\n	gap: 5px;\r\n	background-color: rgb(240, 240, 240);\r\n	width: unset;\r\n    height: 100%;\r\n}\r\n.tooltip {\r\n	position: relative;\r\n}\r\n#abcl label, #abcl input, #abcl button {\r\n	display: block;\r\n	text-align: center;\r\n	margin: auto;\r\n\r\n}\r\n#abcl-mess {grid-area: a;}\r\n#abcl-visual {grid-area: b;}\r\n#abcl-wet {grid-area: c;}\r\n#abcl-mess-wet-chance {grid-area: d;\r\n	width: 95%;\r\n	margin: auto;\r\n}\r\n\r\n#abcl-clothing-accidents {grid-area: e;}\r\n#abcl-automatic-accidents {grid-area: f;}\r\n#abcl-timer-duration {grid-area: g;}\r\n#wettings-messes-category {\r\n	display: grid;\r\n\r\n\r\n	grid-template-areas: \r\n		"a b c"\r\n		"d d d"\r\n		"e e e"\r\n		"f g .";\r\n	width: 250px;\r\n	grid-template-columns: 1fr 1fr 1fr;\r\n	\r\n}\r\n.settings-category {\r\n	background-color: gainsboro;\r\n	box-shadow: 0 0 5px 1px #c7c7c7 inset;\r\n	border-radius: 2px;\r\n	width: fit-content;\r\n	padding: 10px;\r\n}\r\n.abcl-exit-button {\r\n    background-image: url("Icons/Exit.png");\r\n    aspect-ratio: 1;\r\n    width: 6vw;\r\n    background-repeat: no-repeat;\r\n    background-position: center;\r\n    background-size: 5vw;\r\n    }\r\n#abcl-exit {\r\n	position: absolute;\r\n	top: 2vw;\r\n	right: 2vw;\r\n}\r\n\r\n.tooltip:before, .tooltip::after {\r\n	--scale: 0;\r\n	content: attr(data-tooltip);\r\n	top: -0.25rem;\r\n	color: #ffffff;\r\n	padding: 0.5rem;\r\n	left: 50%;\r\n	background-color: #000;\r\n	position: absolute;\r\n\r\n	transform:  translateX(-50%) translateY(-100%) scale(var(--scale));\r\n	\r\n	transition: transform 0.1s;\r\n}\r\n.tooltip:hover:before, .tooltip:hover::after {\r\n	--scale: 1;\r\n}\r\n\r\n\r\n#abcl input[type="number"]:focus {\r\n	outline: none;\r\n}\r\n#abcl input[type="number"]::-webkit-inner-spin-button {\r\n	-webkit-appearance: none;\r\n}\r\n.ABCLstyle-interactable {\r\n	background-color: rgb(238, 238, 238);\r\n	border: rgb(175, 175, 175) 1px solid;\r\n	text-align: center;\r\n	margin: auto;\r\n	display: block;\r\n	padding: 3px;\r\n	border-radius: 1px;\r\n}\r\n.ABCLstyle-interactable option {\r\n	text-align: center;\r\n}\r\n\r\n\r\n.hidden {\r\n	display: none !important;\r\n}';
+  var abcl_default = '.abcl-navbar {\r\n	overflow: auto;\r\n	white-space: nowrap;\r\n	padding: 0;\r\n	margin: 0;\r\n	position: relative;\r\n}\r\n.abcl-navbar li {\r\n	display: inline-block;\r\n	text-align: center;\r\n	text-decoration: none;\r\n}\r\n.abcl-navbar button {\r\n	padding: 12px;\r\n	border-top-left-radius: 6px;\r\n	border-top-right-radius: 6px;\r\n	border: 1px black solid;\r\n	border-bottom: 0;\r\n}\r\n.abcl-navbar button:disabled {\r\n	background: white;\r\n}\r\n#abcl {\r\n	aspect-ratio: auto 2000 / 1000;\r\n  	height: 100%;\r\n  	margin: auto;\r\n	max-width: 100%;\r\n}\r\n#abcl .page {\r\n	border: 1px solid #000;\r\n	width: calc(100% - 60px);\r\n	position: relative;\r\n\r\n	font-family: sans-serif;\r\n	padding: 30px;\r\n}\r\n\r\n#page-abcl-1:not(.hidden) {\r\n	display: grid;\r\n	grid-template-rows: 1fr 1fr 1fr;\r\n	grid-template-columns:repeat(6, min-content);\r\n	gap: 25px;\r\n	background-color: rgb(240, 240, 240);\r\n	width: unset;\r\n    height: 100%;\r\n}\r\n.tooltip {\r\n	position: relative;\r\n}\r\n#abcl label, #abcl button {\r\n	display: block;\r\n	text-align: center;\r\n}\r\n#abcl input {\r\n	position: relative;\r\n	left:50%;\r\n	transform:translateX(-50%)\r\n}\r\n#abcl-mess {grid-area: a;}\r\n#abcl-visual {grid-area: b;}\r\n#abcl-wet {grid-area: c;}\r\n#abcl-mess-wet-chance {grid-area: d;\r\n	width: 95%;\r\n	margin: auto;\r\n}\r\n\r\n#abcl-clothing-accidents {grid-area: e;}\r\n#abcl-automatic-accidents {grid-area: f;}\r\n#abcl-timer-duration {grid-area: g;}\r\n#wettings-messes-category {\r\n	display: grid;\r\n\r\n\r\n	grid-template-areas: \r\n		"a b c"\r\n		"d d d"\r\n		"e e e"\r\n		"f g .";\r\n	width: 250px;\r\n	grid-template-columns: 1fr 1fr 1fr;\r\n	\r\n}\r\n.settings-category {\r\n	background-color: gainsboro;\r\n	box-shadow: 0 0 5px 1px #c7c7c7 inset;\r\n	border-radius: 2px;\r\n	width: fit-content;\r\n	padding: 10px;\r\n}\r\n.abcl-exit-button {\r\n    background-image: url("Icons/Exit.png");\r\n    aspect-ratio: 1;\r\n    width: 6vw;\r\n    background-repeat: no-repeat;\r\n    background-position: center;\r\n    background-size: 5vw;\r\n    }\r\n#abcl-exit {\r\n	position: absolute;\r\n	top: 30px;\r\n	right: 30px;\r\n}\r\n.tooltip-down:before, .tooltip-down::after {\r\n	transform:  translateX(-50%) translateY(50%) scale(var(--scale)) !important;\r\n}\r\n.tooltip:before, .tooltip::after {\r\n	--scale: 0;\r\n	font-size: 17px;\r\n	content: attr(data-tooltip);\r\n	top: -0.25rem;\r\n	color: #000000;\r\n	padding: 0.5rem;\r\n	left: 50%;\r\n	background-color: #ffffff;\r\n	border: #000 1px solid;\r\n	border-radius: 5px;\r\n	position: absolute;\r\n	width: 100px;\r\n	transform:  translateX(-50%) translateY(-100%) scale(var(--scale));\r\n	box-shadow: 0px 2px 3px rgba(0,0,0,30%);\r\n	transition: transform 0.05s;\r\n	z-index: 100;\r\n	pointer-events: none;\r\n}\r\n.tooltip:hover:before, .tooltip:hover::after {\r\n	--scale: 1;\r\n}\r\n\r\n\r\n#abcl input[type="number"]:focus {\r\n	outline: none;\r\n}\r\n#abcl input[type="number"]::-webkit-inner-spin-button {\r\n	-webkit-appearance: none;\r\n}\r\n.ABCLstyle-interactable {\r\n	background-color: rgb(238, 238, 238);\r\n	border: rgb(175, 175, 175) 1px solid;\r\n	text-align: center;\r\n	margin: auto;\r\n	padding: 3px;\r\n	border-radius: 1px;\r\n}\r\n\r\ninput.ABCLstyle-interactable[type="checkbox"] {\r\n	width: 20px !important;\r\n	height: 20px !important;\r\n  }\r\n.ABCLstyle-interactable option {\r\n	text-align: center;\r\n}\r\n\r\n\r\n\r\n.hidden {\r\n	display: none !important;\r\n}\r\n';
 
   // data/settings.html
-  var settings_default = `<div id="abcl" class="hidden">\r
+  var settings_default = `<!-- <head>-->\r
+<!--    <link href="./abcl.css" rel="stylesheet">-->\r
+    \r
+<!--</head> -->\r
+\r
+<div id="abcl" class="hidden">\r
+    <ol class="abcl-navbar">\r
+        <li class="tab" id="page-abcl-1-tab" >\r
+            <button disabled="" onclick="showPageById('page-abcl-1')">\r
+            Your settings\r
+        </button></li>\r
+        <li class="tab" id="page-abcl-2-tab"><button onclick="showPageById('page-abcl-2')">\r
+            Other's settings    \r
+        </button></li>\r
+    </ol>\r
 <div id="page-abcl-1" class="page">\r
     <div id="wettings-messes-category" class="settings-category"> <!-- All mess/wet related --> \r
         \r
-        <p class="setting tooltip" id="abcl-mess" data-tooltip="If checked, mess accidents will happen.">\r
-            <label>Messes</label>\r
-            <input type="checkbox" checked> \r
+        <p class="setting tooltip tooltip-down" id="abcl-mess" data-tooltip="If checked, mess accidents will happen.">\r
+            <label for="mess-checkbox">Messes</label>\r
+            <input type="checkbox" id="mess-checkbox" class="ABCLstyle-interactable" checked> \r
         </p>\r
-    \r
-        <p class="setting tooltip" id="abcl-visual" data-tooltip="Controls if accidents are visible on the character.">\r
-            <label>Visual</label>\r
-            <input type="checkbox" checked>\r
+        \r
+        <p class="setting tooltip tooltip-down" id="abcl-visuals" data-tooltip="Controls if accidents are visible on the character.">\r
+            <label for="visuals-checkbox">Visuals</label>\r
+            <input type="checkbox" id="visuals-checkbox" class="ABCLstyle-interactable" checked>\r
         </p>\r
-\r
-        <p class="setting tooltip" id="abcl-wet" data-tooltip="If checked, wet accidents will happen.">\r
-            <label>Wets</label>\r
-            <input type="checkbox" checked>\r
+        \r
+        <p class="setting tooltip tooltip-down" id="abcl-wet" data-tooltip="If checked, wet accidents will happen.">\r
+            <label for="wet-checkbox">Wets</label>\r
+            <input type="checkbox" id="wet-checkbox" class="ABCLstyle-interactable" checked>\r
         </p>\r
-\r
-        <p class="setting tooltip" id="abcl-mess-wet-chance" data-tooltip="The chance of a mess accident happening instead of a wet accident.">\r
-            <label>Mess vs Wet</label>\r
-            <input type="range" id="abcl-mess-wet-chance" min="0" max="100" value="50">\r
+        \r
+        <p class="setting tooltip tooltip-down" id="abcl-mess-wet-chance" data-tooltip="The chance of a mess accident happening instead of a wet accident.">\r
+            <label for="mess-wet-range">Mess vs Wet</label>\r
+            <input type="range" id="mess-wet-range" min="0" max="100" value="66">\r
         </p>\r
-    \r
-        <p class="setting tooltip" id="abcl-clothing-accidents" data-tooltip="Accidents that happen outside the diaper.">\r
-            <label>Clothing-Accidents</label>\r
-            <input type="checkbox" checked>\r
+        \r
+        <p class="setting tooltip" id="abcl-clothing-accidents" data-tooltip="Accidents that happen without the diaper.">\r
+            <label for="clothing-accidents-checkbox">Clothing-Accidents</label>\r
+            <input type="checkbox" id="clothing-accidents-checkbox" class="ABCLstyle-interactable" checked>\r
         </p>\r
-\r
+        \r
+        <p class="setting tooltip" id="abcl-leaks" data-tooltip="Leakage that happen when the diaper is full.">\r
+            <label for="leaks-checkbox">Leaks</label>\r
+            <input type="checkbox" id="leaks-checkbox" class="ABCLstyle-interactable" checked>\r
+        </p>\r
+        \r
         <p class="setting tooltip" id="abcl-timer-enabled" data-tooltip="If checked, accidents will happen automatically by the timer.">\r
-            <label>Timer enabled</label>\r
-            <input type="checkbox" checked>\r
+            <label for="timer-enabled-checkbox">Timer enabled</label>\r
+            <input type="checkbox" id="timer-enabled-checkbox" class="ABCLstyle-interactable" checked>\r
         </p>\r
+\r
         <p class="setting tooltip" id="abcl-timer-duration" data-tooltip="The time between automatic accidents.">\r
             <label>Timer duration</label>\r
-            <input type="number" value="30" min="5" max="420"><span>minutes</span>\r
+            <input type="number" value="30" min="15" max="420"><span>minutes</span>\r
         </p>\r
     </div>\r
     <div class="settings-category">\r
@@ -244,10 +264,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     <div class="settings-category">  \r
     <button id="abcl-reset-button" onclick="document.getElementById('reset-confirm-abcl').showModal()">Reset data</button>\r
     </div>\r
-    <button class="abcl-exit-button" id="abcl-exit" onclick="PreferenceSubscreenAbclExit()"></button>\r
+    <button class="abcl-exit-button" id="abcl-exit" onclick="PreferenceSubscreenExtensionsClear(); document.querySelector('#abcl').classList.add('hidden')"></button>\r
 \r
 </div>\r
-\r
+<div id="page-abcl-2" class="page"></div>\r
 <dialog id="reset-confirm-abcl">\r
     <p>Are you sure you want to reset all ABCL data?</p>\r
     <button onclick="Abcl.reset()">Yes</button>\r
@@ -652,9 +672,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     version: "1.1.5",
     repository: ""
   });
+  function isJsonParsable(str) {
+    try {
+      JSON.parse(str);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
   modApi.hookFunction("ServerAccountBeep", 10, (args, next) => {
     let data = args[0];
-    if (data.BeepType == "Leash" && !!data.Message) {
+    if (data.BeepType == "Leash" && !!data.Message && isJsonParsable(data.Message)) {
       try {
         const json = JSON.parse(data.Message);
         if (json?.isZoelib) {
@@ -777,8 +805,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return false;
   }
   function getTime() {
-    let modifier = Math.pow(1.02, modSession.settings.regressionLevel + 1) * (getDesperationLevel() + 1);
-    return Math.floor(getTimeUntilAccident() / modifier * 100) / 100;
+    const regressionLevel = modSession.settings.regressionLevel;
+    const desperationLevel = getDesperationLevel();
+    const modifier = Math.max(1, Math.pow(1.02, regressionLevel) * (desperationLevel + 1));
+    const currentTime = Date.now();
+    const accidentTime = modSession.settings.lastAccident + modSession.settings.timerDuration * 60 / modifier;
+    const deltaMilliseconds = accidentTime - currentTime;
+    const deltaSeconds = Math.max(0, Math.floor(deltaMilliseconds / 1e3));
+    return Math.max(0, Math.floor(deltaSeconds));
   }
   function isMilk() {
     let items = Player.Appearance;
@@ -801,13 +835,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
   }
-  function getTimeUntilAccident() {
-    const currentTime = Date.now();
-    const accidentTime = modSession.settings.lastAccident + modSession.settings.timerDuration;
-    const deltaMilliseconds = accidentTime - currentTime;
-    const deltaSeconds = Math.max(0, Math.floor(deltaMilliseconds / 1e3));
-    return deltaSeconds;
-  }
   function nextDiaperAction() {
     const chanceForNothing = 0.1;
     const total = modSession.settings.messChance + modSession.settings.wetChance + chanceForNothing;
@@ -821,6 +848,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const result = weightedArray[RandomInt(0, weightedArray.length - 1)];
     return { result, mess: messChance, wet: wetChance, nothing: chanceForNothing };
   }
+  function ABCLsetSetting(key, value) {
+    modSession.settings[key] = value;
+  }
+  function ABCLgetSetting(key) {
+    return modSession.settings[key];
+  }
+  globalThis.ABCLsetSetting = ABCLsetSetting;
+  globalThis.ABCLgetSetting = ABCLgetSetting;
 
   // src/modules/bcModSdk.ts
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk());
@@ -917,26 +952,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
 </section>`;
 
   // src/modules/data.ts
-  function getRuntime() {
-    if (document.getElementById("ABCLruntimeID")) {
-      const runtimeElement = document.getElementById("ABCLruntimeID");
-      if (!runtimeElement?.innerText) {
-        throw new Error("Runtime element not found");
-      }
-      return runtimeElement.innerText;
-    }
-    return "https://raw.githubusercontent.com/zoe-64/ABCL/main/";
-  }
   var DiaperUseLevels = {
-    "Clean": "#8F8F8F",
-    "Middlewet": "#ffe58b",
-    "Maximumwet": "#ffd33e",
-    "Middlemess": "#423019",
-    "Maximummess": "#3C302C",
-    "Selfwet": "#4F4B1B",
-    "Selfmess": "#3B2B17"
+    "clean": "#8F8F8F",
+    "middlewet": "#ffe58b",
+    "maximumwet": "#ffd33e",
+    "middlemess": "#423019",
+    "maximummess": "#3C302C",
+    "selfwet": "#242103",
+    "selfmess": "#1f170d"
   };
-  var runtime = getRuntime();
   var templates = {
     stats: stats_default,
     settings: settings_default
@@ -956,16 +980,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
     SentenceBuilder.data["\xA7by-player\xA7"] = { "neutral": [Pronoun.get("Reflexive", Player)] };
     SentenceBuilder.data = { ...ABCLdata.verbs, ...SentenceBuilder.data };
     Messager.addListener(ABCLMessagerListener, -5, "ABCL Message Processor");
-  }
-  function sendChangeDiaperMessage(by) {
-    if (by != "self") {
-      SentenceBuilder.data["\xA7by-player\xA7"] = { "neutral": [by] };
-      promptMessage(ABCLdata.messages[modStorage.settings.messageType]["changeBy"]);
-    } else {
-      SentenceBuilder.data["\xA7by-player\xA7"] = { "neutral": [GetName(Player)] };
-      promptMessage(ABCLdata.messages[modStorage.settings.messageType]["changeSelf"]);
-      SentenceBuilder.data["\xA7by-player\xA7"] = { "neutral": [Pronoun.get("Reflexive", Player)] };
-    }
   }
   function ABCLMessagerListener(response) {
     if (response.Type == "Hidden") {
@@ -1015,16 +1029,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return result;
   }
-  function promptMessage(unformatedMessage) {
+  function sendMessage(variant) {
     SentenceBuilder.target = Player;
-    let message = SentenceBuilder.prompt(unformatedMessage, Player);
+    let message = SentenceBuilder.prompt(ABCLdata.messages[modSession.settings.messageType][variant], Player);
     if (modSession.settings.messageType == "internalMonologue") {
       Messager.send(message, Player.MemberNumber, "LocalMessage");
     } else {
-      ServerSend("ChatRoomChat", { Content: "Beep", Type: "Action", Dictionary: [
-        { Tag: "Beep", Text: "msg" },
-        { Tag: "msg", Text: message }
-      ] });
+      Messager.send(message, void 0, "Action");
     }
   }
 
@@ -1053,11 +1064,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
     let diaper = null;
     if (savedDiaper.Layer == 0) {
       diaper = new Diaper(replaceSlotWithSavedItem("Panties", savedDiaper.SavedItem, false));
+      diaper.wettings = savedDiaper.Wettings;
+      diaper.messes = savedDiaper.Messes;
     }
     if (savedDiaper.Layer == 1) {
       diaper = new Diaper(replaceSlotWithSavedItem("ItemPelvis", savedDiaper.SavedItem, false));
+      diaper.wettings = savedDiaper.Wettings;
+      diaper.messes = savedDiaper.Messes;
     }
     if (!diaper) return null;
+    updateDiaper();
     ServerPlayerInventorySync();
     return diaper;
   }
@@ -1085,19 +1101,39 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function loadDiaperLayers() {
     hookFunction("CharacterAppearanceSetItem", 2, (args, next) => {
       let [_character, slot, _asset] = args;
+      const action = next(args);
       if (slot == "ItemPelvis" || slot == "Panties") {
         updateDiaper(false);
       }
-      return next(args);
+      return action;
+    });
+    hookFunction("InventoryRemove", 2, (args, next) => {
+      let [_character, slot] = args;
+      const action = next(args);
+      if (slot == "ItemPelvis" || slot == "Panties") {
+        updateDiaper(false);
+      }
+      return action;
     });
     hookFunction("InventoryLock", 2, (args, next) => {
       let [_C, _Item, _Lock, _MemberNumber] = args;
+      const action = next(args);
       if (typeof _Item === "string") _Item = InventoryGet(_C, _Item);
-      const _slot = _Item.Asset.DynamicGroupName == "Panties" ? "bottomLayer" : "topLayer";
-      if (Diaper.isDiaper(_Item) && modSession[_slot]?.item) {
-        modSession[_slot].item = _Item;
+      if (Diaper.isDiaper(_Item) && modSession["topLayer"]?.item) {
+        modSession["topLayer"].item = _Item;
       }
-      return next(args);
+      return action;
+    });
+    hookFunction("InventoryUnlock", 2, (args, next) => {
+      let [_C, _Item] = args;
+      const action = next(args);
+      if (typeof _Item === "string") _Item = InventoryGet(_C, _Item);
+      if (_Item && _Item.Property && _Item.Property.Effect) {
+        if (Diaper.isDiaper(_Item) && modSession["topLayer"]?.item) {
+          modSession["topLayer"].item = _Item;
+        }
+      }
+      return action;
     });
   }
   var Diaper = class _Diaper {
@@ -1158,12 +1194,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if ((diaperData.type === "primary" || diaperData.type === "primary&secondary") && typeof this.item.Color == "string") {
         this.item.Color = this.item.Asset.DefaultColor;
       }
-      let messyColor = DiaperUseLevels["Clean"];
-      let wetColor = DiaperUseLevels["Clean"];
+      let messyColor = DiaperUseLevels["clean"];
+      let wetColor = DiaperUseLevels["clean"];
       const messyLevel = this.messes / this.absorbancy;
       const wetLevel = this.wettings / this.absorbancy;
-      messyColor = getColor(messyLevel, "Maximummess", "Middlemess", "Clean");
-      wetColor = getColor(wetLevel, "Maximumwet", "Middlewet", "Clean");
+      messyColor = getColor(messyLevel, "maximummess", "middlemess", "clean");
+      wetColor = getColor(wetLevel, "maximumwet", "middlewet", "clean");
       const primaryColor = AverageColor(messyColor, wetColor, 0.7);
       const secondaryColor = AverageColor(messyColor, wetColor, 0.9);
       const { indexes } = diaperData;
@@ -1176,17 +1212,28 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
   };
+  function getColor(level, highLevel, midLevel, lowLevel) {
+    if (level > 0.75) {
+      return level > 0.9 ? DiaperUseLevels[highLevel] : AverageColor(DiaperUseLevels[highLevel], DiaperUseLevels[midLevel], level - 0.75);
+    } else {
+      return AverageColor(DiaperUseLevels[midLevel], DiaperUseLevels[lowLevel], level);
+    }
+  }
   function updateDiaper(refresh = true) {
     if (!modSession.bottomLayer || modSession.bottomLayer.isReplaced()) {
       const item = InventoryGet(Player, "Panties");
       if (item && Diaper.isDiaper(item)) {
         modSession.bottomLayer = new Diaper(item);
+      } else {
+        modSession.bottomLayer = null;
       }
     }
     if (!modSession.topLayer || modSession.topLayer.isReplaced()) {
       const item = InventoryGet(Player, "ItemPelvis");
       if (item && Diaper.isDiaper(item)) {
         modSession.topLayer = new Diaper(item);
+      } else {
+        modSession.topLayer = null;
       }
     }
     if (!modStorage.settings.enabled || !modStorage.settings.visuals) {
@@ -1207,35 +1254,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ChatRoomCharacterUpdate(Player);
     }
   }
-  function getColor(level, highLevel, midLevel, lowLevel) {
-    if (level > 0.75) {
-      return level > 0.9 ? DiaperUseLevels[highLevel] : AverageColor(DiaperUseLevels[highLevel], DiaperUseLevels[midLevel], level - 0.75);
-    } else {
-      return AverageColor(DiaperUseLevels[midLevel], DiaperUseLevels[lowLevel], level);
-    }
-  }
   function changeDiaper(player, by = "self") {
     if (player != Player && player != null) {
       Messager.send({ "Action": "ChangeDiaper", "MemberNumber": player.MemberNumber }, player.MemberNumber, "Hidden");
       return;
     }
-    if (globalThis.BCC_LOADED) {
-      if (!hasPermissionToChangeDiaper(Player, Player)) {
-        return;
-      }
-    }
     modSession.topLayer?.change();
     modSession.bottomLayer?.change();
     updateDiaper();
-    sendChangeDiaperMessage(by);
+    if (by != "self") {
+      SentenceBuilder.data["\xA7by-player\xA7"] = { "neutral": [by] };
+      sendMessage("changeBy");
+    } else {
+      SentenceBuilder.data["\xA7by-player\xA7"] = { "neutral": [GetName(Player)] };
+      sendMessage("changeSelf");
+    }
+    SentenceBuilder.data["\xA7by-player\xA7"] = { "neutral": [Pronoun.get("Reflexive", Player)] };
   }
-  function triggerDiaperAccident(action = null) {
+  function releaseInClothes(action = null) {
     if (!modSession.settings.enabled || !modSession.settings.intentionalLeaks) {
       return;
     }
     if (action == null) {
-      const action2 = nextDiaperAction()["result"];
-      if (action2 == "nothing") return;
+      action = nextDiaperAction()["result"];
+      if (action == "nothing") return;
     }
     let result = "selfmess";
     if (action == "messes") {
@@ -1244,57 +1286,40 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (action == "wettings") {
       result = "selfwet";
     }
-    promptMessage(ABCLdata.messages[modSession.settings.messageType][result]);
+    sendMessage(result);
     if (!modSession.settings.visuals) return;
     let itemsBelow = [];
     itemsBelow.push(
       ...["Shoes", "Socks", "Panties", "ItemPelvis", "ItemBoots", "Garters", "RightAnklet", "LeftAnklet", "SuitLower", "ClothLower"].map((slot) => InventoryGet(Player, slot))
     );
     itemsBelow = itemsBelow.filter((item) => item != null);
-    applyColorToItems(itemsBelow, DiaperUseLevels[result]);
+    applyColorToItems(itemsBelow, DiaperUseLevels[result], 0.1);
     updateDiaper();
   }
-  function triggerDiaperAction() {
+  function releaseInDiaper() {
     const { result } = nextDiaperAction();
     if (result === "nothing") return;
     const layers = [modSession.bottomLayer, modSession.topLayer];
-    applyDiaperActionToLayer(layers, result);
-    modSession.settings.regressionLevel += getRegressionIncreese();
-    getDiaperActionMessage(layers, result);
-    updateDiaper();
-  }
-  function applyDiaperActionToLayer(layers, result) {
+    let absorbancy = 0;
+    let total = 0;
     for (const layer of layers) {
       if (layer && layer.wettings + layer.messes < layer.absorbancy) {
         layer[result] += 1;
-        return true;
       }
-    }
-    return false;
-  }
-  function getDiaperActionMessage(layers, action) {
-    let message = "immergency";
-    let absorbancy = 0;
-    let total = 0;
-    let result = "mess";
-    if (action == "messes") {
-      result = "mess";
-    }
-    if (action == "wettings") {
-      result = "wet";
-    }
-    for (const layer of layers) {
       if (layer) {
         absorbancy += layer.absorbancy;
         total += layer.messes + layer.wettings;
       }
     }
-    if (absorbancy > total) {
-      message = result;
-    } else if (total === absorbancy) {
-      message = "fully" + result;
+    modSession.settings.regressionLevel += getRegressionIncreese();
+    let message = { "messes": "mess", "wettings": "wet" }[result];
+    if (total === absorbancy) {
+      message = "fully" + message;
+    } else if (absorbancy < total) {
+      message = "immergency";
     }
-    promptMessage(ABCLdata.messages[modSession.settings.messageType][message]);
+    sendMessage(message);
+    updateDiaper();
   }
 
   // src/modules/storage.ts
@@ -1393,7 +1418,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (modSession.topLayer) {
       modStorage.topLayer = diaperToSavedDiaper(modSession.topLayer);
     } else {
-      modStorage.bottomLayer = null;
+      modStorage.topLayer = null;
     }
     if (modSession.bottomLayer) {
       modStorage.bottomLayer = diaperToSavedDiaper(modSession.bottomLayer);
@@ -1420,26 +1445,71 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // src/modules/settingsMenu.ts
   function loadSettingsMenu() {
-    let currentSettingsPage = null;
-    const settingsButtonLeft = 200;
-    const settingsButtonTop = 260;
-    const settingsButtonWidth = 600;
-    const settingsButtonHeight = 75;
-    const settingsButtonsGap = 100;
+    initializeSettings();
     PreferenceRegisterExtensionSetting({
       Identifier: "ABCL",
       ButtonText: "ABCL Settings",
       Image: abcl_default2,
       click: () => {
-        if (MouseIn(1815, 75, 90, 90)) currentSettingsPage === null ? PreferenceSubscreenExtensionsClear() : currentSettingsPage = null;
       },
       run: () => {
       },
       exit: () => {
+        document.querySelector("#abcl")?.classList.add("hidden");
       },
       load: () => {
+        document.querySelector("#abcl")?.classList.remove("hidden");
       }
     });
+  }
+  function initializeSettings() {
+    const settings = [
+      { id: "#abcl-mess input", key: "messing", type: "checkbox" },
+      { id: "#abcl-visuals input", key: "visuals", type: "checkbox" },
+      { id: "#abcl-wet input", key: "wetting", type: "checkbox" },
+      { id: "#abcl-mess-wet-chance input", key: "messChance", type: "range" },
+      { id: "#abcl-clothing-accidents input", key: "intentionalLeaks", type: "checkbox" },
+      { id: "#abcl-leaks input", key: "accidentalLeaks", type: "checkbox" },
+      { id: "#abcl-timer-enabled input", key: "timerEnabled", type: "checkbox" },
+      { id: "#abcl-timer-duration input", key: "timerDuration", type: "number" },
+      { id: "#abcl-message-type select", key: "messageType", type: "text" }
+    ];
+    settings.forEach((setting) => {
+      const element = document.querySelector(setting.id);
+      if (element) {
+        const value = ABCLgetSetting(setting.key);
+        if (setting.type === "checkbox") {
+          element.checked = value;
+        } else if (setting.id == "#abcl-timer-duration input") {
+          element.value = Number(value) / (60 * 30);
+        } else if (setting.type === "range" || setting.type === "number" || setting.type === "text") {
+          element.value = value;
+        }
+        element.addEventListener("change", function() {
+          let newValue;
+          if (setting.id == "#abcl-mess-wet-chance input") {
+            updateMessWetChance(Number(this.value));
+            return;
+          }
+          if (setting.type === "checkbox") {
+            newValue = this.checked;
+          } else if (setting.id == "#abcl-timer-duration input") {
+            newValue = Number(this.value * (60 * 30));
+          } else if (setting.type === "range" || setting.type === "number") {
+            newValue = Number(this.value);
+          } else if (setting.type === "text") {
+            newValue = this.value;
+          }
+          ABCLsetSetting(setting.key, newValue);
+        });
+      }
+    });
+  }
+  function updateMessWetChance(value) {
+    const messChance = 1 - value / 100;
+    const wetChance = value / 100;
+    ABCLsetSetting("wetChance", wetChance);
+    ABCLsetSetting("messChance", messChance);
   }
 
   // src/modules/commands.ts
@@ -1464,10 +1534,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       name: "tick",
       description: "Jumps forward to the next accident",
       action: () => {
-        if (modStorage.topLayer || modStorage.bottomLayer) {
-          triggerDiaperAction();
+        if (modSession.topLayer || modSession.bottomLayer) {
+          releaseInDiaper();
         } else {
-          triggerDiaperAccident();
+          releaseInClothes();
+          modSession.settings.regressionLevel += getRegressionIncreese();
+          desperationTick();
         }
         ChatRoomSendLocal(`<p style='background-color:#ecc826'>ABCL: ${Player.Nickname == "" ? Player.Name : Player.Nickname} squeezes ${Pronoun.get("dependent", Player)} abdomen trying to get it all out. (only you can see this).</p>`);
       }
@@ -1522,7 +1594,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   async function statUpdateLoop() {
     const statBoxes = document.querySelectorAll(".stats-box");
-    const seconds = getTimeUntilAccident();
+    const seconds = getTime();
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     const chance = nextDiaperAction();
@@ -1550,8 +1622,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (bar) bar.style.width = seconds / (getTime() * 60) * 100 + "%";
       if (absorbancyTotal) absorbancyTotal.textContent = (totalAbsorbancy * 60).toString();
       if (desperationBase) desperationBase.textContent = (Math.floor(modSession.settings.desperationLevel * 10) / 10).toString();
-      if (regressionBase) regressionBase.textContent = (Math.floor((getRegressionIncreese() + modSession.settings.regressionLevel) * 10) / 10).toString();
-      if (regressionModifier) regressionModifier.textContent = (Math.floor(getRegressionIncreese() * 10) / 10).toString();
+      if (regressionBase) regressionBase.textContent = (Math.floor((getRegressionIncreese() + modSession.settings.regressionLevel) * 10) / 10).toString() + "%";
+      if (regressionModifier) regressionModifier.textContent = (Math.floor(getRegressionIncreese() * 10) / 10).toString() + "%";
     });
   }
 
@@ -1760,7 +1832,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var style = document.createElement("style");
   style.innerHTML = abcl_default;
   document.head.append(style);
-  document.body.append(settings_default);
+  document.body.insertAdjacentHTML("beforeend", settings_default);
   waitFor(() => typeof window.Player?.MemberNumber === "number").then(() => {
     initStorage();
     loadSettingsMenu();
@@ -1781,17 +1853,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
   async function loop() {
     updateDiaper();
     while (true) {
-      if (!modSession.settings.enabled || !modSession.settings.timerEnabled || getTimeUntilAccident() > 0) {
-        await new Promise((r) => setTimeout(r, getTime() * 1e3));
+      if (!modSession.settings.enabled || !modSession.settings.timerEnabled || getTime() > 0) {
+        await new Promise((r) => setTimeout(r, Math.max(getTime() * 1e3)));
         continue;
       }
-      modSession.settings.lastAccident = Date.now();
+      modSession.settings.lastAccident = Date.now() + 6e4;
       if (modSession.topLayer || modSession.bottomLayer) {
-        triggerDiaperAction();
+        releaseInDiaper();
       } else {
         modSession.settings.regressionLevel += getRegressionIncreese();
         desperationTick();
-        triggerDiaperAccident();
+        releaseInClothes();
       }
     }
   }

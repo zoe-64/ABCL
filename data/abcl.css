@@ -1,27 +1,45 @@
-
-#abcl .page {
-	background-color: #ffffff;
-	border: 1px solid #000;
-	z-index: 100;
+.abcl-navbar {
+	overflow: auto;
+	white-space: nowrap;
 	padding: 0;
-	margin: auto;
-	outline: none;
-	display: block;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	position: absolute;
+	margin: 0;
+	position: relative;
+}
+.abcl-navbar li {
+	display: inline-block;
+	text-align: center;
+	text-decoration: none;
+}
+.abcl-navbar button {
+	padding: 12px;
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
+	border: 1px black solid;
+	border-bottom: 0;
+}
+.abcl-navbar button:disabled {
+	background: white;
+}
+#abcl {
 	aspect-ratio: auto 2000 / 1000;
-	font-family: sans-serif;
+  	height: 100%;
+  	margin: auto;
+	max-width: 100%;
+}
+#abcl .page {
+	border: 1px solid #000;
+	width: calc(100% - 60px);
+	position: relative;
 
+	font-family: sans-serif;
+	padding: 30px;
 }
 
 #page-abcl-1:not(.hidden) {
 	display: grid;
 	grid-template-rows: 1fr 1fr 1fr;
 	grid-template-columns:repeat(6, min-content);
-	gap: 5px;
+	gap: 25px;
 	background-color: rgb(240, 240, 240);
 	width: unset;
     height: 100%;
@@ -29,11 +47,14 @@
 .tooltip {
 	position: relative;
 }
-#abcl label, #abcl input, #abcl button {
+#abcl label, #abcl button {
 	display: block;
 	text-align: center;
-	margin: auto;
-
+}
+#abcl input {
+	position: relative;
+	left:50%;
+	transform:translateX(-50%)
 }
 #abcl-mess {grid-area: a;}
 #abcl-visual {grid-area: b;}
@@ -76,23 +97,30 @@
     }
 #abcl-exit {
 	position: absolute;
-	top: 2vw;
-	right: 2vw;
+	top: 30px;
+	right: 30px;
 }
-
+.tooltip-down:before, .tooltip-down::after {
+	transform:  translateX(-50%) translateY(50%) scale(var(--scale)) !important;
+}
 .tooltip:before, .tooltip::after {
 	--scale: 0;
+	font-size: 17px;
 	content: attr(data-tooltip);
 	top: -0.25rem;
-	color: #ffffff;
+	color: #000000;
 	padding: 0.5rem;
 	left: 50%;
-	background-color: #000;
+	background-color: #ffffff;
+	border: #000 1px solid;
+	border-radius: 5px;
 	position: absolute;
-
+	width: 100px;
 	transform:  translateX(-50%) translateY(-100%) scale(var(--scale));
-	
-	transition: transform 0.1s;
+	box-shadow: 0px 2px 3px rgba(0,0,0,30%);
+	transition: transform 0.05s;
+	z-index: 100;
+	pointer-events: none;
 }
 .tooltip:hover:before, .tooltip:hover::after {
 	--scale: 1;
@@ -110,13 +138,18 @@
 	border: rgb(175, 175, 175) 1px solid;
 	text-align: center;
 	margin: auto;
-	display: block;
 	padding: 3px;
 	border-radius: 1px;
 }
+
+input.ABCLstyle-interactable[type="checkbox"] {
+	width: 20px !important;
+	height: 20px !important;
+  }
 .ABCLstyle-interactable option {
 	text-align: center;
 }
+
 
 
 .hidden {

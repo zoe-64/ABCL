@@ -60,7 +60,7 @@ export function getRegressionIncreese() {
 	return total
 }
 export function increeseRegression() {
-	modStorage.settings.regressionLevel += getRegressionIncreese()
+	modStorage.settings.regressionLevel = Math.min(modStorage.settings.regressionLevel+getRegressionIncreese(), 100)
 }
 
 // desperation needs rework

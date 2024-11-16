@@ -2,28 +2,16 @@ import { GetName, GetPlayer, Messager, Pronoun, SentenceBuilder } from "zoelib/d
 import { ABCLdata } from "../index";
 import { modSession, modStorage } from "./storage";
 import { changeDiaper } from "./diaper";
-
+import { TMessageVariants } from "./data"
 export function loadMessages() {
 	SentenceBuilder.data["§name§"] = {get neutral() {return [GetName(Player)]}};
 	SentenceBuilder.data["§items-below§"] = {get neutral() {return [getItemsBelow()]}};
 	SentenceBuilder.data["§current-diaper§"] = {get neutral() {return [InventoryGet(Player, "ItemPelvis")?.Asset?.Description || InventoryGet(Player, "Panties")?.Asset?.Description || "diaper"]}};
 	SentenceBuilder.data["§by-player§"] = {"neutral":[Pronoun.get("Reflexive", Player)]};
 	SentenceBuilder.data = {...ABCLdata.verbs, ...SentenceBuilder.data};
-
 	Messager.addListener(ABCLMessagerListener, -5, "ABCL Message Processor");
 }
 
-export function sendChangeDiaperMessage(by:string){
-	if (by != "self") {
-		SentenceBuilder.data["§by-player§"] = {"neutral":[by]};
-		promptMessage(ABCLdata.messages[modStorage.settings.messageType]["changeBy"]);
-	} else {
-		SentenceBuilder.data["§by-player§"] = {"neutral":[GetName(Player)]};
-		promptMessage(ABCLdata.messages[modStorage.settings.messageType]["changeSelf"]);
-		SentenceBuilder.data["§by-player§"] = {"neutral":[Pronoun.get("Reflexive", Player)]};
-	}
-   
-}
 export function ABCLMessagerListener(response:ServerChatRoomMessage):boolean {
 	if (response.Type == "Hidden") {   
 		try {
@@ -74,16 +62,12 @@ export function getItemsBelow() {
 	}
 	return result;
 } 
-export function promptMessage(unformatedMessage:string) {
+export function sendMessage(variant: keyof TMessageVariants) {
 	SentenceBuilder.target = Player;
-	let message = SentenceBuilder.prompt(unformatedMessage, Player);
-	
+	let message = SentenceBuilder.prompt(ABCLdata.messages[modSession.settings.messageType][variant], Player);
 	if (modSession.settings.messageType == "internalMonologue") {
 		Messager.send(message,Player.MemberNumber, "LocalMessage");
 	} else {
-		ServerSend("ChatRoomChat", {Content: "Beep", Type: "Action", Dictionary: [
-			{ Tag: "Beep", Text: "msg" },
-			{ Tag: "msg", Text: message},
-		]});        
+		Messager.send(message, undefined, "Action");
 	}
 } 

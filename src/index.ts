@@ -4,8 +4,8 @@ import { modSession, modStorage, initStorage } from "./modules/storage";
 import { loadSettingsMenu } from "./modules/settingsMenu";
 import { loadCommands } from "./modules/commands";
 
-import { getTime, getTimeUntilAccident, isVersionNewer, waitFor } from "./modules/utils";
-import { loadDiaperLayers, triggerDiaperAccident, triggerDiaperAction, updateDiaper } from "./modules/diaper";
+import { getTime, isVersionNewer, waitFor } from "./modules/utils";
+import { loadDiaperLayers, releaseInClothes, releaseInDiaper, updateDiaper } from "./modules/diaper";
 import { IModData } from "./modules/data";
 export function getModVersion(): string {
     return "1.2.1";
@@ -19,7 +19,7 @@ export const ABCLdata:IModData = JSON.parse(data.toString());
 const style = document.createElement("style");
 style.innerHTML = css;
 document.head.append(style);
-document.body.append(html)
+document.body.insertAdjacentHTML("beforeend",html)
 waitFor(() => typeof window.Player?.MemberNumber === "number").then(() => {
     initStorage();
     loadSettingsMenu();
@@ -41,19 +41,19 @@ waitFor(() => typeof window.Player?.MemberNumber === "number").then(() => {
 async function loop() {
     updateDiaper()
     while (true) {
-        if (!modSession.settings.enabled || !modSession.settings.timerEnabled || getTimeUntilAccident() > 0) {
-            await new Promise(r => setTimeout(r, getTime() * 1000));
+        if (!modSession.settings.enabled || !modSession.settings.timerEnabled || getTime() > 0) {
+            await new Promise(r => setTimeout(r, Math.max(getTime() * 1000)));
             continue;
         }
-        modSession.settings.lastAccident = Date.now() ;
+        modSession.settings.lastAccident = Date.now() +60000;
 
      
         if (modSession.topLayer || modSession.bottomLayer) {
-            triggerDiaperAction()
+            releaseInDiaper()
         } else {
             modSession.settings.regressionLevel+= getRegressionIncreese()
             desperationTick()
-            triggerDiaperAccident()
+            releaseInClothes()
         }
     }
 }

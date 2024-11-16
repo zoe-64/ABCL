@@ -1,9 +1,9 @@
 import { GetName, GetPlayer, Messager, Pronoun } from "zoelib/dist/zoelib.mjs";
 import { templates } from "./data";
 import { modSession, modStorage } from "./storage";
-import { changeDiaper, triggerDiaperAccident, triggerDiaperAction } from "./diaper";
-import { getTime, getTimeUntilAccident, nextDiaperAction } from "./utils";
-import { getRegressionIncreese } from "./stats";
+import { changeDiaper, releaseInClothes, releaseInDiaper } from "./diaper";
+import { getTime,nextDiaperAction } from "./utils";
+import { desperationTick, getRegressionIncreese } from "./stats";
 
 
 interface ICommand {
@@ -44,10 +44,12 @@ const commands: ICommand[] = [
         name: "tick",
         description: "Jumps forward to the next accident",
         action: () => {
-            if (modStorage.topLayer || modStorage.bottomLayer) {
-                triggerDiaperAction()
+            if (modSession.topLayer || modSession.bottomLayer) {
+                releaseInDiaper()
             } else {
-                triggerDiaperAccident();
+                releaseInClothes();
+                modSession.settings.regressionLevel+= getRegressionIncreese()
+                desperationTick()
             }
             ChatRoomSendLocal(`<p style='background-color:#ecc826'>ABCL: ${Player.Nickname == '' ? Player.Name : Player.Nickname} squeezes ${Pronoun.get("dependent", Player)} abdomen trying to get it all out. (only you can see this).</p>`);
         }
@@ -116,7 +118,7 @@ export function loadCommands(): void {
 
 export async function statUpdateLoop() {
         const statBoxes = document.querySelectorAll('.stats-box');
-        const seconds = getTimeUntilAccident();
+        const seconds = getTime();
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = Math.floor(seconds % 60);
         const chance = nextDiaperAction();
@@ -146,7 +148,7 @@ export async function statUpdateLoop() {
             if (bar) bar.style.width = (seconds / (getTime() * 60)) * 100 + '%';
             if (absorbancyTotal) absorbancyTotal.textContent = (totalAbsorbancy * 60).toString();
             if (desperationBase) desperationBase.textContent = (Math.floor(modSession.settings.desperationLevel * 10) / 10).toString();
-            if (regressionBase) regressionBase.textContent = (Math.floor((getRegressionIncreese() + modSession.settings.regressionLevel) * 10) / 10).toString();
-            if (regressionModifier) regressionModifier.textContent = (Math.floor(getRegressionIncreese() * 10) / 10).toString();
+            if (regressionBase) regressionBase.textContent = (Math.floor((getRegressionIncreese() + modSession.settings.regressionLevel) * 10) / 10).toString() + '%';
+            if (regressionModifier) regressionModifier.textContent = (Math.floor(getRegressionIncreese() * 10) / 10).toString() + '%';
         });
     }

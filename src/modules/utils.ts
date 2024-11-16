@@ -1,5 +1,5 @@
 import { AverageColor, Messager, RandomInt, SentenceBuilder } from "zoelib/dist/zoelib.mjs";
-import { modSession } from "./storage";
+import { ABCLSettings, modSession } from "./storage";
 import { getDesperationLevel } from "./stats";
 
 export function sleep(ms: number): Promise<() => {}> {
@@ -59,9 +59,16 @@ export function isVersionNewer(version1: string, version2: string): boolean {
 
 	return false;
 }
-export function getTime() {
-	let modifier = Math.pow(1.02, (modSession.settings.regressionLevel +1)) * (getDesperationLevel() + 1)
-	return Math.floor((getTimeUntilAccident() / modifier)*100)/100;
+export function getTime(): number {
+    const regressionLevel = modSession.settings.regressionLevel;
+    const desperationLevel = getDesperationLevel();
+    const modifier = Math.max(1, (Math.pow(1.02, regressionLevel) * (desperationLevel + 1)));
+
+    const currentTime = Date.now();
+    const accidentTime = modSession.settings.lastAccident + (modSession.settings.timerDuration * 60)/modifier;
+    const deltaMilliseconds = accidentTime - currentTime;
+    const deltaSeconds = Math.max(0, Math.floor(deltaMilliseconds / 1000));
+    return Math.max(0, Math.floor(deltaSeconds));
 }
 export function isMilk() {
 	let items = Player.Appearance
@@ -85,13 +92,6 @@ export function applyColorToItems(items:Item[], color:HexColor, transparency:num
     }
 }
 
-export function getTimeUntilAccident():number {
-	const currentTime = Date.now(); 
-    const accidentTime = modSession.settings.lastAccident + modSession.settings.timerDuration;
-    const deltaMilliseconds = accidentTime - currentTime;
-    const deltaSeconds = Math.max(0, Math.floor(deltaMilliseconds / 1000)); 
-    return deltaSeconds;
-}
 
 export type TDiaperAction = "messes" | "wettings" | "nothing"
 export function nextDiaperAction(): { result: TDiaperAction; mess: number; wet: number; nothing: number } {
@@ -110,3 +110,15 @@ export function nextDiaperAction(): { result: TDiaperAction; mess: number; wet: 
 
     return { result, mess: messChance, wet: wetChance, nothing: chanceForNothing };
 }
+export function ABCLsetSetting(key: string, value:any) {
+	// @ts-ignore
+	modSession.settings[key] = value
+}
+export function ABCLgetSetting(key: string) {
+	// @ts-ignore
+	return modSession.settings[key]
+}
+(globalThis as any).ABCLsetSetting = ABCLsetSetting;
+(globalThis as any).ABCLgetSetting = ABCLgetSetting;
+
+

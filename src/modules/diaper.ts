@@ -2,9 +2,9 @@ import bcModSdk from "bondage-club-mod-sdk";
 import { modSession, modStorage, TSavedDiaper, TSavedItem } from "./storage";
 import { hookFunction } from "./bcModSdk";
 import { ABCLdata } from "../index";
-import { DiaperUseLevels, MessageType } from "./data";
-import { AverageColor, Messager } from "zoelib/dist/zoelib.mjs";
-import { promptMessage, sendChangeDiaperMessage } from "./message";
+import { DiaperUseLevels, MessageType, TMessageVariants } from "./data";
+import { AverageColor, GetName, Messager, Pronoun, SentenceBuilder } from "zoelib/dist/zoelib.mjs";
+import { sendMessage } from "./message";
 import { applyColorToItems, nextDiaperAction, TDiaperAction } from "./utils";
 import { getRegressionIncreese } from "./stats";
 
@@ -45,11 +45,17 @@ export function savedDiaperToDiaper(savedDiaper:TSavedDiaper): Diaper | null {
 
 	if (savedDiaper.Layer == 0) {
 		diaper = new Diaper(replaceSlotWithSavedItem("Panties",savedDiaper.SavedItem,false));
+		diaper.wettings = savedDiaper.Wettings
+		diaper.messes = savedDiaper.Messes
 	}
 	if (savedDiaper.Layer == 1) {
 		diaper = new Diaper(replaceSlotWithSavedItem("ItemPelvis",savedDiaper.SavedItem,false));
+		diaper.wettings = savedDiaper.Wettings
+		diaper.messes = savedDiaper.Messes
+		
 	}
 	if (!diaper) return null;
+	updateDiaper()
 	ServerPlayerInventorySync()
 	return diaper
 }
@@ -57,7 +63,6 @@ export function compareItemToSavedItem(item:Item, savedItem:TSavedItem) {
 	return item.Asset.Name === savedItem.Asset.Name && JSON.stringify(item.Color) === JSON.stringify(savedItem.Color)
 		&& JSON.stringify(item.Craft) === JSON.stringify(savedItem.Craft) && JSON.stringify(item.Property) === JSON.stringify(savedItem.Property)	
 }
-
 export function replaceSlotWithSavedItem(slot:AssetGroupName,savedItem: TSavedItem, push=true): Item {
 	const item = InventoryGet(Player, slot)
 	if (item && compareItemToSavedItem(item,savedItem)) return item
@@ -81,26 +86,46 @@ export function replaceSlotWithSavedItem(slot:AssetGroupName,savedItem: TSavedIt
 	if (push) ServerPlayerInventorySync()
 	return newItem
 }
-
-
-
 export function loadDiaperLayers(): void {
+
 	hookFunction('CharacterAppearanceSetItem', 2, (args:any, next:Function) => {
 		let [_character, slot, _asset] = args;
+		const action = next(args)
 		if (slot == "ItemPelvis" || slot == "Panties") {
 			updateDiaper(false) 
 		}
-		return next(args);
+		return action;
 	});
+	hookFunction('InventoryRemove',2 ,(args:any, next:Function) => {
+		let [_character, slot] = args;
+		const action = next(args)
+		if (slot == "ItemPelvis" || slot == "Panties") {
+			updateDiaper(false) 
+		}
+		return action;
+	})
 	hookFunction('InventoryLock', 2, (args:any, next:Function) => {
 		let [_C, _Item, _Lock, _MemberNumber] = args;
+		const action = next(args)
 		// @ts-ignore
 		if (typeof _Item === 'string') _Item = InventoryGet(_C, _Item) as Item;
-		const _slot: "bottomLayer" | "topLayer" = _Item.Asset.DynamicGroupName == "Panties" ? "bottomLayer" : "topLayer" 
-		if (Diaper.isDiaper(_Item) && modSession[_slot]?.item) {	
-			modSession[_slot].item = _Item
+		if (Diaper.isDiaper(_Item) && modSession["topLayer"]?.item) {	
+			modSession["topLayer"].item = _Item
 		}
-		return next(args);
+		return action;
+	});
+	hookFunction('InventoryUnlock', 2, (args:any, next:Function) => {
+		let [_C, _Item] = args;
+		const action = next(args)
+		// @ts-ignore
+		if (typeof _Item === 'string') _Item = InventoryGet(_C, _Item) as Item;
+		if (_Item && _Item.Property && _Item.Property.Effect) {
+			if (Diaper.isDiaper(_Item) && modSession["topLayer"]?.item) {	
+				modSession["topLayer"].item = _Item
+			}
+		}
+		return action;
+
 	});
 }
 
@@ -164,12 +189,12 @@ export class Diaper {
 		if ((diaperData.type === "primary" || diaperData.type === "primary&secondary") && typeof this.item.Color == "string") {
 			this.item.Color = this.item.Asset.DefaultColor as ItemColor;
 		}
-		let messyColor = DiaperUseLevels["Clean"];
-		let wetColor = DiaperUseLevels["Clean"];
+		let messyColor = DiaperUseLevels["clean"];
+		let wetColor = DiaperUseLevels["clean"];
 		const messyLevel = this.messes / this.absorbancy;
 		const wetLevel = this.wettings / this.absorbancy;
-		messyColor = getColor(messyLevel, "Maximummess", "Middlemess", "Clean");
-		wetColor = getColor(wetLevel, "Maximumwet", "Middlewet", "Clean");
+		messyColor = getColor(messyLevel, "maximummess", "middlemess", "clean");
+		wetColor = getColor(wetLevel, "maximumwet", "middlewet", "clean");
 		const primaryColor = AverageColor(messyColor, wetColor, 0.7);
 		const secondaryColor = AverageColor(messyColor, wetColor, 0.9);
 		
@@ -183,17 +208,28 @@ export class Diaper {
 		}
 	}
 }
+function getColor(level: number, highLevel: string, midLevel: string, lowLevel: string): string {
+    if (level > 0.75) {
+        return level > 0.9 ? DiaperUseLevels[highLevel] : AverageColor(DiaperUseLevels[highLevel], DiaperUseLevels[midLevel], level - 0.75);
+    } else {
+        return AverageColor(DiaperUseLevels[midLevel], DiaperUseLevels[lowLevel], level);
+    }
+}
 export function updateDiaper(refresh=true) {
 	if (!modSession.bottomLayer || modSession.bottomLayer.isReplaced()) {
 		const item = InventoryGet(Player, "Panties");
 		if (item && Diaper.isDiaper(item)) {
 			modSession.bottomLayer = new Diaper(item)
+		} else {
+			modSession.bottomLayer = null	
 		}
 	}
 	if (!modSession.topLayer || modSession.topLayer.isReplaced()) {
 		const item = InventoryGet(Player, "ItemPelvis");
 		if (item && Diaper.isDiaper(item)) {
 			modSession.topLayer = new Diaper(item)
+		} else {
+			modSession.topLayer = null
 		}
 	}
 	if (!modStorage.settings.enabled || !modStorage.settings.visuals) {
@@ -215,43 +251,39 @@ export function updateDiaper(refresh=true) {
 		ChatRoomCharacterUpdate(Player);
 	}
 }
-function getColor(level: number, highLevel: string, midLevel: string, lowLevel: string): string {
-    if (level > 0.75) {
-        return level > 0.9 ? DiaperUseLevels[highLevel] : AverageColor(DiaperUseLevels[highLevel], DiaperUseLevels[midLevel], level - 0.75);
-    } else {
-        return AverageColor(DiaperUseLevels[midLevel], DiaperUseLevels[lowLevel], level);
-    }
-}
+
 
 export function changeDiaper(player:typeof Player, by="self") {
 	if (player != Player && player != null) { // change another player's diaper
 		Messager.send({"Action": "ChangeDiaper", "MemberNumber": player.MemberNumber}, player.MemberNumber, "Hidden");
 		return;
 	}
-	if ((globalThis as any).BCC_LOADED) { // @ts-ignore
-		if (!hasPermissionToChangeDiaper(Player, Player)) {
-			return;
-		}
-	}
 	modSession.topLayer?.change()
 	modSession.bottomLayer?.change()
-	
 
 	updateDiaper();
-	  // being changed by someone else
-	sendChangeDiaperMessage(by)
-}
+	if (by != "self") {
+		SentenceBuilder.data["§by-player§"] = {"neutral":[by]};
+		sendMessage("changeBy");
+	} else {
+		SentenceBuilder.data["§by-player§"] = {"neutral":[GetName(Player)]};
+		sendMessage("changeSelf");
+	}
+	SentenceBuilder.data["§by-player§"] = {"neutral":[Pronoun.get("Reflexive", Player)]};
+
+	}
 
 
-export function triggerDiaperAccident(action:TDiaperAction | null = null) {
+export function releaseInClothes(action:TDiaperAction | null = null) {
 	if (!modSession.settings.enabled || !modSession.settings.intentionalLeaks) {
 		return;
 	}
 	if (action == null) {
-		const action = nextDiaperAction()["result"] as TDiaperAction; 
+		action = nextDiaperAction()["result"] as TDiaperAction; 
 		if (action == "nothing") return; 
 		
 	}
+	
 	let result:MessageType = "selfmess"
 	if (action == "messes") {
 		result = "selfmess"
@@ -259,7 +291,7 @@ export function triggerDiaperAccident(action:TDiaperAction | null = null) {
 	if (action == "wettings") {
 		result = "selfwet" 
 	}
-	promptMessage(ABCLdata.messages[modSession.settings.messageType][result])
+	sendMessage(result)
 
 	if (!modSession.settings.visuals) return
 	
@@ -270,54 +302,36 @@ export function triggerDiaperAccident(action:TDiaperAction | null = null) {
 	);
 	itemsBelow = itemsBelow.filter(item => item != null);
 	
-	applyColorToItems(itemsBelow,DiaperUseLevels[result])
+	applyColorToItems(itemsBelow,DiaperUseLevels[result], 0.1)
 	
 	updateDiaper();
 }
-export function triggerDiaperAction() {
+export function releaseInDiaper() {
 	const { result } = nextDiaperAction();
 	if (result === "nothing") return;
 	const layers = [modSession.bottomLayer, modSession.topLayer];
 	
-	applyDiaperActionToLayer(layers, result)
-	
-  
-	modSession.settings.regressionLevel += getRegressionIncreese();
-	getDiaperActionMessage(layers, result);
-	updateDiaper();
-  }
-  function applyDiaperActionToLayer(layers: (Diaper | null | undefined)[] , result: "messes" | "wettings"): boolean {
-	for (const layer of layers) {
-	  if (layer && layer.wettings + layer.messes < layer.absorbancy) {
-		layer[result] += 1;
-		return true;
-	  }
-	}
-	return false;
-}
-function getDiaperActionMessage(layers: (Diaper | null | undefined)[], action:TDiaperAction) {
-	let message:MessageType = "immergency";
 	let absorbancy = 0;
 	let total = 0;
-	let result:MessageType = "mess"
-	if (action == "messes") {
-		result = "mess"
-	}
-	if (action == "wettings") {
-		result = "wet" 
-	}
 	for (const layer of layers) {
-	  if (layer) {
-		absorbancy += layer.absorbancy;
-		total += layer.messes + layer.wettings;
-	  }
+		if (layer && layer.wettings + layer.messes < layer.absorbancy) {
+		  	layer[result] += 1;
+		}
+		if (layer) {
+			absorbancy += layer.absorbancy;
+			total += layer.messes + layer.wettings;
+		}
 	}
   
-	if (absorbancy > total) {
-	  message = result;
-	} else if (total === absorbancy) {
-	  message = "fully" + result as MessageType;
+	modSession.settings.regressionLevel += getRegressionIncreese();
+	let message = {"messes":"mess","wettings":"wet"}[result] as keyof TMessageVariants
+	if (total === absorbancy) {
+		message = "fully" + message as keyof TMessageVariants;
+	} else if (absorbancy < total) {
+		message = "immergency"
 	}
-  
-	promptMessage(ABCLdata.messages[modSession.settings.messageType][message]);
-}
+
+	sendMessage(message)
+	updateDiaper();
+  }
+

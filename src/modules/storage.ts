@@ -166,7 +166,7 @@ export function serializeStorage() {
     if (modSession.topLayer) {
 		modStorage.topLayer = diaperToSavedDiaper(modSession.topLayer)
 	} else {
-        modStorage.bottomLayer = null
+        modStorage.topLayer = null
     }
 	if (modSession.bottomLayer) {
 		modStorage.bottomLayer = diaperToSavedDiaper(modSession.bottomLayer);

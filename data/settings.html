@@ -1,39 +1,59 @@
+<!-- <head>-->
+<!--    <link href="./abcl.css" rel="stylesheet">-->
+    
+<!--</head> -->
+
 <div id="abcl" class="hidden">
+    <ol class="abcl-navbar">
+        <li class="tab" id="page-abcl-1-tab" >
+            <button disabled="" onclick="showPageById('page-abcl-1')">
+            Your settings
+        </button></li>
+        <li class="tab" id="page-abcl-2-tab"><button onclick="showPageById('page-abcl-2')">
+            Other's settings    
+        </button></li>
+    </ol>
 <div id="page-abcl-1" class="page">
     <div id="wettings-messes-category" class="settings-category"> <!-- All mess/wet related --> 
         
-        <p class="setting tooltip" id="abcl-mess" data-tooltip="If checked, mess accidents will happen.">
-            <label>Messes</label>
-            <input type="checkbox" checked> 
+        <p class="setting tooltip tooltip-down" id="abcl-mess" data-tooltip="If checked, mess accidents will happen.">
+            <label for="mess-checkbox">Messes</label>
+            <input type="checkbox" id="mess-checkbox" class="ABCLstyle-interactable" checked> 
         </p>
-    
-        <p class="setting tooltip" id="abcl-visual" data-tooltip="Controls if accidents are visible on the character.">
-            <label>Visual</label>
-            <input type="checkbox" checked>
+        
+        <p class="setting tooltip tooltip-down" id="abcl-visuals" data-tooltip="Controls if accidents are visible on the character.">
+            <label for="visuals-checkbox">Visuals</label>
+            <input type="checkbox" id="visuals-checkbox" class="ABCLstyle-interactable" checked>
         </p>
-
-        <p class="setting tooltip" id="abcl-wet" data-tooltip="If checked, wet accidents will happen.">
-            <label>Wets</label>
-            <input type="checkbox" checked>
+        
+        <p class="setting tooltip tooltip-down" id="abcl-wet" data-tooltip="If checked, wet accidents will happen.">
+            <label for="wet-checkbox">Wets</label>
+            <input type="checkbox" id="wet-checkbox" class="ABCLstyle-interactable" checked>
         </p>
-
-        <p class="setting tooltip" id="abcl-mess-wet-chance" data-tooltip="The chance of a mess accident happening instead of a wet accident.">
-            <label>Mess vs Wet</label>
-            <input type="range" id="abcl-mess-wet-chance" min="0" max="100" value="50">
+        
+        <p class="setting tooltip tooltip-down" id="abcl-mess-wet-chance" data-tooltip="The chance of a mess accident happening instead of a wet accident.">
+            <label for="mess-wet-range">Mess vs Wet</label>
+            <input type="range" id="mess-wet-range" min="0" max="100" value="66">
         </p>
-    
-        <p class="setting tooltip" id="abcl-clothing-accidents" data-tooltip="Accidents that happen outside the diaper.">
-            <label>Clothing-Accidents</label>
-            <input type="checkbox" checked>
+        
+        <p class="setting tooltip" id="abcl-clothing-accidents" data-tooltip="Accidents that happen without the diaper.">
+            <label for="clothing-accidents-checkbox">Clothing-Accidents</label>
+            <input type="checkbox" id="clothing-accidents-checkbox" class="ABCLstyle-interactable" checked>
         </p>
-
+        
+        <p class="setting tooltip" id="abcl-leaks" data-tooltip="Leakage that happen when the diaper is full.">
+            <label for="leaks-checkbox">Leaks</label>
+            <input type="checkbox" id="leaks-checkbox" class="ABCLstyle-interactable" checked>
+        </p>
+        
         <p class="setting tooltip" id="abcl-timer-enabled" data-tooltip="If checked, accidents will happen automatically by the timer.">
-            <label>Timer enabled</label>
-            <input type="checkbox" checked>
+            <label for="timer-enabled-checkbox">Timer enabled</label>
+            <input type="checkbox" id="timer-enabled-checkbox" class="ABCLstyle-interactable" checked>
         </p>
+
         <p class="setting tooltip" id="abcl-timer-duration" data-tooltip="The time between automatic accidents.">
             <label>Timer duration</label>
-            <input type="number" value="30" min="5" max="420"><span>minutes</span>
+            <input type="number" value="30" min="15" max="420"><span>minutes</span>
         </p>
     </div>
     <div class="settings-category">
@@ -49,10 +69,10 @@
     <div class="settings-category">  
     <button id="abcl-reset-button" onclick="document.getElementById('reset-confirm-abcl').showModal()">Reset data</button>
     </div>
-    <button class="abcl-exit-button" id="abcl-exit" onclick="PreferenceSubscreenAbclExit()"></button>
+    <button class="abcl-exit-button" id="abcl-exit" onclick="PreferenceSubscreenExtensionsClear(); document.querySelector('#abcl').classList.add('hidden')"></button>
 
 </div>
-
+<div id="page-abcl-2" class="page"></div>
 <dialog id="reset-confirm-abcl">
     <p>Are you sure you want to reset all ABCL data?</p>
     <button onclick="Abcl.reset()">Yes</button>
