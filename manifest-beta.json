@@ -27,7 +27,7 @@
   ],
   "content_scripts": [
     {
-      "js": ["contentscript.js"],
+      "js": ["beta/contentscript.js"],
       "matches": [
         "https://bondage-europe.com/*",
         "https://www.bondage-europe.com/*",
@@ -44,7 +44,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["ABCL.js"],
+      "resources": ["beta/ABCL.js"],
       "matches": [
         "https://bondage-europe.com/*",
         "https://www.bondage-europe.com/*",

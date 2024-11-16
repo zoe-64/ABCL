@@ -1,0 +1,1 @@
+javascript:(function (){const scriptSrc = "https://zoe-64.github.io/ABCL/beta/ABCL.js?_=" + Date.now(); let script = document.createElement("script"); script.setAttribute("language", "JavaScript"); script.setAttribute("crossorigin", "anonymous"); script.setAttribute("src", scriptSrc); document.head.appendChild(script);})()
