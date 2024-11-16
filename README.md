@@ -1,4 +1,4 @@
-# ABCL 1.1
+# ABCL 1.2
  ABCL is an addon for [Bondage Club](https://www.bondageprojects.com/club_game/)
  Stands for "Adult baby club lover"~
  
