@@ -20,7 +20,7 @@
   We prefer you use TamperMonkey or ViolentMonkey.
   ### TamperMonkey or ViolentMonkey
   If you use [TamperMonkey](https://www.tampermonkey.net/) or [ViolentMonkey](https://violentmonkey.github.io): (available for several browsers: Chrome, Edge, Safari, Opera, Firefox)
-    1. Visit and click on install [ABCL.user.js](https://github.com/zoe-64/ABCL/raw/main/ABCL.user.js)
+    1. Visit and click on install [ABCL.user.js](https://github.com/zoe-64/ABCL/raw/main/ABCL.user.js) or [beta/ABCL.user.js](https://github.com/zoe-64/ABCL/blob/main/beta/ABCL.user.js)
 
   ### Alternative (Extension)
   1. Download the Latest file on the Releases page
@@ -29,11 +29,11 @@
   4. Load as Unpacked. Done. If the file can't be seen, see step 2.
 
   ### Bookmark (must be used before login)
-  1. Go to [bookmark.js](https://github.com/zoe-64/ABCL/blob/main/bookmark.js)
+  1. Go to [bookmark.js](https://github.com/zoe-64/ABCL/blob/main/bookmark.js) or [beta/bookmark.js](https://github.com/zoe-64/ABCL/blob/main/beta/bookmark.js)
   2. Use the code to set as bookmark
   3. Before login, activate the bookmark
   4. Login!
-     
+
 ## Credits
 Special thanks to tetris245 for helping me get into modding!
 
