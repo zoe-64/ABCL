@@ -213,48 +213,48 @@ One of mods you are using is using an old version of SDK. It will work for now b
         \r
         <p class="setting tooltip tooltip-down" id="abcl-mess" data-tooltip="If checked, mess accidents will happen.">\r
             <label for="mess-checkbox">Messes</label>\r
-            <input type="checkbox" id="mess-checkbox" class="ABCLstyle-interactable" checked> \r
+            <input type="checkbox" id="property-messing" class="ABCLstyle-interactable" checked> \r
         </p>\r
         \r
         <p class="setting tooltip tooltip-down" id="abcl-visuals" data-tooltip="Controls if accidents are visible on the character.">\r
             <label for="visuals-checkbox">Visuals</label>\r
-            <input type="checkbox" id="visuals-checkbox" class="ABCLstyle-interactable" checked>\r
+            <input type="checkbox" id="property-wetting" class="ABCLstyle-interactable" checked>\r
         </p>\r
         \r
         <p class="setting tooltip tooltip-down" id="abcl-wet" data-tooltip="If checked, wet accidents will happen.">\r
             <label for="wet-checkbox">Wets</label>\r
-            <input type="checkbox" id="wet-checkbox" class="ABCLstyle-interactable" checked>\r
+            <input type="checkbox" id="property-visuals" class="ABCLstyle-interactable" checked>\r
         </p>\r
         \r
         <p class="setting tooltip tooltip-down" id="abcl-mess-wet-chance" data-tooltip="The chance of a mess accident happening instead of a wet accident.">\r
             <label for="mess-wet-range">Mess vs Wet</label>\r
-            <input type="range" id="mess-wet-range" min="0" max="100" value="66">\r
+            <input type="range" id="property-messChanceWetChance" min="0" max="100" value="66">\r
         </p>\r
         \r
         <p class="setting tooltip" id="abcl-clothing-accidents" data-tooltip="Accidents that happen without the diaper.">\r
             <label for="clothing-accidents-checkbox">Clothing-Accidents</label>\r
-            <input type="checkbox" id="clothing-accidents-checkbox" class="ABCLstyle-interactable" checked>\r
+            <input type="checkbox" id="property-intentionalLeaks" class="ABCLstyle-interactable" checked>\r
         </p>\r
         \r
         <p class="setting tooltip" id="abcl-leaks" data-tooltip="Leakage that happen when the diaper is full.">\r
             <label for="leaks-checkbox">Leaks</label>\r
-            <input type="checkbox" id="leaks-checkbox" class="ABCLstyle-interactable" checked>\r
+            <input type="checkbox" id="property-accidentalLeaks" class="ABCLstyle-interactable" checked>\r
         </p>\r
         \r
         <p class="setting tooltip" id="abcl-timer-enabled" data-tooltip="If checked, accidents will happen automatically by the timer.">\r
             <label for="timer-enabled-checkbox">Timer enabled</label>\r
-            <input type="checkbox" id="timer-enabled-checkbox" class="ABCLstyle-interactable" checked>\r
+            <input type="checkbox" id="property-timerPaused" class="ABCLstyle-interactable" checked>\r
         </p>\r
 \r
         <p class="setting tooltip" id="abcl-timer-duration" data-tooltip="The time between automatic accidents.">\r
             <label>Timer duration</label>\r
-            <input type="number" value="30" min="15" max="420"><span>minutes</span>\r
+            <input type="number" value="30" min="15" max="420" id="property-timerDuration"><span>minutes</span>\r
         </p>\r
     </div>\r
     <div class="settings-category">\r
         <p class="setting" id="abcl-message-type">\r
             <label>Message style:</label>\r
-            <select class="ABCLstyle-interactable" id="abcl-message-type">\r
+            <select class="ABCLstyle-interactable" id="property-messageType">\r
                 <option value="default">Normal</option>\r
                 <option value="internalMonologue">Internal Monologue</option>\r
                 <option value="embarrassment">Embarressment</option>\r
@@ -392,13 +392,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
     static process(response, isJson = true, type = "Hidden") {
       if (response.Type != type) return null;
       if (isJson) {
-        let data;
+        let data2;
         try {
-          data = JSON.parse(response.Content);
+          data2 = JSON.parse(response.Content);
         } catch (e) {
           return null;
         }
-        return { ...data, ...response };
+        return { ...data2, ...response };
       }
       return response;
     }
@@ -681,10 +681,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   modApi.hookFunction("ServerAccountBeep", 10, (args, next) => {
-    let data = args[0];
-    if (data.BeepType == "Leash" && !!data.Message && isJsonParsable(data.Message)) {
+    let data2 = args[0];
+    if (data2.BeepType == "Leash" && !!data2.Message && isJsonParsable(data2.Message)) {
       try {
-        const json = JSON.parse(data.Message);
+        const json = JSON.parse(data2.Message);
         if (json?.isZoelib) {
           Messager.beepListeners.forEach((callback, key) => {
             callback(json.Content, json.sender);
@@ -698,65 +698,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return next(args);
     }
   });
-
-  // src/modules/stats.ts
-  function getRegressionItems(items = Player.Appearance) {
-    let inFilter = [];
-    for (let item of items) {
-      if (ABCLdata.Items[item.Asset.Description]) {
-        inFilter.push(item);
-      }
-    }
-    for (let item of items) {
-      for (let key in ABCLdata.Regex) {
-        if (item.Asset.Description.toLowerCase().match(key.toLowerCase())) {
-          if (!inFilter.includes(item)) {
-            inFilter.push(item);
-          }
-        }
-      }
-    }
-    return inFilter;
-  }
-  function getRegressionIncreese() {
-    let total = 0;
-    for (let item of Player.Appearance) {
-      if (ABCLdata.Items[item.Asset.Description]) {
-        total += ABCLdata.Items[item.Asset.Description].modifier;
-      }
-      for (let key in ABCLdata.Regex) {
-        if (item.Asset.Description.toLowerCase().match(key.toLowerCase())) {
-          total += ABCLdata.Regex[key].modifier;
-        }
-      }
-    }
-    for (let item of getRegressionItems()) {
-      for (let key in ABCLdata.CraftingModifiers.regression) {
-        total += item?.Craft?.Description?.includes(key) ? ABCLdata.CraftingModifiers.regression[key] : 0;
-      }
-    }
-    return total;
-  }
-  function getDesperationLevel() {
-    let total = modStorage.settings.desperationLevel;
-    for (let item of getRegressionItems()) {
-      for (let key in ABCLdata.CraftingModifiers.desperation) {
-        total += item?.Craft?.Description?.includes(key) ? ABCLdata.CraftingModifiers.regression[key] : 0;
-      }
-    }
-    ;
-    return total;
-  }
-  function desperationTick() {
-    let total = modStorage.settings.desperationLevel;
-    if (isMilk()) {
-      total = 3;
-    }
-    if (!isMilk()) {
-      total = total != 0 ? total - 1 : 0;
-    }
-    return total;
-  }
 
   // src/modules/utils.ts
   function sleep(ms) {
@@ -772,7 +713,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return true;
   }
   function chatSendABCLMessage(msg, _data = void 0, targetNumber = void 0) {
-    const data = {
+    const data2 = {
       Content: "abclMsg",
       Dictionary: {
         //@ts-ignore
@@ -780,9 +721,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       },
       Type: "Hidden"
     };
-    if (_data) data.Dictionary.data = _data;
-    if (targetNumber) data.Target = targetNumber;
-    ServerSend("ChatRoomChat", data);
+    if (_data) data2.Dictionary.data = _data;
+    if (targetNumber) data2.Target = targetNumber;
+    ServerSend("ChatRoomChat", data2);
   }
   function getPlayer(value) {
     if (!value) return;
@@ -806,22 +747,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function getTime() {
     const regressionLevel = modSession.settings.regressionLevel;
-    const desperationLevel = getDesperationLevel();
-    const modifier = Math.max(1, Math.pow(1.02, regressionLevel) * (desperationLevel + 1));
+    const metabolism = modSession.settings.desperationMetabolismLevel;
+    const modifier = Math.max(1, Math.pow(1.02, regressionLevel) * (metabolism / 100 + 1));
     const currentTime = Date.now();
-    const accidentTime = modSession.settings.lastAccident + modSession.settings.timerDuration * 60 / modifier;
+    const accidentTime = modSession.settings.lastAccident.lastCalled + modSession.settings.lastAccident.waitDuration * 1e3 / modifier;
     const deltaMilliseconds = accidentTime - currentTime;
     const deltaSeconds = Math.max(0, Math.floor(deltaMilliseconds / 1e3));
     return Math.max(0, Math.floor(deltaSeconds));
   }
-  function isMilk() {
+  function hasMilk() {
     let items = Player.Appearance;
     for (let item of items) {
       if (item.Asset.Description.toLowerCase().includes("milk")) {
-        return true;
+        return { isNursery: item.Asset.Description.toLowerCase() == "RegressedMilk", isMilk: true, state: ["resting", "held up", "held up high"][item?.Property?.TypeRecord?.typed ?? 0] };
       }
     }
-    return false;
+    return { isNursery: false, isMilk: false, state: "resting" };
   }
   function applyColorToItems(items, color, transparency = 0.2) {
     for (let item of items) {
@@ -856,6 +797,41 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   globalThis.ABCLsetSetting = ABCLsetSetting;
   globalThis.ABCLgetSetting = ABCLgetSetting;
+  var WaitForCondition = class {
+    lastCalled;
+    waitDuration;
+    paused;
+    callback;
+    lastDuration;
+    constructor(waitDuration = 1, callback = null, startAt = Date.now(), paused = false) {
+      this.lastCalled = startAt;
+      this.waitDuration = waitDuration;
+      this.paused = paused;
+      this.callback = callback;
+      this.lastDuration = waitDuration;
+    }
+    repeat() {
+      if (this.lastCalled + this.lastDuration * 1e3 < Date.now()) {
+        this.lastCalled = Date.now();
+        if (this.callback) this.callback();
+      }
+    }
+    check() {
+      if (this.lastCalled + this.lastDuration * 1e3 < Date.now()) {
+        this.lastCalled = Date.now();
+        return true;
+      }
+      return false;
+    }
+    checkIn(seconds) {
+      this.lastDuration = seconds;
+      return this.check();
+    }
+    repeatIn(seconds) {
+      this.lastDuration = seconds;
+      this.repeat();
+    }
+  };
 
   // src/modules/bcModSdk.ts
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk());
@@ -1039,65 +1015,64 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
 
-  // src/modules/diaper.ts
-  function itemToSavedItem(item) {
-    return {
-      Asset: {
-        Name: item.Asset.Name,
-        DynamicGroupName: item.Asset.DynamicGroupName,
-        Description: item.Asset.Description
-      },
-      Color: item.Color,
-      Craft: item.Craft,
-      Property: item.Property
-    };
-  }
-  function diaperToSavedDiaper(diaper) {
-    return {
-      Messes: diaper.messes,
-      Wettings: diaper.wettings,
-      Layer: diaper.layer,
-      SavedItem: itemToSavedItem(diaper.item)
-    };
-  }
-  function savedDiaperToDiaper(savedDiaper) {
-    let diaper = null;
-    if (savedDiaper.Layer == 0) {
-      diaper = new Diaper(replaceSlotWithSavedItem("Panties", savedDiaper.SavedItem, false));
-      diaper.wettings = savedDiaper.Wettings;
-      diaper.messes = savedDiaper.Messes;
-    }
-    if (savedDiaper.Layer == 1) {
-      diaper = new Diaper(replaceSlotWithSavedItem("ItemPelvis", savedDiaper.SavedItem, false));
-      diaper.wettings = savedDiaper.Wettings;
-      diaper.messes = savedDiaper.Messes;
-    }
-    if (!diaper) return null;
-    updateDiaper();
-    ServerPlayerInventorySync();
-    return diaper;
-  }
-  function compareItemToSavedItem(item, savedItem) {
-    return item.Asset.Name === savedItem.Asset.Name && JSON.stringify(item.Color) === JSON.stringify(savedItem.Color) && JSON.stringify(item.Craft) === JSON.stringify(savedItem.Craft) && JSON.stringify(item.Property) === JSON.stringify(savedItem.Property);
-  }
-  function replaceSlotWithSavedItem(slot, savedItem, push = true) {
-    const item = InventoryGet(Player, slot);
-    if (item && compareItemToSavedItem(item, savedItem)) return item;
-    if (item) InventoryRemove(Player, slot, false);
-    InventoryWear(Player, savedItem.Asset.Name, slot, savedItem.Color, 10, Player.MemberNumber, savedItem.Craft, false);
-    const newItem = InventoryGet(Player, slot);
-    if (savedItem.Property && savedItem.Property.hasOwnProperty("LockedBy")) {
-      const lockName = savedItem.Property["LockedBy"];
-      const asset = lockName ? AssetGet(Player.AssetFamily, "ItemMisc", lockName) : null;
-      console.log("new lock");
-      if (asset) {
-        InventoryLock(Player, slot, { Asset: asset }, savedItem.Property.LockMemberNumber);
+  // src/modules/stats.ts
+  function getRegressionItems(items = Player.Appearance) {
+    let inFilter = [];
+    for (let item of items) {
+      if (ABCLdata.Items[item.Asset.Description]) {
+        inFilter.push(item);
       }
     }
-    console.log(newItem, savedItem);
-    if (push) ServerPlayerInventorySync();
-    return newItem;
+    for (let item of items) {
+      for (let key in ABCLdata.Regex) {
+        if (item.Asset.Description.toLowerCase().match(key.toLowerCase())) {
+          if (!inFilter.includes(item)) {
+            inFilter.push(item);
+          }
+        }
+      }
+    }
+    return inFilter;
   }
+  function getRegressionIncreese() {
+    let total = 0;
+    for (let item of Player.Appearance) {
+      if (ABCLdata.Items[item.Asset.Description]) {
+        total += ABCLdata.Items[item.Asset.Description].modifier;
+      }
+      for (let key in ABCLdata.Regex) {
+        if (item.Asset.Description.toLowerCase().match(key.toLowerCase())) {
+          total += ABCLdata.Regex[key].modifier;
+        }
+      }
+    }
+    for (let item of getRegressionItems()) {
+      for (let key in ABCLdata.CraftingModifiers.regression) {
+        total += item?.Craft?.Description?.includes(key) ? ABCLdata.CraftingModifiers.regression[key] : 0;
+      }
+    }
+    return total;
+  }
+  function increeseDesperation() {
+    const { isNursery, isMilk, state } = hasMilk();
+    const modifier = { "resting": 0, "held up": 1, "held up high": 3 }[state];
+    if (isMilk && modSession.settings.desperationLevel < 100) {
+      if (isNursery) {
+        modSession.settings.desperationLevel += modifier / 2;
+      } else {
+        modSession.settings.desperationLevel += modifier;
+      }
+    } else if (modSession.settings.desperationLevel > 0) {
+      modSession.settings.desperationLevel -= 1;
+    }
+    if (isNursery && modSession.settings.desperationMetabolismLevel < 100) {
+      modSession.settings.desperationMetabolismLevel += modifier;
+    } else if (modSession.settings.desperationMetabolismLevel > 0) {
+      modSession.settings.desperationMetabolismLevel -= 1;
+    }
+  }
+
+  // src/modules/diaper.ts
   function loadDiaperLayers() {
     hookFunction("CharacterAppearanceSetItem", 2, (args, next) => {
       let [_character, slot, _asset] = args;
@@ -1236,7 +1211,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         modSession.topLayer = null;
       }
     }
-    if (!modStorage.settings.enabled || !modStorage.settings.visuals) {
+    if (!modStorage2.settings.enabled || !modStorage2.settings.visuals) {
       return;
     }
     const topItem = InventoryGet(Player, "ItemPelvis");
@@ -1322,63 +1297,164 @@ One of mods you are using is using an old version of SDK. It will work for now b
     updateDiaper();
   }
 
-  // src/modules/storage.ts
-  var modStorage;
-  var modSession = {
-    settings: {
-      enabled: true,
-      visuals: true,
-      wetting: true,
-      messing: true,
-      intentionalLeaks: false,
-      accidentalLeaks: false,
-      messChance: 0.3,
-      wetChance: 0.5,
-      messageType: "internalMonologue",
-      timerEnabled: true,
-      timerDuration: 30 * 60 * 60,
-      lastAccident: Date.now() / 1e3,
-      regressionLevel: 0,
-      desperationLevel: 0
+  // src/modules/save.ts
+  function savedABCLSettingsToABCLSettings(savedABCLSettings) {
+    return {
+      lastAccident: new WaitForCondition(savedABCLSettings.timerDuration, null, savedABCLSettings.lastAccident, savedABCLSettings.timerPaused),
+      enabled: savedABCLSettings.enabled,
+      visuals: savedABCLSettings.visuals,
+      messing: savedABCLSettings.messing,
+      wetting: savedABCLSettings.wetting,
+      intentionalLeaks: savedABCLSettings.intentionalLeaks,
+      accidentalLeaks: savedABCLSettings.accidentalLeaks,
+      messChance: savedABCLSettings.messChance,
+      wetChance: savedABCLSettings.wetChance,
+      messageType: savedABCLSettings.messageType,
+      regressionLevel: savedABCLSettings.regressionLevel,
+      desperationLevel: savedABCLSettings.desperationLevel,
+      desperationMetabolismLevel: savedABCLSettings.desperationMetabolismLevel,
+      settingAccess: savedABCLSettings.settingAccess
+    };
+  }
+  function ABCLSettingsToSavedABCLSettings(ABCLSettings) {
+    return {
+      enabled: ABCLSettings.enabled,
+      visuals: ABCLSettings.visuals,
+      messing: ABCLSettings.messing,
+      wetting: ABCLSettings.wetting,
+      timerDuration: ABCLSettings.lastAccident.waitDuration,
+      timerPaused: ABCLSettings.lastAccident.paused,
+      lastAccident: ABCLSettings.lastAccident.lastCalled,
+      intentionalLeaks: ABCLSettings.intentionalLeaks,
+      accidentalLeaks: ABCLSettings.accidentalLeaks,
+      messChance: ABCLSettings.messChance,
+      wetChance: ABCLSettings.wetChance,
+      messageType: ABCLSettings.messageType,
+      regressionLevel: ABCLSettings.regressionLevel,
+      desperationLevel: ABCLSettings.desperationLevel,
+      desperationMetabolismLevel: ABCLSettings.desperationMetabolismLevel,
+      settingAccess: ABCLSettings.settingAccess
+    };
+  }
+  function itemToSavedItem(item) {
+    return {
+      Asset: {
+        Name: item.Asset.Name,
+        DynamicGroupName: item.Asset.DynamicGroupName,
+        Description: item.Asset.Description
+      },
+      Color: item.Color,
+      Craft: item.Craft,
+      Property: item.Property
+    };
+  }
+  function diaperToSavedDiaper(diaper) {
+    return {
+      Messes: diaper.messes,
+      Wettings: diaper.wettings,
+      Layer: diaper.layer,
+      SavedItem: itemToSavedItem(diaper.item)
+    };
+  }
+  function savedDiaperToDiaper(savedDiaper) {
+    let diaper = null;
+    if (savedDiaper.Layer == 0) {
+      diaper = new Diaper(replaceSlotWithSavedItem("Panties", savedDiaper.SavedItem, false));
+      diaper.wettings = savedDiaper.Wettings;
+      diaper.messes = savedDiaper.Messes;
     }
+    if (savedDiaper.Layer == 1) {
+      diaper = new Diaper(replaceSlotWithSavedItem("ItemPelvis", savedDiaper.SavedItem, false));
+      diaper.wettings = savedDiaper.Wettings;
+      diaper.messes = savedDiaper.Messes;
+    }
+    if (!diaper) return null;
+    updateDiaper();
+    ServerPlayerInventorySync();
+    return diaper;
+  }
+  function compareItemToSavedItem(item, savedItem) {
+    return item.Asset.Name === savedItem.Asset.Name && JSON.stringify(item.Color) === JSON.stringify(savedItem.Color) && JSON.stringify(item.Craft) === JSON.stringify(savedItem.Craft) && JSON.stringify(item.Property) === JSON.stringify(savedItem.Property);
+  }
+  function replaceSlotWithSavedItem(slot, savedItem, push = true) {
+    const item = InventoryGet(Player, slot);
+    if (item && compareItemToSavedItem(item, savedItem)) return item;
+    if (item) InventoryRemove(Player, slot, false);
+    InventoryWear(Player, savedItem.Asset.Name, slot, savedItem.Color, 10, Player.MemberNumber, savedItem.Craft, false);
+    const newItem = InventoryGet(Player, slot);
+    if (savedItem.Property && savedItem.Property.hasOwnProperty("LockedBy")) {
+      const lockName = savedItem.Property["LockedBy"];
+      const asset = lockName ? AssetGet(Player.AssetFamily, "ItemMisc", lockName) : null;
+      console.log("new lock");
+      if (asset) {
+        InventoryLock(Player, slot, { Asset: asset }, savedItem.Property.LockMemberNumber);
+      }
+    }
+    console.log(newItem, savedItem);
+    if (push) ServerPlayerInventorySync();
+    return newItem;
+  }
+
+  // src/modules/storage.ts
+  var modStorage2;
+  var defaultSettings = {
+    enabled: true,
+    visuals: true,
+    wetting: true,
+    messing: true,
+    intentionalLeaks: false,
+    accidentalLeaks: false,
+    messChance: 0.3,
+    wetChance: 0.5,
+    messageType: "internalMonologue",
+    timerPaused: false,
+    timerDuration: 30 * 60,
+    lastAccident: Date.now(),
+    regressionLevel: 0,
+    desperationLevel: 0,
+    desperationMetabolismLevel: 0,
+    settingAccess: []
+  };
+  var modSession = {
+    settings: savedABCLSettingsToABCLSettings(defaultSettings)
   };
   var modStorageSaveString;
+  function mergeData(target, source) {
+    Object.keys(source).forEach((key) => {
+      if (typeof source[key] === "object" && source[key] !== null) {
+        if (typeof target[key] !== "object" || target[key] === null) {
+          target[key] = Array.isArray(source[key]) ? [] : {};
+        }
+        mergeData(target[key], source[key]);
+      } else {
+        if (target[key] === void 0) {
+          target[key] = source[key];
+        }
+      }
+    });
+  }
+  var defaultStorage = {
+    settings: defaultSettings,
+    version: getModVersion()
+  };
   function initStorage() {
-    const data = {
-      settings: {
-        enabled: true,
-        visuals: true,
-        wetting: true,
-        messing: true,
-        intentionalLeaks: false,
-        accidentalLeaks: false,
-        messChance: 0.3,
-        wetChance: 0.5,
-        messageType: "internalMonologue",
-        timerEnabled: true,
-        timerDuration: 30 * 60 * 60,
-        lastAccident: Date.now() / 1e3,
-        regressionLevel: 0,
-        desperationLevel: 0
-      },
-      version: getModVersion()
-    };
     const storage = Player.ExtensionSettings.ABCL;
     if (typeof storage === "string") {
       const decompressed = LZString.decompressFromBase64(storage);
-      modStorage = decompressed ? JSON.parse(decompressed) : data;
+      modStorage2 = decompressed ? JSON.parse(decompressed) : modSession;
     } else {
-      modStorage = data;
+      modStorage2 = defaultStorage;
     }
-    Object.keys(data).forEach((key) => {
-      if (modStorage[key] === void 0) {
-        modStorage[key] = data[key];
+    mergeData(modStorage2, defaultStorage);
+    Object.keys(defaultStorage).forEach((key) => {
+      if (modStorage2[key] === void 0) {
+        modStorage2[key] = data[key];
       }
     });
     deserializeStorage();
-    modStorageSaveString = JSON.stringify(modStorage);
+    modStorageSaveString = JSON.stringify(modStorage2);
     chatSendABCLMessage("syncStorage", {
-      storage: modStorage
+      storage: modStorage2
     });
     hookFunction("ChatRoomMessage", 20, (args, next) => {
       const message = args[0];
@@ -1390,7 +1466,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (msg === "syncStorage") {
           if (!sender.ABCL) {
             chatSendABCLMessage("syncStorage", {
-              storage: modStorage
+              storage: modStorage2
             }, sender.MemberNumber);
           }
           sender.ABCL = data2.storage;
@@ -1401,41 +1477,41 @@ One of mods you are using is using an old version of SDK. It will work for now b
     hookFunction("ChatRoomSync", -20, (args, next) => {
       next(args);
       chatSendABCLMessage("syncStorage", {
-        storage: modStorage
+        storage: modStorage2
       });
     });
   }
   function deserializeStorage() {
-    if (modStorage.topLayer) {
-      modSession.topLayer = savedDiaperToDiaper(modStorage.topLayer);
+    if (modStorage2.topLayer) {
+      modSession.topLayer = savedDiaperToDiaper(modStorage2.topLayer);
     }
-    if (modStorage.bottomLayer) {
-      modSession.bottomLayer = savedDiaperToDiaper(modStorage.bottomLayer);
+    if (modStorage2.bottomLayer) {
+      modSession.bottomLayer = savedDiaperToDiaper(modStorage2.bottomLayer);
     }
-    modSession.settings = modStorage.settings;
+    modSession.settings = savedABCLSettingsToABCLSettings(modStorage2.settings);
   }
   function serializeStorage() {
     if (modSession.topLayer) {
-      modStorage.topLayer = diaperToSavedDiaper(modSession.topLayer);
+      modStorage2.topLayer = diaperToSavedDiaper(modSession.topLayer);
     } else {
-      modStorage.topLayer = null;
+      modStorage2.topLayer = null;
     }
     if (modSession.bottomLayer) {
-      modStorage.bottomLayer = diaperToSavedDiaper(modSession.bottomLayer);
+      modStorage2.bottomLayer = diaperToSavedDiaper(modSession.bottomLayer);
     } else {
-      modStorage.bottomLayer = null;
+      modStorage2.bottomLayer = null;
     }
-    modStorage.settings = modSession.settings;
+    modStorage2.settings = ABCLSettingsToSavedABCLSettings(modSession.settings);
   }
   function updateModStorage() {
-    if (typeof modStorage !== "object") return;
+    if (typeof modStorage2 !== "object") return;
     serializeStorage();
-    if (JSON.stringify(modStorage) === modStorageSaveString) return;
-    modStorageSaveString = JSON.stringify(modStorage);
-    Player.ExtensionSettings.ABCL = LZString.compressToBase64(JSON.stringify(modStorage));
+    if (JSON.stringify(modStorage2) === modStorageSaveString) return;
+    modStorageSaveString = JSON.stringify(modStorage2);
+    Player.ExtensionSettings.ABCL = LZString.compressToBase64(JSON.stringify(modStorage2));
     ServerPlayerExtensionSettingsSync("ABCL");
     chatSendABCLMessage("syncStorage", {
-      storage: modStorage
+      storage: modStorage2
     });
   }
   setInterval(updateModStorage, 800);
@@ -1445,7 +1521,94 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // src/modules/settingsMenu.ts
   function loadSettingsMenu() {
-    initializeSettings();
+    const settings = {
+      messing: {
+        element: document.querySelector("#property-messing"),
+        set: () => {
+          modSession.settings.messing = settings.messing.element.checked;
+        },
+        load: () => {
+          settings.messing.element.checked = modSession.settings.messing;
+        }
+      },
+      wetting: {
+        element: document.querySelector("#property-wetting"),
+        set: () => {
+          modSession.settings.wetting = settings.wetting.element.checked;
+        },
+        load: () => {
+          settings.wetting.element.checked = modSession.settings.wetting;
+        }
+      },
+      visuals: {
+        element: document.querySelector("#property-visuals"),
+        set: () => {
+          modSession.settings.visuals = settings.visuals.element.checked;
+        },
+        load: () => {
+          settings.visuals.element.checked = modSession.settings.visuals;
+        }
+      },
+      intentionalLeaks: {
+        element: document.querySelector("#property-intentionalLeaks"),
+        set: () => {
+          modSession.settings.intentionalLeaks = settings.intentionalLeaks.element.checked;
+        },
+        load: () => {
+          settings.intentionalLeaks.element.checked = modSession.settings.intentionalLeaks;
+        }
+      },
+      accidentalLeaks: {
+        element: document.querySelector("#property-accidentalLeaks"),
+        set: () => {
+          modSession.settings.accidentalLeaks = settings.accidentalLeaks.element.checked;
+        },
+        load: () => {
+          settings.accidentalLeaks.element.checked = modSession.settings.accidentalLeaks;
+        }
+      },
+      timerPaused: {
+        element: document.querySelector("#property-timerPaused"),
+        set: () => {
+          modSession.settings.lastAccident.paused = settings.timerPaused.element.checked;
+        },
+        load: () => {
+          settings.timerPaused.element.checked = modSession.settings.lastAccident.paused;
+        }
+      },
+      timerDuration: {
+        element: document.querySelector("#property-timerDuration"),
+        set: () => {
+          modSession.settings.lastAccident.lastDuration = Number(settings.timerDuration.element.value) * 60;
+        },
+        load: () => {
+          settings.timerDuration.element.value = String(Math.round(modSession.settings.lastAccident.lastDuration / 60));
+        }
+      },
+      messChanceWetChance: {
+        element: document.querySelector("#property-messChanceWetChance"),
+        set: () => {
+          const messChance = 1 - Number(settings.messChanceWetChance.element.value) / 100;
+          const wetChance = Number(settings.messChanceWetChance.element.value) / 100;
+          modSession.settings.wetChance = wetChance;
+          modSession.settings.messChance = messChance;
+        },
+        load: () => {
+          const messChance = (1 - Number(modSession.settings.messChance)) * 100;
+          settings.messChanceWetChance.element.value = String(messChance);
+        }
+      },
+      messageType: {
+        element: document.querySelector("#property-messageType"),
+        set: () => {
+          modSession.settings.messageType = settings.messageType.element.value;
+        },
+        load: () => {
+          settings.messageType.element.value = String(modSession.settings.messageType);
+        }
+      }
+    };
+    initializeSettings(settings);
     PreferenceRegisterExtensionSetting({
       Identifier: "ABCL",
       ButtonText: "ABCL Settings",
@@ -1462,54 +1625,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     });
   }
-  function initializeSettings() {
-    const settings = [
-      { id: "#abcl-mess input", key: "messing", type: "checkbox" },
-      { id: "#abcl-visuals input", key: "visuals", type: "checkbox" },
-      { id: "#abcl-wet input", key: "wetting", type: "checkbox" },
-      { id: "#abcl-mess-wet-chance input", key: "messChance", type: "range" },
-      { id: "#abcl-clothing-accidents input", key: "intentionalLeaks", type: "checkbox" },
-      { id: "#abcl-leaks input", key: "accidentalLeaks", type: "checkbox" },
-      { id: "#abcl-timer-enabled input", key: "timerEnabled", type: "checkbox" },
-      { id: "#abcl-timer-duration input", key: "timerDuration", type: "number" },
-      { id: "#abcl-message-type select", key: "messageType", type: "text" }
-    ];
-    settings.forEach((setting) => {
-      const element = document.querySelector(setting.id);
-      if (element) {
-        const value = ABCLgetSetting(setting.key);
-        if (setting.type === "checkbox") {
-          element.checked = value;
-        } else if (setting.id == "#abcl-timer-duration input") {
-          element.value = Number(value) / (60 * 30);
-        } else if (setting.type === "range" || setting.type === "number" || setting.type === "text") {
-          element.value = value;
-        }
-        element.addEventListener("change", function() {
-          let newValue;
-          if (setting.id == "#abcl-mess-wet-chance input") {
-            updateMessWetChance(Number(this.value));
-            return;
-          }
-          if (setting.type === "checkbox") {
-            newValue = this.checked;
-          } else if (setting.id == "#abcl-timer-duration input") {
-            newValue = Number(this.value * (60 * 30));
-          } else if (setting.type === "range" || setting.type === "number") {
-            newValue = Number(this.value);
-          } else if (setting.type === "text") {
-            newValue = this.value;
-          }
-          ABCLsetSetting(setting.key, newValue);
-        });
+  function initializeSettings(settings) {
+    for (let [key, setting] of Object.entries(settings)) {
+      if (setting.element) {
+        setting.element.addEventListener("change", setting.set);
+        setting.load();
+      } else {
+        console.warn(`${key} setting doesn't have an element`);
       }
-    });
-  }
-  function updateMessWetChance(value) {
-    const messChance = 1 - value / 100;
-    const wetChance = value / 100;
-    ABCLsetSetting("wetChance", wetChance);
-    ABCLsetSetting("messChance", messChance);
+    }
   }
 
   // src/modules/commands.ts
@@ -1539,7 +1663,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         } else {
           releaseInClothes();
           modSession.settings.regressionLevel += getRegressionIncreese();
-          desperationTick();
+          increeseDesperation();
         }
         ChatRoomSendLocal(`<p style='background-color:#ecc826'>ABCL: ${Player.Nickname == "" ? Player.Name : Player.Nickname} squeezes ${Pronoun.get("dependent", Player)} abdomen trying to get it all out. (only you can see this).</p>`);
       }
@@ -1552,7 +1676,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         let [command, ...input] = args.split(/[ ,]+/);
         let identifier = input[0];
         if (identifier == null) {
-          if (!(modStorage.topLayer || modStorage.bottomLayer)) {
+          if (!(modStorage2.topLayer || modStorage2.bottomLayer)) {
             ChatRoomSendLocal(
               "<p style='background-color:#ecc826'>ABCL: You don't have a diaper!</p>"
             );
@@ -1564,7 +1688,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             ChatRoomSendLocal("<p style='background-color:#ecc826'>ABCL: Player not found!</p>");
             return;
           }
-          if (modStorage.topLayer || modStorage.bottomLayer) {
+          if (modStorage2.topLayer || modStorage2.bottomLayer) {
             changeDiaper(player);
           } else {
             ChatRoomSendLocal("<p style='background-color:#ecc826'>ABCL: " + ChatRoomHTMLEntities(GetName(player)) + " does not have a diaper!</p>");
@@ -1833,38 +1957,40 @@ One of mods you are using is using an old version of SDK. It will work for now b
   style.innerHTML = abcl_default;
   document.head.append(style);
   document.body.insertAdjacentHTML("beforeend", settings_default);
+  console.info("ABCL Loaded: " + getModVersion());
   waitFor(() => typeof window.Player?.MemberNumber === "number").then(() => {
     initStorage();
     loadSettingsMenu();
     loadCommands();
     loadMessages();
     loadDiaperLayers();
-    if (isVersionNewer(getModVersion(), modStorage.version)) {
+    if (isVersionNewer(getModVersion(), modStorage2.version)) {
       if (ServerPlayerIsInChatRoom()) {
-        modStorage.version = getModVersion();
+        modStorage2.version = getModVersion();
       } else {
         ServerSocket.once("ChatRoomSync", () => {
-          modStorage.version = getModVersion();
+          modStorage2.version = getModVersion();
         });
       }
     }
-    loop();
-  });
-  async function loop() {
     updateDiaper();
-    while (true) {
-      if (!modSession.settings.enabled || !modSession.settings.timerEnabled || getTime() > 0) {
-        await new Promise((r) => setTimeout(r, Math.max(getTime() * 1e3)));
-        continue;
-      }
-      modSession.settings.lastAccident = Date.now() + 6e4;
+    console.log(modSession.settings.lastAccident);
+    setInterval(loop, 1e3);
+  });
+  var bottleChecker = new WaitForCondition(30, increeseDesperation);
+  async function loop() {
+    if (!modSession.settings.enabled) {
+      return;
+    }
+    if (modSession.settings.lastAccident.checkIn(getTime())) {
       if (modSession.topLayer || modSession.bottomLayer) {
         releaseInDiaper();
       } else {
         modSession.settings.regressionLevel += getRegressionIncreese();
-        desperationTick();
+        increeseDesperation();
         releaseInClothes();
       }
     }
+    bottleChecker.repeat();
   }
 })();

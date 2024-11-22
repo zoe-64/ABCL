@@ -1,6 +1,6 @@
 import { ABCLdata } from "../index";
-import { modStorage } from "./storage";
-import { isMilk } from "./utils";
+import { modSession, modStorage } from "./storage";
+import { hasMilk } from "./utils";
 
 export function getRegressionItems(items=Player.Appearance): Item[] {
 	let inFilter = [];
@@ -27,7 +27,7 @@ export function getWetChance() {
 			chance += item?.Craft?.Description?.includes(key) ? ABCLdata.CraftingModifiers.wetChance[key] : 0;
 		}
 	}
-	return chance;
+	return chance + Math.floor(modSession.settings.desperationLevel/3);
 }
 
 export function getMessChance() {
@@ -75,22 +75,32 @@ export function getDesperationLevel() {
 	
 	return total;
 }
-export function desperationTick() {
-	let total = modStorage.settings.desperationLevel;
-	if (isMilk()) {
-		total = 3;
+ 
+// https://discord.com/channels/1253391626378674289/1253411913128214578/1265667020012388496
+export function increeseDesperation() { // milk dependance
+	const {isNursery,isMilk,state} = hasMilk()
+	const modifier = {"resting":0, "held up":1, "held up high":3}[state]
+	if (isMilk && modSession.settings.desperationLevel < 100) {
+		if (isNursery) {
+			modSession.settings.desperationLevel += modifier/2
+		} else {
+			modSession.settings.desperationLevel += modifier
+		}
+	} else if (modSession.settings.desperationLevel > 0) {
+		modSession.settings.desperationLevel -= 1
 	}
-	if (!isMilk()) {
-		total = (total != 0) ? total - 1 : 0;
+	
+	if (isNursery && modSession.settings.desperationMetabolismLevel < 100) {
+		modSession.settings.desperationMetabolismLevel += modifier
+	} else if (modSession.settings.desperationMetabolismLevel > 0) {
+		modSession.settings.desperationMetabolismLevel -= 1
 	}
-	return total
 }
-/*
-export function getWetBaseChance() {
-	return modStorage.settings.wetChance
-}
+
+
+
 export function setWetBaseChance(chance:number) {
 	modStorage.settings.wetChance = chance
 }
 
-*/
+

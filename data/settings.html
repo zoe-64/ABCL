@@ -18,48 +18,48 @@
         
         <p class="setting tooltip tooltip-down" id="abcl-mess" data-tooltip="If checked, mess accidents will happen.">
             <label for="mess-checkbox">Messes</label>
-            <input type="checkbox" id="mess-checkbox" class="ABCLstyle-interactable" checked> 
+            <input type="checkbox" id="property-messing" class="ABCLstyle-interactable" checked> 
         </p>
         
         <p class="setting tooltip tooltip-down" id="abcl-visuals" data-tooltip="Controls if accidents are visible on the character.">
             <label for="visuals-checkbox">Visuals</label>
-            <input type="checkbox" id="visuals-checkbox" class="ABCLstyle-interactable" checked>
+            <input type="checkbox" id="property-wetting" class="ABCLstyle-interactable" checked>
         </p>
         
         <p class="setting tooltip tooltip-down" id="abcl-wet" data-tooltip="If checked, wet accidents will happen.">
             <label for="wet-checkbox">Wets</label>
-            <input type="checkbox" id="wet-checkbox" class="ABCLstyle-interactable" checked>
+            <input type="checkbox" id="property-visuals" class="ABCLstyle-interactable" checked>
         </p>
         
         <p class="setting tooltip tooltip-down" id="abcl-mess-wet-chance" data-tooltip="The chance of a mess accident happening instead of a wet accident.">
             <label for="mess-wet-range">Mess vs Wet</label>
-            <input type="range" id="mess-wet-range" min="0" max="100" value="66">
+            <input type="range" id="property-messChanceWetChance" min="0" max="100" value="66">
         </p>
         
         <p class="setting tooltip" id="abcl-clothing-accidents" data-tooltip="Accidents that happen without the diaper.">
             <label for="clothing-accidents-checkbox">Clothing-Accidents</label>
-            <input type="checkbox" id="clothing-accidents-checkbox" class="ABCLstyle-interactable" checked>
+            <input type="checkbox" id="property-intentionalLeaks" class="ABCLstyle-interactable" checked>
         </p>
         
         <p class="setting tooltip" id="abcl-leaks" data-tooltip="Leakage that happen when the diaper is full.">
             <label for="leaks-checkbox">Leaks</label>
-            <input type="checkbox" id="leaks-checkbox" class="ABCLstyle-interactable" checked>
+            <input type="checkbox" id="property-accidentalLeaks" class="ABCLstyle-interactable" checked>
         </p>
         
         <p class="setting tooltip" id="abcl-timer-enabled" data-tooltip="If checked, accidents will happen automatically by the timer.">
             <label for="timer-enabled-checkbox">Timer enabled</label>
-            <input type="checkbox" id="timer-enabled-checkbox" class="ABCLstyle-interactable" checked>
+            <input type="checkbox" id="property-timerPaused" class="ABCLstyle-interactable" checked>
         </p>
 
         <p class="setting tooltip" id="abcl-timer-duration" data-tooltip="The time between automatic accidents.">
             <label>Timer duration</label>
-            <input type="number" value="30" min="15" max="420"><span>minutes</span>
+            <input type="number" value="30" min="15" max="420" id="property-timerDuration"><span>minutes</span>
         </p>
     </div>
     <div class="settings-category">
         <p class="setting" id="abcl-message-type">
             <label>Message style:</label>
-            <select class="ABCLstyle-interactable" id="abcl-message-type">
+            <select class="ABCLstyle-interactable" id="property-messageType">
                 <option value="default">Normal</option>
                 <option value="internalMonologue">Internal Monologue</option>
                 <option value="embarrassment">Embarressment</option>

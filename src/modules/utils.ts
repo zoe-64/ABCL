@@ -1,5 +1,5 @@
 import { AverageColor, Messager, RandomInt, SentenceBuilder } from "zoelib/dist/zoelib.mjs";
-import { ABCLSettings, modSession } from "./storage";
+import { modSession } from "./storage";
 import { getDesperationLevel } from "./stats";
 
 export function sleep(ms: number): Promise<() => {}> {
@@ -61,23 +61,23 @@ export function isVersionNewer(version1: string, version2: string): boolean {
 }
 export function getTime(): number {
     const regressionLevel = modSession.settings.regressionLevel;
-    const desperationLevel = getDesperationLevel();
-    const modifier = Math.max(1, (Math.pow(1.02, regressionLevel) * (desperationLevel + 1)));
+    const metabolism = modSession.settings.desperationMetabolismLevel;
+    const modifier = Math.max(1, (Math.pow(1.02, regressionLevel) * (metabolism/100 + 1)));
 
-    const currentTime = Date.now();
-    const accidentTime = modSession.settings.lastAccident + (modSession.settings.timerDuration * 60)/modifier;
+    const currentTime = Date.now()
+    const accidentTime = modSession.settings.lastAccident.lastCalled + (modSession.settings.lastAccident.waitDuration * 1000)/modifier;
     const deltaMilliseconds = accidentTime - currentTime;
     const deltaSeconds = Math.max(0, Math.floor(deltaMilliseconds / 1000));
     return Math.max(0, Math.floor(deltaSeconds));
 }
-export function isMilk() {
+export function hasMilk(): {isNursery:boolean, isMilk: boolean, state: "resting" | "held up" | "held up high"} {
 	let items = Player.Appearance
 	for (let item of items) {
 		if (item.Asset.Description.toLowerCase().includes("milk")) {
-			return true;
+			return {isNursery:(item.Asset.Description.toLowerCase() == "RegressedMilk"),isMilk:true, state: ["resting", "held up", "held up high"][item?.Property?.TypeRecord?.typed ?? 0] as "resting" | "held up" | "held up high"}
 		}
 	}
-	return false;
+	return {isNursery:false,isMilk:false, state: "resting"}
 }
 export function applyColorToItems(items:Item[], color:HexColor, transparency:number = 0.2) {
     for (let item of items) {
@@ -122,3 +122,38 @@ export function ABCLgetSetting(key: string) {
 (globalThis as any).ABCLgetSetting = ABCLgetSetting;
 
 
+export class WaitForCondition {
+	lastCalled: number
+	waitDuration: number;
+	paused: boolean;
+	callback: Function | null;
+	lastDuration: number;
+	constructor(waitDuration:number=1, callback:Function | null= null, startAt:number = Date.now(), paused:boolean=false) {
+		this.lastCalled = startAt;
+		this.waitDuration = waitDuration;
+		this.paused = paused;
+		this.callback = callback
+		this.lastDuration = waitDuration
+	}
+	repeat() {
+		if (this.lastCalled + this.lastDuration*1000 < Date.now()) {
+			this.lastCalled = Date.now();
+			if (this.callback) this.callback()
+		}
+	}
+	check():boolean {
+		if (this.lastCalled + this.lastDuration*1000 < Date.now()) {
+			this.lastCalled = Date.now();
+			return true
+		}
+		return false
+	}
+	checkIn(seconds:number): boolean {
+		this.lastDuration = seconds
+		return this.check()
+	}
+	repeatIn(seconds:number) {
+		this.lastDuration = seconds
+		this.repeat()
+	}
+}

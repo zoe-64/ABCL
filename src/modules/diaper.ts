@@ -1,5 +1,5 @@
 import bcModSdk from "bondage-club-mod-sdk";
-import { modSession, modStorage, TSavedDiaper, TSavedItem } from "./storage";
+import { modSession, modStorage} from "./storage";
 import { hookFunction } from "./bcModSdk";
 import { ABCLdata } from "../index";
 import { DiaperUseLevels, MessageType, TMessageVariants } from "./data";
@@ -8,84 +8,7 @@ import { sendMessage } from "./message";
 import { applyColorToItems, nextDiaperAction, TDiaperAction } from "./utils";
 import { getRegressionIncreese } from "./stats";
 
-export function itemToSavedItem(item: Item): TSavedItem {
-	return {
-		Asset: {
-			Name: item.Asset.Name,
-			DynamicGroupName: item.Asset.DynamicGroupName,
-			Description: item.Asset.Description,
-		},
-		Color: item.Color,
-		Craft: item.Craft,
-		Property: item.Property
-	}
-}
-export function savedItemToItem(item:TSavedItem): Item {
-	const Asset = AssetGet("Female3DCG", item.Asset.DynamicGroupName, item.Asset.Name)
-	if (!Asset) {
-		throw Error("Asset not recognized")
-	}
-	return {
-		Asset: Asset,
-		Color: item.Color,
-		Craft: item.Craft,
-		Property: item.Property
-	}
-}
-export function diaperToSavedDiaper(diaper:Diaper): TSavedDiaper {
-	return {
-		Messes:diaper.messes,
-		Wettings:diaper.wettings,
-		Layer:diaper.layer,
-		SavedItem:itemToSavedItem(diaper.item)
-	}
-}
-export function savedDiaperToDiaper(savedDiaper:TSavedDiaper): Diaper | null {
-	let diaper = null
 
-	if (savedDiaper.Layer == 0) {
-		diaper = new Diaper(replaceSlotWithSavedItem("Panties",savedDiaper.SavedItem,false));
-		diaper.wettings = savedDiaper.Wettings
-		diaper.messes = savedDiaper.Messes
-	}
-	if (savedDiaper.Layer == 1) {
-		diaper = new Diaper(replaceSlotWithSavedItem("ItemPelvis",savedDiaper.SavedItem,false));
-		diaper.wettings = savedDiaper.Wettings
-		diaper.messes = savedDiaper.Messes
-		
-	}
-	if (!diaper) return null;
-	updateDiaper()
-	ServerPlayerInventorySync()
-	return diaper
-}
-export function compareItemToSavedItem(item:Item, savedItem:TSavedItem) {
-	return item.Asset.Name === savedItem.Asset.Name && JSON.stringify(item.Color) === JSON.stringify(savedItem.Color)
-		&& JSON.stringify(item.Craft) === JSON.stringify(savedItem.Craft) && JSON.stringify(item.Property) === JSON.stringify(savedItem.Property)	
-}
-export function replaceSlotWithSavedItem(slot:AssetGroupName,savedItem: TSavedItem, push=true): Item {
-	const item = InventoryGet(Player, slot)
-	if (item && compareItemToSavedItem(item,savedItem)) return item
-
-	if (item) InventoryRemove(Player, slot, false)	
-	InventoryWear(Player, savedItem.Asset.Name, slot, savedItem.Color, 10, Player.MemberNumber, savedItem.Craft, false)
-	const newItem = InventoryGet(Player, slot) as Item 
-	
-	if (savedItem.Property && savedItem.Property.hasOwnProperty("LockedBy")) {
-		const lockName = savedItem.Property["LockedBy"]
-		const asset = lockName ? AssetGet(Player.AssetFamily, "ItemMisc", lockName) : null 
-		
-		console.log("new lock")
-		if (asset) {
-			InventoryLock(Player, slot, {Asset:asset}, savedItem.Property.LockMemberNumber)
-			
-		}
-		
-	}
-	console.log(newItem, savedItem)
-	if (push) ServerPlayerInventorySync()
-	return newItem
-}
 export function loadDiaperLayers(): void {
 
 	hookFunction('CharacterAppearanceSetItem', 2, (args:any, next:Function) => {

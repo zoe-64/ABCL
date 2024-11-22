@@ -3,7 +3,7 @@ import { templates } from "./data";
 import { modSession, modStorage } from "./storage";
 import { changeDiaper, releaseInClothes, releaseInDiaper } from "./diaper";
 import { getTime,nextDiaperAction } from "./utils";
-import { desperationTick, getRegressionIncreese } from "./stats";
+import { increeseDesperation, getRegressionIncreese } from "./stats";
 
 
 interface ICommand {
@@ -49,7 +49,7 @@ const commands: ICommand[] = [
             } else {
                 releaseInClothes();
                 modSession.settings.regressionLevel+= getRegressionIncreese()
-                desperationTick()
+                increeseDesperation()
             }
             ChatRoomSendLocal(`<p style='background-color:#ecc826'>ABCL: ${Player.Nickname == '' ? Player.Name : Player.Nickname} squeezes ${Pronoun.get("dependent", Player)} abdomen trying to get it all out. (only you can see this).</p>`);
         }

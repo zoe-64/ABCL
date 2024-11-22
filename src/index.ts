@@ -1,16 +1,16 @@
 import css from "../data/abcl.css"
 import html from "../data/settings.html"
-import { modSession, modStorage, initStorage } from "./modules/storage";
+import { modSession, modStorage, initStorage, resetStorage } from "./modules/storage";
 import { loadSettingsMenu } from "./modules/settingsMenu";
 import { loadCommands } from "./modules/commands";
 
-import { getTime, isVersionNewer, waitFor } from "./modules/utils";
+import { getTime, isVersionNewer, waitFor, WaitForCondition } from "./modules/utils";
 import { loadDiaperLayers, releaseInClothes, releaseInDiaper, updateDiaper } from "./modules/diaper";
 import { IModData } from "./modules/data";
 export function getModVersion(): string {
     return "1.2.1";
 }
-import { desperationTick, getRegressionIncreese } from "./modules/stats";
+import { increeseDesperation, getRegressionIncreese } from "./modules/stats";
 import data from "../data/dictionary.json"
 import { loadMessages } from "./modules/message";
 
@@ -20,6 +20,7 @@ const style = document.createElement("style");
 style.innerHTML = css;
 document.head.append(style);
 document.body.insertAdjacentHTML("beforeend",html)
+console.info("ABCL Loaded: " + getModVersion())
 waitFor(() => typeof window.Player?.MemberNumber === "number").then(() => {
     initStorage();
     loadSettingsMenu();
@@ -35,25 +36,24 @@ waitFor(() => typeof window.Player?.MemberNumber === "number").then(() => {
 			});
 		}
     }
-    loop();
-});
-
-async function loop() {
     updateDiaper()
-    while (true) {
-        if (!modSession.settings.enabled || !modSession.settings.timerEnabled || getTime() > 0) {
-            await new Promise(r => setTimeout(r, Math.max(getTime() * 1000)));
-            continue;
-        }
-        modSession.settings.lastAccident = Date.now() +60000;
-
-     
+    console.log(modSession.settings.lastAccident)
+    setInterval(loop, 1000)
+});
+const bottleChecker = new WaitForCondition(30, increeseDesperation) 
+async function loop() {
+    if (!modSession.settings.enabled) {
+        return
+    }
+    if (modSession.settings.lastAccident.checkIn(getTime())) {
         if (modSession.topLayer || modSession.bottomLayer) {
             releaseInDiaper()
         } else {
             modSession.settings.regressionLevel+= getRegressionIncreese()
-            desperationTick()
+            increeseDesperation()
             releaseInClothes()
         }
     }
+    bottleChecker.repeat()
+
 }
