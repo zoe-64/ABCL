@@ -14,7 +14,7 @@
 // @run-at document-end
 // ==/UserScript==
 
-const scriptSrc = "https://zoe-64.github.io/ABCL/ABCL.js?_=" + Date.now();
+const scriptSrc = "https://zoe-64.github.io/ABCL/index.js?_=" + Date.now();
 
 let script = document.createElement("script");
 script.setAttribute("language", "JavaScript");

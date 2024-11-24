@@ -1,7 +1,7 @@
 {
   "name": "ABCL",
   "description": "Diaper lover mod for Bondage Club",
-  "version": "1.0",
+  "version": "2.0",
   "manifest_version": 3,
   "icons": {
     "128": "images/icon128.png",
@@ -44,7 +44,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["ABCL.js"],
+      "resources": ["index.js"],
       "matches": [
         "https://bondage-europe.com/*",
         "https://www.bondage-europe.com/*",
