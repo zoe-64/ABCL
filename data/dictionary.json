@@ -1,47 +1,53 @@
 { 
+    "DiaperSizeScale": {
+        "none": 0,
+        "small": 1500,
+        "medium": 3000,
+        "large": 5000
+    },
     "Diapers": {
             "Patterned Diaper": {
-            "indexes": [1],
-            "type": "primary",
-            "absorbancy": 2
+                "primaryColor": 1,
+                "size": "small"
             },
             "Bulky Diaper": {
-            "indexes": [1,0],
-            "type": "primary&secondary",
-            "absorbancy": 4
+                "primaryColor": 1,
+                "secondaryColor": 0,
+                "size": "medium"
+            },
+            "Bulky Chastity Diaper 0": {
+                "primaryColor": 1,
+                "secondaryColor": 0,
+                "size": "medium"
+            },
+            "Bulky Chastity Diaper 1": {
+                "primaryColor": 1,
+                "secondaryColor": 0,
+                "size": "large"
             },
             "Poofy Diaper": {
-            "indexes": [1,0],
-            "type": "primary&secondary",
-            "absorbancy": 4
-            },
-            "Bulky Chastity Diaper": {
-            "indexes": [1,0],
-            "type": "primary&secondary",
-            "absorbancy": 5
+                "primaryColor": 1,
+                "secondaryColor": 0,
+                "size": "medium"
             },
             "Poofy Chastity Diaper": {
-            "indexes": [1,0],
-            "type": "primary&secondary",
-            "absorbancy": 4
+                "primaryColor": 1,
+                "secondaryColor": 0,
+                "size": "medium"
             },
             "Plastic Covered Diaper": {
-            "indexes": [0],
-            "type": "primary",
-            "absorbancy": 4
+                "primaryColor": 0,
+                "size": "medium"
             },
             "Satin Covered Diaper": {
-                "indexes": [0],
-                "type": "primary",
-                "absorbancy": 6
+                "primaryColor": 0,
+                "size": "large"
             },
             "Diaper": {
-                "type": "mono",
-                "absorbancy": 2
+                "size": "small"
             },
             "Diaper Harness": {
-                "type": "mono",
-                "absorbancy": 0
+                "size": "none"
             }
     },
     "Items": {

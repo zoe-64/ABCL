@@ -2,49 +2,55 @@
 (() => {
   // data/dictionary.json
   var dictionary_default = `{ \r
+    "DiaperSizeScale": {\r
+        "none": 0,\r
+        "small": 1500,\r
+        "medium": 3000,\r
+        "large": 5000\r
+    },\r
     "Diapers": {\r
             "Patterned Diaper": {\r
-            "indexes": [1],\r
-            "type": "primary",\r
-            "absorbancy": 2\r
+                "primaryColor": 1,\r
+                "size": "small"\r
             },\r
             "Bulky Diaper": {\r
-            "indexes": [1,0],\r
-            "type": "primary&secondary",\r
-            "absorbancy": 4\r
+                "primaryColor": 1,\r
+                "secondaryColor": 0,\r
+                "size": "medium"\r
+            },\r
+            "Bulky Chastity Diaper 0": {\r
+                "primaryColor": 1,\r
+                "secondaryColor": 0,\r
+                "size": "medium"\r
+            },\r
+            "Bulky Chastity Diaper 1": {\r
+                "primaryColor": 1,\r
+                "secondaryColor": 0,\r
+                "size": "large"\r
             },\r
             "Poofy Diaper": {\r
-            "indexes": [1,0],\r
-            "type": "primary&secondary",\r
-            "absorbancy": 4\r
-            },\r
-            "Bulky Chastity Diaper": {\r
-            "indexes": [1,0],\r
-            "type": "primary&secondary",\r
-            "absorbancy": 5\r
+                "primaryColor": 1,\r
+                "secondaryColor": 0,\r
+                "size": "medium"\r
             },\r
             "Poofy Chastity Diaper": {\r
-            "indexes": [1,0],\r
-            "type": "primary&secondary",\r
-            "absorbancy": 4\r
+                "primaryColor": 1,\r
+                "secondaryColor": 0,\r
+                "size": "medium"\r
             },\r
             "Plastic Covered Diaper": {\r
-            "indexes": [0],\r
-            "type": "primary",\r
-            "absorbancy": 4\r
+                "primaryColor": 0,\r
+                "size": "medium"\r
             },\r
             "Satin Covered Diaper": {\r
-                "indexes": [0],\r
-                "type": "primary",\r
-                "absorbancy": 6\r
+                "primaryColor": 0,\r
+                "size": "large"\r
             },\r
             "Diaper": {\r
-                "type": "mono",\r
-                "absorbancy": 2\r
+                "size": "small"\r
             },\r
             "Diaper Harness": {\r
-                "type": "mono",\r
-                "absorbancy": 0\r
+                "size": "none"\r
             }\r
     },\r
     "Items": {\r
@@ -196,9 +202,54 @@
 }\r
 `;
 
+  // src/modules/player.ts
+  var player = {
+    _bladder: 0,
+    _bowel: 0,
+    waterIntake: 1 / 200,
+    foodIntake: 1 / 450,
+    metabolism: 1,
+    // slow / normal / fast
+    get bladder() {
+      return this._bladder;
+    },
+    set bladder(value) {
+      this._bladder = value;
+      if (value > 1) this._bladder = 1;
+      if (value < 0) this._bladder = 0;
+    },
+    get bowel() {
+      return this._bowel;
+    },
+    set bowel(value) {
+      this._bowel = value;
+      if (value > 1) this._bowel = 1;
+      if (value < 0) this._bowel = 0;
+    },
+    update() {
+      player.bladder += player.waterIntake * player.metabolism / 100;
+      player.bowel += player.foodIntake * player.metabolism / 100;
+    }
+  };
+
   // src/index.ts
   function getModVersion() {
     return "2.0";
   }
   globalThis.ABCLdata = dictionary_default;
+  var abclData = dictionary_default;
+  console.log(`abcl loaded version: ${getModVersion()}`);
+  function loop() {
+    player.update();
+    if (player.bladder === 1) {
+      player.bladder = 0;
+      console.log("wet accident!!!");
+    }
+    if (player.bowel === 1) {
+      player.bowel = 0;
+      console.log("messy accident!!!");
+    }
+  }
+  setInterval(loop, 1e3);
+  loop();
 })();
