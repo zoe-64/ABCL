@@ -1,9 +1,11 @@
+import { settings } from ".."
+
 export const player = {
 	_bladder: 0.0,
 	_bowel: 0.0,
-	waterIntake: 1/200, 
-	foodIntake: 1/450,
-	metabolism: 1.0, // slow / normal / fast
+	waterIntake: settings.waterIntake, 
+	foodIntake: settings.foodIntake,
+	metabolism: settings.metabolism, // slow / normal / fast 
 	get bladder() {
 		return this._bladder
 	},
@@ -24,5 +26,13 @@ export const player = {
 	update() {
 		player.bladder += player.waterIntake * player.metabolism / 100
 		player.bowel += player.foodIntake * player.metabolism / 100
+		if (player.bladder === 1) {
+			player.bladder = 0
+			console.log("wet accident!!!")
+		}
+		if (player.bowel === 1) {
+			player.bowel = 0
+			console.log("messy accident!!!")
+		}
 	}
 }

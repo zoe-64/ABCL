@@ -8,16 +8,16 @@ export const abclData:any = data
 
 console.log(`abcl loaded version: ${getModVersion()}`)
 
-function loop() {
-    player.update()
-    if (player.bladder === 1) {
-        player.bladder = 0
-        console.log("wet accident!!!")
-    }
-    if (player.bowel === 1) {
-        player.bowel = 0
-        console.log("messy accident!!!")
-    }
+// temporary until settings have been implemented
+export const settings = { // all properties aren't changable even though they are called settings
+    metabolism: 1.0,
+    waterIntake: 1/200, 
+	foodIntake: 1/450,
+}
+
+function loop() {  
+    player.update() 
+  
 }
 setInterval(loop, 1000);
 loop()
