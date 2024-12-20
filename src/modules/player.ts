@@ -1,4 +1,6 @@
-import { settings } from ".."
+import { updateColor } from "./diaper"
+import { settings } from "./settings"
+
 
 export const player = {
 	_bladder: 0.0,
@@ -28,11 +30,13 @@ export const player = {
 		player.bowel += player.foodIntake * player.metabolism / 100
 		if (player.bladder === 1) {
 			player.bladder = 0
-			console.log("wet accident!!!")
+			settings.wetness += 500
+			updateColor()
 		}
 		if (player.bowel === 1) {
 			player.bowel = 0
-			console.log("messy accident!!!")
+			settings.soiliness += 500
+			updateColor()
 		}
 	}
 }

@@ -13,5 +13,8 @@ type abclData = {
 			"secondaryColor"?: number,
 			"size": number
 		}
+	},
+	"DiaperColors": {
+		[key:string]:string
 	}
 }

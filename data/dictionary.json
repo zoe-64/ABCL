@@ -1,4 +1,13 @@
 { 
+    "DiaperColors": {
+        "clean": "#8F8F8F",
+		"middlewet": "#ffe58b",
+		"maximumwet": "#ffd33e",
+		"middlemess": "#423019",
+		"maximummess": "#3C302C",
+		"selfwet": "#242103",
+		"selfmess": "#1f170d"
+    },
     "DiaperSizeScale": {
         "none": 0,
         "small": 1500,
