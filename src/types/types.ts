@@ -34,3 +34,13 @@ export type ModScreen = {
   module: string;
   functions: ScreenFunctions;
 };
+
+export enum PermissionLevels {
+  Anyone = 0,
+  ItemPermission = 1,
+  Friends = 2,
+  Lovers = 3,
+  // TODO: Mistress = 4 Perhaps counts mistress as BCX Mistresses, BCC Caretakers, etc
+  Owner = 5, // TODO: Consider BCX owners, BCC Mommies, etc
+  Self = 6,
+}

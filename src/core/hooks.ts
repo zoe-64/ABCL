@@ -3,7 +3,26 @@ import {
   PluginServerChatRoomMessage,
 } from "../types/types";
 import { logger } from "./logger";
-import { bcModSDK, getCharacter, waitFor } from "./utils";
+import {
+  bcModSDK,
+  getCharacter,
+  getMyMaxPermissionLevel,
+  waitFor,
+} from "./utils";
+
+const filterRestrictedSettings = (
+  settings: ModSettings,
+  target: PlayerCharacter | Character
+) => {
+  const myHighestPermission = getMyMaxPermissionLevel(target);
+
+  return Object.entries(settings).reduce((acc, [key, value]) => {
+    if (value.permission.canView <= myHighestPermission) {
+      acc[key] = value;
+    }
+    return acc;
+  }, {} as ModSettings);
+};
 
 /**
  * Sends an update of the player's settings to the specified target or to everyone in the chat room.
@@ -73,7 +92,9 @@ const handleSyncPacket = (data: PluginServerChatRoomMessage) => {
   const otherCharacter = getCharacter(data.Sender);
   if (!otherCharacter) return;
 
-  otherCharacter[modIdentifier] = { Settings: dict.message.settings };
+  otherCharacter[modIdentifier] = {
+    Settings: filterRestrictedSettings(dict.message.settings, otherCharacter),
+  };
 };
 
 /**

@@ -1,5 +1,6 @@
 import bcModSdkRef from "bondage-club-mod-sdk";
 import { ModName, ModRepo, ModVersion } from "../types/definitions";
+import { PermissionLevels } from "../types/types";
 
 export const bcModSDK = bcModSdkRef.registerMod({
   name: ModName,
@@ -51,4 +52,20 @@ export const sendChatLocal = (message: string): void => {
   msgElement.classList.add(`${modIdentifier}LocalMessage`);
   document.querySelector("#TextAreaChatLog")?.appendChild(msgElement);
   ElementScrollToEnd("TextAreaChatLog");
+};
+
+export const getMyMaxPermissionLevel = (
+  target: PlayerCharacter | Character
+) => {
+  if (target.MemberNumber === Player.MemberNumber) return PermissionLevels.Self;
+  if (target.IsOwnedByPlayer()) return PermissionLevels.Owner;
+  if (target.IsLoverOfPlayer()) return PermissionLevels.Lovers;
+
+  if (target.MemberNumber && Player.FriendList?.includes(target.MemberNumber))
+    return PermissionLevels.Friends;
+
+  if (ServerChatRoomGetAllowItem(Player, target))
+    return PermissionLevels.ItemPermission;
+
+  return PermissionLevels.Anyone;
 };

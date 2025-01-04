@@ -9,13 +9,24 @@ declare const modIdentifier: string;
 declare const publicURL: string;
 
 interface ModSettings {
-  ModVersion: string;
+  [key: string]: {
+    value: string | number;
+    permission: {
+      canView: number;
+      canModify: number;
+    };
+  };
+}
+
+interface ModStorageModel {
+  ModVersion?: string;
+  Settings: ModSettings;
+}
+
+interface PlayerCharacter {
+  [modIdentifier: string]: ModStorageModel;
 }
 
 interface Character {
-  [modIdentifier: string]:
-    | {
-        Settings: ModSettings;
-      }
-    | undefined;
+  [modIdentifier: string]: ModStorageModel | undefined;
 }

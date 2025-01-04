@@ -1,8 +1,24 @@
 import { merge } from "lodash-es";
+import { PermissionLevels } from "../types/types";
 import { sendUpdateMySettings } from "./hooks";
 import { logger } from "./logger";
 
-const defaultSettings: Omit<ModSettings, "ModVersion"> = {};
+const defaultSettings: ModSettings = {
+  ExampleSetting1: {
+    value: "example value",
+    permission: {
+      canView: PermissionLevels.Anyone,
+      canModify: PermissionLevels.Self,
+    },
+  },
+  ExampleSetting2: {
+    value: 0,
+    permission: {
+      canView: PermissionLevels.Lovers,
+      canModify: PermissionLevels.Lovers,
+    },
+  },
+};
 
 export const mutateSettings = (newSettings: Partial<ModSettings>) => {
   Player[modIdentifier].Settings = merge(
@@ -61,20 +77,15 @@ export const loadOrGenerateSettings = () => {
     Settings = JSON.parse(dataString) as ModSettings;
   }
 
-  const settingsObject = merge(
-    // Combines objects recursively in order, to
+  const modStorageObject = merge(
     {
-      Settings: defaultSettings,
+      Settings: defaultSettings, // Start with default settings, so if new settings are added they are added to all players
+      ModVersion: modVersion,
     },
-    { Settings },
-    {
-      Settings: {
-        ModVersion: modVersion, // Always override the mod version
-      },
-    }
+    { Settings } // Merge in the user's existing settings
   );
 
-  logger.debug({ message: "Merged settings object", settingsObject });
+  logger.debug({ message: "Merged settings object", modStorageObject });
 
-  Player[modIdentifier] = settingsObject;
+  Player[modIdentifier] = modStorageObject;
 };
