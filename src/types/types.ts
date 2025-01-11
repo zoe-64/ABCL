@@ -44,3 +44,20 @@ export enum PermissionLevels {
   Owner = 5, // TODO: Consider BCX owners, BCC Mommies, etc
   Self = 6,
 }
+
+/** Overall structure for additional data */
+export type AbclData = {
+  DiaperSizeScale: {
+    [key: string]: number;
+  };
+  Diapers: {
+    [key: string]: {
+      primaryColor?: number;
+      secondaryColor?: number;
+      size: number;
+    };
+  };
+  DiaperColors: {
+    [key: string]: string;
+  };
+};

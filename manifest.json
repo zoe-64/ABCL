@@ -1,0 +1,58 @@
+{
+  "name": "ABCL",
+  "description": "Diaper lover mod for Bondage Club",
+  "version": "2.0",
+  "manifest_version": 3,
+  "icons": {
+    "128": "./src/extension/icon128.png",
+    "48": "./src/extension/icon48.png",
+    "16": "./src/extension/icon16.png"
+  },
+  "permissions": ["tabs", "storage", "activeTab"],
+  "host_permissions": [
+    "https://bondage-europe.com/*",
+    "https://www.bondage-europe.com/*",
+    "http://bondageprojects.com/*",
+    "https://bondageprojects.com/*",
+    "http://www.bondageprojects.com/*",
+    "https://www.bondageprojects.com/*",
+    "http://bondageprojects.elementfx.com/*",
+    "https://bondageprojects.elementfx.com/*",
+    "http://www.bondageprojects.elementfx.com/*",
+    "https://www.bondageprojects.elementfx.com/*"
+  ],
+  "content_scripts": [
+    {
+      "js": ["./src/extension/contentscript.js"],
+      "matches": [
+        "https://bondage-europe.com/*",
+        "https://www.bondage-europe.com/*",
+        "http://bondageprojects.com/*",
+        "https://bondageprojects.com/*",
+        "http://www.bondageprojects.com/*",
+        "https://www.bondageprojects.com/*",
+        "http://bondageprojects.elementfx.com/*",
+        "https://bondageprojects.elementfx.com/*",
+        "http://www.bondageprojects.elementfx.com/*",
+        "https://www.bondageprojects.elementfx.com/*"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["loader.user.js", "dist/main.js"],
+      "matches": [
+        "https://bondage-europe.com/*",
+        "https://www.bondage-europe.com/*",
+        "http://bondageprojects.com/*",
+        "https://bondageprojects.com/*",
+        "http://www.bondageprojects.com/*",
+        "https://www.bondageprojects.com/*",
+        "http://bondageprojects.elementfx.com/*",
+        "https://bondageprojects.elementfx.com/*",
+        "http://www.bondageprojects.elementfx.com/*",
+        "https://www.bondageprojects.elementfx.com/*"
+      ]
+    }
+  ]
+}

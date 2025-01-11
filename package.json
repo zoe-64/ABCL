@@ -22,6 +22,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/lodash-es": "^4.17.12",
+    "abcl": "file:",
     "bc-stubs": "^111.0.0",
     "bondage-club-mod-sdk": "^1.2.0"
   },
