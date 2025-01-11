@@ -1,18 +1,46 @@
 {
   "name": "abcl",
-  "version": "1.0.0",
-  "description": "ABCL is an addon for [Bondage Club](https://www.bondageprojects.com/club_game/)\r  Stands for \"Adult baby club lover\"~",
-  "main": "./src/ABCL.js",
-  "scripts": {
-    "build": "esbuild --bundle ./src/ABCL.ts --outfile=ABCL.js --watch"
+  "displayName": "ABCL",
+  "version": "2.0.0",
+  "description": "An addon for [Bondage Club](https://www.bondageprojects.com/club_game/). Stands for \"Adult baby club lover\"~",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoe-64/ABCL.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Zoe, Maple, En",
+  "buildSettings": {
+    "identifier": "ABCL",
+    "input": "main.ts"
+  },
+  "scripts": {
+    "build": "rollup -c rollup.config.js --configDeploy https://github.com/zoe-64/ABCL/raw/main/ABCL.user.js",
+    "build:local": "rollup -c rollup.config.js --configDebug --configDeploy http://localhost:3042",
+    "dev": "npm run build:local && http-server ./public -p 3042 --cors",
+    "watch": "nodemon --exec \"npm run dev\" -e js,ts --ignore public/"
+  },
+  "license": "MIT",
   "dependencies": {
-    "bc-stubs": "^106.0.0",
-    "esbuild": "^0.23.0",
-    "typescript": "^5.5.3",
-    "zoelib": "^1.0.3"
+    "@types/lodash-es": "^4.17.12",
+    "bc-stubs": "^111.0.0",
+    "bondage-club-mod-sdk": "^1.2.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.5",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/core-js": "^2.5.8",
+    "@types/css": "^0.0.37",
+    "@types/node": "^20.16.1",
+    "http-server": "^14.1.1",
+    "lodash-es": "^4.17.21",
+    "nodemon": "^3.1.4",
+    "rollup": "^4.13.2",
+    "rollup-plugin-cleanup": "^3.2.1",
+    "rollup-plugin-copy": "^3.5.0",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.3"
   }
 }
