@@ -29,8 +29,8 @@ const filterRestrictedSettings = (
  *
  * @param {number} [target] - The MemberNumber of the target player. If not specified, the update is sent to all players.
  */
-export const sendUpdateMySettings = (target?: number) => {
-  const syncSettingsMessage: any = {
+export const sendUpdateMyData = (target?: number) => {
+  const syncDataMessage: any = {
     Type: "Hidden",
     Content: `${modIdentifier}Msg`,
     Sender: Player.MemberNumber,
@@ -39,6 +39,7 @@ export const sendUpdateMySettings = (target?: number) => {
         message: {
           type: "sync",
           settings: Player[modIdentifier].Settings,
+          stats: Player[modIdentifier].Stats,
           target,
         },
       },
@@ -46,17 +47,17 @@ export const sendUpdateMySettings = (target?: number) => {
   };
 
   logger.debug({
-    message: `Sending updated settings to ${target ?? "everyone"}`,
-    data: syncSettingsMessage,
+    message: `Sending updated data to ${target ?? "everyone"}`,
+    data: syncDataMessage,
   });
-  ServerSend("ChatRoomChat", syncSettingsMessage);
+  ServerSend("ChatRoomChat", syncDataMessage);
 };
 
 /**
- * Sends a request packet to other players in the chat room to retrieve their settings.
+ * Sends a request packet to other players in the chat room to retrieve their data.
  */
-export const sendRequestOtherSettingsPacket = () => {
-  const syncSettingsMessage: any = {
+export const sendRequestOtherDataPacket = () => {
+  const syncDataMessage: any = {
     Type: "Hidden",
     Content: `${modIdentifier}Msg`,
     Sender: Player.MemberNumber,
@@ -69,12 +70,12 @@ export const sendRequestOtherSettingsPacket = () => {
     ],
   };
 
-  logger.debug(`Requesting settings from others.`);
-  ServerSend("ChatRoomChat", syncSettingsMessage);
+  logger.debug(`Requesting data from others.`);
+  ServerSend("ChatRoomChat", syncDataMessage);
 };
 
 /**
- * Handles the "sync" packet received from other players, updating the local player's settings with the received data.
+ * Handles the "sync" packet received from other players, updating the local player's data with the received data.
  *
  * @param {PluginServerChatRoomMessage} data - The message data received from the server.
  */
@@ -85,7 +86,7 @@ const handleSyncPacket = (data: PluginServerChatRoomMessage) => {
     | undefined;
   if (!dict?.message) return;
   logger.debug({
-    message: `Received updated settings`,
+    message: `Received updated data`,
     data,
   });
 
@@ -94,20 +95,20 @@ const handleSyncPacket = (data: PluginServerChatRoomMessage) => {
 
   otherCharacter[modIdentifier] = {
     Settings: filterRestrictedSettings(dict.message.settings, otherCharacter),
-    Stats: {},
+    Stats: dict.message.stats,
   };
 };
 
 /**
- * Handles the "init" packet received from other players, sending the player's settings to the requester.
+ * Handles the "init" packet received from other players, sending the player's data to the requester.
  *
  * @param {PluginServerChatRoomMessage} data - The message data received from the server.
  */
 const handleInitPacket = (data: PluginServerChatRoomMessage) => {
   if (!data.Sender) return;
-  logger.debug(`Received request for settings`);
+  logger.debug(`Received request for data`);
 
-  sendUpdateMySettings(data.Sender);
+  sendUpdateMyData(data.Sender);
 };
 
 /**
@@ -133,14 +134,14 @@ const receivePacket = (data: PluginServerChatRoomMessage) => {
 };
 
 /**
- * Initializes hooks for intercepting chat room messages and synchronizing player settings.
+ * Initializes hooks for intercepting chat room messages and synchronizing player data.
  * This function waits until the server is connected before setting up hooks.
  */
 const initHooks = async () => {
   await waitFor(() => ServerSocket && ServerIsConnected);
 
   bcModSDK.hookFunction("ChatRoomSync", 1, (args, next) => {
-    sendUpdateMySettings(); // Tell everyone else to update their copy of our settings, when we join a room.
+    sendUpdateMyData(); // Tell everyone else to update their copy of our data, when we join a room.
     return next(args);
   });
 
@@ -150,7 +151,7 @@ const initHooks = async () => {
       args[0].Sender === Player.MemberNumber
     ) {
       // Announce (via an init packet) that we're ready to receive data models.
-      sendRequestOtherSettingsPacket();
+      sendRequestOtherDataPacket();
       return;
     }
 

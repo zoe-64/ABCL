@@ -1,6 +1,6 @@
 import initHooks from "./core/hooks";
 import { logger } from "./core/logger";
-import { loadOrGenerateSettings } from "./core/settings";
+import { loadOrGenerateData } from "./core/settings";
 import { bcModSDK, isObject } from "./core/utils";
 import { initScreens } from "./screens";
 import { initSettingsScreen } from "./screens/Settings";
@@ -55,7 +55,7 @@ const init = () => {
   document.head.appendChild(injectedStyles);
 
   ServerPlayerSync();
-  loadOrGenerateSettings();
+  loadOrGenerateData();
   initSettingsScreen();
   initScreens([]);
   initHooks();
