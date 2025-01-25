@@ -1,7 +1,11 @@
+export type PartialDeep<T> = {
+  [P in keyof T]?: PartialDeep<T[P]>;
+};
 export type ChatMessageSyncDictionaryEntry = {
   message: {
     type: "sync";
     settings: ModSettings;
+    stats: ModStats;
     target?: number;
   };
 };

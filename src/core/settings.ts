@@ -1,6 +1,6 @@
 import { merge } from "lodash-es";
-import { PermissionLevels } from "../types/types";
-import { sendUpdateMySettings } from "./hooks";
+import { PartialDeep, PermissionLevels } from "../types/types";
+import { sendUpdateMyData as sendUpdateMyData } from "./hooks";
 import { logger } from "./logger";
 
 const defaultSettings: ModSettings = {
@@ -40,62 +40,65 @@ const defaultStats: ModStats = {
     value: 1 / 250,
   },
 };
-
-export const mutateSettings = (newSettings: Partial<ModSettings>) => {
-  Player[modIdentifier].Settings = merge(
-    Player[modIdentifier].Settings,
-    newSettings
-  );
-
-  saveSettings();
+const defaultData: ModStorageModel = {
+  Settings: defaultSettings,
+  Stats: defaultStats,
 };
 
-let settingsSaveTimeout: number | null = null;
+export const mutateData = (newData: PartialDeep<ModStorageModel>) => {
+  Player[modIdentifier] = merge(Player[modIdentifier] || defaultData, newData);
+  saveData();
+};
+(window as any).mutateData = mutateData;
+
+let dataSaveTimeout: number | null = null;
 /**
- * Saves the settings by compressing and storing them in the Player object and sending an update to the server.
+ * Saves the data by compressing and storing them in the Player object and sending an update to the server.
  *
  * @remarks
- * This function compresses the settings using LZString and stores them in the Player object.
- * It also sets a timeout to synchronize the extension settings with the server and send an update if necessary.
+ * This function compresses the data using LZString and stores them in the Player object.
+ * It also sets a timeout to synchronize the extension data with the server and send an update if necessary.
  */
-export const saveSettings = () => {
+export const saveData = () => {
   const compressed = LZString.compressToBase64(
-    JSON.stringify(Player[modIdentifier].Settings)
+    JSON.stringify(Player[modIdentifier])
   );
   Player.ExtensionSettings[modIdentifier] = compressed;
 
-  if (settingsSaveTimeout) {
-    logger.debug("Clearing existing settings save timeout");
-    clearTimeout(settingsSaveTimeout);
+  if (dataSaveTimeout) {
+    logger.debug("Clearing existing data save timeout");
+    clearTimeout(dataSaveTimeout);
   }
-  settingsSaveTimeout = setTimeout(() => {
+  dataSaveTimeout = setTimeout(() => {
     ServerPlayerExtensionSettingsSync(modIdentifier);
     logger.debug({
-      message: "Settings saved, sending update to server",
+      message: "Data saved, sending update to server",
       data: compressed,
     });
-    sendUpdateMySettings();
+    sendUpdateMyData();
   }, 1000);
 };
 
 const devMode = false; // Manually toggle during local development if needed to clear settings
-export const loadOrGenerateSettings = () => {
+export const loadOrGenerateData = () => {
   if (devMode) {
     Player.ExtensionSettings[modIdentifier] = "N4XyA==="; // Empty object compressed
     ServerPlayerExtensionSettingsSync(modIdentifier);
-    logger.warn("Dev mode enabled, cleared settings");
+    logger.warn("Dev mode enabled, cleared data");
   }
 
-  let Settings;
+  let Settings, Stats;
   const dataString = LZString.decompressFromBase64(
     Player.ExtensionSettings[modIdentifier]
   );
   if (!dataString) {
     logger.info(`Generating new settings`);
     Settings = {};
+    Stats = {};
   } else {
     logger.info(`Loaded settings from server`);
-    Settings = JSON.parse(dataString) as ModSettings;
+    Settings = JSON.parse(dataString).Settings as ModSettings;
+    Stats = JSON.parse(dataString).Stats as ModStats;
   }
 
   const modStorageObject = merge(
@@ -104,7 +107,7 @@ export const loadOrGenerateSettings = () => {
       Stats: defaultStats,
       ModVersion: modVersion,
     },
-    { Settings } // Merge in the user's existing settings
+    { Settings, Stats } // Merge in the user's existing data
   );
 
   logger.debug({ message: "Merged settings object", modStorageObject });
