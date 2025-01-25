@@ -1,0 +1,62 @@
+{
+  "DiaperColors": {
+    "clean": "#8F8F8F",
+    "middlewet": "#ffe58b",
+    "maximumwet": "#ffd33e",
+    "middlemess": "#423019",
+    "maximummess": "#3C302C",
+    "selfwet": "#242103",
+    "selfmess": "#1f170d"
+  },
+  "DiaperSizeScale": {
+    "none": 0,
+    "small": 1500,
+    "medium": 3000,
+    "large": 5000
+  },
+  "Diapers": {
+    "Patterned Diaper": {
+      "primaryColor": 1,
+      "size": "small"
+    },
+    "Bulky Diaper": {
+      "primaryColor": 1,
+      "secondaryColor": 0,
+      "size": "medium"
+    },
+    "Bulky Chastity Diaper 0": {
+      "primaryColor": 1,
+      "secondaryColor": 0,
+      "size": "medium"
+    },
+    "Bulky Chastity Diaper 1": {
+      "primaryColor": 1,
+      "secondaryColor": 0,
+      "size": "large"
+    },
+    "Poofy Diaper": {
+      "primaryColor": 1,
+      "secondaryColor": 0,
+      "size": "medium"
+    },
+    "Poofy Chastity Diaper": {
+      "primaryColor": 1,
+      "secondaryColor": 0,
+      "size": "medium"
+    },
+    "Plastic Covered Diaper": {
+      "primaryColor": 0,
+      "size": "medium"
+    },
+    "Satin Covered Diaper": {
+      "primaryColor": 0,
+      "size": "large"
+    },
+    "Diaper": {
+      "size": "small"
+    },
+    "Diaper Harness": {
+      "size": "none"
+    }
+  }
+}

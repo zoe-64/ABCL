@@ -11,12 +11,33 @@ const defaultSettings: ModSettings = {
       canModify: PermissionLevels.Self,
     },
   },
-  ExampleSetting2: {
-    value: 0,
+  Metabolism: {
+    value: "normal", // "slow", "normal", "fast"
     permission: {
-      canView: PermissionLevels.Lovers,
-      canModify: PermissionLevels.Lovers,
+      canView: PermissionLevels.Self,
+      canModify: PermissionLevels.Self,
     },
+  },
+};
+
+const defaultStats: ModStats = {
+  Bladder: {
+    value: 0.0,
+  },
+  Bowel: {
+    value: 0.0,
+  },
+  Soiliness: {
+    value: 0,
+  },
+  Wetness: {
+    value: 0,
+  },
+  WaterIntake: {
+    value: 1 / 450,
+  },
+  FoodIntake: {
+    value: 1 / 250,
   },
 };
 
@@ -80,6 +101,7 @@ export const loadOrGenerateSettings = () => {
   const modStorageObject = merge(
     {
       Settings: defaultSettings, // Start with default settings, so if new settings are added they are added to all players
+      Stats: defaultStats,
       ModVersion: modVersion,
     },
     { Settings } // Merge in the user's existing settings

@@ -17,10 +17,16 @@ interface ModSettings {
     };
   };
 }
+interface ModStats {
+  [key: string]: {
+    value: string | number;
+  };
+}
 
 interface ModStorageModel {
   ModVersion?: string;
   Settings: ModSettings;
+  Stats: ModStats;
 }
 
 interface PlayerCharacter {

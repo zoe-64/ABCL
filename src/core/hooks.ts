@@ -94,6 +94,7 @@ const handleSyncPacket = (data: PluginServerChatRoomMessage) => {
 
   otherCharacter[modIdentifier] = {
     Settings: filterRestrictedSettings(dict.message.settings, otherCharacter),
+    Stats: {},
   };
 };
 
