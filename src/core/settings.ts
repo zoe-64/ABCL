@@ -4,18 +4,46 @@ import { sendUpdateMyData as sendUpdateMyData } from "./hooks";
 import { logger } from "./logger";
 
 const defaultSettings: ModSettings = {
-  ExampleSetting1: {
-    value: "example value",
+  Metabolism: {
+    value: "Normal",
     permission: {
       canView: PermissionLevels.Anyone,
+      canModify: PermissionLevels.Owner,
+    },
+  },
+  DisableWetting: {
+    value: false,
+    permission: {
+      canView: PermissionLevels.Owner, // maybe it could be used to signal to other players that this player does not like wetting
       canModify: PermissionLevels.Self,
     },
   },
-  Metabolism: {
-    value: "normal", // "slow", "normal", "fast"
+  DisableSoiling: {
+    value: false,
     permission: {
-      canView: PermissionLevels.Self,
+      canView: PermissionLevels.Owner,
       canModify: PermissionLevels.Self,
+    },
+  },
+  CaregiverIDs: {
+    value: [],
+    permission: {
+      canView: PermissionLevels.Anyone, // if this is not set to anyone then it would mean only those that fit the permission level could be caregivers, however it could be a good thing
+      canModify: PermissionLevels.Self,
+    },
+  },
+  OpenRemoteSettings: {
+    value: false,
+    permission: {
+      canView: PermissionLevels.Anyone, // this should probably always be visible
+      canModify: PermissionLevels.Self,
+    },
+  },
+  LockedOutOfSettings: {
+    value: false,
+    permission: {
+      canView: PermissionLevels.Owner,
+      canModify: PermissionLevels.Self, // if value becomes true then the player wouldn't be able to turn it off, we should warn for this
     },
   },
 };

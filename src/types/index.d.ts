@@ -7,19 +7,55 @@ declare const modName: string;
 declare const modRepo: string;
 declare const modIdentifier: string;
 declare const publicURL: string;
-
+type MetabolismSettingValues = "Normal" | "Fast" | "Slow";
 interface ModSettings {
-  [key: string]: {
-    value: string | number;
-    permission: {
-      canView: number;
-      canModify: number;
-    };
+  Metabolism: {
+    value: MetabolismSettingValues;
+    permission: ModSettingPermission;
+  };
+  DisableWetting: {
+    value: boolean;
+    permission: ModSettingPermission;
+  };
+  DisableSoiling: {
+    value: boolean;
+    permission: ModSettingPermission;
+  };
+  CaregiverIDs: {
+    value: number[];
+    permission: ModSettingPermission;
+  };
+  OpenRemoteSettings: {
+    value: boolean;
+    permission: ModSettingPermission;
+  };
+  LockedOutOfSettings: {
+    value: boolean;
+    permission: ModSettingPermission;
   };
 }
+type ModSettingPermission = {
+  canView: number;
+  canModify: number;
+};
 interface ModStats {
-  [key: string]: {
-    value: string | number;
+  Bladder: {
+    value: number;
+  };
+  Bowel: {
+    value: number;
+  };
+  Soiliness: {
+    value: number;
+  };
+  Wetness: {
+    value: number;
+  };
+  WaterIntake: {
+    value: number;
+  };
+  FoodIntake: {
+    value: number;
   };
 }
 
