@@ -15,7 +15,7 @@
 
  
  Feel free to contact me at @cute.zoey on discord or [my server](https://discord.gg/V9rNpRQqtZ) if you encounter any bugs or have thoughts!
- 
+
 ## Install
   We prefer you use TamperMonkey or ViolentMonkey.
   ### TamperMonkey or ViolentMonkey
@@ -33,7 +33,8 @@
   2. Use the code to set as bookmark
   3. Before login, activate the bookmark
   4. Login!
-
+## Incompatibilities
+  BCC is not compatable with ABCL. 
 ## Credits
 Special thanks to tetris245 for helping me get into modding!
 
