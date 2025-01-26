@@ -18,7 +18,7 @@ const filterRestrictedSettings = (
 
   return Object.entries(settings).reduce((acc, [key, value]) => {
     if (value.permission.canView <= myHighestPermission) {
-      acc[key] = value;
+      acc[key as keyof ModSettings] = value;
     }
     return acc;
   }, {} as ModSettings);
