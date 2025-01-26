@@ -189,3 +189,4 @@ export const handlePlayerUpdate = () => {
   }
   playerSaver.save();
 };
+(window as any).modData = modData;
