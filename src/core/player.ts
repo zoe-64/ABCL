@@ -1,5 +1,12 @@
-import { mutateData } from "./settings";
-import { Saver } from "./utils";
+import { ABCLdata } from "../main";
+import { defaultStats, mutateData } from "./settings";
+import {
+  averageColor,
+  getPlayerDiaperSize,
+  isDiaper,
+  mixLevels,
+  Saver,
+} from "./utils";
 
 const metabolismValues: Map<MetabolismSettingValues, number> = new Map([
   ["Normal", 1],
@@ -22,8 +29,8 @@ export const modData = {
   },
   stats: {
     // intake
-    _waterIntake: 0,
-    _foodIntake: 0,
+    _waterIntake: defaultStats.WaterIntake.value,
+    _foodIntake: defaultStats.FoodIntake.value,
     set WaterIntake(value: number) {
       if (value < 0) value = 0;
       this._waterIntake = value;
@@ -40,9 +47,9 @@ export const modData = {
     },
 
     // bladder
-    _bladderValue: 0,
-    _bladderSize: 0,
-    _wetnessValue: 0,
+    _bladderValue: defaultStats.Bladder.value,
+    _bladderSize: defaultStats.Bladder.size,
+    _wetnessValue: defaultStats.Wetness.value,
 
     set BladderValue(value: number) {
       if (value < 0) value = 0;
@@ -61,6 +68,7 @@ export const modData = {
     set WetnessValue(value: number) {
       if (value < 0) value = 0;
       this._wetnessValue = value;
+      updateDiaperColor();
     },
     get WetnessValue() {
       return this._wetnessValue;
@@ -75,9 +83,9 @@ export const modData = {
     },
 
     // bowel
-    _bowelValue: 0,
-    _bowelSize: 0,
-    _soilinessValue: 0,
+    _bowelValue: defaultStats.Bowel.value,
+    _bowelSize: defaultStats.Bowel.size,
+    _soilinessValue: defaultStats.Soiliness.value,
 
     set BowelValue(value: number) {
       if (value < 0) value = 0;
@@ -97,6 +105,7 @@ export const modData = {
     set SoilinessValue(value: number) {
       if (value < 0) value = 0;
       this._soilinessValue = value;
+      updateDiaperColor();
     },
     get SoilinessValue() {
       return this._soilinessValue;
@@ -168,9 +177,84 @@ export const modData = {
   },
 };
 
-(window as any).modData = modData;
+// diaper
+export function getPlayerDiaper(): {
+  ItemPelvis: Item | null;
+  Panties: Item | null;
+} {
+  const pelvisItem = InventoryGet(Player, "ItemPelvis");
+  const panties = InventoryGet(Player, "Panties");
+  let diapers: { ItemPelvis: Item | null; Panties: Item | null } = {
+    ItemPelvis: null,
+    Panties: null,
+  };
+  if (pelvisItem && isDiaper(pelvisItem)) {
+    diapers["ItemPelvis"] = pelvisItem;
+  }
+  if (panties && isDiaper(panties)) {
+    diapers["Panties"] = panties;
+  }
+  return diapers;
+}
+
+function setDiaperColor(
+  slot: AssetGroupName,
+  primaryColor: string,
+  secondaryColor: string,
+  player: typeof Player = Player
+) {
+  const item = InventoryGet(player, slot);
+  if (item && isDiaper(item)) {
+    const type = typeof item.Asset.DefaultColor;
+    const diaper =
+      ABCLdata.Diapers[item.Asset.Description as keyof typeof ABCLdata.Diapers];
+
+    if (type !== typeof item.Color) {
+      item.Color = item.Asset.DefaultColor as ItemColor;
+    }
+    if (type === "object" && JSON.stringify(item.Color).includes('"Default"')) {
+      item.Color = JSON.parse(
+        JSON.stringify(item.Color).replaceAll(/"Default"/g, '"#FFFFFF"')
+      );
+    }
+    const color: string[] = (item.Color ?? item.Asset.DefaultColor) as string[];
+    if ("primaryColor" in diaper) {
+      color[diaper.primaryColor] = primaryColor;
+    }
+    if ("secondaryColor" in diaper) {
+      color[diaper.secondaryColor] = secondaryColor;
+    }
+    item.Color = color;
+  }
+}
+export function updateDiaperColor() {
+  const messLevel = modData.stats.SoilinessValue / getPlayerDiaperSize();
+  const wetLevel = modData.stats.WetnessValue / getPlayerDiaperSize();
+
+  const messColor = mixLevels(
+    messLevel,
+    ABCLdata.DiaperColors["maximummess"],
+    ABCLdata.DiaperColors["middlemess"],
+    ABCLdata.DiaperColors["clean"]
+  );
+  const wetColor = mixLevels(
+    wetLevel,
+    ABCLdata.DiaperColors["maximumwet"],
+    ABCLdata.DiaperColors["middlewet"],
+    ABCLdata.DiaperColors["clean"]
+  );
+
+  const primaryColor = averageColor(messColor, wetColor, 0.7);
+  const secondaryColor = averageColor(messColor, wetColor, 0.9);
+
+  setDiaperColor("ItemPelvis", primaryColor, secondaryColor, Player);
+  setDiaperColor("Panties", primaryColor, secondaryColor, Player);
+  CharacterRefresh(Player, true);
+  ChatRoomCharacterUpdate(Player);
+}
+
 const playerSaver = new Saver(3 * 60 * 1000);
-export const handlePlayerUpdate = () => {
+export const playerUpdate = () => {
   modData.stats.BladderValue +=
     modData.stats.WaterIntake * modData.settings.Metabolism;
   modData.stats.BowelValue +=

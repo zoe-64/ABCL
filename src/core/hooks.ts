@@ -3,6 +3,7 @@ import {
   PluginServerChatRoomMessage,
 } from "../types/types";
 import { logger } from "./logger";
+import { updateDiaperColor } from "./player";
 import {
   bcModSDK,
   getCharacter,
@@ -157,6 +158,12 @@ const initHooks = async () => {
 
     receivePacket(args[0] as PluginServerChatRoomMessage);
     return next(args);
+  });
+  bcModSDK.hookFunction("CharacterAppearanceSetItem", 1, (args, next) => {
+    let [_character, _slot, _asset] = args;
+    const _result = next(args);
+    updateDiaperColor();
+    return _result;
   });
 };
 
