@@ -50,22 +50,24 @@ const defaultSettings: ModSettings = {
 
 const defaultStats: ModStats = {
   Bladder: {
-    value: 0.0,
+    value: 0, // in ml
+    size: 1000, // in ml
   },
   Bowel: {
-    value: 0.0,
+    value: 0, // in ml
+    size: 1000, // in ml
   },
   Soiliness: {
-    value: 0,
+    value: 0, // in ml
   },
   Wetness: {
-    value: 0,
+    value: 0, // in ml
   },
   WaterIntake: {
-    value: 1 / 450,
+    value: 200, // ml per minute
   },
   FoodIntake: {
-    value: 1 / 250,
+    value: 100, // ml per minute
   },
 };
 const defaultData: ModStorageModel = {
@@ -142,3 +144,11 @@ export const loadOrGenerateData = () => {
 
   Player[modIdentifier] = modStorageObject;
 };
+
+const clearData = () => {
+  Player.ExtensionSettings[modIdentifier] = "N4XyA==="; // Empty object compressed
+  ServerPlayerExtensionSettingsSync(modIdentifier);
+  logger.warn("cleared data");
+};
+
+(window as any).clearData = clearData;

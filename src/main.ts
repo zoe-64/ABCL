@@ -1,11 +1,13 @@
 import initHooks from "./core/hooks";
 import { logger } from "./core/logger";
+import { handlePlayerUpdate, modData } from "./core/player";
 import { loadOrGenerateData } from "./core/settings";
 import { bcModSDK, isObject } from "./core/utils";
 import { initScreens } from "./screens";
 import { initSettingsScreen } from "./screens/Settings";
 import { css } from "./screens/styles/css";
 
+export const updateInterval = 60 * 1000;
 const initWait = () => {
   logger.info(`Waiting for possible login...`);
   if (CurrentScreen == null || CurrentScreen === "Login") {
@@ -61,6 +63,13 @@ const init = () => {
   initHooks();
   logger.info(`Ready.`);
   window.modLoadFlag = true;
+  modData.load();
+  setInterval(loop, updateInterval);
+  loop();
 };
 
 initWait();
+
+const loop = () => {
+  handlePlayerUpdate();
+};

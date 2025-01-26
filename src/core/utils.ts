@@ -1,6 +1,7 @@
 import bcModSdkRef from "bondage-club-mod-sdk";
 import { ModName, ModRepo, ModVersion } from "../types/definitions";
 import { PermissionLevels } from "../types/types";
+import { saveData } from "./settings";
 
 export const bcModSDK = bcModSdkRef.registerMod({
   name: ModName,
@@ -69,3 +70,18 @@ export const getMyMaxPermissionLevel = (
 
   return PermissionLevels.Anyone;
 };
+
+// might be useful
+export class Saver {
+  private lastSaveTime: number = 0;
+  private allowedSaveInterval: number;
+  constructor(allowedSaveInterval: number) {
+    this.allowedSaveInterval = allowedSaveInterval;
+  }
+  save() {
+    if (Date.now() - this.lastSaveTime > this.allowedSaveInterval) {
+      saveData();
+      this.lastSaveTime = Date.now();
+    }
+  }
+}
