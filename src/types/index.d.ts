@@ -41,9 +41,11 @@ type ModSettingPermission = {
 interface ModStats {
   Bladder: {
     value: number;
+    size: number;
   };
   Bowel: {
     value: number;
+    size: number;
   };
   Soiliness: {
     value: number;
