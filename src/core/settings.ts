@@ -48,7 +48,7 @@ const defaultSettings: ModSettings = {
   },
 };
 
-const defaultStats: ModStats = {
+export const defaultStats: ModStats = {
   Bladder: {
     value: 0, // in ml
     size: 1000, // in ml

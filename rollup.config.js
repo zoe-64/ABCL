@@ -5,9 +5,9 @@ const replace = require("@rollup/plugin-replace");
 const cleanup = require("rollup-plugin-cleanup");
 const copy = require("rollup-plugin-copy");
 const terser = require("@rollup/plugin-terser");
+const json = require("@rollup/plugin-json");
 const path = require("path");
 const pkg = require("./package.json");
-
 const deployFileName = "main.js";
 
 const buildSettings = {
@@ -103,6 +103,7 @@ const plugins_debug = (deploySite) => [
     inlineSources: true,
   }),
   cleanup(),
+  json(),
 ];
 
 const plugins = (deploySite) => [

@@ -2,6 +2,7 @@ import bcModSdkRef from "bondage-club-mod-sdk";
 import { ModName, ModRepo, ModVersion } from "../types/definitions";
 import { PermissionLevels } from "../types/types";
 import { saveData } from "./settings";
+import { ABCLdata } from "../main";
 
 export const bcModSDK = bcModSdkRef.registerMod({
   name: ModName,
@@ -71,6 +72,66 @@ export const getMyMaxPermissionLevel = (
   return PermissionLevels.Anyone;
 };
 
+export function averageColor(
+  color_1: HexColor,
+  color_2: HexColor,
+  ratio: number = 0.5
+): HexColor {
+  let rgb_1 = DrawHexToRGB(color_1);
+  let rgb_2 = DrawHexToRGB(color_2);
+  let avgRgb: RGBColor = {
+    r: Math.round(rgb_1.r * ratio + rgb_2.r * (1 - ratio)),
+    g: Math.round(rgb_1.g * ratio + rgb_2.g * (1 - ratio)),
+    b: Math.round(rgb_1.b * ratio + rgb_2.b * (1 - ratio)),
+  };
+  return DrawRGBToHex([avgRgb.r, avgRgb.g, avgRgb.b]);
+}
+
+export function mixLevels(
+  level: number,
+  highLevel: string,
+  midLevel: string,
+  lowLevel: string
+): string {
+  if (level > 0.75) {
+    return level > 0.9
+      ? highLevel
+      : averageColor(highLevel, midLevel, level - 0.75);
+  } else {
+    return averageColor(midLevel, lowLevel, level);
+  }
+}
+
+export function getPlayerDiaperSize(player: typeof Player = Player): number {
+  const pelvisItem = InventoryGet(player, "ItemPelvis");
+  const panties = InventoryGet(player, "Panties");
+  let size = 0;
+  if (pelvisItem && isDiaper(pelvisItem)) {
+    size += getDiaperSize(pelvisItem);
+  }
+  if (panties && isDiaper(panties)) {
+    size += getDiaperSize(panties);
+  }
+  return size;
+}
+export function getDiaperSize(diaper: Item): number {
+  if (
+    diaper.Asset.Description === "Poofy Chastity Diaper" &&
+    diaper.Property?.TypeRecord?.typed === 1
+  ) {
+    return ABCLdata.DiaperSizeScale.large;
+  }
+  return ABCLdata.DiaperSizeScale[
+    ABCLdata.Diapers[diaper.Asset.Description as keyof typeof ABCLdata.Diapers]
+      .size as keyof typeof ABCLdata.DiaperSizeScale
+  ];
+}
+export function isDiaper(item: Item): boolean {
+  return (
+    item.Asset.Description.toLowerCase().includes("diaper") &&
+    item.Asset.Description in ABCLdata.Diapers
+  );
+}
 // might be useful
 export class Saver {
   private lastSaveTime: number = 0;
