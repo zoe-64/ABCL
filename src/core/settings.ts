@@ -69,6 +69,12 @@ export const defaultStats: ModStats = {
   FoodIntake: {
     value: 100, // ml per minute
   },
+  Incontinence: {
+    value: 0,
+  },
+  MentalRegression: {
+    value: 0,
+  },
 };
 const defaultData: ModStorageModel = {
   Settings: defaultSettings,
@@ -151,4 +157,5 @@ const clearData = () => {
   logger.warn("cleared data");
 };
 
-(window as any).clearData = clearData;
+(<any>window).clearData = clearData;
+(<any>window).saveData = saveData;
