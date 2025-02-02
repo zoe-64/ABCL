@@ -153,3 +153,26 @@ export class Saver {
     }
   }
 }
+
+export const waitForElement = async (
+  selector: string,
+  options: { childCheck?: boolean } = {}
+): Promise<Element> => {
+  return new Promise((resolve) => {
+    const element = document.querySelector(selector);
+    if (element) {
+      resolve(element);
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      const target = document.querySelector(selector);
+      if (target && (!options.childCheck || target.childElementCount > 0)) {
+        observer.disconnect();
+        resolve(target);
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+};
