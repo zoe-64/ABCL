@@ -102,6 +102,13 @@ export function mixLevels(
   }
 }
 
+export function hasDiaper(player: typeof Player = Player): boolean {
+  const pelvisItem = InventoryGet(player, "ItemPelvis");
+  const panties = InventoryGet(player, "Panties");
+  return Boolean(
+    (pelvisItem && isDiaper(pelvisItem)) || (panties && isDiaper(panties))
+  );
+}
 export function getPlayerDiaperSize(player: typeof Player = Player): number {
   const pelvisItem = InventoryGet(player, "ItemPelvis");
   const panties = InventoryGet(player, "Panties");
