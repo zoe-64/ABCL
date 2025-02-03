@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { bcModSDK, hasDiaper, waitForElement } from "./utils";
+import { bcModSDK, waitForElement } from "./utils";
 
 export type ABCLActivity = {
   Name: string;

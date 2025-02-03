@@ -1,5 +1,5 @@
-import { activities } from "./activities";
-import { hasDiaper } from "./utils";
+import { activities } from "../activities";
+import { hasDiaper } from "../utils";
 activities["ChangeDiaper"] = {
   Name: "Change Diaper",
   Image: `${publicURL}/activity/changeDiaper.svg`,
