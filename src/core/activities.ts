@@ -1,6 +1,5 @@
-import _ from "lodash";
+import { initActivitiesData } from "./data/activities-data";
 import { bcModSDK, waitForElement } from "./utils";
-
 export type ABCLActivity = {
   Name: string;
   Image: string;
@@ -57,8 +56,9 @@ export const activityFitsCriteria = (
 };
 export const activities: Record<string, ABCLActivity> = {};
 
-export const loadActivities = (): void => {
+export const initActivities = (): void => {
   /** clickedObj becomes null with custom activities */
+  initActivitiesData();
   bcModSDK.hookFunction(
     "DialogMenuMapping.activities.GetClickStatus",
     1,
