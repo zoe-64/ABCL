@@ -7,6 +7,7 @@ import { initScreens } from "./screens";
 import { initSettingsScreen } from "./screens/Settings";
 import { css } from "./screens/styles/css";
 import abclData from "./assets/dictionary.json" assert { type: "json" };
+import { initActivities } from "./core/activities";
 export type AbclData = typeof abclData;
 export const ABCLdata: AbclData = abclData;
 (window as any).ABCLdata = ABCLdata;
@@ -68,6 +69,7 @@ const init = () => {
   logger.info(`Ready.`);
   window.modLoadFlag = true;
   modData.load();
+  initActivities();
   setInterval(loop, updateInterval);
   loop();
 };
