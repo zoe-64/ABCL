@@ -154,6 +154,7 @@ export class Saver {
   }
 }
 
+
 export const waitForElement = async (
   selector: string,
   options: { childCheck?: boolean } = {}
@@ -176,3 +177,25 @@ export const waitForElement = async (
     observer.observe(document.body, { childList: true, subtree: true });
   });
 };
+
+// similar to saver but limits how often a function can be called
+export class Debouncer {
+  private lastCallTime: number = 0;
+  private allowedCallInterval: number;
+  constructor(allowedCallInterval: number) {
+    this.allowedCallInterval = allowedCallInterval;
+  }
+  check(): boolean {
+    if (Date.now() - this.lastCallTime > this.allowedCallInterval) {
+      this.lastCallTime = Date.now();
+      return true;
+    }
+    return false;
+  }
+  reset() {
+    this.lastCallTime = 0;
+  }
+  isReady() {
+    return Date.now() - this.lastCallTime > this.allowedCallInterval;
+  }
+}

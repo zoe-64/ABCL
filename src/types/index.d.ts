@@ -59,6 +59,12 @@ interface ModStats {
   FoodIntake: {
     value: number;
   };
+  MentalRegression: {
+    value: number;
+  };
+  Incontinence: {
+    value: number;
+  };
 }
 
 interface ModStorageModel {
