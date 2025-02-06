@@ -1,15 +1,15 @@
 import initHooks from "./core/hooks";
 import { logger } from "./core/logger";
-import { playerUpdate, modData } from "./core/player";
+import { playerUpdate } from "./core/player";
 import { loadOrGenerateData } from "./core/settings";
 import { bcModSDK, isObject } from "./core/utils";
 import { initScreens } from "./screens";
 import { initSettingsScreen } from "./screens/Settings";
 import { css } from "./screens/styles/css";
 import abclData from "./assets/dictionary.json" assert { type: "json" };
+import { loadMinigames } from "./core/minigames";
 export type AbclData = typeof abclData;
 export const ABCLdata: AbclData = abclData;
-(window as any).ABCLdata = ABCLdata;
 
 export const updateInterval = 60 * 1000;
 const initWait = () => {
@@ -67,9 +67,8 @@ const init = () => {
   initHooks();
   logger.info(`Ready.`);
   window.modLoadFlag = true;
-  modData.load();
+  loadMinigames();
   setInterval(loop, updateInterval);
-  loop();
 };
 
 initWait();

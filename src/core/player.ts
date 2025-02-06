@@ -1,7 +1,8 @@
 import { ABCLdata } from "../main";
-import { defaultStats, mutateData } from "./settings";
+import { mutateData } from "./settings";
 import {
   averageColor,
+  Debouncer,
   getPlayerDiaperSize,
   isDiaper,
   mixLevels,
@@ -15,63 +16,63 @@ const metabolismValues: Map<MetabolismSettingValues, number> = new Map([
 ]);
 
 export const modData = {
-  load() {
-    this.stats._waterIntake = Player[modIdentifier].Stats.WaterIntake.value;
-    this.stats._foodIntake = Player[modIdentifier].Stats.FoodIntake.value;
-
-    this.stats._bladderValue = Player[modIdentifier].Stats.Bladder.value;
-    this.stats._bladderSize = Player[modIdentifier].Stats.Bladder.size;
-    this.stats._wetnessValue = Player[modIdentifier].Stats.Wetness.value;
-
-    this.stats._bowelValue = Player[modIdentifier].Stats.Bowel.value;
-    this.stats._bowelSize = Player[modIdentifier].Stats.Bowel.size;
-    this.stats._soilinessValue = Player[modIdentifier].Stats.Soiliness.value;
-  },
   stats: {
+    set MentalRegression(value: number) {
+      if (value < 0) value = 0;
+      if (value > 1) value = 1;
+      Player[modIdentifier].Stats.MentalRegression.value = value;
+    },
+    get MentalRegression() {
+      return Player[modIdentifier].Stats.MentalRegression.value;
+    },
+    set Incontinence(value: number) {
+      if (value < 0) value = 0;
+      if (value > 1) value = 1;
+      Player[modIdentifier].Stats.Incontinence.value = value;
+    },
+    get Incontinence() {
+      return Player[modIdentifier].Stats.Incontinence.value;
+    },
+
     // intake
-    _waterIntake: defaultStats.WaterIntake.value,
-    _foodIntake: defaultStats.FoodIntake.value,
     set WaterIntake(value: number) {
       if (value < 0) value = 0;
-      this._waterIntake = value;
+      Player[modIdentifier].Stats.WaterIntake.value = value;
     },
     get WaterIntake() {
-      return this._waterIntake;
+      return Player[modIdentifier].Stats.WaterIntake.value;
     },
     set FoodIntake(value: number) {
       if (value < 0) value = 0;
-      this._foodIntake = value;
+      Player[modIdentifier].Stats.FoodIntake.value = value;
     },
     get FoodIntake() {
-      return this._foodIntake;
+      return Player[modIdentifier].Stats.FoodIntake.value;
     },
 
     // bladder
-    _bladderValue: defaultStats.Bladder.value,
-    _bladderSize: defaultStats.Bladder.size,
-    _wetnessValue: defaultStats.Wetness.value,
 
     set BladderValue(value: number) {
       if (value < 0) value = 0;
-      this._bladderValue = value;
+      Player[modIdentifier].Stats.Bladder.value = value;
     },
     get BladderValue() {
-      return this._bladderValue;
+      return Player[modIdentifier].Stats.Bladder.value;
     },
     set BladderSize(value: number) {
       if (value < 0) value = 0;
-      this._bladderSize = value;
+      Player[modIdentifier].Stats.Bladder.size = value;
     },
     get BladderSize(): number {
-      return this._bladderSize;
+      return Player[modIdentifier].Stats.Bladder.size;
     },
     set WetnessValue(value: number) {
       if (value < 0) value = 0;
-      this._wetnessValue = value;
+      Player[modIdentifier].Stats.Wetness.value = value;
       updateDiaperColor();
     },
     get WetnessValue() {
-      return this._wetnessValue;
+      return Player[modIdentifier].Stats.Wetness.value;
     },
     // computed
     set BladderFullness(value: number) {
@@ -83,32 +84,28 @@ export const modData = {
     },
 
     // bowel
-    _bowelValue: defaultStats.Bowel.value,
-    _bowelSize: defaultStats.Bowel.size,
-    _soilinessValue: defaultStats.Soiliness.value,
-
     set BowelValue(value: number) {
       if (value < 0) value = 0;
-      this._bowelValue = value;
+      Player[modIdentifier].Stats.Bowel.value = value;
     },
     get BowelValue() {
-      return this._bowelValue;
+      return Player[modIdentifier].Stats.Bowel.value;
     },
 
     set BowelSize(value: number) {
       if (value < 0) value = 0;
-      this._bowelSize = value;
+      Player[modIdentifier].Stats.Bowel.size = value;
     },
     get BowelSize(): number {
-      return this._bowelSize;
+      return Player[modIdentifier].Stats.Bowel.size;
     },
     set SoilinessValue(value: number) {
       if (value < 0) value = 0;
-      this._soilinessValue = value;
+      Player[modIdentifier].Stats.Soiliness.value = value;
       updateDiaperColor();
     },
     get SoilinessValue() {
-      return this._soilinessValue;
+      return Player[modIdentifier].Stats.Soiliness.value;
     },
     // computed
     set BowelFullness(value: number) {
@@ -253,24 +250,121 @@ export function updateDiaperColor() {
   ChatRoomCharacterUpdate(Player);
 }
 
-const playerSaver = new Saver(3 * 60 * 1000);
+const playerSaver = new Saver(2 * 60 * 1000);
+
+/**
+ * @param { number } minutes - such as modData.stats.bladderValue/200 or modData.stats.bowelValue/100
+ * @returns
+ */
+export function incontinenceProgressionIncreese(minutes: number) {
+  const stages = [
+    { time: 60 * 60 * 20, start: 0, end: 0.25 },
+    { time: 60 * 60 * 40, start: 0.25, end: 0.5 },
+    { time: 60 * 60 * 80, start: 0.5, end: 0.75 },
+    { time: 60 * 60 * 160, start: 0.75, end: 1 },
+  ];
+  for (const { time, start, end } of stages) {
+    if (
+      modData.stats.Incontinence >= start &&
+      modData.stats.Incontinence < end
+    ) {
+      return minutes / time;
+    }
+  }
+  return 0;
+}
+
+/*
+ * 100% chance:
+ * Incontinence 10% + Fullness 95%
+ * Incontinence 20% + Fullness 89%
+ * Incontinence 30% + Fullness 83%
+ * Incontinence 40% + Fullness 77%
+ * Incontinence 50% + Fullness 71%
+ * Incontinence 60% + Fullness 65%
+ * Incontinence 70% + Fullness 59%
+ * Incontinence 80% + Fullness 53%
+ * Incontinence 90% + Fullness 47%
+ * Incontinence 100% + Fullness 41%
+ */
+function getIncontinenceThreshold(
+  incontinence: number,
+  fullness: number
+): number {
+  const incontinenceFactor = 0.645;
+  const fullnessFactor = 0.968;
+
+  const threshold =
+    incontinenceFactor * incontinence + fullnessFactor * fullness;
+
+  return threshold;
+}
+(<any>window).getIncontinenceThreshold = getIncontinenceThreshold;
+
+const incontinenceCheck = new Debouncer(0);
+
+export const wetSelf = () => {
+  if (
+    !modData.settings.DisableWetting &&
+    incontinenceCheck.check() &&
+    (getIncontinenceThreshold(
+      modData.stats.Incontinence,
+      modData.stats.BladderFullness
+    ) > Math.random() ||
+      modData.stats.BladderFullness >= 1)
+  ) {
+    MiniGameStart(
+      "WetMinigame",
+      16 *
+        getIncontinenceThreshold(
+          modData.stats.Incontinence,
+          modData.stats.BladderFullness
+        ),
+      "noOp"
+    );
+  }
+};
+
+export const soilSelf = () => {
+  if (
+    !modData.settings.DisableSoiling &&
+    incontinenceCheck.check() &&
+    (getIncontinenceThreshold(
+      modData.stats.Incontinence,
+      modData.stats.BowelFullness
+    ) > Math.random() ||
+      modData.stats.BowelFullness >= 1)
+  ) {
+    MiniGameStart(
+      "MessMinigame",
+      16 *
+        getIncontinenceThreshold(
+          modData.stats.Incontinence,
+          modData.stats.BowelFullness
+        ),
+      "noOp"
+    );
+  }
+};
+(<any>window).noOp = () => {};
+
+export const changeDiaper = () => {
+  // maybe later add a diaper change minigame
+
+  modData.stats.SoilinessValue = 0;
+  modData.stats.WetnessValue = 0;
+  updateDiaperColor();
+};
 export const playerUpdate = () => {
   modData.stats.BladderValue +=
     modData.stats.WaterIntake * modData.settings.Metabolism;
   modData.stats.BowelValue +=
     modData.stats.FoodIntake * modData.settings.Metabolism;
 
-  if (!modData.settings.DisableSoiling && modData.stats.BowelFullness >= 1) {
-    modData.stats.SoilinessValue += modData.stats.BowelValue;
-    modData.stats.BowelValue = 0;
-    console.log("Soiling");
-  }
-
-  if (!modData.settings.DisableWetting && modData.stats.BladderFullness >= 1) {
-    modData.stats.WetnessValue += modData.stats.BladderValue;
-    modData.stats.BladderValue = 0;
-    console.log("Wetting");
-  }
+  wetSelf();
+  soilSelf();
   playerSaver.save();
 };
+(<any>window).playerUpdate = playerUpdate;
 (window as any).modData = modData;
+(<any>window).changeDiaper = changeDiaper;
