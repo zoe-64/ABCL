@@ -7,6 +7,7 @@ import { initScreens } from "./screens";
 import { initSettingsScreen } from "./screens/Settings";
 import { css } from "./screens/styles/css";
 import abclData from "./assets/dictionary.json" assert { type: "json" };
+import { initActivities } from "./core/activities";
 import { loadMinigames } from "./core/minigames";
 export type AbclData = typeof abclData;
 export const ABCLdata: AbclData = abclData;
@@ -67,6 +68,8 @@ const init = () => {
   initHooks();
   logger.info(`Ready.`);
   window.modLoadFlag = true;
+  modData.load();
+  initActivities();
   loadMinigames();
   setInterval(loop, updateInterval);
 };

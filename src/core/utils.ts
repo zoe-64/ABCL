@@ -102,6 +102,13 @@ export function mixLevels(
   }
 }
 
+export function hasDiaper(player: typeof Player = Player): boolean {
+  const pelvisItem = InventoryGet(player, "ItemPelvis");
+  const panties = InventoryGet(player, "Panties");
+  return Boolean(
+    (pelvisItem && isDiaper(pelvisItem)) || (panties && isDiaper(panties))
+  );
+}
 export function getPlayerDiaperSize(player: typeof Player = Player): number {
   const pelvisItem = InventoryGet(player, "ItemPelvis");
   const panties = InventoryGet(player, "Panties");
@@ -146,6 +153,30 @@ export class Saver {
     }
   }
 }
+
+
+export const waitForElement = async (
+  selector: string,
+  options: { childCheck?: boolean } = {}
+): Promise<Element> => {
+  return new Promise((resolve) => {
+    const element = document.querySelector(selector);
+    if (element) {
+      resolve(element);
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      const target = document.querySelector(selector);
+      if (target && (!options.childCheck || target.childElementCount > 0)) {
+        observer.disconnect();
+        resolve(target);
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+};
 
 // similar to saver but limits how often a function can be called
 export class Debouncer {
