@@ -85,7 +85,6 @@ export const mutateData = (newData: PartialDeep<ModStorageModel>) => {
   Player[modIdentifier] = merge(Player[modIdentifier] || defaultData, newData);
   saveData();
 };
-(window as any).mutateData = mutateData;
 
 let dataSaveTimeout: number | null = null;
 /**
@@ -151,11 +150,8 @@ export const loadOrGenerateData = () => {
   Player[modIdentifier] = modStorageObject;
 };
 
-const clearData = () => {
+export const clearData = () => {
   Player.ExtensionSettings[modIdentifier] = "N4XyA==="; // Empty object compressed
   ServerPlayerExtensionSettingsSync(modIdentifier);
   logger.warn("cleared data");
 };
-
-(<any>window).clearData = clearData;
-(<any>window).saveData = saveData;
