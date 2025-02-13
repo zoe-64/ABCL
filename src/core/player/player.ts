@@ -7,11 +7,14 @@ import {
   mentalRegressionOvertime,
   updateDiaperColor,
 } from "./diaper";
+import { abclStatsWindow } from "./ui";
 
 const metabolismValues: Map<MetabolismSettingValues, number> = new Map([
-  ["Normal", 1],
-  ["Slow", 0.5],
-  ["Fast", 1.5],
+  ["Slow", 0.5], // 40 min
+  ["Normal", 1], // 20 min
+  ["Fast", 1.5], // 13.3 min
+  ["Faster", 2], // 10 min
+  ["Fastest", 3], // 6.6 min
 ]);
 
 export const abclPlayer = {
@@ -40,9 +43,13 @@ export const abclPlayer = {
       ) > Math.random() ||
         abclPlayer.stats.BladderFullness >= 1)
     ) {
+      if (CurrentScreen != "ChatRoom") {
+        (<any>window).WetMinigameEnd(false);
+        return;
+      }
       MiniGameStart(
         "WetMinigame",
-        16 *
+        20 *
           getAccidentThreshold(
             abclPlayer.stats.Incontinence,
             abclPlayer.stats.BladderFullness
@@ -61,9 +68,13 @@ export const abclPlayer = {
       ) > Math.random() ||
         abclPlayer.stats.BowelFullness >= 1)
     ) {
+      if (CurrentScreen != "ChatRoom") {
+        (<any>window).MessMinigameEnd(false);
+        return;
+      }
       MiniGameStart(
         "MessMinigame",
-        16 *
+        20 *
           getAccidentThreshold(
             abclPlayer.stats.Incontinence,
             abclPlayer.stats.BowelFullness
@@ -116,6 +127,7 @@ export const abclPlayer = {
       if (value < 0) value = 0;
       if (value > 1) value = 1;
       Player[modIdentifier].Stats.MentalRegression.value = value;
+      abclStatsWindow.update();
     },
     get MentalRegression() {
       return Player[modIdentifier].Stats.MentalRegression.value;
@@ -124,6 +136,7 @@ export const abclPlayer = {
       if (value < 0) value = 0;
       if (value > 1) value = 1;
       Player[modIdentifier].Stats.Incontinence.value = value;
+      abclStatsWindow.update();
     },
     get Incontinence() {
       return Player[modIdentifier].Stats.Incontinence.value;
@@ -150,6 +163,7 @@ export const abclPlayer = {
     set BladderValue(value: number) {
       if (value < 0) value = 0;
       Player[modIdentifier].Stats.Bladder.value = value;
+      abclStatsWindow.update();
     },
     get BladderValue() {
       return Player[modIdentifier].Stats.Bladder.value;
@@ -157,6 +171,7 @@ export const abclPlayer = {
     set BladderSize(value: number) {
       if (value < 0) value = 0;
       Player[modIdentifier].Stats.Bladder.size = value;
+      abclStatsWindow.update();
     },
     get BladderSize(): number {
       return Player[modIdentifier].Stats.Bladder.size;
@@ -165,6 +180,7 @@ export const abclPlayer = {
       if (value < 0) value = 0;
       Player[modIdentifier].Stats.Wetness.value = value;
       updateDiaperColor();
+      abclStatsWindow.update();
     },
     get WetnessValue() {
       return Player[modIdentifier].Stats.Wetness.value;
@@ -173,6 +189,7 @@ export const abclPlayer = {
     set BladderFullness(value: number) {
       if (value < 0) value = 0;
       this.BladderValue = value * this.BladderSize;
+      abclStatsWindow.update();
     },
     get BladderFullness(): number {
       return this.BladderValue / this.BladderSize;
@@ -182,6 +199,7 @@ export const abclPlayer = {
     set BowelValue(value: number) {
       if (value < 0) value = 0;
       Player[modIdentifier].Stats.Bowel.value = value;
+      abclStatsWindow.update();
     },
     get BowelValue() {
       return Player[modIdentifier].Stats.Bowel.value;
@@ -190,6 +208,7 @@ export const abclPlayer = {
     set BowelSize(value: number) {
       if (value < 0) value = 0;
       Player[modIdentifier].Stats.Bowel.size = value;
+      abclStatsWindow.update();
     },
     get BowelSize(): number {
       return Player[modIdentifier].Stats.Bowel.size;
@@ -198,6 +217,7 @@ export const abclPlayer = {
       if (value < 0) value = 0;
       Player[modIdentifier].Stats.Soiliness.value = value;
       updateDiaperColor();
+      abclStatsWindow.update();
     },
     get SoilinessValue() {
       return Player[modIdentifier].Stats.Soiliness.value;
@@ -206,6 +226,7 @@ export const abclPlayer = {
     set BowelFullness(value: number) {
       if (value < 0) value = 0;
       this.BowelValue = value * this.BowelSize;
+      abclStatsWindow.update();
     },
     get BowelFullness(): number {
       return this.BowelValue / this.BowelSize;

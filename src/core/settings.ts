@@ -51,11 +51,11 @@ const defaultSettings: ModSettings = {
 export const defaultStats: ModStats = {
   Bladder: {
     value: 0, // in ml
-    size: 1000, // in ml
+    size: 300, // in ml, quite arbitrary
   },
   Bowel: {
     value: 0, // in ml
-    size: 1000, // in ml
+    size: 200, // in ml
   },
   Soiliness: {
     value: 0, // in ml
@@ -64,10 +64,10 @@ export const defaultStats: ModStats = {
     value: 0, // in ml
   },
   WaterIntake: {
-    value: 200, // ml per minute
+    value: 300 / 20, // accident every 20 minutes
   },
   FoodIntake: {
-    value: 100, // ml per minute
+    value: 200 / 60,
   },
   Incontinence: {
     value: 0,
