@@ -3,16 +3,16 @@ import { bcModSDK, waitForElement } from "./utils";
 export type ABCLActivity = {
   Name: string;
   Image: string;
-  OnClick?: Function;
+  OnClick?: (player: Character, group: AssetGroupItemName) => void;
   Target?: AssetGroupItemName[];
   TargetSelf?: AssetGroupItemName[];
-  Criteria?: (player: typeof Player) => boolean;
+  Criteria?: (player: Character) => boolean;
 };
 export const insertActivityButton = (
   name: string,
   id: string,
   src: string,
-  onClick?: Function
+  onClick?: (player: Character, group: AssetGroupItemName) => void
 ): HTMLButtonElement => {
   const button = document.createElement("button");
   button.id = id;
@@ -22,9 +22,11 @@ export const insertActivityButton = (
   button.innerHTML = `<img decoding="async" loading="lazy" src="${src}" class="button-image"><span class="button-label button-label-bottom">${name}</span>`;
 
   button.addEventListener("click", (e) => {
+    const player = CurrentCharacter ?? Player;
+    const focusGroup = player?.FocusGroup?.Name;
+    if (!onClick || !focusGroup) return;
+    onClick(player, focusGroup);
     DialogLeave();
-    if (!onClick) return;
-    onClick(CurrentCharacter);
   });
 
   return button;
@@ -45,11 +47,13 @@ export const activityIsInserted = (id: string): boolean => {
 };
 export const activityFitsCriteria = (
   activity: ABCLActivity,
-  player: typeof Player
+  player: Character
 ): boolean => {
-  if (!activity.Criteria) return true;
+  if (!player) {
+    return false;
+  }
   return Boolean(
-    activity.Criteria(player) &&
+    (!activity.Criteria || activity.Criteria(player)) &&
       player.FocusGroup &&
       activityInGroup(activity, player.FocusGroup.Name)
   );
@@ -78,7 +82,7 @@ export const initActivities = (): void => {
     const focusGroup = CurrentCharacter?.FocusGroup?.Name;
     if (!focusGroup) return;
     Object.entries(activities).forEach(([id, activity]) => {
-      if (activityFitsCriteria(activity, Player)) {
+      if (activityFitsCriteria(activity, CurrentCharacter ?? Player)) {
         if (!activityIsInserted(id)) {
           activityGrid.appendChild(
             insertActivityButton(

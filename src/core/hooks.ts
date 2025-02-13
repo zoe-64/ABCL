@@ -1,20 +1,22 @@
 import {
-  ChatMessageSyncDictionaryEntry,
+  SyncEntry,
   PluginServerChatRoomMessage,
+  MessageEntry,
+  ChangeDiaperRequestEntry,
 } from "../types/types";
 import { logger } from "./logger";
-import { updateDiaperColor } from "./player";
+import { pendingRequests } from "./pendingRequest";
+import { changeDiaper, updateDiaperColor } from "./player/diaper";
+import { getCharacter, getCharacterName } from "./player/playerUtils";
+import { ABCLYesNoPrompt } from "./player/ui";
 import {
   bcModSDK,
-  getCharacter,
   getMyMaxPermissionLevel,
+  sendChatLocal,
   waitFor,
 } from "./utils";
 
-const filterRestrictedSettings = (
-  settings: ModSettings,
-  target: PlayerCharacter | Character
-) => {
+const filterRestrictedSettings = (settings: ModSettings, target: Character) => {
   const myHighestPermission = getMyMaxPermissionLevel(target);
 
   return Object.entries(settings).reduce((acc, [key, value]) => {
@@ -25,54 +27,52 @@ const filterRestrictedSettings = (
   }, {} as ModSettings);
 };
 
+export const sendServerChatRoomMessage = (
+  message: MessageEntry
+): PluginServerChatRoomMessage => {
+  const ChatRoomMessage: PluginServerChatRoomMessage = {
+    Type: "Hidden",
+    Content: `${modIdentifier}Msg`,
+    Sender: Player.MemberNumber,
+    Dictionary: [
+      {
+        message: message,
+      },
+    ],
+  };
+
+  ServerSend("ChatRoomChat", ChatRoomMessage as ServerChatRoomMessage);
+  return ChatRoomMessage;
+};
 /**
  * Sends an update of the player's settings to the specified target or to everyone in the chat room.
  *
  * @param {number} [target] - The MemberNumber of the target player. If not specified, the update is sent to all players.
  */
 export const sendUpdateMyData = (target?: number) => {
-  const syncDataMessage: any = {
-    Type: "Hidden",
-    Content: `${modIdentifier}Msg`,
-    Sender: Player.MemberNumber,
-    Dictionary: [
-      {
-        message: {
-          type: "sync",
-          settings: Player[modIdentifier].Settings,
-          stats: Player[modIdentifier].Stats,
-          target,
-        },
-      },
-    ],
-  };
+  const syncDataMessage: PluginServerChatRoomMessage =
+    sendServerChatRoomMessage({
+      type: "sync",
+      settings: Player[modIdentifier].Settings,
+      stats: Player[modIdentifier].Stats,
+      target,
+    });
 
   logger.debug({
     message: `Sending updated data to ${target ?? "everyone"}`,
     data: syncDataMessage,
   });
-  ServerSend("ChatRoomChat", syncDataMessage);
 };
 
 /**
  * Sends a request packet to other players in the chat room to retrieve their data.
  */
 export const sendRequestOtherDataPacket = () => {
-  const syncDataMessage: any = {
-    Type: "Hidden",
-    Content: `${modIdentifier}Msg`,
-    Sender: Player.MemberNumber,
-    Dictionary: [
-      {
-        message: {
-          type: "init",
-        },
-      },
-    ],
-  };
+  sendServerChatRoomMessage({
+    type: "init",
+  });
 
   logger.debug(`Requesting data from others.`);
-  ServerSend("ChatRoomChat", syncDataMessage);
 };
 
 /**
@@ -82,10 +82,8 @@ export const sendRequestOtherDataPacket = () => {
  */
 const handleSyncPacket = (data: PluginServerChatRoomMessage) => {
   if (!data.Sender) return;
-  const dict = data.Dictionary?.[0] as
-    | ChatMessageSyncDictionaryEntry
-    | undefined;
-  if (!dict?.message) return;
+  const message = data.Dictionary?.[0]?.message as SyncEntry | undefined;
+  if (!message) return;
   logger.debug({
     message: `Received updated data`,
     data,
@@ -95,8 +93,8 @@ const handleSyncPacket = (data: PluginServerChatRoomMessage) => {
   if (!otherCharacter) return;
 
   otherCharacter[modIdentifier] = {
-    Settings: filterRestrictedSettings(dict.message.settings, otherCharacter),
-    Stats: dict.message.stats,
+    Settings: filterRestrictedSettings(message.settings, otherCharacter),
+    Stats: message.stats,
   };
 };
 
@@ -119,18 +117,89 @@ const handleInitPacket = (data: PluginServerChatRoomMessage) => {
  */
 const receivePacket = (data: PluginServerChatRoomMessage) => {
   if (data?.Content !== `${modIdentifier}Msg`) return;
-  if (!data.Sender) return;
+  if (!data.Sender || !data.Dictionary) return;
   if (data.Sender === Player.MemberNumber) return;
   if (data.Type !== "Hidden") return;
-  if (!data.Dictionary?.[0]?.message) return;
+  if (!data.Dictionary[0]?.message) return;
 
-  switch (data.Dictionary[0].message.type) {
-    case "init":
-      handleInitPacket(data);
-      break;
-    case "sync":
-      handleSyncPacket(data);
-      break;
+  const message = data.Dictionary[0].message;
+  if ("type" in message) {
+    const type = message.type;
+    switch (type) {
+      case "init":
+        handleInitPacket(data);
+        break;
+      case "sync":
+        handleSyncPacket(data);
+        break;
+      case "changeDiaper":
+        console.log(pendingRequests.get(message.id));
+        let request = pendingRequests.get(message.id);
+        if (
+          !request &&
+          (message.state === "accepted" || message.state === "rejected")
+        )
+          return;
+
+        switch (message.state) {
+          case "accepted":
+            request!.state = "accepted";
+            sendChatLocal(
+              `${getCharacterName(
+                data.Sender
+              )} accepted your change diaper request.`
+            );
+            break;
+          case "rejected":
+            request!.state = "rejected";
+            sendChatLocal(
+              `${getCharacterName(
+                data.Sender
+              )} rejected your change diaper request.`
+            );
+            break;
+          case "pending":
+            new ABCLYesNoPrompt(
+              `${getCharacterName(data.Sender)} wants to change your diaper.`,
+              () => {
+                sendChatLocal(
+                  `${getCharacterName(data.Sender)} changed your diaper.`
+                );
+                changeDiaper();
+                sendServerChatRoomMessage({
+                  type: "changeDiaper",
+                  state: "accepted",
+                  id: message.id,
+                } as ChangeDiaperRequestEntry);
+              },
+              () => {
+                sendServerChatRoomMessage({
+                  type: "changeDiaper",
+                  state: "rejected",
+                  id: message.id,
+                } as ChangeDiaperRequestEntry);
+              },
+              10 * 1000
+            );
+            break;
+          case "timedout":
+            sendChatLocal(
+              `${getCharacterName(
+                data.Sender
+              )}'s change diaper request timed out.`
+            );
+            break;
+          case "cancelled":
+            sendChatLocal(
+              `${getCharacterName(
+                data.Sender
+              )} cancelled their change diaper request.`
+            );
+            break;
+        }
+
+        break;
+    }
   }
 };
 

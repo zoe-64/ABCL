@@ -1,6 +1,7 @@
 // from LSCG - https://github.com/littlesera/LSCG/blob/8072c4d636a66bf12473823722afbc82fda8f98e/src/MiniGames/minigames.ts#L3C1-L3C87
 
-import { incontinenceProgressionIncreese, modData } from "./player";
+import { incontinenceOnAccident } from "./player/diaper";
+import { abclPlayer } from "./player/player";
 import { bcModSDK } from "./utils";
 
 // for minigame text loading
@@ -9,7 +10,7 @@ bcModSDK.hookFunction("TextLoad", 5, (args, next) => {
     return;
   else return next(args);
 });
-export const loadMinigames = () => {
+export const initMinigames = () => {
   registerMiniGame(new MessMinigame());
   registerMiniGame(new WetMinigame());
 };
@@ -195,17 +196,18 @@ export class MessMinigame extends AccidentMiniGame {
   End(victory: boolean) {
     super.End(victory);
     if (!victory) {
-      modData.stats.SoilinessValue += modData.stats.BowelValue;
+      abclPlayer.stats.SoilinessValue += abclPlayer.stats.BowelValue;
 
-      modData.stats.Incontinence += incontinenceProgressionIncreese(
-        modData.stats.BowelValue / 100
+      abclPlayer.stats.Incontinence += incontinenceOnAccident(
+        abclPlayer.stats.BowelValue / 100
       );
-      modData.stats.BowelValue = 0;
+      abclPlayer.stats.BowelValue = 0;
     } else {
-      modData.stats.Incontinence -= incontinenceProgressionIncreese(
-        modData.stats.BowelValue / 100
+      abclPlayer.stats.Incontinence -= incontinenceOnAccident(
+        abclPlayer.stats.BowelValue / 100
       );
     }
+    abclPlayer.onAccident();
   }
 }
 
@@ -218,17 +220,18 @@ export class WetMinigame extends AccidentMiniGame {
   End(victory: boolean) {
     super.End(victory);
     if (!victory) {
-      modData.stats.WetnessValue += modData.stats.BladderValue;
+      abclPlayer.stats.WetnessValue += abclPlayer.stats.BladderValue;
 
-      modData.stats.Incontinence += incontinenceProgressionIncreese(
-        modData.stats.BladderValue / 200
+      abclPlayer.stats.Incontinence += incontinenceOnAccident(
+        abclPlayer.stats.BladderValue / 200
       );
 
-      modData.stats.BladderValue = 0;
+      abclPlayer.stats.BladderValue = 0;
     } else {
-      modData.stats.Incontinence -= incontinenceProgressionIncreese(
-        modData.stats.BladderValue / 200
+      abclPlayer.stats.Incontinence -= incontinenceOnAccident(
+        abclPlayer.stats.BladderValue / 200
       );
     }
+    abclPlayer.onAccident();
   }
 }

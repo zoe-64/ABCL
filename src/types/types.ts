@@ -1,32 +1,43 @@
+import { PendingRequest } from "../core/pendingRequest";
+
 export type PartialDeep<T> = {
   [P in keyof T]?: PartialDeep<T[P]>;
 };
-export type ChatMessageSyncDictionaryEntry = {
-  message: {
-    type: "sync";
-    settings: ModSettings;
-    stats: ModStats;
-    target?: number;
-  };
-};
 
-export type ChatMessageInitDictionaryEntry = {
-  message: {
-    type: "init";
-  };
+export type SyncEntry = {
+  type: "sync";
+  settings: ModSettings;
+  stats: ModStats;
+  target?: number;
 };
+export type InitEntry = {
+  type: "init";
+};
+export type RequestEntry = {
+  type: "pendingRequest";
+  state: typeof PendingRequest.prototype.state;
+  identifier: typeof PendingRequest.prototype.type;
+  id: typeof PendingRequest.prototype.id;
+};
+export type ChangeDiaperRequestEntry = Omit<RequestEntry, "type"> & {
+  type: "changeDiaper";
+};
+export type MessageEntry =
+  | SyncEntry
+  | InitEntry
+  | RequestEntry
+  | ChangeDiaperRequestEntry;
 
 export interface PluginServerChatRoomMessage extends ServerChatRoomMessageBase {
   /** The character to target the message at. null means it's broadcast to the room. */
   Target?: number;
   Content: ServerChatRoomMessageContentType;
   Type: ServerChatRoomMessageType;
-  Dictionary?:
-    | ChatMessageSyncDictionaryEntry[]
-    | ChatMessageInitDictionaryEntry[];
+  Dictionary?: {
+    message: MessageEntry;
+  }[];
   Timeout?: number;
 }
-
 export type PreferenceActivity = {
   self: number;
   other: number;
@@ -64,4 +75,5 @@ export type AbclData = {
   DiaperColors: {
     [key: string]: string;
   };
+  BabyClothes: string[];
 };
