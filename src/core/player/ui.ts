@@ -1,65 +1,108 @@
-import { generateUniqueID } from "../utils";
+import { bcModSDK, generateUniqueID } from "../utils";
 import { abclPlayer } from "./player";
 
 export class ABCLStatsWindow {
   statsWindow: HTMLElement;
+  minimizeButton: HTMLButtonElement;
+  closeButton: HTMLButtonElement;
+  openButton: HTMLButtonElement;
+  folded: boolean = false;
   constructor() {
+    document.addEventListener("click", () => {
+      if (CurrentScreen !== "ChatRoom") {
+        this.close();
+        this.openButton.style.display = "none";
+      } else {
+        this.openButton.style.display = "block";
+      }
+    });
+    this.openButton = document.createElement("button");
+    this.openButton.classList.add(`${modIdentifier}OpenStatsButton`);
+    this.openButton.textContent = "ABCL Stats";
+    overlay.appendChild(this.openButton);
+
     this.statsWindow = document.createElement("div");
     new MovableElement(this.statsWindow);
+
     this.statsWindow.classList.add(`${modIdentifier}StatsWindow`);
-    this.statsWindow.innerHTML = `<p class="${modIdentifier}StatsWindowHeader">Stats</p>
+    this.statsWindow.innerHTML = `
+    <div class="${modIdentifier}WindowHeader">
+    <p class="${modIdentifier}WindowHeaderTitle">Stats</p>
+    <button class="${modIdentifier}WindowMinimize">△</button>
+    <button class="${modIdentifier}WindowClose">X</button>
+    </div>
 		<div class="${modIdentifier}StatsWindowContent">
-			<ol class="${modIdentifier}StatsWindowList">
-				<li class="${modIdentifier}StatsWindowListItem ${modIdentifier}SoilinessPercentage"> Soiled-ness 
-        <input type="range" min="0" max="100" value="${
-          abclPlayer.stats.SoilinessPercentage * 100
-        }" class="${modIdentifier}StatsWindowSlider ${modIdentifier}SoilinessPercentageSlider" readonly>
-        </li>
-
-				<li class="${modIdentifier}StatsWindowListItem ${modIdentifier}WetnessPercentage"> Wetness 
-        <input type="range" min="0" max="100" value="${
-          abclPlayer.stats.WetnessPercentage * 100
-        }" class="${modIdentifier}StatsWindowSlider ${modIdentifier}WetnessPercentageSlider" readonly>
-        </li>
-
-				<li class="${modIdentifier}StatsWindowListItem ${modIdentifier}BowelFullness">Bowel <input type="range" min="0" max="100" value="${
-      abclPlayer.stats.BowelFullness * 100
-    }" class="${modIdentifier}StatsWindowSlider ${modIdentifier}BowelFullnessSlider" readonly></li>
-				<li class="${modIdentifier}StatsWindowListItem ${modIdentifier}BladderFullness">Bladder <input type="range" min="0" max="100" value="${
-      abclPlayer.stats.BladderFullness * 100
-    }" class="${modIdentifier}StatsWindowSlider ${modIdentifier}BladderFullnessSlider" readonly></li>
-				<li class="${modIdentifier}StatsWindowListItem ${modIdentifier}Incontinence">Incontinence <input type="range" min="0" max="100" value="${
-      abclPlayer.stats.Incontinence * 100
-    }" class="${modIdentifier}StatsWindowSlider ${modIdentifier}IncontinenceSlider" readonly></li>
-				<li class="${modIdentifier}StatsWindowListItem ${modIdentifier}MentalRegressionSlider">Mental Regression <input type="range" min="0" max="100" value="${
-      abclPlayer.stats.MentalRegression * 100
-    }" class="${modIdentifier}StatsWindowSlider ${modIdentifier}MentalRegressionSlider" readonly></li>
-				</ol>
+			<ol class="${modIdentifier}StatsWindowList">  
+      ${this.getStatsListElement("SoilinessPercentage", "Soiled-ness")}
+      ${this.getStatsListElement("WetnessPercentage", "Wetness")} 
+      ${this.getStatsListElement("BowelFullness", "Bowel")}
+      ${this.getStatsListElement("BladderFullness", "Bladder")}
+      ${this.getStatsListElement("Incontinence", "Incontinence")}
+      ${this.getStatsListElement("MentalRegression", "Mental Regression")}
+      </ol>
 		</div>
 	`;
 
-    overlay.appendChild(this.statsWindow);
-  }
+    this.minimizeButton = this.statsWindow.querySelector(
+      `.${modIdentifier}WindowMinimize`
+    )!;
+    this.closeButton = this.statsWindow.querySelector(
+      `.${modIdentifier}WindowClose`
+    )!;
 
+    this.minimizeButton.addEventListener("click", () => this.fold());
+    overlay.appendChild(this.statsWindow);
+    this.openButton.addEventListener("click", () => {
+      if (this.statsWindow.classList.contains(`${modIdentifier}Hidden`)) {
+        this.open();
+      } else {
+        this.close();
+      }
+    });
+    this.closeButton.addEventListener("click", () => this.close());
+    this.update();
+  }
+  close() {
+    this.statsWindow.classList.add(`${modIdentifier}Hidden`);
+  }
+  open() {
+    this.statsWindow.classList.remove(`${modIdentifier}Hidden`);
+    this.statsWindow.style.top = "0px";
+    this.statsWindow.style.left = "0px";
+  }
+  fold() {
+    this.statsWindow.classList.toggle(`${modIdentifier}StatsWindowFolded`);
+    this.minimizeButton.textContent = this.folded ? "△" : "▽";
+    this.folded = !this.folded;
+  }
+  getStatsListElement(className: string, title: string): string {
+    return `
+				<li class="${modIdentifier}StatsWindowListItem ${modIdentifier}${className}"> ${title}
+        <p></p>
+        <input type="range" min="0" max="100" class="${modIdentifier}StatsWindowSlider ${modIdentifier}${className}Slider" readonly>
+        </li>
+      `;
+  }
   async update() {
-    this.statsWindow
-      .querySelector(`.${modIdentifier}SoilinessPercentage input`)
-      ?.setAttribute("value", `${abclPlayer.stats.SoilinessPercentage * 100}`);
-    this.statsWindow
-      .querySelector(`.${modIdentifier}WetnessPercentage input`)
-      ?.setAttribute("value", `${abclPlayer.stats.WetnessPercentage * 100}`);
-    this.statsWindow
-      .querySelector(`.${modIdentifier}BowelFullness input`)
-      ?.setAttribute("value", `${abclPlayer.stats.BowelFullness * 100}`);
-    this.statsWindow
-      .querySelector(`.${modIdentifier}BladderFullness input`)
-      ?.setAttribute("value", `${abclPlayer.stats.BladderFullness * 100}`);
-    this.statsWindow
-      .querySelector(`.${modIdentifier}Incontinence input`)
-      ?.setAttribute("value", `${abclPlayer.stats.Incontinence * 100}`);
-    this.statsWindow
-      .querySelector(`.${modIdentifier}MentalRegression input`)
-      ?.setAttribute("value", `${abclPlayer.stats.MentalRegression * 100}`);
+    const updateInput = (className: string, value: number) => {
+      this.statsWindow
+        .querySelector<HTMLInputElement>(`.${modIdentifier}${className} input`)
+        ?.setAttribute("value", `${value * 100}`);
+      const paragraphElement =
+        this.statsWindow.querySelector<HTMLParagraphElement>(
+          `.${modIdentifier}${className} p`
+        );
+      if (paragraphElement) {
+        paragraphElement.textContent = `${Math.floor(value * 1000) / 10}%`;
+      }
+    };
+
+    updateInput("SoilinessPercentage", abclPlayer.stats.SoilinessPercentage);
+    updateInput("WetnessPercentage", abclPlayer.stats.WetnessPercentage);
+    updateInput("BowelFullness", abclPlayer.stats.BowelFullness);
+    updateInput("BladderFullness", abclPlayer.stats.BladderFullness);
+    updateInput("Incontinence", abclPlayer.stats.Incontinence);
+    updateInput("MentalRegression", abclPlayer.stats.MentalRegression);
   }
 }
 class MovableElement {
@@ -337,11 +380,25 @@ export class ABCLTextParticle {
 export const overlay = document.createElement("div");
 export let abclStatsWindow: ABCLStatsWindow;
 overlay.classList.add(`${modIdentifier}Overlay`);
+
 export const initOverlay = () => {
   setTimeout(() => {
-    document.body.appendChild(overlay);
-  }, 5000);
+    abclStatsWindow = new ABCLStatsWindow();
 
-  abclStatsWindow = new ABCLStatsWindow();
-  setInterval(() => abclStatsWindow.update(), 1000);
+    bcModSDK.hookFunction(
+      "ChatRoomCharacterViewDrawOverlay",
+      1,
+      (args, next) => {
+        next(args);
+        const [C, CharX, CharY, Zoom] = args;
+        if (C.MemberNumber === Player.MemberNumber) {
+          const [X, Y] = [CharX + 150 * Zoom, CharY + 400 * Zoom];
+
+          abclStatsWindow.openButton.style.top = `${Y}px`;
+          abclStatsWindow.openButton.style.left = `${X}px`;
+        }
+      }
+    );
+    document.body.appendChild(overlay);
+  }, 1500);
 };

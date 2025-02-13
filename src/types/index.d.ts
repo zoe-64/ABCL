@@ -7,7 +7,13 @@ declare const modName: string;
 declare const modRepo: string;
 declare const modIdentifier: string;
 declare const publicURL: string;
-type MetabolismSettingValues = "Normal" | "Fast" | "Slow";
+
+type MetabolismSettingValues =
+  | "Normal"
+  | "Slow"
+  | "Fast"
+  | "Faster"
+  | "Fastest";
 interface ModSettings {
   Metabolism: {
     value: MetabolismSettingValues;

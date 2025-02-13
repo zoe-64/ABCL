@@ -3,11 +3,17 @@ import { PendingRequest } from "../pendingRequest";
 import { abclPlayer } from "./player";
 
 // Is/Has
-export const isLeaking = () => {
+export const isLeaking = (type: "pee" | "poop" | "any" = "any") => {
   const diaperSize = getPlayerDiaperSize();
+  if (type === "pee") {
+    return abclPlayer.stats.WetnessValue >= diaperSize;
+  }
+  if (type === "poop") {
+    return abclPlayer.stats.SoilinessValue >= diaperSize;
+  }
   return (
-    abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue >=
-    diaperSize
+    abclPlayer.stats.SoilinessValue >= diaperSize ||
+    abclPlayer.stats.WetnessValue >= diaperSize
   );
 };
 export const isDiaperDirty = () => {
@@ -97,7 +103,6 @@ export const setDiaperColor = (
     item.Color = color;
   }
 };
-
 export const updateDiaperColor = () => {
   const messLevel = abclPlayer.stats.SoilinessValue / getPlayerDiaperSize();
   const wetLevel = abclPlayer.stats.WetnessValue / getPlayerDiaperSize();
@@ -142,7 +147,7 @@ export function getDiaperSize(diaper: Item): number {
     diaper.Asset.Description === "Poofy Chastity Diaper" &&
     diaper.Property?.TypeRecord?.typed === 1
   ) {
-    return ABCLdata.DiaperSizeScale.large;
+    return ABCLdata.DiaperSizeScale.heavy_adult;
   }
   return ABCLdata.DiaperSizeScale[
     ABCLdata.Diapers[diaper.Asset.Description as keyof typeof ABCLdata.Diapers]
