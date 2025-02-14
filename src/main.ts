@@ -79,5 +79,8 @@ const init = () => {
 initWait();
 
 const loop = () => {
+  if (CurrentScreen !== "ChatRoom") {
+    return;
+  }
   abclPlayer.update();
 };

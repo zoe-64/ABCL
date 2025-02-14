@@ -46,10 +46,6 @@ export const abclPlayer = {
         abclPlayer.stats.BladderFullness >=
           getAccidentThreshold(abclPlayer.stats.Incontinence, 1))
     ) {
-      if (CurrentScreen != "ChatRoom") {
-        (<any>window).WetMinigameEnd(false);
-        return;
-      }
       MiniGameStart(
         "WetMinigame",
         20 *
@@ -72,10 +68,6 @@ export const abclPlayer = {
         abclPlayer.stats.BowelFullness >=
           getAccidentThreshold(abclPlayer.stats.Incontinence, 1))
     ) {
-      if (CurrentScreen != "ChatRoom") {
-        (<any>window).MessMinigameEnd(false);
-        return;
-      }
       MiniGameStart(
         "MessMinigame",
         20 *
