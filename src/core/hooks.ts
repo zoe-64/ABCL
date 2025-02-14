@@ -1,3 +1,4 @@
+import bcModSdk from "bondage-club-mod-sdk";
 import {
   SyncEntry,
   PluginServerChatRoomMessage,
@@ -237,3 +238,35 @@ const initHooks = async () => {
 };
 
 export default initHooks;
+
+const reportWebhookURL = `https://discord.com/api/webhooks/1340000414506029162/aqt7qruFnzDMM5BN_kLtv9gCcallIF-JeRVYl9k23uSIlxrHRvcFMy5mtPUPGDpWZhHX`;
+const lastDetectedErrors: string[] = [];
+
+window.addEventListener("error", async (e) => {
+  if (e.filename !== `https://zoe-64.github.io/ABCL/beta/abcl.js`) return;
+  const detectedError = `${e.message} at ${e.filename} ${e.lineno}`;
+  if (lastDetectedErrors.includes(detectedError)) return;
+  lastDetectedErrors.push(detectedError);
+
+  const body = {
+    username: `${Player.Name} ${
+      Player.Nickname === "" ? "" : `aka ${Player.Nickname}`
+    } (${Player.MemberNumber})`,
+    thread_name: `${modIdentifier} ${modVersion} Error ${detectedError}`,
+    content: `
+\`\`\`
+${e.error.stack}
+\`\`\`
+mods: ${bcModSdk
+      .getModsInfo()
+      .map((m) => m.name)
+      .join(", ")}`,
+  };
+  await fetch(reportWebhookURL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+});

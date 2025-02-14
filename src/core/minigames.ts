@@ -2,7 +2,7 @@
 
 import { incontinenceOnAccident } from "./player/diaper";
 import { abclPlayer } from "./player/player";
-import { bcModSDK } from "./utils";
+import { bcModSDK, sendChatLocal } from "./utils";
 
 // for minigame text loading
 bcModSDK.hookFunction("TextLoad", 5, (args, next) => {
@@ -200,10 +200,12 @@ export class MessMinigame extends AccidentMiniGame {
         abclPlayer.stats.BowelValue / 100
       );
       abclPlayer.stats.BowelValue = 0;
+      sendChatLocal("You've had a stinky accident!");
     } else {
       abclPlayer.stats.Incontinence -= incontinenceOnAccident(
         abclPlayer.stats.BowelValue / 100
       );
+      sendChatLocal("You managed to keep it together!");
     }
     abclPlayer.onAccident();
   }
@@ -225,10 +227,12 @@ export class WetMinigame extends AccidentMiniGame {
       );
 
       abclPlayer.stats.BladderValue = 0;
+      sendChatLocal("You've had a wet accident!");
     } else {
       abclPlayer.stats.Incontinence -= incontinenceOnAccident(
         abclPlayer.stats.BladderValue / 200
       );
+      sendChatLocal("You managed to hold it in!");
     }
     abclPlayer.onAccident();
   }

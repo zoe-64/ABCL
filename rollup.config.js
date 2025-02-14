@@ -8,7 +8,7 @@ const terser = require("@rollup/plugin-terser");
 const json = require("@rollup/plugin-json");
 const path = require("path");
 const pkg = require("./package.json");
-const deployFileName = "main.js";
+const deployFileName = "abcl.js";
 
 const buildSettings = {
   input: pkg.buildSettings.input,

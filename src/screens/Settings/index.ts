@@ -82,11 +82,11 @@ export const initSettingsScreen = async () => {
       DrawButton(1815, 75, 90, 90, "", "White", "Icons/Exit.png");
     },
     click: () => {
-      if (MouseIn(150, 300, 65, 65)) {
+      if (MouseIn(150, 130, 65, 65)) {
         abclPlayer.settings.DisableWetting =
           !abclPlayer.settings.DisableWetting;
       }
-      if (MouseIn(150, 400, 65, 65)) {
+      if (MouseIn(150, 250, 65, 65)) {
         abclPlayer.settings.DisableSoiling =
           !abclPlayer.settings.DisableSoiling;
       }

@@ -2,4 +2,4 @@
 /public
 .env
 /.vscode
-dist/main.js
+dist/abcl.js
