@@ -77,7 +77,7 @@ export const css = `
   right: 10px;
   z-index: 1000;
   aspect-ratio: 1/1;
-  width: min-content;
+  width: 50px;
   white-space: collapse;
   text-align: center;
   border-radius: 5px;

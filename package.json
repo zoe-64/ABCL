@@ -14,7 +14,7 @@
     "input": "main.ts"
   },
   "scripts": {
-    "build": "rollup -c rollup.config.js --configDeploy https://github.com/zoe-64/ABCL/raw/testing-v2/beta",
+    "build": "rollup -c rollup.config.js --configDeploy https://zoe-64.github.io/ABCL/beta",
     "build:local": "rollup -c rollup.config.js --configDebug --configDeploy http://localhost:3042",
     "dev": "npm run build:local && http-server ./public -p 3042 --cors",
     "watch": "nodemon --exec \"npm run dev\" -e js,ts --ignore public/"

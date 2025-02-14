@@ -79,6 +79,7 @@ export const initSettingsScreen = async () => {
         () => getMetabolismValue(abclPlayer.settings.Metabolism, false),
         () => getMetabolismValue(abclPlayer.settings.Metabolism, true)
       );
+      DrawButton(1815, 75, 90, 90, "", "White", "Icons/Exit.png");
     },
     click: () => {
       if (MouseIn(150, 300, 65, 65)) {
@@ -102,6 +103,7 @@ export const initSettingsScreen = async () => {
           true
         );
       }
+      if (MouseIn(1815, 75, 90, 90)) PreferenceSubscreenExtensionsExit();
     },
     exit: () => {
       return true;
