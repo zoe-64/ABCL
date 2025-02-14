@@ -7,7 +7,7 @@ import {
 } from "../types/types";
 import { logger } from "./logger";
 import { pendingRequests } from "./pendingRequest";
-import { changeDiaper, updateDiaperColor } from "./player/diaper";
+import { changeDiaper, isDiaper, updateDiaperColor } from "./player/diaper";
 import { getCharacter, getCharacterName } from "./player/playerUtils";
 import { ABCLYesNoPrompt } from "./player/ui";
 import {
@@ -232,7 +232,9 @@ const initHooks = async () => {
   bcModSDK.hookFunction("CharacterAppearanceSetItem", 1, (args, next) => {
     let [_character, _slot, _asset] = args;
     const _result = next(args);
-    updateDiaperColor();
+    if (_slot === "ItemPelvis" && _asset) {
+      if (isDiaper({ Asset: _asset })) updateDiaperColor();
+    }
     return _result;
   });
 };

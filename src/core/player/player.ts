@@ -1,5 +1,4 @@
 import { merge } from "lodash-es";
-import { mutateData } from "../settings";
 import { Debouncer, Saver, sendChatLocal } from "../utils";
 import {
   getAccidentThreshold,
@@ -9,7 +8,6 @@ import {
   updateDiaperColor,
 } from "./diaper";
 import { abclStatsWindow } from "./ui";
-import { PermissionLevels } from "../../types/types";
 
 const metabolismValues: Map<MetabolismSettingValues, number> = new Map([
   ["Slow", 0.5], // 40 min
