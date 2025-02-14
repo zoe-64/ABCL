@@ -54,6 +54,37 @@ for (const slider of sliders) {
 }
 
 export const css = `
+@media (max-width: 2000px) {
+ .ABCLStatsWindow {
+    transform: scale(1);
+  }
+}
+@media (max-width: 1200px) {
+ .ABCLStatsWindow {
+    transform: scale(0.8);
+  }
+}
+
+
+@media (max-width: 1000px) {
+ .ABCLStatsWindow {
+    transform: scale(0.7);
+  }
+}
+@media (max-width: 900px) {
+ .ABCLStatsWindow {
+    transform: scale(0.6);
+  }
+}
+
+
+
+@media (max-width: 800px) {
+  .ABCLStatsWindow {
+    transform: scale(0.5);
+  }
+}
+
 
 .ABCLOverlay {
 	aspect-ratio: 2/1;
@@ -77,7 +108,7 @@ export const css = `
   right: 10px;
   z-index: 1000;
   aspect-ratio: 1/1;
-  width: 50px;
+  width: 4%;
   white-space: collapse;
   text-align: center;
   border-radius: 5px;
@@ -85,6 +116,8 @@ export const css = `
   border: #e3e3e3 1px solid;
   backdrop-filter: blur(4px);
   pointer-events: all;
+  font-size: clamp(9px, 1.3vw, 43px);
+  cursor: pointer;
 }
 .ABCLOpenStatsButton:hover {
   background: #ffffffd1;

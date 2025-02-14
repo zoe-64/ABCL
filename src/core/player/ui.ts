@@ -392,8 +392,10 @@ export const initOverlay = () => {
         next(args);
         const [C, CharX, CharY, Zoom] = args;
         if (C.MemberNumber === Player.MemberNumber) {
-          const [X, Y] = [CharX + 150 * Zoom, CharY + 400 * Zoom];
-
+          const [X, Y] = [
+            ((CharX + 300 * Zoom) / 2000) * overlay.clientWidth,
+            ((CharY + 550 * Zoom) / 1000) * overlay.clientHeight,
+          ];
           abclStatsWindow.openButton.style.top = `${Y}px`;
           abclStatsWindow.openButton.style.left = `${X}px`;
         }
