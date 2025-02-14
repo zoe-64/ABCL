@@ -15,7 +15,7 @@
 
 (function () {
   "use strict";
-  const src = `https://zoe-64.github.io/ABCL/beta/main.js?v=${Date.now()}`;
+  const src = `https://zoe-64.github.io/ABCL/beta/abcl.js?v=${Date.now()}`;
   if (typeof ABCL_Loaded === "undefined") {
     const script = document.createElement("script");
     script.src = src;
