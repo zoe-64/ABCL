@@ -1,3 +1,4 @@
+import { merge } from "lodash-es";
 import { mutateData } from "../settings";
 import { Debouncer, Saver, sendChatLocal } from "../utils";
 import {
@@ -8,6 +9,7 @@ import {
   updateDiaperColor,
 } from "./diaper";
 import { abclStatsWindow } from "./ui";
+import { PermissionLevels } from "../../types/types";
 
 const metabolismValues: Map<MetabolismSettingValues, number> = new Map([
   ["Slow", 0.5], // 40 min
@@ -25,9 +27,9 @@ export const abclPlayer = {
     // once per minute
     abclPlayer.stats.MentalRegression += mentalRegressionOvertime();
     abclPlayer.stats.BladderValue +=
-      abclPlayer.stats.WaterIntake * abclPlayer.settings.Metabolism;
+      abclPlayer.stats.WaterIntake * abclPlayer.settings.MetabolismValue;
     abclPlayer.stats.BowelValue +=
-      abclPlayer.stats.FoodIntake * abclPlayer.settings.Metabolism;
+      abclPlayer.stats.FoodIntake * abclPlayer.settings.MetabolismValue;
 
     abclPlayer.attemptWetting();
     abclPlayer.attemptSoiling();
@@ -36,12 +38,13 @@ export const abclPlayer = {
   attemptWetting: () => {
     if (
       !abclPlayer.settings.DisableWetting &&
-      incontinenceCheck.check() &&
-      (getAccidentThreshold(
-        abclPlayer.stats.Incontinence,
-        abclPlayer.stats.BladderFullness
-      ) > Math.random() ||
-        abclPlayer.stats.BladderFullness >= 1)
+      ((incontinenceCheck.check() &&
+        getAccidentThreshold(
+          abclPlayer.stats.Incontinence,
+          abclPlayer.stats.BladderFullness
+        ) > Math.random()) ||
+        abclPlayer.stats.BladderFullness >=
+          getAccidentThreshold(abclPlayer.stats.Incontinence, 1))
     ) {
       if (CurrentScreen != "ChatRoom") {
         (<any>window).WetMinigameEnd(false);
@@ -61,12 +64,13 @@ export const abclPlayer = {
   attemptSoiling: () => {
     if (
       !abclPlayer.settings.DisableSoiling &&
-      incontinenceCheck.check() &&
-      (getAccidentThreshold(
-        abclPlayer.stats.Incontinence,
-        abclPlayer.stats.BowelFullness
-      ) > Math.random() ||
-        abclPlayer.stats.BowelFullness >= 1)
+      ((incontinenceCheck.check() &&
+        getAccidentThreshold(
+          abclPlayer.stats.Incontinence,
+          abclPlayer.stats.BowelFullness
+        ) > Math.random()) ||
+        abclPlayer.stats.BowelFullness >=
+          getAccidentThreshold(abclPlayer.stats.Incontinence, 1))
     ) {
       if (CurrentScreen != "ChatRoom") {
         (<any>window).MessMinigameEnd(false);
@@ -161,6 +165,7 @@ export const abclPlayer = {
     // bladder
 
     set BladderValue(value: number) {
+      if (abclPlayer.settings.DisableWetting) return;
       if (value < 0) value = 0;
       Player[modIdentifier].Stats.Bladder.value = value;
       abclStatsWindow.update();
@@ -197,6 +202,7 @@ export const abclPlayer = {
 
     // bowel
     set BowelValue(value: number) {
+      if (abclPlayer.settings.DisableSoiling) return;
       if (value < 0) value = 0;
       Player[modIdentifier].Stats.Bowel.value = value;
       abclStatsWindow.update();
@@ -249,25 +255,29 @@ export const abclPlayer = {
   },
   settings: {
     set Metabolism(value: MetabolismSettingValues) {
-      mutateData({ Settings: { Metabolism: { value: value } } });
+      Player[modIdentifier].Settings.Metabolism.value = value;
+      playerSaver.save();
     },
     set DisableWetting(value: boolean) {
-      mutateData({ Settings: { DisableWetting: { value: value } } });
+      Player[modIdentifier].Settings.DisableWetting.value = value;
+      playerSaver.save();
     },
     set DisableSoiling(value: boolean) {
-      mutateData({ Settings: { DisableSoiling: { value: value } } });
+      Player[modIdentifier].Settings.DisableSoiling.value = value;
+      playerSaver.save();
     },
     addCaregiver(id: number) {
-      mutateData({
+      Player[modIdentifier] = merge(Player[modIdentifier], {
         Settings: {
           CaregiverIDs: {
             value: [...Player[modIdentifier].Settings.CaregiverIDs.value, id],
           },
         },
       });
+      playerSaver.save();
     },
     removeCaregiver(id: number) {
-      mutateData({
+      Player[modIdentifier] = merge(Player[modIdentifier], {
         Settings: {
           CaregiverIDs: {
             value: Player[modIdentifier].Settings.CaregiverIDs.value.filter(
@@ -276,12 +286,16 @@ export const abclPlayer = {
           },
         },
       });
+      playerSaver.save();
     },
     set OpenRemoteSettings(value: boolean) {
-      mutateData({ Settings: { OpenRemoteSettings: { value: value } } });
+      Player[modIdentifier].Settings.OpenRemoteSettings.value = value;
+      playerSaver.save();
     },
-
-    get Metabolism(): number {
+    get Metabolism(): MetabolismSettingValues {
+      return Player[modIdentifier].Settings.Metabolism.value;
+    },
+    get MetabolismValue(): number {
       const metabolism = metabolismValues.get(
         Player[modIdentifier].Settings.Metabolism.value
       );
@@ -307,6 +321,6 @@ export const abclPlayer = {
 
 const playerSaver = new Saver(2 * 60 * 1000);
 
-const incontinenceCheck = new Debouncer(0);
+const incontinenceCheck = new Debouncer(2 * 60 * 1000);
 
 (window as any).abclPlayer = abclPlayer;
