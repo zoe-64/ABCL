@@ -35,6 +35,12 @@ const initWait = () => {
     init();
   }
 };
+const loop = () => {
+  if (CurrentScreen !== "ChatRoom") {
+    return;
+  }
+  abclPlayer.update();
+};
 
 const init = () => {
   const currentAccount = Player.MemberNumber;
@@ -77,10 +83,3 @@ const init = () => {
 };
 
 initWait();
-
-const loop = () => {
-  if (CurrentScreen !== "ChatRoom") {
-    return;
-  }
-  abclPlayer.update();
-};

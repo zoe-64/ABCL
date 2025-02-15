@@ -96,7 +96,6 @@ export class ABCLStatsWindow {
         paragraphElement.textContent = `${Math.floor(value * 1000) / 10}%`;
       }
     };
-
     updateInput("SoilinessPercentage", abclPlayer.stats.SoilinessPercentage);
     updateInput("WetnessPercentage", abclPlayer.stats.WetnessPercentage);
     updateInput("BowelFullness", abclPlayer.stats.BowelFullness);
