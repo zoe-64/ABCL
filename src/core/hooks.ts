@@ -245,17 +245,21 @@ const reportWebhookURL = `https://discord.com/api/webhooks/1340000414506029162/a
 const lastDetectedErrors: string[] = [];
 
 window.addEventListener("error", async (e) => {
-  if (e.filename !== `https://zoe-64.github.io/ABCL/beta/abcl.js`) return;
+  console.error(e.filename);
+  if (!e.filename.toLowerCase().includes("abcl")) return;
   const detectedError = `${e.message} at ${e.filename} ${e.lineno}`;
   if (lastDetectedErrors.includes(detectedError)) return;
   lastDetectedErrors.push(detectedError);
-
   const body = {
     username: `${Player.Name} ${
       Player.Nickname === "" ? "" : `aka ${Player.Nickname}`
     } (${Player.MemberNumber})`,
-    thread_name: `${modIdentifier} ${modVersion} Error ${detectedError}`,
+    thread_name: `${modIdentifier} ${modVersion} Error ${e.message}`.slice(
+      0,
+      100
+    ),
     content: `
+    error: ${detectedError}
 \`\`\`
 ${e.error.stack}
 \`\`\`
