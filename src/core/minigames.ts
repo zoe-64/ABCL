@@ -237,7 +237,6 @@ export class WetMinigame extends AccidentMiniGame {
     if (hasDiaper()) {
       abclPlayer.stats.WetnessValue += abclPlayer.stats.BladderValue;
       sendChatLocal("You've had a wet accident!");
-      return;
     } else {
       //TODO add wetting clothes
       sendChatLocal(
