@@ -47,7 +47,7 @@ export const initSettingsScreen = async () => {
         abclPlayer.settings.DisableWetting,
         false,
         "black",
-        360,
+        230,
         35
       );
       drawCheckbox(
@@ -59,7 +59,7 @@ export const initSettingsScreen = async () => {
         abclPlayer.settings.DisableSoiling,
         false,
         "black",
-        340,
+        230,
         35
       );
       DrawText(

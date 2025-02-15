@@ -7,7 +7,7 @@ export function drawCheckbox(
   isChecked: boolean,
   isDisabled: boolean = false,
   textColor = "Black",
-  textLeft: number = 200,
+  textLeft: number = 10,
   textTop: number = 45
 ): void {
   DrawText(text, left + textLeft, top + textTop, textColor, "Gray");
