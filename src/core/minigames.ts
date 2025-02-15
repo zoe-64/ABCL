@@ -1,6 +1,6 @@
 // from LSCG - https://github.com/littlesera/LSCG/blob/8072c4d636a66bf12473823722afbc82fda8f98e/src/MiniGames/minigames.ts#L3C1-L3C87
 
-import { incontinenceOnAccident } from "./player/diaper";
+import { hasDiaper, incontinenceOnAccident } from "./player/diaper";
 import { abclPlayer } from "./player/player";
 import { bcModSDK, sendChatLocal } from "./utils";
 
@@ -193,20 +193,27 @@ export class MessMinigame extends AccidentMiniGame {
   name = "MessMinigame";
   End(victory: boolean) {
     super.End(victory);
-    if (!victory) {
-      abclPlayer.stats.SoilinessValue += abclPlayer.stats.BowelValue;
-
-      abclPlayer.stats.Incontinence += incontinenceOnAccident(
-        abclPlayer.stats.BowelValue / 100
-      );
-      abclPlayer.stats.BowelValue = 0;
-      sendChatLocal("You've had a stinky accident!");
-    } else {
+    if (victory) {
       abclPlayer.stats.Incontinence -= incontinenceOnAccident(
         abclPlayer.stats.BowelValue / 100
       );
       sendChatLocal("You managed to keep it together!");
+      return;
     }
+
+    if (hasDiaper()) {
+      abclPlayer.stats.SoilinessValue += abclPlayer.stats.BowelValue;
+      sendChatLocal("You've had a messy accident!");
+    } else {
+      //TODO add soiling clothes
+      sendChatLocal(
+        "You've had an messy accident in your clothes! [not yet implemented]"
+      );
+    }
+    abclPlayer.stats.Incontinence += incontinenceOnAccident(
+      abclPlayer.stats.BowelValue / 100
+    );
+    abclPlayer.stats.BowelValue = 0;
     abclPlayer.onAccident();
   }
 }
@@ -219,21 +226,29 @@ export class WetMinigame extends AccidentMiniGame {
   name = "WetMinigame";
   End(victory: boolean) {
     super.End(victory);
-    if (!victory) {
-      abclPlayer.stats.WetnessValue += abclPlayer.stats.BladderValue;
-
-      abclPlayer.stats.Incontinence += incontinenceOnAccident(
-        abclPlayer.stats.BladderValue / 200
-      );
-
-      abclPlayer.stats.BladderValue = 0;
-      sendChatLocal("You've had a wet accident!");
-    } else {
+    if (victory) {
       abclPlayer.stats.Incontinence -= incontinenceOnAccident(
         abclPlayer.stats.BladderValue / 200
       );
       sendChatLocal("You managed to hold it in!");
+      return;
     }
+
+    if (hasDiaper()) {
+      abclPlayer.stats.WetnessValue += abclPlayer.stats.BladderValue;
+      sendChatLocal("You've had a wet accident!");
+      return;
+    } else {
+      //TODO add wetting clothes
+      sendChatLocal(
+        "You've had a wet accident in your clothes! [not yet implemented]"
+      );
+    }
+
+    abclPlayer.stats.Incontinence += incontinenceOnAccident(
+      abclPlayer.stats.BladderValue / 200
+    );
+    abclPlayer.stats.BladderValue = 0;
     abclPlayer.onAccident();
   }
 }

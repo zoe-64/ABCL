@@ -3,6 +3,7 @@ import { Debouncer, Saver, sendChatLocal } from "../utils";
 import {
   getAccidentThreshold,
   getPlayerDiaperSize,
+  hasDiaper,
   mentalRegressionOnAccident,
   mentalRegressionOvertime,
   updateDiaperColor,
@@ -34,48 +35,35 @@ export const abclPlayer = {
     playerSaver.save();
   },
   attemptWetting: () => {
+    if (abclPlayer.settings.DisableWetting) return;
+    const threshold = getAccidentThreshold(abclPlayer.stats.Incontinence, 1);
+    const likelyhood = getAccidentThreshold(
+      abclPlayer.stats.Incontinence,
+      abclPlayer.stats.BladderFullness
+    );
     if (
-      !abclPlayer.settings.DisableWetting &&
-      ((incontinenceCheck.check() &&
-        getAccidentThreshold(
-          abclPlayer.stats.Incontinence,
-          abclPlayer.stats.BladderFullness
-        ) > Math.random()) ||
-        abclPlayer.stats.BladderFullness >=
-          getAccidentThreshold(abclPlayer.stats.Incontinence, 1))
-    ) {
-      MiniGameStart(
-        "WetMinigame",
-        20 *
-          getAccidentThreshold(
-            abclPlayer.stats.Incontinence,
-            abclPlayer.stats.BladderFullness
-          ),
-        "noOp"
-      );
-    }
+      !(
+        likelyhood > Math.random() ||
+        abclPlayer.stats.BladderFullness >= threshold
+      )
+    )
+      return;
+    MiniGameStart("WetMinigame", 20 * likelyhood, "noOp");
   },
   attemptSoiling: () => {
+    if (abclPlayer.settings.DisableSoiling) return;
+    const threshold = getAccidentThreshold(abclPlayer.stats.Incontinence, 1);
+    const likelyhood = getAccidentThreshold(
+      abclPlayer.stats.Incontinence,
+      abclPlayer.stats.BowelFullness
+    );
     if (
-      !abclPlayer.settings.DisableSoiling &&
-      ((incontinenceCheck.check() &&
-        getAccidentThreshold(
-          abclPlayer.stats.Incontinence,
-          abclPlayer.stats.BowelFullness
-        ) > Math.random()) ||
-        abclPlayer.stats.BowelFullness >=
-          getAccidentThreshold(abclPlayer.stats.Incontinence, 1))
-    ) {
-      MiniGameStart(
-        "MessMinigame",
-        20 *
-          getAccidentThreshold(
-            abclPlayer.stats.Incontinence,
-            abclPlayer.stats.BowelFullness
-          ),
-        "noOp"
-      );
-    }
+      !(incontinenceCheck.check() && likelyhood > Math.random()) ||
+      abclPlayer.stats.BowelFullness >= threshold
+    )
+      return;
+
+    MiniGameStart("MessMinigame", 20 * likelyhood, "noOp");
   },
   releaseBladder: () => {
     const isTooEarly = abclPlayer.stats.BladderFullness < 0.3;
@@ -229,6 +217,7 @@ export const abclPlayer = {
     },
 
     get SoilinessPercentage(): number {
+      if (getPlayerDiaperSize() == 0) return 0;
       return this.SoilinessValue / getPlayerDiaperSize();
     },
     set SoilinessPercentage(value: number) {
@@ -236,6 +225,7 @@ export const abclPlayer = {
       this.SoilinessValue = value * getPlayerDiaperSize();
     },
     get WetnessPercentage(): number {
+      if (getPlayerDiaperSize() == 0) return 0;
       return this.WetnessValue / getPlayerDiaperSize();
     },
     set WetnessPercentage(value: number) {
