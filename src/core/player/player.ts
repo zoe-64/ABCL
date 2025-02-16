@@ -1,12 +1,13 @@
 import { merge } from "lodash-es";
 import { Debouncer, Saver, sendChatLocal } from "../utils";
 import {
-  getAccidentThreshold,
+  incontinenceChanceFormula,
   getPlayerDiaperSize,
   hasDiaper,
   mentalRegressionOnAccident,
   mentalRegressionOvertime,
   updateDiaperColor,
+  incontinenceLimitFormula,
 } from "./diaper";
 import { abclStatsWindow } from "./ui";
 
@@ -36,34 +37,35 @@ export const abclPlayer = {
   },
   attemptWetting: () => {
     if (abclPlayer.settings.DisableWetting) return;
-    const threshold = getAccidentThreshold(abclPlayer.stats.Incontinence, 1);
-    const likelyhood = getAccidentThreshold(
+
+    const limit = incontinenceLimitFormula(abclPlayer.stats.Incontinence);
+    const chance = incontinenceChanceFormula(
       abclPlayer.stats.Incontinence,
       abclPlayer.stats.BladderFullness
     );
-    if (
-      !(
-        likelyhood > Math.random() ||
-        abclPlayer.stats.BladderFullness >= threshold
-      )
-    )
+
+    if (!(Math.random() < chance || abclPlayer.stats.BladderFullness > limit))
       return;
-    MiniGameStart("WetMinigame", 20 * likelyhood, "noOp");
+
+    if (!incontinenceCheck.check()) return;
+
+    MiniGameStart("WetMinigame", 30 * chance, "noOp");
   },
   attemptSoiling: () => {
     if (abclPlayer.settings.DisableSoiling) return;
-    const threshold = getAccidentThreshold(abclPlayer.stats.Incontinence, 1);
-    const likelyhood = getAccidentThreshold(
+
+    const limit = incontinenceLimitFormula(abclPlayer.stats.Incontinence);
+    const chance = incontinenceChanceFormula(
       abclPlayer.stats.Incontinence,
       abclPlayer.stats.BowelFullness
     );
-    if (
-      !(incontinenceCheck.check() && likelyhood > Math.random()) ||
-      abclPlayer.stats.BowelFullness >= threshold
-    )
+
+    if (!(Math.random() < chance || abclPlayer.stats.BowelFullness > limit))
       return;
 
-    MiniGameStart("MessMinigame", 20 * likelyhood, "noOp");
+    if (!incontinenceCheck.check()) return;
+
+    MiniGameStart("MessMinigame", 30 * chance, "noOp");
   },
   releaseBladder: () => {
     const isTooEarly = abclPlayer.stats.BladderFullness < 0.3;
@@ -79,7 +81,7 @@ export const abclPlayer = {
       sendChatLocal("You feel a sense of release as you let go.");
     }
     if (isGood) {
-      abclPlayer.stats.Incontinence -= 0.02;
+      abclPlayer.stats.Incontinence -= 0.01;
     } else {
       abclPlayer.stats.Incontinence += 0.02;
     }
@@ -98,7 +100,7 @@ export const abclPlayer = {
       sendChatLocal("You feel a little relief as you let go.");
     }
     if (isGood) {
-      abclPlayer.stats.Incontinence -= 0.02;
+      abclPlayer.stats.Incontinence -= 0.01;
     } else {
       abclPlayer.stats.Incontinence += 0.02;
     }

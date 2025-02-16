@@ -8,7 +8,7 @@ export function getCharacter(memberNumber: number): Character | null {
   }
 
   if (character?.IsPlayer()) {
-    return character as PlayerCharacter;
+    return character as Character;
   }
 
   return character as Character;

@@ -33,58 +33,23 @@ const sliders = [
 let cssSliders = "";
 for (const slider of sliders) {
   cssSliders += `
-	.${modIdentifier}${slider.className}Slider::-webkit-slider-runnable-track {
-		background-color: ${slider.primary} !important;
+  .${modIdentifier}${slider.className} {
+    margin-bottom: 10px;
+    margin-top: 3px;
+  }
+	.${modIdentifier}${slider.className}::part(base) {
+		background-color: ${slider.primary};
 	}
-	.${modIdentifier}${slider.className}Slider::-ms-track {
-		background-color: ${slider.primary} !important;
-	}
-	.${modIdentifier}${slider.className}Slider::-moz-range-track {
-		background-color: ${slider.primary} !important;
-	}
-	.${modIdentifier}${slider.className}Slider::-webkit-slider-progress {
-		background-color: ${slider.secondary} !important;
-	}
-	.${modIdentifier}${slider.className}Slider::-moz-range-progress {
-		background-color: ${slider.secondary} !important;
-	}
-	.${modIdentifier}${slider.className}Slider::-ms-fill-lower {
-		background-color: ${slider.secondary} !important;
-	}`;
+  .${modIdentifier}${slider.className}::part(indicator) {
+    background-color: ${slider.secondary};
+  }`;
 }
 
 export const css = `
-@media (max-width: 2000px) {
- .ABCLStatsWindow {
-    transform: scale(1);
-  }
+
+#ABCLCurrentPlayerSelect {
+  margin-bottom: 5px;
 }
-@media (max-width: 1200px) {
- .ABCLStatsWindow {
-    transform: scale(0.8);
-  }
-}
-
-
-@media (max-width: 1000px) {
- .ABCLStatsWindow {
-    transform: scale(0.7);
-  }
-}
-@media (max-width: 900px) {
- .ABCLStatsWindow {
-    transform: scale(0.6);
-  }
-}
-
-
-
-@media (max-width: 800px) {
-  .ABCLStatsWindow {
-    transform: scale(0.5);
-  }
-}
-
 
 .ABCLOverlay {
 	aspect-ratio: 2/1;
@@ -99,7 +64,9 @@ export const css = `
   
 }
 .ABCLWindowHeaderTitle {
-  margin: 0;
+  margin: 5px;
+  font-size: 32px;
+  font-weight: bold;
 }
 
 .ABCLOpenStatsButton {
@@ -198,13 +165,7 @@ export const css = `
   background: #ff4b4b;
   color: white;
 }
-.ABCLClose {
-  aspect-ratio: 1/1;
-  margin: -6px;
-  background: white;
-  border: black 1px solid;
-  height: 30px;
-}
+
 .ABCLClose:hover {
   background: #ff4b4b;
   color: white;
@@ -224,119 +185,6 @@ export const css = `
   box-shadow: 0 4px 5px 1px #00000014;
 }
 
-.ABCLStatsWindowHeader {
-  font-size: 1.2em;
-  font-weight: bold;
-  margin: -5px;
-  padding: 5px 0 6px 8px;
-  border-bottom: black 1px solid;
-  cursor: pointer;
-}
-.ABCLStatsWindowHeader:hover {
-  background: #fbfbfb;
-}
-.ABCLStatsWindowList {
-  list-style: none; 
-  padding: 0;
-  margin: 0;
-  margin-top: 10px;
-}
-
-.ABCLStatsWindowListItem {
-  display: grid;
-  grid-template-columns: 1fr min-content;
-  margin-top: 10px;
-}
-.ABCLStatsWindowListItem p {
-  margin: 0px;
-  display: inline;
-  text-align: right;
-}
-.ABCLStatsWindowListItem input {
- -webkit-appearance: none;
- appearance: none;
- grid-column: 1/-1;
- margin-top: 3px;
-}
-
-.ABCLStatsWindowListItem input::-ms-thumb {
-  -ms-appearance: none !important;
-   opacity: 0 !important;
-}
-.ABCLStatsWindowListItem input::-moz-range-thumb {
-  -moz-appearance: none !important;
-	opacity: 0 !important;
-}
-.ABCLStatsWindowListItem input::-webkit-slider-thumb {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  opacity: 0 !important;
-}
-.ABCLStatsWindowListItem input::-moz-range-track {
-  -moz-appearance: none !important;
-  appearance: none !important;
-  height: 18px;
-  border-radius: 5px;
-  border: #999 1px solid;
-  cursor: auto !important;
-}
-.ABCLStatsWindowListItem input::-ms-track {
-  -ms-appearance: none !important;
-  appearance: none !important;
-  height: 18px;
-  border-radius: 5px;
-  border: #999 1px solid;
-  cursor: auto !important;
-}
-.ABCLStatsWindowListItem input::-webkit-slider-runnable-track {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  height: 18px;
-  border-radius: 5px;
-  border: #999 1px solid;
-  cursor: auto !important;
-}
-.ABCLStatsWindowListItem input::-ms-fill-lower {
-  -ms-appearance: none !important;
-  appearance: none !important;
-  height: 18px;
-  border-radius: 4px;
-  cursor: auto !important;
-}
-.ABCLStatsWindowListItem input::-moz-range-progress {
-  -moz-appearance: none !important;
-  appearance: none !important;
-  height: 18px;
-  border-radius: 4px;
-  cursor: auto !important;
-
-}
-.ABCLStatsWindowListItem input::-webkit-slider-progress {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  height: 18px;
-  border-radius: 4px;
-  cursor: auto !important;
-}
-
-.ABCLTextParticle {
-  position: fixed;
-  pointer-events: none;
-  transform: translateX(-50%) translateY(-50%);
-  z-index: 1000;
-  font-size: 1.5em;
-  font-weight: bold;
-  mix-blend-mode: difference;
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10 and IE 11 */
-  user-select: none; /* Standard syntax */
-  transition: all 0.5s;
-}
-
-
-.ABCLStatsWindowFolded .ABCLStatsWindowList{
-  display: none;
-}
 
 ${cssSliders}
 

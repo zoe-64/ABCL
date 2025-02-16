@@ -194,9 +194,7 @@ export class MessMinigame extends AccidentMiniGame {
   End(victory: boolean) {
     super.End(victory);
     if (victory) {
-      abclPlayer.stats.Incontinence -= incontinenceOnAccident(
-        abclPlayer.stats.BowelValue / 100
-      );
+      abclPlayer.stats.Incontinence -= incontinenceOnAccident() / 2;
       sendChatLocal("You managed to keep it together!");
       return;
     }
@@ -210,9 +208,7 @@ export class MessMinigame extends AccidentMiniGame {
         "You've had an messy accident in your clothes! [not yet implemented]"
       );
     }
-    abclPlayer.stats.Incontinence += incontinenceOnAccident(
-      abclPlayer.stats.BowelValue / 100
-    );
+    abclPlayer.stats.Incontinence += incontinenceOnAccident();
     abclPlayer.stats.BowelValue = 0;
     abclPlayer.onAccident();
   }
@@ -227,9 +223,7 @@ export class WetMinigame extends AccidentMiniGame {
   End(victory: boolean) {
     super.End(victory);
     if (victory) {
-      abclPlayer.stats.Incontinence -= incontinenceOnAccident(
-        abclPlayer.stats.BladderValue / 200
-      );
+      abclPlayer.stats.Incontinence -= incontinenceOnAccident() / 2;
       sendChatLocal("You managed to hold it in!");
       return;
     }
@@ -244,9 +238,7 @@ export class WetMinigame extends AccidentMiniGame {
       );
     }
 
-    abclPlayer.stats.Incontinence += incontinenceOnAccident(
-      abclPlayer.stats.BladderValue / 200
-    );
+    abclPlayer.stats.Incontinence += incontinenceOnAccident();
     abclPlayer.stats.BladderValue = 0;
     abclPlayer.onAccident();
   }

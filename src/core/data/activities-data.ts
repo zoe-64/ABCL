@@ -47,7 +47,6 @@ export const initActivitiesData = (): void => {
       }
     },
     TargetSelf: ["ItemButt"],
-    //regression stages: low (i.e, <30%) -> medium (i.e, between 30% and 60%) -> high (i.e, >60%)
 
     Criteria: (player) => {
       return true;
@@ -77,6 +76,11 @@ export const initActivitiesData = (): void => {
     },
     TargetSelf: ["ItemButt"],
     Criteria: (player) => {
+      if (abclPlayer.stats.MentalRegression > 0.3) {
+        sendChatLocal(
+          "You try to use the toilet but you can't seem to get anything out."
+        );
+      }
       return abclPlayer.stats.MentalRegression < 0.3;
     },
   };

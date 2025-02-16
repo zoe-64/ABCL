@@ -77,7 +77,7 @@ export const setDiaperColor = (
   slot: AssetGroupName,
   primaryColor: string,
   secondaryColor: string,
-  player: PlayerCharacter = Player
+  player: Character = Player
 ) => {
   const item = InventoryGet(player, slot);
   if (item && isDiaper(item)) {
@@ -130,7 +130,7 @@ export const updateDiaperColor = () => {
 };
 
 // Size
-export function getPlayerDiaperSize(player: PlayerCharacter = Player): number {
+export function getPlayerDiaperSize(player: Character = Player): number {
   const pelvisItem = InventoryGet(player, "ItemPelvis");
   const panties = InventoryGet(player, "Panties");
   let size = 0;
@@ -175,24 +175,19 @@ export const getPlayerDiaper = (): {
 };
 
 // incontinence
-export function getAccidentThreshold(
+export const incontinenceLimitFormula = (incontinence: number) => {
+  return 0.9 - incontinence * 0.5;
+};
+
+export function incontinenceChanceFormula(
   incontinence: number,
-  fullness: number,
-  stressLevel: number = 0,
-  timeSinceLastAccident: number = 1
+  fullness: number
 ): number {
   const incontinenceWeight = 0.6;
   const fullnessWeight = 0.8;
-  const stressWeight = 0.3;
-  const timeWeight = 0.2;
-
-  const baseThreshold =
+  const threshold =
     incontinenceWeight * Math.pow(incontinence, 2) +
-    fullnessWeight * Math.pow(fullness, 3) +
-    stressWeight * stressLevel;
-
-  const timeFactor = 1 / (1 + timeSinceLastAccident * timeWeight);
-  const threshold = baseThreshold * timeFactor;
+    fullnessWeight * Math.pow(fullness, 3);
 
   return Math.min(Math.max(threshold, 0), 1);
 }
@@ -224,19 +219,19 @@ export const mentalRegressionOvertime = () => {
   return modifier / (150 * 60); // 150 hours till 100%
 };
 
-export function incontinenceOnAccident(minutes: number) {
+export function incontinenceOnAccident() {
   const stages = [
-    { time: 60 * 20, start: 0, end: 0.25 },
-    { time: 60 * 40, start: 0.25, end: 0.5 },
-    { time: 60 * 80, start: 0.5, end: 0.75 },
-    { time: 60 * 160, start: 0.75, end: 1 },
+    { totalAccidents: 60, start: 0, end: 0.25 },
+    { totalAccidents: 120, start: 0.25, end: 0.5 },
+    { totalAccidents: 240, start: 0.5, end: 0.75 },
+    { totalAccidents: 480, start: 0.75, end: 1 },
   ];
-  for (const { time, start, end } of stages) {
+  for (const { totalAccidents, start, end } of stages) {
     if (
       abclPlayer.stats.Incontinence >= start &&
       abclPlayer.stats.Incontinence < end
     ) {
-      return minutes / time;
+      return 0.25 / totalAccidents;
     }
   }
   return 0;
@@ -268,12 +263,10 @@ export const mentalRegressionOnAccident = () => {
 
 export const changeDiaper = (player: Character = Player) => {
   const isSomeoneElse = player.MemberNumber !== Player.MemberNumber;
-  console.log("isSomeoneElse", isSomeoneElse, player.MemberNumber);
   if (isSomeoneElse && player.MemberNumber) {
     new PendingRequest(player.MemberNumber, "changeDiaper", 999999);
     return;
   }
-
   abclPlayer.stats.SoilinessValue = 0;
   abclPlayer.stats.WetnessValue = 0;
   updateDiaperColor();

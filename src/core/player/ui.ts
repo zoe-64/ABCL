@@ -1,107 +1,138 @@
-import { bcModSDK, generateUniqueID } from "../utils";
-import { abclPlayer } from "./player";
+import { bcModSDK, generateUniqueID, waitFor, waitForElement } from "../utils";
+import { getPlayerDiaperSize } from "./diaper";
+import { getCharacter, getCharacterName } from "./playerUtils";
 
 export class ABCLStatsWindow {
-  statsWindow: HTMLElement;
-  minimizeButton: HTMLButtonElement;
-  closeButton: HTMLButtonElement;
+  statsDrawer: HTMLElement;
   openButton: HTMLButtonElement;
   folded: boolean = false;
   constructor() {
-    document.addEventListener("click", () => {
-      if (CurrentScreen !== "ChatRoom") {
-        this.close();
-        this.openButton.style.display = "none";
-      } else {
-        this.openButton.style.display = "block";
-      }
-    });
     this.openButton = document.createElement("button");
     this.openButton.classList.add(`${modIdentifier}OpenStatsButton`);
     this.openButton.textContent = "ABCL Stats";
     overlay.appendChild(this.openButton);
 
-    this.statsWindow = document.createElement("div");
-    new MovableElement(this.statsWindow);
-
-    this.statsWindow.classList.add(`${modIdentifier}StatsWindow`);
-    this.statsWindow.innerHTML = `
-    <div class="${modIdentifier}WindowHeader">
+    this.statsDrawer = document.createElement("sl-drawer");
+    this.statsDrawer.innerHTML = `
     <p class="${modIdentifier}WindowHeaderTitle">Stats</p>
-    <button class="${modIdentifier}WindowMinimize">△</button>
-    <button class="${modIdentifier}WindowClose">X</button>
-    </div>
+    <sl-select id="${modIdentifier}CurrentPlayerSelect" value="${Player.MemberNumber}">
+    </sl-select>
+
+  
 		<div class="${modIdentifier}StatsWindowContent">
-			<ol class="${modIdentifier}StatsWindowList">  
-      ${this.getStatsListElement("SoilinessPercentage", "Soiled-ness")}
-      ${this.getStatsListElement("WetnessPercentage", "Wetness")} 
-      ${this.getStatsListElement("BowelFullness", "Bowel")}
-      ${this.getStatsListElement("BladderFullness", "Bladder")}
-      ${this.getStatsListElement("Incontinence", "Incontinence")}
-      ${this.getStatsListElement("MentalRegression", "Mental Regression")}
-      </ol>
+      <label id="SoilinessPercentage">Soiliness</label>
+      <sl-progress-bar label="Soiliness" class="${modIdentifier}SoilinessPercentage"></sl-progress-bar>
+      <label id="WetnessPercentage">Wetness</label>
+      <sl-progress-bar label="Wetness" class="${modIdentifier}WetnessPercentage"></sl-progress-bar>
+      <label id="BowelFullness">Bowel</label>
+      <sl-progress-bar label="Bowel Fullness" class="${modIdentifier}BowelFullness"></sl-progress-bar>
+      <label id="BladderFullness">Bladder</label>
+      <sl-progress-bar label="Bladder Fullness" class="${modIdentifier}BladderFullness"></sl-progress-bar>
+      <label id="Incontinence">Incontinence</label>
+      <sl-progress-bar label="Incontinence" class="${modIdentifier}Incontinence"></sl-progress-bar>
+      <label id="MentalRegression">Mental Regression</label>
+      <sl-progress-bar label="Mental Regression" class="${modIdentifier}MentalRegression"></sl-progress-bar>
 		</div>
+   <sl-button class="${modIdentifier}RefreshButton">Refresh</sl-button>
 	`;
 
-    this.minimizeButton = this.statsWindow.querySelector(
-      `.${modIdentifier}WindowMinimize`
-    )!;
-    this.closeButton = this.statsWindow.querySelector(
-      `.${modIdentifier}WindowClose`
-    )!;
-
-    this.minimizeButton.addEventListener("click", () => this.fold());
-    overlay.appendChild(this.statsWindow);
+    overlay.appendChild(this.statsDrawer);
+    this.statsDrawer
+      .querySelector(`#${modIdentifier}CurrentPlayerSelect`)
+      ?.addEventListener("sl-change", () => this.update());
+    this.statsDrawer
+      .querySelector(`.${modIdentifier}RefreshButton`)
+      ?.addEventListener("click", () => this.update());
     this.openButton.addEventListener("click", () => {
-      if (this.statsWindow.classList.contains(`${modIdentifier}Hidden`)) {
-        this.open();
+      if (this.statsDrawer.getAttribute("open") === "true") {
+        this.statsDrawer.removeAttribute("open");
       } else {
-        this.close();
+        this.statsDrawer.setAttribute("open", "true");
+        this.update();
       }
     });
-    this.closeButton.addEventListener("click", () => this.close());
     this.update();
   }
-  close() {
-    this.statsWindow.classList.add(`${modIdentifier}Hidden`);
-  }
-  open() {
-    this.statsWindow.classList.remove(`${modIdentifier}Hidden`);
-    this.statsWindow.style.top = "0px";
-    this.statsWindow.style.left = "0px";
-  }
-  fold() {
-    this.statsWindow.classList.toggle(`${modIdentifier}StatsWindowFolded`);
-    this.minimizeButton.textContent = this.folded ? "△" : "▽";
-    this.folded = !this.folded;
-  }
-  getStatsListElement(className: string, title: string): string {
-    return `
-				<li class="${modIdentifier}StatsWindowListItem ${modIdentifier}${className}"> ${title}
-        <p></p>
-        <input type="range" min="0" max="100" class="${modIdentifier}StatsWindowSlider ${modIdentifier}${className}Slider" readonly>
-        </li>
-      `;
-  }
+
   async update() {
+    const currentPlayerSelect: HTMLSelectElement | null =
+      this.statsDrawer.querySelector(`#${modIdentifier}CurrentPlayerSelect`);
+    if (!currentPlayerSelect) return;
+
+    let selectedCharacter:
+      | Character
+      | (Character & { ABCL: ModStorageModel })
+      | null = getCharacter(Number(currentPlayerSelect.value));
+
+    // fill select ChatRoomCharacter
+    currentPlayerSelect.innerHTML = "";
+    for (let character of ChatRoomCharacter) {
+      if (!character.ABCL) continue;
+      currentPlayerSelect.innerHTML += `<sl-option value="${
+        character.MemberNumber
+      }">${getCharacterName(character.MemberNumber)}</sl-option>`;
+    }
+    if (!selectedCharacter || !selectedCharacter.ABCL) {
+      selectedCharacter = Player;
+    }
+
     const updateInput = (className: string, value: number) => {
-      this.statsWindow
-        .querySelector<HTMLInputElement>(`.${modIdentifier}${className} input`)
-        ?.setAttribute("value", `${value * 100}`);
-      const paragraphElement =
-        this.statsWindow.querySelector<HTMLParagraphElement>(
-          `.${modIdentifier}${className} p`
-        );
-      if (paragraphElement) {
-        paragraphElement.textContent = `${Math.floor(value * 1000) / 10}%`;
+      value = Math.round(value);
+      const input: HTMLInputElement | null = this.statsDrawer.querySelector(
+        `.${modIdentifier}${className}`
+      );
+      const label: HTMLLabelElement | null = this.statsDrawer.querySelector(
+        `#${className}`
+      );
+      if (!input || !label) return;
+      const valueRounded = Math.round((value + Number.EPSILON) * 10) / 10;
+      if (value >= 100) {
+        input.value = "100";
+        input.innerText = `overflowing ${Math.round(
+          (value - 100) / (value / 100)
+        )}%`;
+        label.innerText = `${label.innerText.split(":")[0]}: overflowing ${
+          valueRounded - 100
+        }%`;
+      } else {
+        input.value = valueRounded.toString();
+        input.innerText = valueRounded.toString() + "%";
+        label.innerText =
+          label.innerText.split(":")[0] + ": " + valueRounded.toString() + "%";
       }
     };
-    updateInput("SoilinessPercentage", abclPlayer.stats.SoilinessPercentage);
-    updateInput("WetnessPercentage", abclPlayer.stats.WetnessPercentage);
-    updateInput("BowelFullness", abclPlayer.stats.BowelFullness);
-    updateInput("BladderFullness", abclPlayer.stats.BladderFullness);
-    updateInput("Incontinence", abclPlayer.stats.Incontinence);
-    updateInput("MentalRegression", abclPlayer.stats.MentalRegression);
+    updateInput(
+      "SoilinessPercentage",
+      (selectedCharacter.ABCL.Stats.Soiliness.value /
+        getPlayerDiaperSize(selectedCharacter)) *
+        100
+    );
+    updateInput(
+      "WetnessPercentage",
+      (selectedCharacter.ABCL.Stats.Wetness.value /
+        getPlayerDiaperSize(selectedCharacter)) *
+        100
+    );
+    updateInput(
+      "BowelFullness",
+      (selectedCharacter.ABCL.Stats.Bowel.value /
+        selectedCharacter.ABCL.Stats.Bowel.size) *
+        100
+    );
+    updateInput(
+      "BladderFullness",
+      (selectedCharacter.ABCL.Stats.Bladder.value /
+        selectedCharacter.ABCL.Stats.Bladder.size) *
+        100
+    );
+    updateInput(
+      "Incontinence",
+      selectedCharacter.ABCL.Stats.Incontinence.value * 100
+    );
+    updateInput(
+      "MentalRegression",
+      selectedCharacter.ABCL.Stats.MentalRegression.value * 100
+    );
   }
 }
 class MovableElement {
@@ -381,7 +412,7 @@ export let abclStatsWindow: ABCLStatsWindow;
 overlay.classList.add(`${modIdentifier}Overlay`);
 
 export const initOverlay = () => {
-  setTimeout(() => {
+  waitForElement("#chat-room-div", { childCheck: true }).then(() => {
     abclStatsWindow = new ABCLStatsWindow();
 
     bcModSDK.hookFunction(
@@ -401,5 +432,5 @@ export const initOverlay = () => {
       }
     );
     document.body.appendChild(overlay);
-  }, 1500);
+  });
 };
