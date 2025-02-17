@@ -1,4 +1,4 @@
-import { bcModSDK, generateUniqueID, waitFor, waitForElement } from "../utils";
+import { bcModSDK, generateUniqueID, waitForElement } from "../utils";
 import { getPlayerDiaperSize } from "./diaper";
 import { getCharacter, getCharacterName } from "./playerUtils";
 
@@ -101,38 +101,40 @@ export class ABCLStatsWindow {
           label.innerText.split(":")[0] + ": " + valueRounded.toString() + "%";
       }
     };
-    updateInput(
-      "SoilinessPercentage",
-      (selectedCharacter.ABCL.Stats.Soiliness.value /
-        getPlayerDiaperSize(selectedCharacter)) *
-        100
-    );
-    updateInput(
-      "WetnessPercentage",
-      (selectedCharacter.ABCL.Stats.Wetness.value /
-        getPlayerDiaperSize(selectedCharacter)) *
-        100
-    );
-    updateInput(
-      "BowelFullness",
-      (selectedCharacter.ABCL.Stats.Bowel.value /
-        selectedCharacter.ABCL.Stats.Bowel.size) *
-        100
-    );
-    updateInput(
-      "BladderFullness",
-      (selectedCharacter.ABCL.Stats.Bladder.value /
-        selectedCharacter.ABCL.Stats.Bladder.size) *
-        100
-    );
-    updateInput(
-      "Incontinence",
-      selectedCharacter.ABCL.Stats.Incontinence.value * 100
-    );
-    updateInput(
-      "MentalRegression",
-      selectedCharacter.ABCL.Stats.MentalRegression.value * 100
-    );
+    if (selectedCharacter.ABCL) {
+      updateInput(
+        "SoilinessPercentage",
+        (selectedCharacter.ABCL.Stats.Soiliness.value /
+          getPlayerDiaperSize(selectedCharacter)) *
+          100
+      );
+      updateInput(
+        "WetnessPercentage",
+        (selectedCharacter.ABCL.Stats.Wetness.value /
+          getPlayerDiaperSize(selectedCharacter)) *
+          100
+      );
+      updateInput(
+        "BowelFullness",
+        (selectedCharacter.ABCL.Stats.Bowel.value /
+          selectedCharacter.ABCL.Stats.Bowel.size) *
+          100
+      );
+      updateInput(
+        "BladderFullness",
+        (selectedCharacter.ABCL.Stats.Bladder.value /
+          selectedCharacter.ABCL.Stats.Bladder.size) *
+          100
+      );
+      updateInput(
+        "Incontinence",
+        selectedCharacter.ABCL.Stats.Incontinence.value * 100
+      );
+      updateInput(
+        "MentalRegression",
+        selectedCharacter.ABCL.Stats.MentalRegression.value * 100
+      );
+    }
   }
 }
 class MovableElement {
