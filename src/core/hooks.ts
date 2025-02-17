@@ -1,3 +1,4 @@
+import bcModSdk from "bondage-club-mod-sdk";
 import {
   SyncEntry,
   PluginServerChatRoomMessage,
@@ -6,7 +7,7 @@ import {
 } from "../types/types";
 import { logger } from "./logger";
 import { pendingRequests } from "./pendingRequest";
-import { changeDiaper, updateDiaperColor } from "./player/diaper";
+import { changeDiaper, isDiaper, updateDiaperColor } from "./player/diaper";
 import { getCharacter, getCharacterName } from "./player/playerUtils";
 import { ABCLYesNoPrompt } from "./player/ui";
 import {
@@ -231,9 +232,47 @@ const initHooks = async () => {
   bcModSDK.hookFunction("CharacterAppearanceSetItem", 1, (args, next) => {
     let [_character, _slot, _asset] = args;
     const _result = next(args);
-    updateDiaperColor();
+    if (_slot === "ItemPelvis" && _asset) {
+      if (isDiaper({ Asset: _asset })) updateDiaperColor();
+    }
     return _result;
   });
 };
 
 export default initHooks;
+
+const reportWebhookURL = `https://discord.com/api/webhooks/1340000414506029162/aqt7qruFnzDMM5BN_kLtv9gCcallIF-JeRVYl9k23uSIlxrHRvcFMy5mtPUPGDpWZhHX`;
+const lastDetectedErrors: string[] = [];
+
+window.addEventListener("error", async (e) => {
+  console.error(e.filename);
+  if (!e.filename.toLowerCase().includes("abcl")) return;
+  const detectedError = `${e.message} at ${e.filename} ${e.lineno}`;
+  if (lastDetectedErrors.includes(detectedError)) return;
+  lastDetectedErrors.push(detectedError);
+  const body = {
+    username: `${Player.Name} ${
+      Player.Nickname === "" ? "" : `aka ${Player.Nickname}`
+    } (${Player.MemberNumber})`,
+    thread_name: `${modIdentifier} ${modVersion} Error ${e.message}`.slice(
+      0,
+      100
+    ),
+    content: `
+    error: ${detectedError}
+\`\`\`
+${e.error.stack}
+\`\`\`
+mods: ${bcModSdk
+      .getModsInfo()
+      .map((m) => m.name)
+      .join(", ")}`,
+  };
+  await fetch(reportWebhookURL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+});

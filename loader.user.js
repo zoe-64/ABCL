@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name __NAME__
 // @namespace https://www.bondageprojects.com/
-// @version 1.6
+// @version 2.0.0-beta
 // @description __DESCRIPTION__
 // @author __AUTHOR__
 // @match https://*.bondageprojects.elementfx.com/R*/*

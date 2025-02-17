@@ -3,7 +3,7 @@ import { PartialDeep, PermissionLevels } from "../types/types";
 import { sendUpdateMyData as sendUpdateMyData } from "./hooks";
 import { logger } from "./logger";
 
-const defaultSettings: ModSettings = {
+export const defaultSettings: ModSettings = {
   Metabolism: {
     value: "Normal",
     permission: {

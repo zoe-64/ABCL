@@ -1,8 +1,8 @@
 // from LSCG - https://github.com/littlesera/LSCG/blob/8072c4d636a66bf12473823722afbc82fda8f98e/src/MiniGames/minigames.ts#L3C1-L3C87
 
-import { incontinenceOnAccident } from "./player/diaper";
+import { hasDiaper, incontinenceOnAccident } from "./player/diaper";
 import { abclPlayer } from "./player/player";
-import { bcModSDK } from "./utils";
+import { bcModSDK, sendChatLocal } from "./utils";
 
 // for minigame text loading
 bcModSDK.hookFunction("TextLoad", 5, (args, next) => {
@@ -28,9 +28,7 @@ export function registerMiniGame<T extends BaseMiniGame>(miniGame: T) {
 }
 
 export abstract class BaseMiniGame {
-  get name(): string {
-    return this.constructor.name;
-  }
+  name: string = "";
 
   abstract Run(): void;
   abstract Click(): void;
@@ -192,21 +190,26 @@ export class MessMinigame extends AccidentMiniGame {
   hintText: string = "Click to maintain control. Keep it together!";
   failText: string = "Oops! You've had an accident!";
   successText: string = "Crisis averted! You stayed composed!";
-
+  name = "MessMinigame";
   End(victory: boolean) {
     super.End(victory);
-    if (!victory) {
-      abclPlayer.stats.SoilinessValue += abclPlayer.stats.BowelValue;
+    if (victory) {
+      abclPlayer.stats.Incontinence -= incontinenceOnAccident() / 2;
+      sendChatLocal("You managed to keep it together!");
+      return;
+    }
 
-      abclPlayer.stats.Incontinence += incontinenceOnAccident(
-        abclPlayer.stats.BowelValue / 100
-      );
-      abclPlayer.stats.BowelValue = 0;
+    if (hasDiaper()) {
+      abclPlayer.stats.SoilinessValue += abclPlayer.stats.BowelValue;
+      sendChatLocal("You've had a messy accident!");
     } else {
-      abclPlayer.stats.Incontinence -= incontinenceOnAccident(
-        abclPlayer.stats.BowelValue / 100
+      //TODO add soiling clothes
+      sendChatLocal(
+        "You've had an messy accident in your clothes! [not yet implemented]"
       );
     }
+    abclPlayer.stats.Incontinence += incontinenceOnAccident();
+    abclPlayer.stats.BowelValue = 0;
     abclPlayer.onAccident();
   }
 }
@@ -216,22 +219,27 @@ export class WetMinigame extends AccidentMiniGame {
   hintText: string = "Click to squeeze tight. Don't let it get away!";
   failText: string = "Oh no! You lost control!";
   successText: string = "You held it in! Phew!";
-
+  name = "WetMinigame";
   End(victory: boolean) {
     super.End(victory);
-    if (!victory) {
+    if (victory) {
+      abclPlayer.stats.Incontinence -= incontinenceOnAccident() / 2;
+      sendChatLocal("You managed to hold it in!");
+      return;
+    }
+
+    if (hasDiaper()) {
       abclPlayer.stats.WetnessValue += abclPlayer.stats.BladderValue;
-
-      abclPlayer.stats.Incontinence += incontinenceOnAccident(
-        abclPlayer.stats.BladderValue / 200
-      );
-
-      abclPlayer.stats.BladderValue = 0;
+      sendChatLocal("You've had a wet accident!");
     } else {
-      abclPlayer.stats.Incontinence -= incontinenceOnAccident(
-        abclPlayer.stats.BladderValue / 200
+      //TODO add wetting clothes
+      sendChatLocal(
+        "You've had a wet accident in your clothes! [not yet implemented]"
       );
     }
+
+    abclPlayer.stats.Incontinence += incontinenceOnAccident();
+    abclPlayer.stats.BladderValue = 0;
     abclPlayer.onAccident();
   }
 }

@@ -14,17 +14,23 @@
     "input": "main.ts"
   },
   "scripts": {
-    "build": "rollup -c rollup.config.js --configDeploy https://github.com/zoe-64/ABCL/raw/main/ABCL.user.js",
+    "build": "rollup -c rollup.config.js --configDeploy https://zoe-64.github.io/ABCL/beta",
     "build:local": "rollup -c rollup.config.js --configDebug --configDeploy http://localhost:3042",
     "dev": "npm run build:local && http-server ./public -p 3042 --cors",
     "watch": "nodemon --exec \"npm run dev\" -e js,ts --ignore public/"
   },
   "license": "MIT",
   "dependencies": {
+    "@shoelace-style/shoelace": "^2.20.0",
     "@types/lodash-es": "^4.17.12",
+    "@types/react-dom": "^19.0.3",
     "abcl": "file:",
     "bc-stubs": "^111.0.0",
-    "bondage-club-mod-sdk": "^1.2.0"
+    "bondage-club-mod-sdk": "^1.2.0",
+    "lit": "^3.2.1",
+    "react-dom": "^19.0.0",
+    "shoelace": "^0.1.1",
+    "tsx-dom": "^3.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
@@ -36,6 +42,7 @@
     "@types/core-js": "^2.5.8",
     "@types/css": "^0.0.37",
     "@types/node": "^20.16.1",
+    "@types/react": "^19.0.8",
     "http-server": "^14.1.1",
     "lodash-es": "^4.17.21",
     "nodemon": "^3.1.4",
