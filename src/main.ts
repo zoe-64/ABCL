@@ -69,18 +69,8 @@ const init = () => {
   shoelaceCSS.rel = "stylesheet";
   shoelaceCSS.href =
     "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/themes/light.css";
-  shoelaceCSS.media = "(prefers-color-scheme:light)";
   document.head.appendChild(shoelaceCSS);
 
-  const shoelaceDarkCSS = document.createElement("link");
-  shoelaceDarkCSS.rel = "stylesheet";
-  shoelaceDarkCSS.href =
-    "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/themes/dark.css";
-  shoelaceDarkCSS.media = "(prefers-color-scheme:dark)";
-  shoelaceDarkCSS.onload = () => {
-    document.documentElement.classList.add("sl-theme-dark");
-  };
-  document.head.appendChild(shoelaceDarkCSS);
   const shoelaceScript = document.createElement("script");
   shoelaceScript.src =
     "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/shoelace-autoloader.js";
