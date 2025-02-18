@@ -1,5 +1,5 @@
 import { bcModSDK, generateUniqueID, waitForElement } from "../utils";
-import { getPlayerDiaperSize } from "./diaper";
+import { getPlayerDiaperSize, hasDiaper } from "./diaper";
 import { getCharacter, getCharacterName } from "./playerUtils";
 
 export class ABCLStatsWindow {
@@ -102,18 +102,24 @@ export class ABCLStatsWindow {
       }
     };
     if (selectedCharacter.ABCL) {
-      updateInput(
-        "SoilinessPercentage",
-        (selectedCharacter.ABCL.Stats.Soiliness.value /
-          getPlayerDiaperSize(selectedCharacter)) *
-          100
-      );
-      updateInput(
-        "WetnessPercentage",
-        (selectedCharacter.ABCL.Stats.Wetness.value /
-          getPlayerDiaperSize(selectedCharacter)) *
-          100
-      );
+      if (hasDiaper(selectedCharacter)) {
+        updateInput(
+          "SoilinessPercentage",
+          (selectedCharacter.ABCL.Stats.Soiliness.value /
+            getPlayerDiaperSize(selectedCharacter)) *
+            100
+        );
+        updateInput(
+          "WetnessPercentage",
+          (selectedCharacter.ABCL.Stats.Wetness.value /
+            getPlayerDiaperSize(selectedCharacter)) *
+            100
+        );
+      } else {
+        updateInput("SoilinessPercentage", 0);
+        updateInput("WetnessPercentage", 0);
+      }
+
       updateInput(
         "BowelFullness",
         (selectedCharacter.ABCL.Stats.Bowel.value /
