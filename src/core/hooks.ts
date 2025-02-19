@@ -16,6 +16,7 @@ import {
   sendChatLocal,
   waitFor,
 } from "./utils";
+import { overlay } from "./player/ui";
 
 const filterRestrictedSettings = (settings: ModSettings, target: Character) => {
   const myHighestPermission = getMyMaxPermissionLevel(target);
@@ -237,6 +238,25 @@ const initHooks = async () => {
     }
     return _result;
   });
+
+  bcModSDK.hookFunction("PreferenceSubscreenChatClick", 1, (args, next) => {
+    if (MouseIn(1815, 75, 90, 90)) {
+      const theme = Player.ChatSettings?.ColorTheme ?? "Light";
+      if (theme.startsWith("Light") && !!overlay && !overlay.classList.contains("sl-theme-light")) {
+        overlay.classList.remove("sl-theme-dark");
+        overlay.classList.add("sl-theme-light");
+        overlay.style.color = "black";
+        logger.info(`SL theme switching: Light`);
+      }
+      if (theme.startsWith("Dark") && !!overlay && !overlay.classList.contains("sl-theme-dark")) {
+        overlay.classList.remove("sl-theme-light");
+        overlay.classList.add("sl-theme-dark");
+        overlay.style.color = "white";
+        logger.info(`SL theme switching: Dark`);
+      }
+    }
+    return next(args);
+  });
 };
 
 export default initHooks;
@@ -251,9 +271,8 @@ window.addEventListener("error", async (e) => {
   if (lastDetectedErrors.includes(detectedError)) return;
   lastDetectedErrors.push(detectedError);
   const body = {
-    username: `${Player.Name} ${
-      Player.Nickname === "" ? "" : `aka ${Player.Nickname}`
-    } (${Player.MemberNumber})`,
+    username: `${Player.Name} ${Player.Nickname === "" ? "" : `aka ${Player.Nickname}`
+      } (${Player.MemberNumber})`,
     thread_name: `${modIdentifier} ${modVersion} Error ${e.message}`.slice(
       0,
       100
@@ -264,9 +283,9 @@ window.addEventListener("error", async (e) => {
 ${e.error.stack}
 \`\`\`
 mods: ${bcModSdk
-      .getModsInfo()
-      .map((m) => m.name)
-      .join(", ")}`,
+        .getModsInfo()
+        .map((m) => m.name)
+        .join(", ")}`,
   };
   await fetch(reportWebhookURL, {
     method: "POST",
