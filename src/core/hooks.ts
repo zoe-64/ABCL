@@ -242,13 +242,13 @@ const initHooks = async () => {
   bcModSDK.hookFunction("PreferenceSubscreenChatClick", 1, (args, next) => {
     if (MouseIn(1815, 75, 90, 90)) {
       const theme = Player.ChatSettings?.ColorTheme ?? "Light";
-      if (theme.startsWith("Light") && !document.documentElement.classList.contains("sl-theme-light") && !!overlay) {
+      if (theme.startsWith("Light") && !!overlay && !overlay.classList.contains("sl-theme-light")) {
         overlay.classList.remove("sl-theme-dark");
         overlay.classList.add("sl-theme-light");
         overlay.style.color = "black";
         logger.info(`SL theme switching: Light`);
       }
-      if (theme.startsWith("Dark") && !document.documentElement.classList.contains("sl-theme-dark") && !!overlay) {
+      if (theme.startsWith("Dark") && !!overlay && !overlay.classList.contains("sl-theme-dark")) {
         overlay.classList.remove("sl-theme-light");
         overlay.classList.add("sl-theme-dark");
         overlay.style.color = "white";
