@@ -65,11 +65,19 @@ const init = () => {
     return next(args);
   });
 
-  const shoelaceCSS = document.createElement("link");
-  shoelaceCSS.rel = "stylesheet";
-  shoelaceCSS.href =
+  const shoelaceCSSLight = document.createElement("link");
+  shoelaceCSSLight.rel = "stylesheet";
+  shoelaceCSSLight.href =
     "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/themes/light.css";
-  document.head.appendChild(shoelaceCSS);
+    // shoelaceCSSLight.media = "(prefers-color-scheme:light)";
+  document.head.appendChild(shoelaceCSSLight);
+
+  const shoelaceCSSDark = document.createElement("link");
+  shoelaceCSSDark.rel = "stylesheet";
+  shoelaceCSSDark.href =
+    "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/themes/dark.css";
+    // shoelaceCSSDark.media = "(prefers-color-scheme:dark)";
+  document.head.appendChild(shoelaceCSSDark);
 
   const shoelaceScript = document.createElement("script");
   shoelaceScript.src =

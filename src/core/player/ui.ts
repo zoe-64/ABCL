@@ -416,6 +416,15 @@ export class ABCLTextParticle {
 }
 
 export const overlay = document.createElement("div");
+overlay.classList.add(
+  (Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ?
+    "sl-theme-light"
+    : "sl-theme-dark"
+);
+overlay.style.color = 
+  (Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ?
+    "black"
+    : "white";
 export let abclStatsWindow: ABCLStatsWindow;
 overlay.classList.add(`${modIdentifier}Overlay`);
 
