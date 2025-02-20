@@ -1,5 +1,5 @@
 {
-  "BabyClothes": [
+  "BabyItems": [
     "Bows Dress",
     "Babydoll Dress",
     "Puffy Dress",
@@ -11,7 +11,12 @@
     "Cosplay Girl Suit",
     "Padded Mittens",
     "Paw Mittens",
-    "Short Smooth Leather Mittens"
+    "Short Smooth Leather Mittens",
+    "Changing Table",
+    "Crib",
+    "Fox Plush",
+    "Bunny Plush",
+    "Shark Plush"
   ],
   "DiaperColors": {
     "clean": "#8F8F8F",
