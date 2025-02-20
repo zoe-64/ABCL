@@ -11,6 +11,7 @@ import { initMinigames } from "./core/minigames";
 import { abclPlayer } from "./core/player/player";
 import "./core/globalExpose";
 import { initOverlay } from "./core/player/ui";
+import { initCommands } from "./core/commands";
 export type AbclData = typeof abclData;
 export const ABCLdata: AbclData = abclData;
 
@@ -93,6 +94,7 @@ const init = () => {
   ServerPlayerSync();
   loadOrGenerateData();
   initSettingsScreen();
+  initCommands();
   initScreens([]);
   initHooks();
   logger.info(`Ready.`);

@@ -1,18 +1,19 @@
 import { activities } from "../activities";
 import { changeDiaper, hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
+import { isABCLPlayer } from "../player/playerUtils";
+import { abclStatsWindow } from "../player/ui";
 import { sendChatLocal } from "../utils";
 export const initActivitiesData = (): void => {
   activities["ChangeDiaper"] = {
     Name: "Change Diaper",
     Image: `${publicURL}/activity/changeDiaper.svg`,
     OnClick: (player: Character, group) => {
-      console.log("Change diaper clicked", player);
-      changeDiaper(player);
+      changeDiaper(player.MemberNumber);
     },
     Target: ["ItemPelvis"],
     Criteria: (player) => {
-      return hasDiaper(player);
+      return hasDiaper(player) && isABCLPlayer(player);
     },
   };
 
@@ -105,6 +106,17 @@ export const initActivitiesData = (): void => {
     TargetSelf: ["ItemPelvis"],
     Criteria: (player) => {
       return hasDiaper(player);
+    },
+  };
+  activities["DiaperCheck"] = {
+    Name: "Diaper Check",
+    Image: `${publicURL}/activity/diaperCheck.png`,
+    OnClick: (player: Character, group) => {
+      abclStatsWindow.open(player.MemberNumber);
+    },
+    Target: ["ItemPelvis"],
+    Criteria: (player) => {
+      return isABCLPlayer(player);
     },
   };
 };

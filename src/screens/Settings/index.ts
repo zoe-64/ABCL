@@ -1,6 +1,5 @@
 import { drawCheckbox } from "../../core/bcUI";
 import { abclPlayer } from "../../core/player/player";
-import { defaultSettings } from "../../core/settings";
 import { ModName } from "../../types/definitions";
 export function getMetabolismValue(
   value: MetabolismSettingValues,

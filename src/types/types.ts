@@ -75,5 +75,5 @@ export type AbclData = {
   DiaperColors: {
     [key: string]: string;
   };
-  BabyClothes: string[];
+  BabyItems: string[];
 };

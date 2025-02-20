@@ -1,18 +1,20 @@
-export function getCharacter(memberNumber: number): Character | null {
-  const character = ChatRoomCharacter.find(
-    (c) => c.MemberNumber === memberNumber
-  );
+// luv you zoi <3
+export const getCharacter = (
+  identifier: string | number
+): Character | undefined => {
+  if (!identifier) return;
+  return ChatRoomCharacter.find((Character) => {
+    return (
+      Character.MemberNumber == identifier ||
+      Character.Name.toLowerCase() === identifier ||
+      Character.Nickname?.toLowerCase() === identifier
+    );
+  });
+};
 
-  if (!character) {
-    return null;
-  }
-
-  if (character?.IsPlayer()) {
-    return character as Character;
-  }
-
-  return character as Character;
-}
+export const isABCLPlayer = (character: Character): boolean => {
+  return Boolean(character?.ABCL);
+};
 
 export function getCharacterName(memberNumber: number | undefined): string {
   if (!memberNumber) {

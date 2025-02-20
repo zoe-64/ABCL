@@ -4,13 +4,13 @@ import { getCharacter, getCharacterName } from "./playerUtils";
 
 export class ABCLStatsWindow {
   statsDrawer: HTMLElement;
-  openButton: HTMLButtonElement;
+  // openButton: HTMLButtonElement;
   folded: boolean = false;
   constructor() {
-    this.openButton = document.createElement("button");
-    this.openButton.classList.add(`${modIdentifier}OpenStatsButton`);
-    this.openButton.textContent = "ABCL Stats";
-    overlay.appendChild(this.openButton);
+    //this.openButton = document.createElement("button");
+    //this.openButton.classList.add(`${modIdentifier}OpenStatsButton`);
+    //this.openButton.textContent = "ABCL Stats";
+    // overlay.appendChild(this.openButton);
 
     this.statsDrawer = document.createElement("sl-drawer");
     this.statsDrawer.innerHTML = `
@@ -43,27 +43,40 @@ export class ABCLStatsWindow {
     this.statsDrawer
       .querySelector(`.${modIdentifier}RefreshButton`)
       ?.addEventListener("click", () => this.update());
-    this.openButton.addEventListener("click", () => {
-      if (this.statsDrawer.getAttribute("open") === "true") {
-        this.statsDrawer.removeAttribute("open");
-      } else {
-        this.statsDrawer.setAttribute("open", "true");
-        this.update();
-      }
-    });
+    // this.openButton.addEventListener("click", () => {
+    //   if (this.statsDrawer.getAttribute("open") === "true") {
+    //     this.close();
+    //   } else {
+    //     this.open();
+    //   }
+    // });
     this.update();
   }
-
+  close() {
+    this.statsDrawer.removeAttribute("open");
+  }
+  open(selectedPlayerId?: number) {
+    this.statsDrawer.setAttribute("open", "true");
+    if (selectedPlayerId !== undefined) {
+      const currentPlayerSelect: HTMLSelectElement | null =
+        this.statsDrawer.querySelector(`#${modIdentifier}CurrentPlayerSelect`);
+      if (currentPlayerSelect) {
+        currentPlayerSelect.value = selectedPlayerId.toString();
+      }
+    }
+    this.update();
+  }
   async update() {
     const currentPlayerSelect: HTMLSelectElement | null =
       this.statsDrawer.querySelector(`#${modIdentifier}CurrentPlayerSelect`);
     if (!currentPlayerSelect) return;
 
-    let selectedCharacter:
-      | Character
-      | (Character & { ABCL: ModStorageModel })
-      | null = getCharacter(Number(currentPlayerSelect.value));
-
+    let selectedCharacter: Character | undefined = getCharacter(
+      currentPlayerSelect.value
+    );
+    if (!selectedCharacter || !selectedCharacter?.ABCL) {
+      selectedCharacter = Player;
+    }
     // fill select ChatRoomCharacter
     currentPlayerSelect.innerHTML = "";
     for (let character of ChatRoomCharacter) {
@@ -71,9 +84,6 @@ export class ABCLStatsWindow {
       currentPlayerSelect.innerHTML += `<sl-option value="${
         character.MemberNumber
       }">${getCharacterName(character.MemberNumber)}</sl-option>`;
-    }
-    if (!selectedCharacter || !selectedCharacter.ABCL) {
-      selectedCharacter = Player;
     }
 
     const updateInput = (className: string, value: number) => {
@@ -101,46 +111,47 @@ export class ABCLStatsWindow {
           label.innerText.split(":")[0] + ": " + valueRounded.toString() + "%";
       }
     };
-    if (selectedCharacter.ABCL) {
-      if (hasDiaper(selectedCharacter)) {
-        updateInput(
-          "SoilinessPercentage",
-          (selectedCharacter.ABCL.Stats.Soiliness.value /
-            getPlayerDiaperSize(selectedCharacter)) *
-            100
-        );
-        updateInput(
-          "WetnessPercentage",
-          (selectedCharacter.ABCL.Stats.Wetness.value /
-            getPlayerDiaperSize(selectedCharacter)) *
-            100
-        );
-      } else {
-        updateInput("SoilinessPercentage", 0);
-        updateInput("WetnessPercentage", 0);
-      }
-
-      updateInput(
-        "BowelFullness",
-        (selectedCharacter.ABCL.Stats.Bowel.value /
-          selectedCharacter.ABCL.Stats.Bowel.size) *
-          100
-      );
-      updateInput(
-        "BladderFullness",
-        (selectedCharacter.ABCL.Stats.Bladder.value /
-          selectedCharacter.ABCL.Stats.Bladder.size) *
-          100
-      );
-      updateInput(
-        "Incontinence",
-        selectedCharacter.ABCL.Stats.Incontinence.value * 100
-      );
-      updateInput(
-        "MentalRegression",
-        selectedCharacter.ABCL.Stats.MentalRegression.value * 100
-      );
+    if (!selectedCharacter.ABCL) {
+      return;
     }
+    if (hasDiaper(selectedCharacter)) {
+      updateInput(
+        "SoilinessPercentage",
+        (selectedCharacter.ABCL.Stats.Soiliness.value /
+          getPlayerDiaperSize(selectedCharacter)) *
+          100
+      );
+      updateInput(
+        "WetnessPercentage",
+        (selectedCharacter.ABCL.Stats.Wetness.value /
+          getPlayerDiaperSize(selectedCharacter)) *
+          100
+      );
+    } else {
+      updateInput("SoilinessPercentage", 0);
+      updateInput("WetnessPercentage", 0);
+    }
+
+    updateInput(
+      "BowelFullness",
+      (selectedCharacter.ABCL.Stats.Bowel.value /
+        selectedCharacter.ABCL.Stats.Bowel.size) *
+        100
+    );
+    updateInput(
+      "BladderFullness",
+      (selectedCharacter.ABCL.Stats.Bladder.value /
+        selectedCharacter.ABCL.Stats.Bladder.size) *
+        100
+    );
+    updateInput(
+      "Incontinence",
+      selectedCharacter.ABCL.Stats.Incontinence.value * 100
+    );
+    updateInput(
+      "MentalRegression",
+      selectedCharacter.ABCL.Stats.MentalRegression.value * 100
+    );
   }
 }
 class MovableElement {
@@ -416,22 +427,23 @@ export class ABCLTextParticle {
 }
 
 export const overlay = document.createElement("div");
-overlay.classList.add(
-  (Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ?
-    "sl-theme-light"
-    : "sl-theme-dark"
-);
-overlay.style.color = 
-  (Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ?
-    "black"
-    : "white";
+
 export let abclStatsWindow: ABCLStatsWindow;
 overlay.classList.add(`${modIdentifier}Overlay`);
 
 export const initOverlay = () => {
   waitForElement("#chat-room-div", { childCheck: true }).then(() => {
     abclStatsWindow = new ABCLStatsWindow();
-
+    overlay.classList.add(
+      (Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light")
+        ? "sl-theme-light"
+        : "sl-theme-dark"
+    );
+    overlay.style.color = (
+      Player.ChatSettings?.ColorTheme ?? "Light"
+    ).startsWith("Light")
+      ? "black"
+      : "white";
     bcModSDK.hookFunction(
       "ChatRoomCharacterViewDrawOverlay",
       1,
@@ -443,8 +455,8 @@ export const initOverlay = () => {
             ((CharX + 300 * Zoom) / 2000) * overlay.clientWidth,
             ((CharY + 550 * Zoom) / 1000) * overlay.clientHeight,
           ];
-          abclStatsWindow.openButton.style.top = `${Y}px`;
-          abclStatsWindow.openButton.style.left = `${X}px`;
+          //abclStatsWindow.openButton.style.top = `${Y}px`;
+          //abclStatsWindow.openButton.style.left = `${X}px`;
         }
       }
     );
