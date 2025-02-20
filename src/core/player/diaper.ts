@@ -39,7 +39,7 @@ export function hasDiaper(player: Character = Player): boolean {
 }
 export const isWearingBabyClothes = () => {
   return Player.Appearance.some((clothing) => {
-    return ABCLdata.BabyClothes.includes(clothing.Asset.Description);
+    return ABCLdata.BabyItems.includes(clothing.Asset.Description);
   });
 };
 
@@ -197,14 +197,11 @@ export const mentalRegressionBonus = () => {
   const assetDescriptions = Player.Appearance.map(
     (clothing) => clothing.Asset.Description
   );
-  const matches = ABCLdata.BabyClothes.concat([
-    "milk",
-    "pacifier",
-    "bib",
-  ]).filter((description) =>
-    assetDescriptions.some((assetDescription) =>
-      assetDescription.toLocaleLowerCase().includes(description)
-    )
+  const matches = ABCLdata.BabyItems.concat(["milk", "pacifier", "bib"]).filter(
+    (description) =>
+      assetDescriptions.some((assetDescription) =>
+        assetDescription.toLocaleLowerCase().includes(description)
+      )
   );
   return Math.min(matches.length * 0.25, 1);
 };
@@ -266,7 +263,7 @@ export const changeDiaper = (
 ) => {
   const isSomeoneElse = memberNumber !== Player.MemberNumber;
   if (isSomeoneElse && memberNumber) {
-    new PendingRequest(memberNumber, "changeDiaper", 999999);
+    new PendingRequest(memberNumber, "changeDiaper", 10);
     return;
   }
   abclPlayer.stats.SoilinessValue = 0;
