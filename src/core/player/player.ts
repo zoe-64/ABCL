@@ -3,7 +3,6 @@ import { Debouncer, Saver, sendChatLocal } from "../utils";
 import {
   incontinenceChanceFormula,
   getPlayerDiaperSize,
-  hasDiaper,
   mentalRegressionOnAccident,
   mentalRegressionOvertime,
   updateDiaperColor,

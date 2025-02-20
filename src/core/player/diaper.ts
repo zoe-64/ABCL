@@ -261,10 +261,12 @@ export const mentalRegressionOnAccident = () => {
   return 0;
 };
 
-export const changeDiaper = (player: Character = Player) => {
-  const isSomeoneElse = player.MemberNumber !== Player.MemberNumber;
-  if (isSomeoneElse && player.MemberNumber) {
-    new PendingRequest(player.MemberNumber, "changeDiaper", 999999);
+export const changeDiaper = (
+  memberNumber: number | undefined = Player.MemberNumber
+) => {
+  const isSomeoneElse = memberNumber !== Player.MemberNumber;
+  if (isSomeoneElse && memberNumber) {
+    new PendingRequest(memberNumber, "changeDiaper", 999999);
     return;
   }
   abclPlayer.stats.SoilinessValue = 0;
