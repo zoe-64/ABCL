@@ -185,10 +185,121 @@ export const css = `
   box-shadow: 0 4px 5px 1px #00000014;
 }
 
+.ABCLSettingPage {
+  width: 81%;
+  margin: 6% auto;
+  pointer-events: all;
+}
+.ABCLAddCaregiver {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 25rem;
+}
+.ABCLAddCaregiverButton {
+  margin-left: 5px;
+}
+.ABCLAddCaregiverInput {
+  margin-right: 5px;
+  flex: 1;
+}
+.ABCLCaregiverLabel {
+  margin-top: 1em;
+  display: block;
+}
+.ABCLCaregiverList {
+  list-style: none;
+  border: solid var(--sl-input-border-width) var(--sl-input-border-color);
+  border-radius: var(--sl-input-border-radius-medium);
+  padding: 0rem 0rem;
+  width: fit-content;
+  min-width: 17em;
+  max-height: 15em;
+  overflow-y: scroll;
+  font-size: var(--sl-button-font-size-medium);
+  line-height: calc(var(--sl-input-height-medium) - var(--sl-input-border-width) * 2);
+}
+.ABCLCaregiver {
+  padding: 0.3rem;
+  border: solid var(--sl-input-border-width) var(--sl-input-border-color);
+  display: flex;
+}
+.ABCLRemoveCaregiver {
+  aspect-ratio: 1;
+  width: fit-content;
+  margin-left: 0.5em;
+}
+.ABCLCaregiverName {
+  flex: 1;
+}
+.ABCLRemoveCaregiver::part(base) {
+  background: #ff7b7b;
+  color: white;
+  font-weight: bold;
+}
+.ABCLSettingPage sl-checkbox {
+  display: block;
+  margin: 1rem 0;
+  width: fit-content;
+}
+.sl-theme-light, .sl-theme-dark {
+  --sl-toggle-size-small: 0.875rem;
+  --sl-toggle-size-medium: 1.125rem;
+  --sl-toggle-size-large: 1.375rem;
 
+  --sl-input-height-small: 1.875em;
+  --sl-input-height-medium: 2.5em;
+  --sl-input-height-large: 3.125em;
+
+  --sl-letter-spacing-loose: 0.075em;
+  --sl-letter-spacing-looser: 0.15em;
+
+  --sl-font-size-large: 1.25em;
+  --sl-font-size-x-large: 1.5em;
+  --sl-font-size-2x-large: 2.25em;
+  --sl-font-size-3x-large: 3em;
+  --sl-font-size-4x-large: 4.5em;
+  
+  --sl-spacing-3x-small: 0.125em;
+  --sl-spacing-2x-small: 0.25em;
+  --sl-spacing-x-small: 0.5em;
+  --sl-spacing-small: 0.75em;
+  --sl-spacing-medium: 1em;
+  --sl-spacing-large: 1.25em;
+  --sl-spacing-x-large: 1.75em;
+  --sl-spacing-2x-large: 2.25em;
+  --sl-spacing-3x-large: 3em;
+  --sl-spacing-4x-large: 4.5em;
+
+  --sl-border-radius-small: 0.1875em;
+  --sl-border-radius-medium: 0.25em;
+  --sl-border-radius-large: 0.5em;
+  --sl-border-radius-x-large: 1em;
+
+  --sl-font-size-2x-small: 1.2vmin;
+  --sl-font-size-x-small: 1.4vmin;
+  --sl-font-size-small: 1.6vmin;
+  --sl-font-size-medium: 1.6vmin;
+  --sl-font-size-large: 2.5vmin;
+  --sl-font-size-x-large: 3vmin;
+  --sl-font-size-2x-large: 4.5vmin;
+  --sl-font-size-3x-large: 6vmin;
+  --sl-font-size-4x-large: 9vmin;
+}
+
+sl-tab, sl-radio-button, sl-checkbox {
+  pointer-events: all;
+}
 ${cssSliders}
 
 .ABCLHidden {
   display: none !important;
+}
+
+/* sorry fusam */
+#fusam-addon-manager-container {
+  position: absolute;
+  top: 0;
 }
 `;

@@ -4,6 +4,12 @@ export type PartialDeep<T> = {
   [P in keyof T]?: PartialDeep<T[P]>;
 };
 
+// entries
+export type NewSettingsEntry = {
+  type: "newSettings";
+  settings: Partial<ModSettings>;
+  version: typeof modVersion;
+};
 export type SyncEntry = {
   type: "sync";
   settings: ModSettings;
@@ -22,11 +28,7 @@ export type RequestEntry = {
 export type ChangeDiaperRequestEntry = Omit<RequestEntry, "type"> & {
   type: "changeDiaper";
 };
-export type MessageEntry =
-  | SyncEntry
-  | InitEntry
-  | RequestEntry
-  | ChangeDiaperRequestEntry;
+export type MessageEntry = SyncEntry | InitEntry | RequestEntry | ChangeDiaperRequestEntry | NewSettingsEntry;
 
 export interface PluginServerChatRoomMessage extends ServerChatRoomMessageBase {
   /** The character to target the message at. null means it's broadcast to the room. */

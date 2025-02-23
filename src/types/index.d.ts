@@ -28,7 +28,10 @@ interface ModSettings {
     permission: ModSettingPermission;
   };
   CaregiverIDs: {
-    value: number[];
+    value: (
+      | { memberNumber?: number; name: string }
+      | { memberNumber: number; name?: string }
+    )[];
     permission: ModSettingPermission;
   };
   OpenRemoteSettings: {

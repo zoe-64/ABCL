@@ -4,14 +4,8 @@ import { getCharacter, getCharacterName } from "./playerUtils";
 
 export class ABCLStatsWindow {
   statsDrawer: HTMLElement;
-  // openButton: HTMLButtonElement;
   folded: boolean = false;
   constructor() {
-    //this.openButton = document.createElement("button");
-    //this.openButton.classList.add(`${modIdentifier}OpenStatsButton`);
-    //this.openButton.textContent = "ABCL Stats";
-    // overlay.appendChild(this.openButton);
-
     this.statsDrawer = document.createElement("sl-drawer");
     this.statsDrawer.innerHTML = `
     <p class="${modIdentifier}WindowHeaderTitle">Stats</p>
@@ -43,13 +37,6 @@ export class ABCLStatsWindow {
     this.statsDrawer
       .querySelector(`.${modIdentifier}RefreshButton`)
       ?.addEventListener("click", () => this.update());
-    // this.openButton.addEventListener("click", () => {
-    //   if (this.statsDrawer.getAttribute("open") === "true") {
-    //     this.close();
-    //   } else {
-    //     this.open();
-    //   }
-    // });
     this.update();
   }
   close() {
@@ -444,22 +431,6 @@ export const initOverlay = () => {
     ).startsWith("Light")
       ? "black"
       : "white";
-    bcModSDK.hookFunction(
-      "ChatRoomCharacterViewDrawOverlay",
-      1,
-      (args, next) => {
-        next(args);
-        const [C, CharX, CharY, Zoom] = args;
-        if (C.MemberNumber === Player.MemberNumber) {
-          const [X, Y] = [
-            ((CharX + 300 * Zoom) / 2000) * overlay.clientWidth,
-            ((CharY + 550 * Zoom) / 1000) * overlay.clientHeight,
-          ];
-          //abclStatsWindow.openButton.style.top = `${Y}px`;
-          //abclStatsWindow.openButton.style.left = `${X}px`;
-        }
-      }
-    );
     document.body.appendChild(overlay);
   });
 };

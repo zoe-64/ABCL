@@ -1,25 +1,16 @@
 import bcModSdk from "bondage-club-mod-sdk";
-import {
-  SyncEntry,
-  PluginServerChatRoomMessage,
-  MessageEntry,
-  ChangeDiaperRequestEntry,
-} from "../types/types";
+import { SyncEntry, PluginServerChatRoomMessage, MessageEntry, ChangeDiaperRequestEntry, NewSettingsEntry } from "../types/types";
 import { logger } from "./logger";
 import { pendingRequests } from "./pendingRequest";
 import { changeDiaper, isDiaper, updateDiaperColor } from "./player/diaper";
 import { getCharacter, getCharacterName } from "./player/playerUtils";
 import { ABCLYesNoPrompt } from "./player/ui";
-import {
-  bcModSDK,
-  getMyMaxPermissionLevel,
-  sendChatLocal,
-  waitFor,
-} from "./utils";
+import { bcModSDK, sendChatLocal, waitFor } from "./utils";
 import { overlay } from "./player/ui";
+import { getPermissionLevel, hasPermissionToModifySetting } from "./player/permissions";
 
 const filterRestrictedSettings = (settings: ModSettings, target: Character) => {
-  const myHighestPermission = getMyMaxPermissionLevel(target);
+  const myHighestPermission = getPermissionLevel(target);
 
   return Object.entries(settings).reduce((acc, [key, value]) => {
     if (value.permission.canView <= myHighestPermission) {
@@ -29,9 +20,7 @@ const filterRestrictedSettings = (settings: ModSettings, target: Character) => {
   }, {} as ModSettings);
 };
 
-export const sendServerChatRoomMessage = (
-  message: MessageEntry
-): PluginServerChatRoomMessage => {
+export const sendServerChatRoomMessage = (message: MessageEntry): PluginServerChatRoomMessage => {
   const ChatRoomMessage: PluginServerChatRoomMessage = {
     Type: "Hidden",
     Content: `${modIdentifier}Msg`,
@@ -52,13 +41,12 @@ export const sendServerChatRoomMessage = (
  * @param {number} [target] - The MemberNumber of the target player. If not specified, the update is sent to all players.
  */
 export const sendUpdateMyData = (target?: number) => {
-  const syncDataMessage: PluginServerChatRoomMessage =
-    sendServerChatRoomMessage({
-      type: "sync",
-      settings: Player[modIdentifier].Settings,
-      stats: Player[modIdentifier].Stats,
-      target,
-    });
+  const syncDataMessage: PluginServerChatRoomMessage = sendServerChatRoomMessage({
+    type: "sync",
+    settings: Player[modIdentifier].Settings,
+    stats: Player[modIdentifier].Stats,
+    target,
+  });
 
   logger.debug({
     message: `Sending updated data to ${target ?? "everyone"}`,
@@ -99,6 +87,30 @@ const handleSyncPacket = (data: PluginServerChatRoomMessage) => {
     Stats: message.stats,
   };
 };
+export const sendNewSettingsPacket = (settings: Partial<ModSettings>) => {
+  sendServerChatRoomMessage({
+    type: "newSettings",
+    settings,
+    version: modVersion,
+  });
+};
+export const handleNewSettingsPacket = (data: PluginServerChatRoomMessage) => {
+  if (!data.Sender) return;
+  const message = data.Dictionary?.[0]?.message as NewSettingsEntry | undefined;
+  if (!message) return;
+  // make sure all settings included are allowed by permissions
+  const allowedSettings = Object.fromEntries(
+    Object.entries(message.settings ?? {}).filter(([key]) => hasPermissionToModifySetting(data.Sender!, key as keyof ModSettings, false))
+  );
+  if (Object.keys(allowedSettings).length === 0) return;
+
+  Player[modIdentifier].Settings = {
+    ...Player[modIdentifier].Settings,
+    ...allowedSettings,
+  };
+
+  console.log("Updated settings", Player[modIdentifier].Settings);
+};
 
 /**
  * Handles the "init" packet received from other players, sending the player's data to the requester.
@@ -137,36 +149,22 @@ const receivePacket = (data: PluginServerChatRoomMessage) => {
       case "changeDiaper":
         console.log(pendingRequests.get(message.id));
         let request = pendingRequests.get(message.id);
-        if (
-          !request &&
-          (message.state === "accepted" || message.state === "rejected")
-        )
-          return;
+        if (!request && (message.state === "accepted" || message.state === "rejected")) return;
 
         switch (message.state) {
           case "accepted":
             request!.state = "accepted";
-            sendChatLocal(
-              `${getCharacterName(
-                data.Sender
-              )} accepted your change diaper request.`
-            );
+            sendChatLocal(`${getCharacterName(data.Sender)} accepted your change diaper request.`);
             break;
           case "rejected":
             request!.state = "rejected";
-            sendChatLocal(
-              `${getCharacterName(
-                data.Sender
-              )} rejected your change diaper request.`
-            );
+            sendChatLocal(`${getCharacterName(data.Sender)} rejected your change diaper request.`);
             break;
           case "pending":
             new ABCLYesNoPrompt(
               `${getCharacterName(data.Sender)} wants to change your diaper.`,
               () => {
-                sendChatLocal(
-                  `${getCharacterName(data.Sender)} changed your diaper.`
-                );
+                sendChatLocal(`${getCharacterName(data.Sender)} changed your diaper.`);
                 changeDiaper();
                 sendServerChatRoomMessage({
                   type: "changeDiaper",
@@ -185,18 +183,10 @@ const receivePacket = (data: PluginServerChatRoomMessage) => {
             );
             break;
           case "timedout":
-            sendChatLocal(
-              `${getCharacterName(
-                data.Sender
-              )}'s change diaper request timed out.`
-            );
+            sendChatLocal(`${getCharacterName(data.Sender)}'s change diaper request timed out.`);
             break;
           case "cancelled":
-            sendChatLocal(
-              `${getCharacterName(
-                data.Sender
-              )} cancelled their change diaper request.`
-            );
+            sendChatLocal(`${getCharacterName(data.Sender)} cancelled their change diaper request.`);
             break;
         }
 
@@ -218,10 +208,7 @@ const initHooks = async () => {
   });
 
   bcModSDK.hookFunction("ChatRoomMessage", 1, (args, next) => {
-    if (
-      args[0].Content === "ServerEnter" &&
-      args[0].Sender === Player.MemberNumber
-    ) {
+    if (args[0].Content === "ServerEnter" && args[0].Sender === Player.MemberNumber) {
       // Announce (via an init packet) that we're ready to receive data models.
       sendRequestOtherDataPacket();
       return;
@@ -271,21 +258,17 @@ window.addEventListener("error", async (e) => {
   if (lastDetectedErrors.includes(detectedError)) return;
   lastDetectedErrors.push(detectedError);
   const body = {
-    username: `${Player.Name} ${Player.Nickname === "" ? "" : `aka ${Player.Nickname}`
-      } (${Player.MemberNumber})`,
-    thread_name: `${modIdentifier} ${modVersion} Error ${e.message}`.slice(
-      0,
-      100
-    ),
+    username: `${Player.Name} ${Player.Nickname === "" ? "" : `aka ${Player.Nickname}`} (${Player.MemberNumber})`,
+    thread_name: `${modIdentifier} ${modVersion} Error ${e.message}`.slice(0, 100),
     content: `
     error: ${detectedError}
 \`\`\`
 ${e.error.stack}
 \`\`\`
 mods: ${bcModSdk
-        .getModsInfo()
-        .map((m) => m.name)
-        .join(", ")}`,
+      .getModsInfo()
+      .map((m) => m.name)
+      .join(", ")}`,
   };
   await fetch(reportWebhookURL, {
     method: "POST",
