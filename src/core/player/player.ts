@@ -12,6 +12,7 @@ import { abclStatsWindow } from "./ui";
 import { getCharacter } from "./playerUtils";
 
 const metabolismValues: Map<MetabolismSettingValues, number> = new Map([
+  ["Disabled", 0],
   ["Slow", 0.5], // 40 min
   ["Normal", 1], // 20 min
   ["Fast", 1.5], // 13.3 min
@@ -37,13 +38,9 @@ export const abclPlayer = {
     if (abclPlayer.settings.DisableWetting) return;
 
     const limit = incontinenceLimitFormula(abclPlayer.stats.Incontinence);
-    const chance = incontinenceChanceFormula(
-      abclPlayer.stats.Incontinence,
-      abclPlayer.stats.BladderFullness
-    );
+    const chance = incontinenceChanceFormula(abclPlayer.stats.Incontinence, abclPlayer.stats.BladderFullness);
 
-    if (!(Math.random() < chance || abclPlayer.stats.BladderFullness > limit))
-      return;
+    if (!(Math.random() < chance || abclPlayer.stats.BladderFullness > limit)) return;
 
     if (!incontinenceCheck.check()) return;
 
@@ -53,13 +50,9 @@ export const abclPlayer = {
     if (abclPlayer.settings.DisableSoiling) return;
 
     const limit = incontinenceLimitFormula(abclPlayer.stats.Incontinence);
-    const chance = incontinenceChanceFormula(
-      abclPlayer.stats.Incontinence,
-      abclPlayer.stats.BowelFullness
-    );
+    const chance = incontinenceChanceFormula(abclPlayer.stats.Incontinence, abclPlayer.stats.BowelFullness);
 
-    if (!(Math.random() < chance || abclPlayer.stats.BowelFullness > limit))
-      return;
+    if (!(Math.random() < chance || abclPlayer.stats.BowelFullness > limit)) return;
 
     if (!incontinenceCheck.check()) return;
 

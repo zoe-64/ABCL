@@ -21,13 +21,9 @@ export const initActivitiesData = (): void => {
     Name: "Sit and Use Potty",
     Image: `${publicURL}/activity/potty-temp.png`,
     OnClick: (player: Character) => {
-      const isTooEarly =
-        abclPlayer.stats.BladderFullness < 0.3 &&
-        abclPlayer.stats.BowelFullness < 0.3;
+      const isTooEarly = abclPlayer.stats.BladderFullness < 0.3 && abclPlayer.stats.BowelFullness < 0.3;
       const isPossible = !isTooEarly;
-      const isGood =
-        abclPlayer.stats.BladderFullness > 0.6 ||
-        abclPlayer.stats.BowelFullness > 0.6;
+      const isGood = abclPlayer.stats.BladderFullness > 0.6 || abclPlayer.stats.BowelFullness > 0.6;
       const isEmbarrassed = abclPlayer.stats.MentalRegression < 0.3;
       const isTooFarGone = abclPlayer.stats.MentalRegression > 0.9;
       if (isTooEarly) {
@@ -57,13 +53,9 @@ export const initActivitiesData = (): void => {
     Name: "Sit and Use Toilet",
     Image: `${publicURL}/activity/toilet-temp.png`,
     OnClick: (player: Character) => {
-      const isTooEarly =
-        abclPlayer.stats.BladderFullness < 0.3 &&
-        abclPlayer.stats.BowelFullness < 0.3;
+      const isTooEarly = abclPlayer.stats.BladderFullness < 0.3 && abclPlayer.stats.BowelFullness < 0.3;
       const isPossible = !isTooEarly;
-      const isGood =
-        abclPlayer.stats.BladderFullness > 0.6 ||
-        abclPlayer.stats.BowelFullness > 0.6;
+      const isGood = abclPlayer.stats.BladderFullness > 0.6 || abclPlayer.stats.BowelFullness > 0.6;
       if (isTooEarly) return;
       if (isPossible) {
         abclPlayer.stats.BladderFullness = 0;
@@ -78,9 +70,7 @@ export const initActivitiesData = (): void => {
     TargetSelf: ["ItemButt"],
     Criteria: (player) => {
       if (abclPlayer.stats.MentalRegression > 0.3) {
-        sendChatLocal(
-          "You try to use the toilet but you can't seem to get anything out."
-        );
+        sendChatLocal("You try to use the toilet but you can't seem to get anything out.");
       }
       return abclPlayer.stats.MentalRegression < 0.3;
     },

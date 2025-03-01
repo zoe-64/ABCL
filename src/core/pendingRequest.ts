@@ -1,7 +1,4 @@
-import {
-  ChangeDiaperRequestEntry,
-  PluginServerChatRoomMessage,
-} from "../types/types";
+import { ChangeDiaperRequestEntry, PluginServerChatRoomMessage } from "../types/types";
 import { generateUniqueID } from "./utils";
 
 export const pendingRequests: Map<string, PendingRequest> = new Map();

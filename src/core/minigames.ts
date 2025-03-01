@@ -6,8 +6,7 @@ import { bcModSDK, sendChatLocal } from "./utils";
 
 // for minigame text loading
 bcModSDK.hookFunction("TextLoad", 5, (args, next) => {
-  if (CurrentScreen === "WetMinigame" || CurrentScreen === "MessMinigame")
-    return;
+  if (CurrentScreen === "WetMinigame" || CurrentScreen === "MessMinigame") return;
   else return next(args);
 });
 export const initMinigames = () => {
@@ -84,8 +83,7 @@ export abstract class AccidentMiniGame extends BaseMiniGame {
       this.AccidentChallenge = 5;
     } else {
       var difficultyTimeAdd = (MiniGameDifficulty - 8) * 0.25;
-      this.AccidentGameDuration =
-        this.BaseGameLength + 1000 * difficultyTimeAdd;
+      this.AccidentGameDuration = this.BaseGameLength + 1000 * difficultyTimeAdd;
       MiniGameTimer = this.GameStartTime + this.AccidentGameDuration; // One extra second per challenge level, minus a third of a second per willpower.
       this.AccidentChallenge = MiniGameDifficulty;
     }
@@ -93,12 +91,7 @@ export abstract class AccidentMiniGame extends BaseMiniGame {
     this.AccidentMaxPosition = 400;
     this.AccidentPosition = this.AccidentMaxPosition;
 
-    console.info(
-      "Accident minigame started: difficulty - " +
-        this.AccidentChallenge +
-        " time - " +
-        this.AccidentGameDuration
-    );
+    console.info("Accident minigame started: difficulty - " + this.AccidentChallenge + " time - " + this.AccidentGameDuration);
   }
   get IsGameActive() {
     return CommonTime() < MiniGameTimer && !MiniGameEnded && !this.GameFailed;
@@ -117,38 +110,23 @@ export abstract class AccidentMiniGame extends BaseMiniGame {
   }
 
   RunGame(delta: number) {
-    var timeElapsed =
-      (this.AccidentGameDuration + CommonTime() - MiniGameTimer) / 1000;
+    var timeElapsed = (this.AccidentGameDuration + CommonTime() - MiniGameTimer) / 1000;
 
     // Adjust acceleration every .4s ticks
     if (CommonTime() > this.AccidentNextTick) {
       this.AccidentNextTick = CommonTime() + 400;
-      this.AccidentAcceleration =
-        -(this.AccidentChallenge * 1.25) - timeElapsed * Math.random();
+      this.AccidentAcceleration = -(this.AccidentChallenge * 1.25) - timeElapsed * Math.random();
     }
-    this.AccidentVelocity = Math.min(
-      this.AccidentVelocity,
-      this.AccidentVelocity + this.AccidentAcceleration * 0.25
-    );
-    if (this.AccidentPosition >= this.AccidentMaxPosition)
-      this.AccidentVelocity = Math.min(0, this.AccidentVelocity);
+    this.AccidentVelocity = Math.min(this.AccidentVelocity, this.AccidentVelocity + this.AccidentAcceleration * 0.25);
+    if (this.AccidentPosition >= this.AccidentMaxPosition) this.AccidentVelocity = Math.min(0, this.AccidentVelocity);
 
     if (this.AccidentPosition > 0) {
       this.AccidentPosition += (this.AccidentVelocity / 1000) * delta * 3.5;
     }
 
-    this.AccidentPosition = Math.max(
-      0,
-      Math.min(this.AccidentPosition, this.AccidentMaxPosition)
-    );
+    this.AccidentPosition = Math.max(0, Math.min(this.AccidentPosition, this.AccidentMaxPosition));
 
-    DrawProgressBar(
-      500 - this.AccidentMaxPosition,
-      800,
-      2 * this.AccidentMaxPosition,
-      50,
-      100 * (this.AccidentPosition / this.AccidentMaxPosition)
-    );
+    DrawProgressBar(500 - this.AccidentMaxPosition, 800, 2 * this.AccidentMaxPosition, 50, 100 * (this.AccidentPosition / this.AccidentMaxPosition));
     DrawText(this.hintText, 500, 875, "white", "black");
 
     // var debugStr = "Chal: " + this.AccidentChallenge + " Pos: " + this.AccidentPosition + " Vel: " + this.AccidentVelocity + " Acc: " + this.AccidentAcceleration;
@@ -174,11 +152,7 @@ export abstract class AccidentMiniGame extends BaseMiniGame {
 
   Click() {
     //CommonIsMobile
-    if (this.IsGameActive)
-      this.AccidentVelocity = Math.max(
-        this.AccidentVelocity + (getRandomInt(11) + 5),
-        20
-      );
+    if (this.IsGameActive) this.AccidentVelocity = Math.max(this.AccidentVelocity + (getRandomInt(11) + 5), 20);
   }
 }
 function getRandomInt(max: number): number {
@@ -204,9 +178,7 @@ export class MessMinigame extends AccidentMiniGame {
       sendChatLocal("You've had a messy accident!");
     } else {
       //TODO add soiling clothes
-      sendChatLocal(
-        "You've had an messy accident in your clothes! [not yet implemented]"
-      );
+      sendChatLocal("You've had an messy accident in your clothes! [not yet implemented]");
     }
     abclPlayer.stats.Incontinence += incontinenceOnAccident();
     abclPlayer.stats.BowelValue = 0;
@@ -233,9 +205,7 @@ export class WetMinigame extends AccidentMiniGame {
       sendChatLocal("You've had a wet accident!");
     } else {
       //TODO add wetting clothes
-      sendChatLocal(
-        "You've had a wet accident in your clothes! [not yet implemented]"
-      );
+      sendChatLocal("You've had a wet accident in your clothes! [not yet implemented]");
     }
 
     abclPlayer.stats.Incontinence += incontinenceOnAccident();

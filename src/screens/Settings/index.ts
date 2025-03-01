@@ -4,7 +4,6 @@ import { overlay } from "../../core/player/ui";
 import { saveData } from "../../core/settings";
 import { ModName } from "../../types/definitions";
 import { hasPermissionToRemote } from "../../core/player/permissions";
-import { sendNewSettingsPacket } from "../../core/hooks";
 
 const htmlSettingPage = document.createElement("div");
 htmlSettingPage.classList.add(`${modIdentifier}SettingPage`);
@@ -38,7 +37,6 @@ const updateCaregiverList = (list: HTMLElement) => {
 export const initSettingsScreen = async () => {
   htmlSettingPage.innerHTML = `<sl-tab-group>
   <sl-tab slot="nav" panel="general">General</sl-tab>
-  <sl-tab slot="nav" panel="caregivers">Caregivers</sl-tab>
   <sl-tab slot="nav" panel="remote">Remote</sl-tab>
   <sl-tab-panel name="general">
 
@@ -58,28 +56,6 @@ export const initSettingsScreen = async () => {
       <sl-checkbox class="${modIdentifier}DisableSoiling"> Disable Soiling </sl-checkbox>
     </sl-tooltip>
 
-  </sl-tab-panel>
-
-  <sl-tab-panel name="caregivers">
-
-    <div class="${modIdentifier}AddCaregiver">
-      <sl-input placeholder="Name | MemberNumber" class="${modIdentifier}AddCaregiverInput">
-      </sl-input>
-      <sl-button class="${modIdentifier}AddCaregiverButton" style="display: inline">Add Caregiver</sl-button>
-    </div>
-    <label class="${modIdentifier}CaregiverLabel">Caregivers</label>
-    <ol class="${modIdentifier}CaregiverList">
-    </ol>
-
-    <sl-tooltip content="Attempts to update your caregivers with names and ids from the chatroom" placement="right-start">
-      <sl-button class="${modIdentifier}UpdateCaregiverData">Update Caregiver Data</sl-button>
-    </sl-tooltip>
-
-    <sl-tooltip content="Makes anyone able to access your settings and change them" placement="right-start">
-      <sl-checkbox class="${modIdentifier}OpenRemoteSettings"> Open Remote Settings </sl-checkbox>
-    </sl-tooltip>
-  
-    
   </sl-tab-panel>
 
   <sl-tab-panel name="remote">
@@ -129,24 +105,11 @@ export const initSettingsScreen = async () => {
   const disableWetting: HTMLInputElement | null = htmlSettingPage.querySelector(`.${modIdentifier}DisableWetting`);
   const disableSoiling: HTMLInputElement | null = htmlSettingPage.querySelector(`.${modIdentifier}DisableSoiling`);
 
-  // caregivers
-  const caregiverListElement: HTMLDivElement | null = htmlSettingPage.querySelector(`.${modIdentifier}CaregiverList`);
-  const caregiverInput: HTMLInputElement | null = htmlSettingPage.querySelector(`.${modIdentifier}AddCaregiverInput`);
-  const caregiverButton: HTMLButtonElement | null = htmlSettingPage.querySelector(`.${modIdentifier}AddCaregiverButton`);
-  const openRemoteSettings: HTMLInputElement | null = htmlSettingPage.querySelector(`.${modIdentifier}OpenRemoteSettings`);
-  const updateCaregiverData: HTMLButtonElement | null = htmlSettingPage.querySelector(`.${modIdentifier}UpdateCaregiverData`);
-
   if (
     //general
     !metabolismSelect ||
     !disableWetting ||
     !disableSoiling ||
-    // caregivers
-    !caregiverListElement ||
-    !caregiverInput ||
-    !caregiverButton ||
-    !openRemoteSettings ||
-    !updateCaregiverData ||
     // remote
     !remotePlayerSelect ||
     !refreshRemotes ||
@@ -191,22 +154,6 @@ export const initSettingsScreen = async () => {
     updateRemoteList(remotePlayerSelect);
   });
 
-  // caregivers
-  openRemoteSettings.addEventListener("sl-change", (e: any) => {
-    abclPlayer.settings.OpenRemoteSettings = e.target.checked;
-  });
-  updateCaregiverData.addEventListener("click", () => {
-    abclPlayer.settings.updateCaregiverData();
-    updateCaregiverList(caregiverListElement);
-  });
-  caregiverButton.addEventListener("click", () => {
-    if (caregiverInput.value) {
-      abclPlayer.settings.addCaregiver(caregiverInput.value);
-      caregiverInput.value = "";
-      updateCaregiverList(caregiverListElement);
-    }
-  });
-
   overlay.appendChild(htmlSettingPage);
   PreferenceRegisterExtensionSetting({
     Identifier: modIdentifier,
@@ -231,7 +178,6 @@ export const initSettingsScreen = async () => {
         selectedCharacter = Player;
       }
 
-      updateCaregiverList(caregiverListElement);
       updateRemoteList(remotePlayerSelect);
       // fill select ChatRoomCharacter
 

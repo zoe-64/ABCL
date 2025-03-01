@@ -95,9 +95,7 @@ let dataSaveTimeout: number | null = null;
  * It also sets a timeout to synchronize the extension data with the server and send an update if necessary.
  */
 export const saveData = () => {
-  const compressed = LZString.compressToBase64(
-    JSON.stringify(Player[modIdentifier])
-  );
+  const compressed = LZString.compressToBase64(JSON.stringify(Player[modIdentifier]));
   Player.ExtensionSettings[modIdentifier] = compressed;
 
   if (dataSaveTimeout) {
@@ -123,9 +121,7 @@ export const loadOrGenerateData = () => {
   }
 
   let Settings, Stats;
-  const dataString = LZString.decompressFromBase64(
-    Player.ExtensionSettings[modIdentifier]
-  );
+  const dataString = LZString.decompressFromBase64(Player.ExtensionSettings[modIdentifier]);
   if (!dataString) {
     logger.info(`Generating new settings`);
     Settings = {};

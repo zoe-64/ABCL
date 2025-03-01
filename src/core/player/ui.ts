@@ -31,12 +31,8 @@ export class ABCLStatsWindow {
 	`;
 
     overlay.appendChild(this.statsDrawer);
-    this.statsDrawer
-      .querySelector(`#${modIdentifier}CurrentPlayerSelect`)
-      ?.addEventListener("sl-change", () => this.update());
-    this.statsDrawer
-      .querySelector(`.${modIdentifier}RefreshButton`)
-      ?.addEventListener("click", () => this.update());
+    this.statsDrawer.querySelector(`#${modIdentifier}CurrentPlayerSelect`)?.addEventListener("sl-change", () => this.update());
+    this.statsDrawer.querySelector(`.${modIdentifier}RefreshButton`)?.addEventListener("click", () => this.update());
     this.update();
   }
   close() {
@@ -45,8 +41,7 @@ export class ABCLStatsWindow {
   open(selectedPlayerId?: number) {
     this.statsDrawer.setAttribute("open", "true");
     if (selectedPlayerId !== undefined) {
-      const currentPlayerSelect: HTMLSelectElement | null =
-        this.statsDrawer.querySelector(`#${modIdentifier}CurrentPlayerSelect`);
+      const currentPlayerSelect: HTMLSelectElement | null = this.statsDrawer.querySelector(`#${modIdentifier}CurrentPlayerSelect`);
       if (currentPlayerSelect) {
         currentPlayerSelect.value = selectedPlayerId.toString();
       }
@@ -54,13 +49,10 @@ export class ABCLStatsWindow {
     this.update();
   }
   async update() {
-    const currentPlayerSelect: HTMLSelectElement | null =
-      this.statsDrawer.querySelector(`#${modIdentifier}CurrentPlayerSelect`);
+    const currentPlayerSelect: HTMLSelectElement | null = this.statsDrawer.querySelector(`#${modIdentifier}CurrentPlayerSelect`);
     if (!currentPlayerSelect) return;
 
-    let selectedCharacter: Character | undefined = getCharacter(
-      currentPlayerSelect.value
-    );
+    let selectedCharacter: Character | undefined = getCharacter(currentPlayerSelect.value);
     if (!selectedCharacter || !selectedCharacter?.ABCL) {
       selectedCharacter = Player;
     }
@@ -68,77 +60,40 @@ export class ABCLStatsWindow {
     currentPlayerSelect.innerHTML = "";
     for (let character of ChatRoomCharacter) {
       if (!character.ABCL) continue;
-      currentPlayerSelect.innerHTML += `<sl-option value="${
-        character.MemberNumber
-      }">${getCharacterName(character.MemberNumber)}</sl-option>`;
+      currentPlayerSelect.innerHTML += `<sl-option value="${character.MemberNumber}">${getCharacterName(character.MemberNumber)}</sl-option>`;
     }
 
     const updateInput = (className: string, value: number) => {
       value = Math.round(value);
-      const input: HTMLInputElement | null = this.statsDrawer.querySelector(
-        `.${modIdentifier}${className}`
-      );
-      const label: HTMLLabelElement | null = this.statsDrawer.querySelector(
-        `#${className}`
-      );
+      const input: HTMLInputElement | null = this.statsDrawer.querySelector(`.${modIdentifier}${className}`);
+      const label: HTMLLabelElement | null = this.statsDrawer.querySelector(`#${className}`);
       if (!input || !label) return;
       const valueRounded = Math.round((value + Number.EPSILON) * 10) / 10;
       if (value >= 100) {
         input.value = "100";
-        input.innerText = `overflowing ${Math.round(
-          (value - 100) / (value / 100)
-        )}%`;
-        label.innerText = `${label.innerText.split(":")[0]}: overflowing ${
-          valueRounded - 100
-        }%`;
+        input.innerText = `overflowing ${Math.round((value - 100) / (value / 100))}%`;
+        label.innerText = `${label.innerText.split(":")[0]}: overflowing ${valueRounded - 100}%`;
       } else {
         input.value = valueRounded.toString();
         input.innerText = valueRounded.toString() + "%";
-        label.innerText =
-          label.innerText.split(":")[0] + ": " + valueRounded.toString() + "%";
+        label.innerText = label.innerText.split(":")[0] + ": " + valueRounded.toString() + "%";
       }
     };
     if (!selectedCharacter.ABCL) {
       return;
     }
     if (hasDiaper(selectedCharacter)) {
-      updateInput(
-        "SoilinessPercentage",
-        (selectedCharacter.ABCL.Stats.Soiliness.value /
-          getPlayerDiaperSize(selectedCharacter)) *
-          100
-      );
-      updateInput(
-        "WetnessPercentage",
-        (selectedCharacter.ABCL.Stats.Wetness.value /
-          getPlayerDiaperSize(selectedCharacter)) *
-          100
-      );
+      updateInput("SoilinessPercentage", (selectedCharacter.ABCL.Stats.Soiliness.value / getPlayerDiaperSize(selectedCharacter)) * 100);
+      updateInput("WetnessPercentage", (selectedCharacter.ABCL.Stats.Wetness.value / getPlayerDiaperSize(selectedCharacter)) * 100);
     } else {
       updateInput("SoilinessPercentage", 0);
       updateInput("WetnessPercentage", 0);
     }
 
-    updateInput(
-      "BowelFullness",
-      (selectedCharacter.ABCL.Stats.Bowel.value /
-        selectedCharacter.ABCL.Stats.Bowel.size) *
-        100
-    );
-    updateInput(
-      "BladderFullness",
-      (selectedCharacter.ABCL.Stats.Bladder.value /
-        selectedCharacter.ABCL.Stats.Bladder.size) *
-        100
-    );
-    updateInput(
-      "Incontinence",
-      selectedCharacter.ABCL.Stats.Incontinence.value * 100
-    );
-    updateInput(
-      "MentalRegression",
-      selectedCharacter.ABCL.Stats.MentalRegression.value * 100
-    );
+    updateInput("BowelFullness", (selectedCharacter.ABCL.Stats.Bowel.value / selectedCharacter.ABCL.Stats.Bowel.size) * 100);
+    updateInput("BladderFullness", (selectedCharacter.ABCL.Stats.Bladder.value / selectedCharacter.ABCL.Stats.Bladder.size) * 100);
+    updateInput("Incontinence", selectedCharacter.ABCL.Stats.Incontinence.value * 100);
+    updateInput("MentalRegression", selectedCharacter.ABCL.Stats.MentalRegression.value * 100);
   }
 }
 class MovableElement {
@@ -331,12 +286,7 @@ export class ABCLYesNoPrompt {
   onDeny: (...args: any) => void;
   id: string;
   prompt: HTMLElement = document.createElement("div");
-  constructor(
-    message: string,
-    onAccept: () => void,
-    onDeny: () => void,
-    timeout: number = -1
-  ) {
+  constructor(message: string, onAccept: () => void, onDeny: () => void, timeout: number = -1) {
     new MovableElement(this.prompt);
     this.id = generateUniqueID();
     this.message = message;
@@ -354,18 +304,14 @@ export class ABCLYesNoPrompt {
     this.prompt.id = this.id;
     this.prompt.innerHTML = `<p>${this.message}</p><button class="${modIdentifier}PromptNo ${modIdentifier}Button">Deny</button><button class="${modIdentifier}PromptYes ${modIdentifier}Button">Accept</button>`;
     overlay.appendChild(this.prompt);
-    this.prompt
-      .querySelector(`#${this.id} .${modIdentifier}PromptYes`)
-      ?.addEventListener("click", () => {
-        this.onAccept();
-        this.prompt.remove();
-      });
-    this.prompt
-      .querySelector(`#${this.id} .${modIdentifier}PromptNo`)
-      ?.addEventListener("click", () => {
-        this.onDeny();
-        this.prompt.remove();
-      });
+    this.prompt.querySelector(`#${this.id} .${modIdentifier}PromptYes`)?.addEventListener("click", () => {
+      this.onAccept();
+      this.prompt.remove();
+    });
+    this.prompt.querySelector(`#${this.id} .${modIdentifier}PromptNo`)?.addEventListener("click", () => {
+      this.onDeny();
+      this.prompt.remove();
+    });
   }
 }
 
@@ -404,9 +350,7 @@ export class ABCLTextParticle {
     setInterval(() => this.render(), 1000 / 30);
   }
   render() {
-    this.element.style.top = `${
-      parseInt(this.element.style.top) - this.speed
-    }px`;
+    this.element.style.top = `${parseInt(this.element.style.top) - this.speed}px`;
     if (parseInt(this.element.style.top) < 0) {
       this.element.remove();
     }
@@ -418,19 +362,15 @@ export const overlay = document.createElement("div");
 export let abclStatsWindow: ABCLStatsWindow;
 overlay.classList.add(`${modIdentifier}Overlay`);
 
-export const initOverlay = () => {
+export const initOverlay = (themed: boolean) => {
   waitForElement("#chat-room-div", { childCheck: true }).then(() => {
     abclStatsWindow = new ABCLStatsWindow();
-    overlay.classList.add(
-      (Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light")
-        ? "sl-theme-light"
-        : "sl-theme-dark"
-    );
-    overlay.style.color = (
-      Player.ChatSettings?.ColorTheme ?? "Light"
-    ).startsWith("Light")
-      ? "black"
-      : "white";
+    overlay.classList.add((Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ? "sl-theme-light" : "sl-theme-dark");
+    if (themed) {
+      overlay.style.color = "var(--tmd-text)";
+    } else {
+      overlay.style.color = (Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ? "black" : "white";
+    }
     document.body.appendChild(overlay);
   });
 };

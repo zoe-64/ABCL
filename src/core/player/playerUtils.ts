@@ -1,15 +1,9 @@
 // luv you zoi <3
-export const getCharacter = (
-  identifier: string | number | Character
-): Character | undefined => {
+export const getCharacter = (identifier: string | number | Character): Character | undefined => {
   if (!identifier) return;
   if (typeof identifier === "object") return identifier;
   return ChatRoomCharacter.find((Character) => {
-    return (
-      Character.MemberNumber == identifier ||
-      Character.Name.toLowerCase() === identifier ||
-      Character.Nickname?.toLowerCase() === identifier
-    );
+    return Character.MemberNumber == identifier || Character.Name.toLowerCase() === identifier || Character.Nickname?.toLowerCase() === identifier;
   });
 };
 
