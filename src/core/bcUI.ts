@@ -11,15 +11,5 @@ export function drawCheckbox(
   textTop: number = 45
 ): void {
   DrawText(text, left + textLeft, top + textTop, textColor, "Gray");
-  DrawButton(
-    left,
-    top,
-    width,
-    height,
-    "",
-    isDisabled ? "#ebebe4" : "White",
-    isChecked ? "Icons/Checked.png" : "",
-    undefined,
-    isDisabled
-  );
+  DrawButton(left, top, width, height, "", isDisabled ? "#ebebe4" : "White", isChecked ? "Icons/Checked.png" : "", undefined, isDisabled);
 }

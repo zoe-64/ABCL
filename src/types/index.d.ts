@@ -8,12 +8,7 @@ declare const modRepo: string;
 declare const modIdentifier: string;
 declare const publicURL: string;
 
-type MetabolismSettingValues =
-  | "Normal"
-  | "Slow"
-  | "Fast"
-  | "Faster"
-  | "Fastest";
+type MetabolismSettingValues = "Disabled" | "Normal" | "Slow" | "Fast" | "Faster" | "Fastest";
 interface ModSettings {
   Metabolism: {
     value: MetabolismSettingValues;
@@ -28,7 +23,7 @@ interface ModSettings {
     permission: ModSettingPermission;
   };
   CaregiverIDs: {
-    value: number[];
+    value: ({ memberNumber?: number; name: string } | { memberNumber: number; name?: string })[];
     permission: ModSettingPermission;
   };
   OpenRemoteSettings: {

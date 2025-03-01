@@ -14,10 +14,7 @@ export function isObject(obj: unknown): obj is Record<string, any> {
   return !!obj && typeof obj === "object" && !Array.isArray(obj);
 }
 
-export async function waitFor(
-  func: { (): any; (): boolean; (): any },
-  cancelFunc = () => false
-) {
+export async function waitFor(func: { (): any; (): boolean; (): any }, cancelFunc = () => false) {
   while (!func()) {
     if (cancelFunc()) return false;
     await new Promise((resolve) => setTimeout(resolve, 10));
@@ -42,11 +39,9 @@ export const getMyMaxPermissionLevel = (target: Character) => {
   if (target.IsOwnedByPlayer()) return PermissionLevels.Owner;
   if (target.IsLoverOfPlayer()) return PermissionLevels.Lovers;
 
-  if (target.MemberNumber && Player.FriendList?.includes(target.MemberNumber))
-    return PermissionLevels.Friends;
+  if (target.MemberNumber && Player.FriendList?.includes(target.MemberNumber)) return PermissionLevels.Friends;
 
-  if (ServerChatRoomGetAllowItem(Player, target))
-    return PermissionLevels.ItemPermission;
+  if (ServerChatRoomGetAllowItem(Player, target)) return PermissionLevels.ItemPermission;
 
   return PermissionLevels.Anyone;
 };
@@ -66,10 +61,7 @@ export class Saver {
   }
 }
 
-export const waitForElement = async (
-  selector: string,
-  options: { childCheck?: boolean } = {}
-): Promise<Element> => {
+export const waitForElement = async (selector: string, options: { childCheck?: boolean } = {}): Promise<Element> => {
   return new Promise((resolve) => {
     const element = document.querySelector(selector);
     if (element) {
@@ -90,9 +82,7 @@ export const waitForElement = async (
 };
 export const generateUniqueID = (identifier?: string) => {
   identifier = identifier || modIdentifier;
-  return `${identifier}_${Date.now()}_${Math.random()
-    .toString(36)
-    .substr(2, 9)}`;
+  return `${identifier}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 };
 // similar to saver but limits how often a function can be called
 export class Debouncer {

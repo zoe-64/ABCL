@@ -6,11 +6,7 @@ class Logger {
   }> = [];
   private maxLogSize: number = 100;
 
-  private log(
-    level: string,
-    message: any,
-    logFunction: (...args: any[]) => void
-  ) {
+  private log(level: string, message: any, logFunction: (...args: any[]) => void) {
     const timestamp = new Date().toISOString();
     const logEntry = {
       message,
@@ -19,11 +15,7 @@ class Logger {
       timestamp,
     };
 
-    logFunction(
-      `%c${modIdentifier}:`,
-      `font-weight: bold; color: #f6cbde;`,
-      logEntry
-    );
+    logFunction(`%c${modIdentifier}:`, `font-weight: bold; color: #f6cbde;`, logEntry);
 
     this.logs.push(logEntry);
 

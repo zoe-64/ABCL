@@ -9,8 +9,10 @@ import {
   incontinenceLimitFormula,
 } from "./diaper";
 import { abclStatsWindow } from "./ui";
+import { getCharacter } from "./playerUtils";
 
 const metabolismValues: Map<MetabolismSettingValues, number> = new Map([
+  ["Disabled", 0],
   ["Slow", 0.5], // 40 min
   ["Normal", 1], // 20 min
   ["Fast", 1.5], // 13.3 min
@@ -25,10 +27,8 @@ export const abclPlayer = {
   update: () => {
     // once per minute
     abclPlayer.stats.MentalRegression += mentalRegressionOvertime();
-    abclPlayer.stats.BladderValue +=
-      abclPlayer.stats.WaterIntake * abclPlayer.settings.MetabolismValue;
-    abclPlayer.stats.BowelValue +=
-      abclPlayer.stats.FoodIntake * abclPlayer.settings.MetabolismValue;
+    abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * abclPlayer.settings.MetabolismValue;
+    abclPlayer.stats.BowelValue += abclPlayer.stats.FoodIntake * abclPlayer.settings.MetabolismValue;
 
     abclPlayer.attemptWetting();
     abclPlayer.attemptSoiling();
@@ -38,13 +38,9 @@ export const abclPlayer = {
     if (abclPlayer.settings.DisableWetting) return;
 
     const limit = incontinenceLimitFormula(abclPlayer.stats.Incontinence);
-    const chance = incontinenceChanceFormula(
-      abclPlayer.stats.Incontinence,
-      abclPlayer.stats.BladderFullness
-    );
+    const chance = incontinenceChanceFormula(abclPlayer.stats.Incontinence, abclPlayer.stats.BladderFullness);
 
-    if (!(Math.random() < chance || abclPlayer.stats.BladderFullness > limit))
-      return;
+    if (!(Math.random() < chance || abclPlayer.stats.BladderFullness > limit)) return;
 
     if (!incontinenceCheck.check()) return;
 
@@ -54,13 +50,9 @@ export const abclPlayer = {
     if (abclPlayer.settings.DisableSoiling) return;
 
     const limit = incontinenceLimitFormula(abclPlayer.stats.Incontinence);
-    const chance = incontinenceChanceFormula(
-      abclPlayer.stats.Incontinence,
-      abclPlayer.stats.BowelFullness
-    );
+    const chance = incontinenceChanceFormula(abclPlayer.stats.Incontinence, abclPlayer.stats.BowelFullness);
 
-    if (!(Math.random() < chance || abclPlayer.stats.BowelFullness > limit))
-      return;
+    if (!(Math.random() < chance || abclPlayer.stats.BowelFullness > limit)) return;
 
     if (!incontinenceCheck.check()) return;
 
@@ -237,49 +229,70 @@ export const abclPlayer = {
   settings: {
     set Metabolism(value: MetabolismSettingValues) {
       Player[modIdentifier].Settings.Metabolism.value = value;
-      playerSaver.save();
     },
     set DisableWetting(value: boolean) {
       Player[modIdentifier].Settings.DisableWetting.value = value;
-      playerSaver.save();
     },
     set DisableSoiling(value: boolean) {
       Player[modIdentifier].Settings.DisableSoiling.value = value;
-      playerSaver.save();
     },
-    addCaregiver(id: number) {
+    updateCaregiverData() {
+      this.Caregivers.map((caregiver) => {
+        let character;
+        if (!caregiver.memberNumber) {
+          character = getCharacter(caregiver.name!);
+        }
+        if (!caregiver.name) {
+          character = getCharacter(caregiver.memberNumber!);
+        }
+        if (character) {
+          caregiver.memberNumber = character.MemberNumber;
+          caregiver.name = character.Name;
+        }
+      });
+    },
+    addCaregiver(identifier: string | number | Character) {
+      const character = getCharacter(identifier);
+      let name;
+      let memberNumber;
+      if (typeof identifier === "string") {
+        name = identifier;
+      }
+      if (typeof identifier === "number") {
+        memberNumber = identifier;
+      }
+
       Player[modIdentifier] = merge(Player[modIdentifier], {
         Settings: {
           CaregiverIDs: {
-            value: [...Player[modIdentifier].Settings.CaregiverIDs.value, id],
+            value: [
+              ...Player[modIdentifier].Settings.CaregiverIDs.value,
+              {
+                memberNumber: character?.MemberNumber || memberNumber,
+                name: character?.Name || name,
+              },
+            ],
           },
         },
       });
-      playerSaver.save();
     },
-    removeCaregiver(id: number) {
-      Player[modIdentifier] = merge(Player[modIdentifier], {
-        Settings: {
-          CaregiverIDs: {
-            value: Player[modIdentifier].Settings.CaregiverIDs.value.filter(
-              (x) => x !== id
-            ),
-          },
-        },
+    removeCaregiver(identifier: number | string) {
+      Player[modIdentifier].Settings.CaregiverIDs.value = Player[modIdentifier].Settings.CaregiverIDs.value.filter((x) => {
+        if (typeof identifier === "string") {
+          return x.name !== identifier;
+        }
+        return x.memberNumber !== identifier;
       });
-      playerSaver.save();
     },
+
     set OpenRemoteSettings(value: boolean) {
       Player[modIdentifier].Settings.OpenRemoteSettings.value = value;
-      playerSaver.save();
     },
     get Metabolism(): MetabolismSettingValues {
       return Player[modIdentifier].Settings.Metabolism.value;
     },
     get MetabolismValue(): number {
-      const metabolism = metabolismValues.get(
-        Player[modIdentifier].Settings.Metabolism.value
-      );
+      const metabolism = metabolismValues.get(Player[modIdentifier].Settings.Metabolism.value);
       if (typeof metabolism == "undefined") {
         throw new Error("Invalid metabolism value");
       }
@@ -291,8 +304,11 @@ export const abclPlayer = {
     get DisableSoiling(): boolean {
       return Player[modIdentifier].Settings.DisableSoiling.value;
     },
-    get CaregiverIDs(): number[] {
+    get Caregivers(): ({ memberNumber?: number; name: string } | { memberNumber: number; name?: string })[] {
       return Player[modIdentifier].Settings.CaregiverIDs.value;
+    },
+    set Caregivers(value: ({ memberNumber?: number; name: string } | { memberNumber: number; name?: string })[]) {
+      Player[modIdentifier].Settings.CaregiverIDs.value = value;
     },
     get OpenRemoteSettings(): boolean {
       return Player[modIdentifier].Settings.OpenRemoteSettings.value;
