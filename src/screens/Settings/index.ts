@@ -1,38 +1,20 @@
 import { abclPlayer } from "../../core/player/player";
 import { getCharacter, getCharacterName } from "../../core/player/playerUtils";
 import { overlay } from "../../core/player/ui";
-import { saveData } from "../../core/settings";
+import { syncData } from "../../core/settings";
 import { ModName } from "../../types/definitions";
-import { hasPermissionToRemote } from "../../core/player/permissions";
 
 const htmlSettingPage = document.createElement("div");
-htmlSettingPage.classList.add(`${modIdentifier}SettingPage`);
-htmlSettingPage.classList.add(`${modIdentifier}Hidden`);
+htmlSettingPage.classList.add(`${modIdentifier}SettingPage`, `${modIdentifier}Hidden`);
 
 const updateRemoteList = (list: HTMLElement) => {
-  list.innerHTML = "";
-  for (let character of ChatRoomCharacter) {
-    if (!character.ABCL || character.MemberNumber === Player.MemberNumber) continue;
-    if (!hasPermissionToRemote(character)) continue;
-    list.innerHTML += `<sl-option value="${character.MemberNumber}">${getCharacterName(character.MemberNumber)}</sl-option>`;
-  }
-};
-const updateCaregiverList = (list: HTMLElement) => {
-  list.innerHTML = "";
-  for (let { memberNumber, name } of Player.ABCL.Settings.CaregiverIDs.value) {
-    if (!memberNumber && !name) continue;
-    const listElement = document.createElement("li");
-    listElement.classList.add(`${modIdentifier}Caregiver`);
-    listElement.setAttribute("value", memberNumber?.toString() ?? name);
-    listElement.innerHTML = `<span class="${modIdentifier}CaregiverName">${name} (${memberNumber})</span>
-    <sl-button class="${modIdentifier}RemoveCaregiver" style="display: inline">X</sl-button>`;
-    listElement.querySelector(`.${modIdentifier}RemoveCaregiver`)!.addEventListener("click", () => {
-      console.log("Removing caregiver", memberNumber, name);
-      abclPlayer.settings.removeCaregiver(memberNumber ?? name!);
-      updateCaregiverList(list);
-    });
-    list.appendChild(listElement);
-  }
+  if ((<any>window)?.LITTLISH_CLUB) return;
+  const caregivers = window.LITTLISH_CLUB.getCaregiversOf(Player);
+  list.innerHTML = ChatRoomCharacter.filter(
+    (character) => character.ABCL && character.MemberNumber !== Player.MemberNumber && caregivers.includes(Player.MemberNumber!)
+  )
+    .map((character) => `<sl-option value="${character.MemberNumber}">${getCharacterName(character.MemberNumber)}</sl-option>`)
+    .join("");
 };
 export const initSettingsScreen = async () => {
   htmlSettingPage.innerHTML = `<sl-tab-group>
@@ -119,7 +101,7 @@ export const initSettingsScreen = async () => {
     !remoteDisableWetting ||
     !remoteDisableSoiling
   )
-    return;
+    throw new Error("Could not find elements");
 
   // general
   metabolismSelect.addEventListener("sl-change", (e: any) => {
@@ -136,9 +118,9 @@ export const initSettingsScreen = async () => {
   const updateSelectedRemotePlayer = (memberNumber: MemberNumber) => {
     const character: Character | undefined = getCharacter(memberNumber);
     if (!character || !character.ABCL) return;
-    remoteMetabolismSelect.value = character.ABCL.Settings.Metabolism.value;
-    remoteDisableWetting.checked = character.ABCL.Settings.DisableWetting.value;
-    remoteDisableSoiling.checked = character.ABCL.Settings.DisableSoiling.value;
+    remoteMetabolismSelect.value = character.ABCL.Settings.Metabolism;
+    remoteDisableWetting.checked = character.ABCL.Settings.DisableWetting;
+    remoteDisableSoiling.checked = character.ABCL.Settings.DisableSoiling;
   };
   const pushSettings = (memberNumber: MemberNumber) => {
     // let settings: Partial<ModSettings> = {};
@@ -167,7 +149,7 @@ export const initSettingsScreen = async () => {
     },
     exit: () => {
       htmlSettingPage.classList.add(`${modIdentifier}Hidden`);
-      saveData();
+      syncData();
       return true;
     },
     load: () => {

@@ -4,7 +4,6 @@ import { loadOrGenerateData } from "./core/settings";
 import { bcModSDK, isObject, waitForElement } from "./core/utils";
 import { initScreens } from "./screens";
 import { initSettingsScreen } from "./screens/Settings";
-import { createCSS } from "./screens/styles/css";
 import abclData from "./assets/dictionary.json" assert { type: "json" };
 import { initActivities } from "./core/activities";
 import { initMinigames } from "./core/minigames";
@@ -30,6 +29,7 @@ const initWait = () => {
         init();
       }
     });
+    return;
   }
   logger.info(`${modIdentifier}: Already logged in, loading...`);
   init();
@@ -77,25 +77,6 @@ const init = async () => {
     }
   };
   await isThemeLoaded();
-  const shoelaceCSSLight = document.createElement("link");
-  shoelaceCSSLight.rel = "stylesheet";
-  shoelaceCSSLight.href = "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/themes/light.css";
-  document.head.appendChild(shoelaceCSSLight);
-
-  const shoelaceCSSDark = document.createElement("link");
-  shoelaceCSSDark.rel = "stylesheet";
-  shoelaceCSSDark.href = "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/themes/dark.css";
-  document.head.appendChild(shoelaceCSSDark);
-
-  const shoelaceScript = document.createElement("script");
-  shoelaceScript.src = "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/shoelace-autoloader.js";
-  shoelaceScript.type = "module";
-  shoelaceScript.async = true;
-  document.head.appendChild(shoelaceScript);
-
-  const injectedStyles = document.createElement("style");
-  injectedStyles.innerHTML = createCSS(isUsingThemed());
-  document.head.appendChild(injectedStyles);
 
   ServerPlayerSync();
   loadOrGenerateData();

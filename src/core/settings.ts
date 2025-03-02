@@ -1,51 +1,23 @@
-import { merge } from "lodash-es";
-import { PartialDeep, PermissionLevels } from "../types/types";
+import { merge, debounce } from "lodash-es";
+import { PartialDeep } from "../types/types";
 import { sendUpdateMyData as sendUpdateMyData } from "./hooks";
 import { logger } from "./logger";
 
+export const metabolismValues: Map<MetabolismSettingValues, number> = new Map([
+  ["Disabled", 0],
+  ["Slow", 0.5], // 40 min
+  ["Normal", 1], // 20 min
+  ["Fast", 1.5], // 13.3 min
+  ["Faster", 2], // 10 min
+  ["Fastest", 3], // 6.6 min
+]);
+
 export const defaultSettings: ModSettings = {
-  Metabolism: {
-    value: "Normal",
-    permission: {
-      canView: PermissionLevels.Anyone,
-      canModify: PermissionLevels.Owner,
-    },
-  },
-  DisableWetting: {
-    value: false,
-    permission: {
-      canView: PermissionLevels.Owner, // maybe it could be used to signal to other players that this player does not like wetting
-      canModify: PermissionLevels.Self,
-    },
-  },
-  DisableSoiling: {
-    value: false,
-    permission: {
-      canView: PermissionLevels.Owner,
-      canModify: PermissionLevels.Self,
-    },
-  },
-  CaregiverIDs: {
-    value: [],
-    permission: {
-      canView: PermissionLevels.Anyone, // if this is not set to anyone then it would mean only those that fit the permission level could be caregivers, however it could be a good thing
-      canModify: PermissionLevels.Self,
-    },
-  },
-  OpenRemoteSettings: {
-    value: false,
-    permission: {
-      canView: PermissionLevels.Anyone, // this should probably always be visible
-      canModify: PermissionLevels.Self,
-    },
-  },
-  LockedOutOfSettings: {
-    value: false,
-    permission: {
-      canView: PermissionLevels.Owner,
-      canModify: PermissionLevels.Self, // if value becomes true then the player wouldn't be able to turn it off, we should warn for this
-    },
-  },
+  Metabolism: "Normal",
+  DisableWetting: false,
+  DisableSoiling: false,
+  OpenRemoteSettings: false,
+  LockedOutOfSettings: false,
 };
 
 export const defaultStats: ModStats = {
@@ -81,68 +53,49 @@ const defaultData: ModStorageModel = {
   Stats: defaultStats,
 };
 
-export const mutateData = (newData: PartialDeep<ModStorageModel>) => {
+export const updateData = (newData: PartialDeep<ModStorageModel>) => {
   Player[modIdentifier] = merge(Player[modIdentifier] || defaultData, newData);
-  saveData();
+  syncData();
 };
 
-let dataSaveTimeout: number | null = null;
-/**
- * Saves the data by compressing and storing them in the Player object and sending an update to the server.
- *
- * @remarks
- * This function compresses the data using LZString and stores them in the Player object.
- * It also sets a timeout to synchronize the extension data with the server and send an update if necessary.
- */
-export const saveData = () => {
+export const syncData = debounce(() => {
   const compressed = LZString.compressToBase64(JSON.stringify(Player[modIdentifier]));
   Player.ExtensionSettings[modIdentifier] = compressed;
+  ServerPlayerExtensionSettingsSync(modIdentifier);
+  sendUpdateMyData();
+}, 1000);
 
-  if (dataSaveTimeout) {
-    logger.debug("Clearing existing data save timeout");
-    clearTimeout(dataSaveTimeout);
-  }
-  dataSaveTimeout = setTimeout(() => {
-    ServerPlayerExtensionSettingsSync(modIdentifier);
-    logger.debug({
-      message: "Data saved, sending update to server",
-      data: compressed,
-    });
-    sendUpdateMyData();
-  }, 1000);
-};
-
-const devMode = false; // Manually toggle during local development if needed to clear settings
+//const devMode = false; use clearData() // Manually toggle during local development if needed to clear settings
 export const loadOrGenerateData = () => {
-  if (devMode) {
-    Player.ExtensionSettings[modIdentifier] = "N4XyA==="; // Empty object compressed
-    ServerPlayerExtensionSettingsSync(modIdentifier);
-    logger.warn("Dev mode enabled, cleared data");
-  }
-
-  let Settings, Stats;
   const dataString = LZString.decompressFromBase64(Player.ExtensionSettings[modIdentifier]);
-  if (!dataString) {
-    logger.info(`Generating new settings`);
-    Settings = {};
-    Stats = {};
-  } else {
-    logger.info(`Loaded settings from server`);
-    Settings = JSON.parse(dataString).Settings as ModSettings;
-    Stats = JSON.parse(dataString).Stats as ModStats;
+  const data = dataString
+    ? JSON.parse(dataString)
+    : {
+        Settings: {},
+        Stats: {},
+        ModVersion: modVersion,
+      };
+
+  // migrations
+  if (data.ModVersion === "2.0.0") {
+    // in 2.0.1 we removed the permission levels and caregivers from the settings because of littlish taking over
+    data.Settings = Object.fromEntries(
+      Object.entries(data.Settings as Record<string, { value: any }>)
+        .filter(([key]) => key !== "CaregiverIDs")
+        .map(([key, { value }]) => [key, value])
+    );
+    data.ModVersion = "2.0.1";
   }
 
   const modStorageObject = merge(
     {
-      Settings: defaultSettings, // Start with default settings, so if new settings are added they are added to all players
+      Settings: defaultSettings,
       Stats: defaultStats,
       ModVersion: modVersion,
     },
-    { Settings, Stats } // Merge in the user's existing data
+    data
   );
-
   logger.debug({ message: "Merged settings object", modStorageObject });
-
   Player[modIdentifier] = modStorageObject;
 };
 

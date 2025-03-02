@@ -10,15 +10,7 @@ import {
 } from "./diaper";
 import { abclStatsWindow } from "./ui";
 import { getCharacter } from "./playerUtils";
-
-const metabolismValues: Map<MetabolismSettingValues, number> = new Map([
-  ["Disabled", 0],
-  ["Slow", 0.5], // 40 min
-  ["Normal", 1], // 20 min
-  ["Fast", 1.5], // 13.3 min
-  ["Faster", 2], // 10 min
-  ["Fastest", 3], // 6.6 min
-]);
+import { metabolismValues } from "../settings";
 
 export const abclPlayer = {
   onAccident: () => {
@@ -228,90 +220,35 @@ export const abclPlayer = {
   },
   settings: {
     set Metabolism(value: MetabolismSettingValues) {
-      Player[modIdentifier].Settings.Metabolism.value = value;
+      Player[modIdentifier].Settings.Metabolism = value;
     },
     set DisableWetting(value: boolean) {
-      Player[modIdentifier].Settings.DisableWetting.value = value;
+      Player[modIdentifier].Settings.DisableWetting = value;
     },
     set DisableSoiling(value: boolean) {
-      Player[modIdentifier].Settings.DisableSoiling.value = value;
+      Player[modIdentifier].Settings.DisableSoiling = value;
     },
-    updateCaregiverData() {
-      this.Caregivers.map((caregiver) => {
-        let character;
-        if (!caregiver.memberNumber) {
-          character = getCharacter(caregiver.name!);
-        }
-        if (!caregiver.name) {
-          character = getCharacter(caregiver.memberNumber!);
-        }
-        if (character) {
-          caregiver.memberNumber = character.MemberNumber;
-          caregiver.name = character.Name;
-        }
-      });
-    },
-    addCaregiver(identifier: string | number | Character) {
-      const character = getCharacter(identifier);
-      let name;
-      let memberNumber;
-      if (typeof identifier === "string") {
-        name = identifier;
-      }
-      if (typeof identifier === "number") {
-        memberNumber = identifier;
-      }
-
-      Player[modIdentifier] = merge(Player[modIdentifier], {
-        Settings: {
-          CaregiverIDs: {
-            value: [
-              ...Player[modIdentifier].Settings.CaregiverIDs.value,
-              {
-                memberNumber: character?.MemberNumber || memberNumber,
-                name: character?.Name || name,
-              },
-            ],
-          },
-        },
-      });
-    },
-    removeCaregiver(identifier: number | string) {
-      Player[modIdentifier].Settings.CaregiverIDs.value = Player[modIdentifier].Settings.CaregiverIDs.value.filter((x) => {
-        if (typeof identifier === "string") {
-          return x.name !== identifier;
-        }
-        return x.memberNumber !== identifier;
-      });
-    },
-
     set OpenRemoteSettings(value: boolean) {
-      Player[modIdentifier].Settings.OpenRemoteSettings.value = value;
+      Player[modIdentifier].Settings.OpenRemoteSettings = value;
     },
     get Metabolism(): MetabolismSettingValues {
-      return Player[modIdentifier].Settings.Metabolism.value;
+      return Player[modIdentifier].Settings.Metabolism;
     },
     get MetabolismValue(): number {
-      const metabolism = metabolismValues.get(Player[modIdentifier].Settings.Metabolism.value);
+      const metabolism = metabolismValues.get(Player[modIdentifier].Settings.Metabolism);
       if (typeof metabolism == "undefined") {
         throw new Error("Invalid metabolism value");
       }
       return metabolism;
     },
     get DisableWetting(): boolean {
-      return Player[modIdentifier].Settings.DisableWetting.value;
+      return Player[modIdentifier].Settings.DisableWetting;
     },
     get DisableSoiling(): boolean {
-      return Player[modIdentifier].Settings.DisableSoiling.value;
-    },
-    get Caregivers(): ({ memberNumber?: number; name: string } | { memberNumber: number; name?: string })[] {
-      return Player[modIdentifier].Settings.CaregiverIDs.value;
-    },
-    set Caregivers(value: ({ memberNumber?: number; name: string } | { memberNumber: number; name?: string })[]) {
-      Player[modIdentifier].Settings.CaregiverIDs.value = value;
+      return Player[modIdentifier].Settings.DisableSoiling;
     },
     get OpenRemoteSettings(): boolean {
-      return Player[modIdentifier].Settings.OpenRemoteSettings.value;
+      return Player[modIdentifier].Settings.OpenRemoteSettings;
     },
   },
 };

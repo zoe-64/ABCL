@@ -7,18 +7,6 @@ import { getCharacter, getCharacterName } from "./player/playerUtils";
 import { ABCLYesNoPrompt } from "./player/ui";
 import { bcModSDK, sendChatLocal, waitFor } from "./utils";
 import { overlay } from "./player/ui";
-import { getPermissionLevel, hasPermissionToModifySetting } from "./player/permissions";
-
-const filterRestrictedSettings = (settings: ModSettings, target: Character) => {
-  const myHighestPermission = getPermissionLevel(target);
-
-  return Object.entries(settings).reduce((acc, [key, value]) => {
-    if (value.permission.canView <= myHighestPermission) {
-      acc[key as keyof ModSettings] = value;
-    }
-    return acc;
-  }, {} as ModSettings);
-};
 
 export const sendServerChatRoomMessage = (message: MessageEntry): PluginServerChatRoomMessage => {
   const ChatRoomMessage: PluginServerChatRoomMessage = {
@@ -83,7 +71,7 @@ const handleSyncPacket = (data: PluginServerChatRoomMessage) => {
   if (!otherCharacter) return;
 
   otherCharacter[modIdentifier] = {
-    Settings: filterRestrictedSettings(message.settings, otherCharacter),
+    Settings: message.settings,
     Stats: message.stats,
   };
 };
@@ -99,14 +87,10 @@ export const handleNewSettingsPacket = (data: PluginServerChatRoomMessage) => {
   const message = data.Dictionary?.[0]?.message as NewSettingsEntry | undefined;
   if (!message) return;
   // make sure all settings included are allowed by permissions
-  const allowedSettings = Object.fromEntries(
-    Object.entries(message.settings ?? {}).filter(([key]) => hasPermissionToModifySetting(data.Sender!, key as keyof ModSettings, false))
-  );
-  if (Object.keys(allowedSettings).length === 0) return;
 
   Player[modIdentifier].Settings = {
     ...Player[modIdentifier].Settings,
-    ...allowedSettings,
+    ...message.settings,
   };
 
   console.log("Updated settings", Player[modIdentifier].Settings);
