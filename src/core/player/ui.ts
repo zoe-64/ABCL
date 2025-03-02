@@ -1,4 +1,5 @@
-import { bcModSDK, generateUniqueID, waitForElement } from "../utils";
+import { createCSS } from "../../screens/styles/css";
+import { generateUniqueID, waitForElement } from "../utils";
 import { getPlayerDiaperSize, hasDiaper } from "./diaper";
 import { getCharacter, getCharacterName } from "./playerUtils";
 
@@ -252,34 +253,6 @@ class MovableElement {
   }
 }
 
-export class ABCLNotification {
-  message: string;
-  duration: number;
-  constructor(message: string, duration: number = 3000) {
-    this.message = message;
-    this.duration = duration;
-    this.show();
-  }
-
-  show() {
-    const notification = document.createElement("div");
-    notification.classList.add(`${modIdentifier}Notification`);
-    notification.textContent = this.message;
-
-    const closeButton = document.createElement("button");
-    closeButton.classList.add("ABCLClose");
-    closeButton.textContent = "X";
-    closeButton.addEventListener("click", () => notification.remove());
-
-    notification.appendChild(closeButton);
-    overlay.appendChild(notification);
-
-    setTimeout(() => {
-      notification.remove();
-    }, this.duration);
-  }
-}
-
 export class ABCLYesNoPrompt {
   message: string;
   onAccept: (...args: any) => void;
@@ -315,62 +288,39 @@ export class ABCLYesNoPrompt {
   }
 }
 
-// like in cookie clicker how numbers float up
-export class ABCLTextParticle {
-  element: HTMLElement = document.createElement("div");
-  color: string = "white";
-  size: number = 1;
-  speed: number = 1;
-  x: number = 0;
-  y: number = 0;
-
-  constructor(
-    element: HTMLElement | string,
-    options: { size?: number; speed?: number; x: number; y: number } = {
-      x: 0,
-      y: 0,
-    },
-    color: string = "white"
-  ) {
-    if (typeof element === "string") {
-      this.element.innerHTML = element;
-    } else {
-      this.element = element;
-    }
-    this.speed = options.speed || 1;
-    this.size = options.size || 1;
-    this.x = options.x;
-    this.y = options.y;
-    this.element.classList.add(`${modIdentifier}TextParticle`);
-    this.element.style.color = color;
-    this.element.style.fontSize = `${options.size}px`;
-    this.element.style.left = `${options.x}px`;
-    this.element.style.top = `${options.y}px`;
-    overlay.appendChild(this.element);
-    setInterval(() => this.render(), 1000 / 30);
-  }
-  render() {
-    this.element.style.top = `${parseInt(this.element.style.top) - this.speed}px`;
-    if (parseInt(this.element.style.top) < 0) {
-      this.element.remove();
-    }
-  }
-}
-
 export const overlay = document.createElement("div");
 
 export let abclStatsWindow: ABCLStatsWindow;
 overlay.classList.add(`${modIdentifier}Overlay`);
 
 export const initOverlay = (themed: boolean) => {
-  waitForElement("#chat-room-div", { childCheck: true }).then(() => {
-    abclStatsWindow = new ABCLStatsWindow();
-    overlay.classList.add((Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ? "sl-theme-light" : "sl-theme-dark");
-    if (themed) {
-      overlay.style.color = "var(--tmd-text)";
-    } else {
-      overlay.style.color = (Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ? "black" : "white";
-    }
-    document.body.appendChild(overlay);
-  });
+  const shoelaceCSSLight = document.createElement("link");
+  shoelaceCSSLight.rel = "stylesheet";
+  shoelaceCSSLight.href = "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/themes/light.css";
+  document.head.appendChild(shoelaceCSSLight);
+
+  const shoelaceCSSDark = document.createElement("link");
+  shoelaceCSSDark.rel = "stylesheet";
+  shoelaceCSSDark.href = "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/themes/dark.css";
+  document.head.appendChild(shoelaceCSSDark);
+
+  const shoelaceScript = document.createElement("script");
+  shoelaceScript.src = "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/shoelace-autoloader.js";
+  shoelaceScript.type = "module";
+  shoelaceScript.async = true;
+  document.head.appendChild(shoelaceScript);
+
+  const injectedStyles = document.createElement("style");
+  injectedStyles.innerHTML = createCSS(themed);
+
+  document.head.appendChild(injectedStyles);
+  document.body.appendChild(overlay);
+  abclStatsWindow = new ABCLStatsWindow();
+  overlay.classList.add((Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ? "sl-theme-light" : "sl-theme-dark");
+  if (themed) {
+    overlay.style.color = "var(--tmd-text)";
+  } else {
+    overlay.style.color = (Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ? "black" : "white";
+  }
+  waitForElement("#chat-room-div", { childCheck: true }).then(() => {});
 };

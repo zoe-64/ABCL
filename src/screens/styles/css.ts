@@ -189,6 +189,7 @@ export const createCSS = (themed: boolean) => {
 	pointer-events: none;
   font-family: arial;
   color: ${fontColor};
+  order: 100;
 }
 .ABCLWindowHeaderTitle {
   margin: 5px;
@@ -442,11 +443,63 @@ ${
 .ABCLoverlay sl-radio-button::part(label) {
   color: var(--tmd-text);
 }
-.ABCLoverlay sl-tab::part(base):hover:not(.tab--disabled) {
+.ABCLoverlay sl-tab::part(base) 
+  background-color: var(--tmd-element-hover);
+}
+.ABCLoverlay sl-tab::part(base):hover {
   color: var(--tmd-text);
   background-color: var(--tmd-element-hover);
 }
 
+sl-radio-button::part(button), sl-tab::part(base) {
+  color: var(--tmd-text);
+  background-color: var(--tmd-element);
+  
+}
+sl-tab::part(base) {
+  border-radius: 0;
+}
+sl-radio-button::part(button) {
+    border: var(--tmd-element) 1px solid;
+}
+
+sl-radio-button::part(button):hover, sl-tab::part(base):hover {
+  background-color: var(--tmd-element-hover);
+}
+sl-radio-button::part(button):hover {
+  border: var(--tmd-element-hover) 1px solid;
+}
+
+sl-radio-button::part(button--checked), sl-tab[aria-selected="true"]::part(base) {
+
+  background-color: var(--tmd-accent);
+}
+sl-radio-button::part(button--checked):hover ,sl-tab[aria-selected="true"]::part(base):hover {
+  background-color: var(--tmd-accent-hover);
+}
+
+sl-button::part(base) {
+  background-color: var(--tmd-element);
+  border-color: var(--tmd-accent);
+
+}
+sl-button::part(base):hover {
+   background-color: var(--tmd-element-hover);
+   border-color: var(--tmd-accent-hover);
+}
+sl-button::part(base):active {
+  background-color: var(--tmd-accent-hover);
+  border-color: var(--tmd-accent-hover)
+}
+sl-button::part(label) {
+  color: var(--tmd-text);
+}
+sl-button::part(label) {
+  color: var(--tmd-text);
+}
+sl-button {
+    margin: 0.5em 0;
+}
 `
 }
 
