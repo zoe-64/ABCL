@@ -3,12 +3,7 @@ import { ModScreen } from "../types/types";
 
 export const initScreens = (screens: ModScreen[]) => {
   bcModSDK.hookFunction("TextLoad", 5, (args, next) => {
-    if (
-      screens.some(
-        (screen) =>
-          screen.module === CurrentModule && screen.id === CurrentScreen
-      )
-    ) {
+    if (screens.some((screen) => screen.module === CurrentModule && screen.id === CurrentScreen)) {
       return;
     }
 

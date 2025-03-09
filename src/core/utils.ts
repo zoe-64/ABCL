@@ -10,6 +10,13 @@ export const bcModSDK = bcModSdkRef.registerMod({
   repository: ModRepo,
 });
 
+export enum HookPriority {
+  OBSERVE = 0,
+  ADD_BEHAVIOR = 1,
+  MODIFY_BEHAVIOR = 5,
+  OVERRIDE_BEHAVIOR = 10,
+  TOP = 100,
+}
 export function isObject(obj: unknown): obj is Record<string, any> {
   return !!obj && typeof obj === "object" && !Array.isArray(obj);
 }

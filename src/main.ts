@@ -1,7 +1,7 @@
 import initHooks from "./core/hooks";
 import { logger } from "./core/logger";
 import { loadOrGenerateData } from "./core/settings";
-import { bcModSDK, isObject, waitForElement } from "./core/utils";
+import { bcModSDK, HookPriority, isObject, waitForElement } from "./core/utils";
 import { initScreens } from "./screens";
 import { initSettingsScreen } from "./screens/Settings";
 import abclData from "./assets/dictionary.json" assert { type: "json" };
@@ -11,15 +11,22 @@ import { abclPlayer } from "./core/player/player";
 import "./core/global";
 import { initOverlay } from "./core/player/ui";
 import { initCommands } from "./core/commands";
-import bcModSdk from "bondage-club-mod-sdk";
 export type AbclData = typeof abclData;
 export const ABCLdata: AbclData = abclData;
-
 export const updateInterval = 60 * 1000;
+
+if (CurrentScreen == null || CurrentScreen === "Login") {
+  logger.info(`Waiting for possible login...`);
+  bcModSDK.hookFunction("LoginResponse", HookPriority.OBSERVE, (args, next) => {
+    next(args);
+    const { Name, AccountName } = args[0];
+    if (typeof Name === "string" && typeof AccountName === "string") init();
+  });
+} else init();
+
 
 const initWait = () => {
   logger.info(`Waiting for possible login...`);
-  if (CurrentScreen == null || CurrentScreen === "Login") {
     bcModSDK.hookFunction("LoginResponse", 0, (args, next) => {
       next(args);
       if (!isObject(args[0])) return;
@@ -31,8 +38,6 @@ const initWait = () => {
     });
     return;
   }
-  logger.info(`${modIdentifier}: Already logged in, loading...`);
-  init();
 };
 const loop = () => {
   if (CurrentScreen !== "ChatRoom") {
@@ -85,7 +90,6 @@ const init = async () => {
   initScreens([]);
   initHooks();
   logger.info(`Ready.`);
-  window.modLoadFlag = true;
   initActivities();
   initMinigames();
   initOverlay(isUsingThemed());

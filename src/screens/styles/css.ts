@@ -121,11 +121,11 @@ function generateDynamicCSSVariables(property: string, sourceVariable: string, f
   --tmd-room-blocked-hover: #A20E0E;
   --tmd-room-game: #3575B5;
   --tmd-room-game-hover: #4E8CCB;`;
-export const createCSS = (themed: boolean) => {
+export const createCSS = () => {
   const shoelaceOverides =
     generateDynamicCSSVariables("color-primary", "--tmd-accent", hexToHsl("#0284c7")) +
     generateDynamicCSSVariables("color-neutral", "--tmd-element", hexToHsl("#52525b"));
-  const fontColor = themed ? "var(--tmd-text)" : "black";
+  const fontColor = "var(--tmd-text, --sl-color-neutral-700)";
   const sliders = [
     {
       className: "SoilinessPercentage",
