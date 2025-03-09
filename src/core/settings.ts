@@ -1,26 +1,22 @@
 import { merge, debounce } from "lodash-es";
-import { PartialDeep } from "../types/types";
+import { DiaperSettingValues, MetabolismSettings, PartialDeep } from "../types/types";
 import { sendUpdateMyData as sendUpdateMyData } from "./hooks";
 import { logger } from "./logger";
 
-export const metabolismValues: Map<MetabolismSettingValues, number> = new Map([
-  ["Disabled", 0],
-  ["Slow", 0.5], // 40 min
-  ["Normal", 1], // 20 min
-  ["Fast", 1.5], // 13.3 min
-  ["Faster", 2], // 10 min
-  ["Fastest", 3], // 6.6 min
-]);
-
 export const defaultSettings: ModSettings = {
-  Metabolism: "Normal",
-  DisableWetting: false,
-  DisableSoiling: false,
+  PeeMetabolism: MetabolismSettings.Normal,
+  PoopMetabolism: MetabolismSettings.Normal,
   OpenRemoteSettings: false,
   LockedOutOfSettings: false,
+  DisableWettingLeaks: false,
+  DisableSoilingLeaks: true,
+  OnDiaperChange: DiaperSettingValues.Ask,
 };
 
 export const defaultStats: ModStats = {
+  PuddleSize: {
+    value: 0,
+  },
   Bladder: {
     value: 0, // in ml
     size: 300, // in ml, quite arbitrary
@@ -73,25 +69,30 @@ export const loadOrGenerateData = () => {
     : {
         Settings: {},
         Stats: {},
-        ModVersion: modVersion,
       };
 
   // migrations
   if (data.ModVersion === "2.0.0") {
-    // in 2.0.1 we removed the permission levels and caregivers from the settings because of littlish taking over
-    data.Settings = Object.fromEntries(
-      Object.entries(data.Settings as Record<string, { value: any }>)
-        .filter(([key]) => key !== "CaregiverIDs")
-        .map(([key, { value }]) => [key, value])
-    );
-    data.ModVersion = "2.0.1";
+    const metabolismValue = data.Settings.Metabolism;
+    const disableWetting = data.Settings.DisableWetting;
+    data.Settings = {
+      ...Object.fromEntries(
+        Object.entries(data.Settings as Record<string, { value: any }>)
+          .filter(([key]) => !["DisableWetting", "DisableSoiling", "Metabolism", "CaregiverIDs"].includes(key))
+          .map(([key, { value }]) => [key, value])
+      ),
+      PeeMetabolism: disableWetting ? "Disabled" : metabolismValue,
+      PoopMetabolism: disableWetting ? "Disabled" : metabolismValue,
+    };
+    data.ModVersion = undefined;
+    data.Version = "2.0.1";
   }
 
   const modStorageObject = merge(
     {
       Settings: defaultSettings,
       Stats: defaultStats,
-      ModVersion: modVersion,
+      Version: modVersion,
     },
     data
   );

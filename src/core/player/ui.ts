@@ -293,7 +293,7 @@ export const overlay = document.createElement("div");
 export let abclStatsWindow: ABCLStatsWindow;
 overlay.classList.add(`${modIdentifier}Overlay`);
 
-export const initOverlay = (themed: boolean) => {
+export const initOverlay = () => {
   const shoelaceCSSLight = document.createElement("link");
   shoelaceCSSLight.rel = "stylesheet";
   shoelaceCSSLight.href = "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/themes/light.css";
@@ -311,16 +311,20 @@ export const initOverlay = (themed: boolean) => {
   document.head.appendChild(shoelaceScript);
 
   const injectedStyles = document.createElement("style");
-  injectedStyles.innerHTML = createCSS(themed);
+  injectedStyles.innerHTML = createCSS();
 
   document.head.appendChild(injectedStyles);
-  document.body.appendChild(overlay);
   abclStatsWindow = new ABCLStatsWindow();
   overlay.classList.add((Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ? "sl-theme-light" : "sl-theme-dark");
-  if (themed) {
-    overlay.style.color = "var(--tmd-text)";
-  } else {
-    overlay.style.color = (Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ? "black" : "white";
-  }
-  waitForElement("#chat-room-div", { childCheck: true }).then(() => {});
+  overlay.style.color = (Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ? "var(--tmd-text,black)" : "var(--tmd-text,white)";
+  document.body.appendChild(overlay);
+
+  waitForElement("#chat-room-div", { childCheck: true }).then(() => {
+    waitForElement(`.${modIdentifier}Overlay`).then(() => {
+      document.removeChild(overlay);
+      setTimeout(() => {
+        document.appendChild(overlay);
+      }, 1000);
+    });
+  });
 };

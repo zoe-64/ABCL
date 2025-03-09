@@ -1,44 +1,45 @@
 import bcModSdk from "bondage-club-mod-sdk";
-import { SyncEntry, PluginServerChatRoomMessage, MessageEntry, ChangeDiaperRequestEntry, NewSettingsEntry } from "../types/types";
+import { PluginServerChatRoomMessage, ListenerTypeMap, HookListener } from "../types/types";
 import { logger } from "./logger";
-import { pendingRequests } from "./pendingRequest";
-import { changeDiaper, isDiaper, updateDiaperColor } from "./player/diaper";
-import { getCharacter, getCharacterName } from "./player/playerUtils";
-import { ABCLYesNoPrompt } from "./player/ui";
-import { bcModSDK, sendChatLocal, waitFor } from "./utils";
+import { isDiaper, updateDiaperColor } from "./player/diaper";
+import { isABCLPlayer } from "./player/playerUtils";
+import { bcModSDK, waitFor } from "./utils";
 import { overlay } from "./player/ui";
-
-export const sendServerChatRoomMessage = (message: MessageEntry): PluginServerChatRoomMessage => {
+import { ModIdentifier, ModVersion } from "../types/definitions";
+import { actions } from "./actionLoader";
+export const sendDataToAction = (type: string, data?: any, target?: number) => {
   const ChatRoomMessage: PluginServerChatRoomMessage = {
     Type: "Hidden",
-    Content: `${modIdentifier}Msg`,
+    Content: `${ModIdentifier}Msg`,
     Sender: Player.MemberNumber,
+    Target: target,
     Dictionary: [
       {
-        message: message,
+        type: type,
+        data: data,
       },
     ],
   };
-
   ServerSend("ChatRoomChat", ChatRoomMessage as ServerChatRoomMessage);
-  return ChatRoomMessage;
 };
+
 /**
  * Sends an update of the player's settings to the specified target or to everyone in the chat room.
  *
  * @param {number} [target] - The MemberNumber of the target player. If not specified, the update is sent to all players.
  */
 export const sendUpdateMyData = (target?: number) => {
-  const syncDataMessage: PluginServerChatRoomMessage = sendServerChatRoomMessage({
-    type: "sync",
-    settings: Player[modIdentifier].Settings,
-    stats: Player[modIdentifier].Stats,
-    target,
-  });
-
+  sendDataToAction(
+    "sync",
+    {
+      settings: Player[ModIdentifier].Settings,
+      stats: Player[ModIdentifier].Stats,
+      version: ModVersion,
+    },
+    target
+  );
   logger.debug({
     message: `Sending updated data to ${target ?? "everyone"}`,
-    data: syncDataMessage,
   });
 };
 
@@ -46,146 +47,61 @@ export const sendUpdateMyData = (target?: number) => {
  * Sends a request packet to other players in the chat room to retrieve their data.
  */
 export const sendRequestOtherDataPacket = () => {
-  sendServerChatRoomMessage({
-    type: "init",
-  });
+  sendDataToAction("init");
 
   logger.debug(`Requesting data from others.`);
 };
 
 /**
- * Handles the "sync" packet received from other players, updating the local player's data with the received data.
- *
- * @param {PluginServerChatRoomMessage} data - The message data received from the server.
- */
-const handleSyncPacket = (data: PluginServerChatRoomMessage) => {
-  if (!data.Sender) return;
-  const message = data.Dictionary?.[0]?.message as SyncEntry | undefined;
-  if (!message) return;
-  logger.debug({
-    message: `Received updated data`,
-    data,
-  });
-
-  const otherCharacter = getCharacter(data.Sender);
-  if (!otherCharacter) return;
-
-  otherCharacter[modIdentifier] = {
-    Settings: message.settings,
-    Stats: message.stats,
-  };
-};
-export const sendNewSettingsPacket = (settings: Partial<ModSettings>) => {
-  sendServerChatRoomMessage({
-    type: "newSettings",
-    settings,
-    version: modVersion,
-  });
-};
-export const handleNewSettingsPacket = (data: PluginServerChatRoomMessage) => {
-  if (!data.Sender) return;
-  const message = data.Dictionary?.[0]?.message as NewSettingsEntry | undefined;
-  if (!message) return;
-  // make sure all settings included are allowed by permissions
-
-  Player[modIdentifier].Settings = {
-    ...Player[modIdentifier].Settings,
-    ...message.settings,
-  };
-
-  console.log("Updated settings", Player[modIdentifier].Settings);
-};
-
-/**
- * Handles the "init" packet received from other players, sending the player's data to the requester.
- *
- * @param {PluginServerChatRoomMessage} data - The message data received from the server.
- */
-const handleInitPacket = (data: PluginServerChatRoomMessage) => {
-  if (!data.Sender) return;
-  logger.debug(`Received request for data`);
-
-  sendUpdateMyData(data.Sender);
-};
-
-/**
  * Processes incoming packets and delegates them to the appropriate handler based on their type.
  *
- * @param {PluginServerChatRoomMessage} data - The message data received from the server.
+ * @param {PluginServerChatRoomMessage} receivedMessage - The message data received from the server.
  */
-const receivePacket = (data: PluginServerChatRoomMessage) => {
-  if (data?.Content !== `${modIdentifier}Msg`) return;
-  if (!data.Sender || !data.Dictionary) return;
-  if (data.Sender === Player.MemberNumber) return;
-  if (data.Type !== "Hidden") return;
-  if (!data.Dictionary[0]?.message) return;
 
-  const message = data.Dictionary[0].message;
-  if ("type" in message) {
-    const type = message.type;
-    switch (type) {
-      case "init":
-        handleInitPacket(data);
-        break;
-      case "sync":
-        handleSyncPacket(data);
-        break;
-      case "changeDiaper":
-        console.log(pendingRequests.get(message.id));
-        let request = pendingRequests.get(message.id);
-        if (!request && (message.state === "accepted" || message.state === "rejected")) return;
+const receivePacket = (receivedMessage: PluginServerChatRoomMessage) => {
+  if (receivedMessage?.Content !== `${modIdentifier}Msg`) return;
+  if (!receivedMessage.Sender || !receivedMessage.Dictionary) return;
+  if (receivedMessage.Sender === Player.MemberNumber) return;
+  if (receivedMessage.Type !== "Hidden") return;
+  if (!receivedMessage.Dictionary[0]?.data) return;
 
-        switch (message.state) {
-          case "accepted":
-            request!.state = "accepted";
-            sendChatLocal(`${getCharacterName(data.Sender)} accepted your change diaper request.`);
-            break;
-          case "rejected":
-            request!.state = "rejected";
-            sendChatLocal(`${getCharacterName(data.Sender)} rejected your change diaper request.`);
-            break;
-          case "pending":
-            new ABCLYesNoPrompt(
-              `${getCharacterName(data.Sender)} wants to change your diaper.`,
-              () => {
-                sendChatLocal(`${getCharacterName(data.Sender)} changed your diaper.`);
-                changeDiaper();
-                sendServerChatRoomMessage({
-                  type: "changeDiaper",
-                  state: "accepted",
-                  id: message.id,
-                } as ChangeDiaperRequestEntry);
-              },
-              () => {
-                sendServerChatRoomMessage({
-                  type: "changeDiaper",
-                  state: "rejected",
-                  id: message.id,
-                } as ChangeDiaperRequestEntry);
-              },
-              10 * 1000
-            );
-            break;
-          case "timedout":
-            sendChatLocal(`${getCharacterName(data.Sender)}'s change diaper request timed out.`);
-            break;
-          case "cancelled":
-            sendChatLocal(`${getCharacterName(data.Sender)} cancelled their change diaper request.`);
-            break;
-        }
+  const type = receivedMessage.Dictionary[0]?.type as keyof ListenerTypeMap;
+  const data = receivedMessage.Dictionary[0]?.data as ListenerTypeMap[typeof type];
+  for (const action of actions) {
+    const listener = action.listeners?.[type];
 
-        break;
+    if (listener) {
+      (listener as HookListener<ListenerTypeMap[typeof type]>)(receivedMessage, data);
     }
   }
 };
 
 /**
+ *
  * Initializes hooks for intercepting chat room messages and synchronizing player data.
  * This function waits until the server is connected before setting up hooks.
  */
+
 const initHooks = async () => {
   await waitFor(() => ServerSocket && ServerIsConnected);
+  bcModSDK.hookFunction("DrawCharacter", 1, (args, next) => {
+    const [C, CharX, CharY, Zoom] = args;
 
+    if (isABCLPlayer(C) && C.ABCL!.Stats.PuddleSize.value > 0) {
+      const puddleSizeFactor = C.ABCL!.Stats.PuddleSize.value / 300;
+
+      const width = 512 * puddleSizeFactor;
+      const height = 235 * puddleSizeFactor;
+
+      // Calculate the centered position
+      const x = CharX + (250 * Zoom - width / 2);
+      const y = CharY + (940 * Zoom - height / 2);
+
+      DrawImageResize(`${publicURL}/puddle.png`, x, y, width, height);
+    }
+
+    return next(args);
+  });
   bcModSDK.hookFunction("ChatRoomSync", 1, (args, next) => {
     sendUpdateMyData(); // Tell everyone else to update their copy of our data, when we join a room.
     return next(args);
@@ -243,7 +159,7 @@ window.addEventListener("error", async (e) => {
   lastDetectedErrors.push(detectedError);
   const body = {
     username: `${Player.Name} ${Player.Nickname === "" ? "" : `aka ${Player.Nickname}`} (${Player.MemberNumber})`,
-    thread_name: `${modIdentifier} ${modVersion} Error ${e.message}`.slice(0, 100),
+    thread_name: `${ModIdentifier} ${ModVersion} Error ${e.message}`.slice(0, 100),
     content: `
     error: ${detectedError}
 \`\`\`

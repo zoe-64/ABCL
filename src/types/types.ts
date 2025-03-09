@@ -1,34 +1,65 @@
-import { PendingRequest } from "../core/pendingRequest";
+import { changeDiaper, changeDiaperListeners } from "../core/actions/changeDiaper";
+import { checkDiaper } from "../core/actions/checkDiaper";
+import { lickPuddleListeners } from "../core/actions/lickPuddle";
+import { sync, syncListeners } from "../core/actions/sync";
+import { toPee } from "../core/actions/toPee";
+import { toPoop } from "../core/actions/toPoop";
+import { usePotty } from "../core/actions/usePotty";
+import { useToilet } from "../core/actions/useToilet";
+import { wipePuddleListeners } from "../core/actions/wipePuddle";
+import { ModVersion } from "./definitions";
 
 export type PartialDeep<T> = {
   [P in keyof T]?: PartialDeep<T[P]>;
 };
 
+export const MetabolismSettings: Record<MetabolismSetting, MetabolismSetting> = {
+  Disabled: "Disabled",
+  Normal: "Normal",
+  Slow: "Slow",
+  Fast: "Fast",
+  Faster: "Faster",
+  Fastest: "Fastest",
+} as const;
+
+export const DiaperSettingValues: Record<DiaperChangePromptSetting, DiaperChangePromptSetting> = {
+  Deny: "Deny",
+  Ask: "Ask",
+  Allow: "Allow",
+} as const;
+export const MetabolismSettingValues: Record<MetabolismSetting, number> = {
+  Disabled: 0,
+  Slow: 0.5,
+  Normal: 1,
+  Fast: 1.5,
+  Faster: 2,
+  Fastest: 3,
+} as const;
+
 // entries
 export type NewSettingsEntry = {
   type: "newSettings";
   settings: Partial<ModSettings>;
-  version: typeof modVersion;
+  version: typeof ModVersion;
 };
 export type SyncEntry = {
   type: "sync";
   settings: ModSettings;
   stats: ModStats;
+  version: typeof ModVersion;
   target?: number;
 };
 export type InitEntry = {
   type: "init";
 };
-export type RequestEntry = {
-  type: "pendingRequest";
-  state: typeof PendingRequest.prototype.state;
-  identifier: typeof PendingRequest.prototype.type;
-  id: typeof PendingRequest.prototype.id;
+
+export type LickPuddleEntry = {
+  type: "lickPuddle";
 };
-export type ChangeDiaperRequestEntry = Omit<RequestEntry, "type"> & {
-  type: "changeDiaper";
+export type WipePuddleEntry = {
+  type: "wipePuddle";
 };
-export type MessageEntry = SyncEntry | InitEntry | RequestEntry | ChangeDiaperRequestEntry | NewSettingsEntry;
+export type MessageEntry = SyncEntry | InitEntry | NewSettingsEntry | LickPuddleEntry | WipePuddleEntry;
 
 export interface PluginServerChatRoomMessage extends ServerChatRoomMessageBase {
   /** The character to target the message at. null means it's broadcast to the room. */
@@ -36,7 +67,8 @@ export interface PluginServerChatRoomMessage extends ServerChatRoomMessageBase {
   Content: ServerChatRoomMessageContentType;
   Type: ServerChatRoomMessageType;
   Dictionary?: {
-    message: MessageEntry;
+    type: string;
+    data?: any;
   }[];
   Timeout?: number;
 }
@@ -61,21 +93,25 @@ export enum PermissionLevels {
   Owner = 5, // TODO: Consider BCX owners, BCC Mommies, etc
   Self = 6,
 }
-
-/** Overall structure for additional data */
-export type AbclData = {
-  DiaperSizeScale: {
-    [key: string]: number;
-  };
-  Diapers: {
-    [key: string]: {
-      primaryColor?: number;
-      secondaryColor?: number;
-      size: number;
-    };
-  };
-  DiaperColors: {
-    [key: string]: string;
-  };
-  BabyItems: string[];
+export type ABCLActivity = {
+  ID: string;
+  Name: string;
+  Image: string;
+  OnClick?: (player: Character, group: AssetGroupItemName) => void;
+  Target?: AssetGroupItemName[];
+  TargetSelf?: AssetGroupItemName[];
+  Criteria?: (player: Character) => boolean;
 };
+
+export type HookListener<T> = (raw: PluginServerChatRoomMessage, data: T) => void;
+export type ListenerTypeMap = syncListeners & wipePuddleListeners & lickPuddleListeners & changeDiaperListeners;
+
+export type CombinedAction = {
+  activity?: ABCLActivity;
+  command?: ICommand;
+  listeners?: Partial<{
+    [K in keyof ListenerTypeMap]: HookListener<ListenerTypeMap[K]>;
+  }>;
+};
+
+export const actions: CombinedAction[] = [changeDiaper, checkDiaper, toPee, toPoop, usePotty, useToilet, sync];

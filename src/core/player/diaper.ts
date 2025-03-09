@@ -1,12 +1,11 @@
-import { ABCLdata } from "../../main";
-import { PendingRequest } from "../pendingRequest";
-import { abclPlayer } from "./player";
+import { ABCLdata } from "../../constants";
+import { abclPlayer, updatePlayerClothes } from "./player";
 
 // Is/Has
 export const isLeaking = (type: "pee" | "poop" | "any" = "any") => {
   const diaperSize = getPlayerDiaperSize();
   if (type === "pee") {
-    return abclPlayer.stats.WetnessValue >= diaperSize;
+    return abclPlayer.stats.PuddleSize > 0;
   }
   if (type === "poop") {
     return abclPlayer.stats.SoilinessValue >= diaperSize;
@@ -28,7 +27,7 @@ export function hasDiaper(player: Character = Player): boolean {
 }
 export const isWearingBabyClothes = () => {
   return Player.Appearance.some((clothing) => {
-    return ABCLdata.BabyItems.includes(clothing.Asset.Description);
+    return ABCLdata.ItemDefinitions.BabyItems.includes(clothing.Asset.Description);
   });
 };
 
@@ -85,8 +84,7 @@ export const updateDiaperColor = () => {
 
   setDiaperColor("ItemPelvis", primaryColor, secondaryColor, Player);
   setDiaperColor("Panties", primaryColor, secondaryColor, Player);
-  CharacterRefresh(Player, true);
-  ChatRoomCharacterUpdate(Player);
+  updatePlayerClothes();
 };
 
 // Size
@@ -144,7 +142,7 @@ export function incontinenceChanceFormula(incontinence: number, fullness: number
 // mental regression
 export const mentalRegressionBonus = () => {
   const assetDescriptions = Player.Appearance.map((clothing) => clothing.Asset.Description);
-  const matches = ABCLdata.BabyItems.concat(["milk", "pacifier", "bib"]).filter((description) =>
+  const matches = ABCLdata.ItemDefinitions.BabyItems.concat(["milk", "pacifier", "bib"]).filter((description) =>
     assetDescriptions.some((assetDescription) => assetDescription.toLocaleLowerCase().includes(description))
   );
   return Math.min(matches.length * 0.25, 1);
@@ -182,15 +180,4 @@ export const mentalRegressionOnAccident = () => {
   if (0.5 > abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 0.75 && isLeaking()) return modifier / 1000;
   if (0.75 > abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 1 && isLeaking()) return modifier / 1500;
   return 0;
-};
-
-export const changeDiaper = (memberNumber: number | undefined = Player.MemberNumber) => {
-  const isSomeoneElse = memberNumber !== Player.MemberNumber;
-  if (isSomeoneElse && memberNumber) {
-    new PendingRequest(memberNumber, "changeDiaper", 10);
-    return;
-  }
-  abclPlayer.stats.SoilinessValue = 0;
-  abclPlayer.stats.WetnessValue = 0;
-  updateDiaperColor();
 };

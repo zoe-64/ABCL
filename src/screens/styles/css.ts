@@ -190,6 +190,7 @@ export const createCSS = () => {
   font-family: arial;
   color: ${fontColor};
   order: 100;
+  z-index: 10000;
 }
 .ABCLWindowHeaderTitle {
   margin: 5px;
@@ -432,77 +433,73 @@ ${cssSliders}
 ${shoelaceOverides}
 }
 
-${
-  themed &&
-  `.ABCLoverlay sl-radio-button::part(button),
+.ABCLoverlay sl-radio-button::part(button),
   .ABCLoverlay sl-tab::part(base), 
   .ABCLoverlay sl-tab::part(base).tab {
-  background-color: var(--tmd-element);
-  color: var(--tmd-text);
+  background-color: var(--tmd-element,  var(--sl-color-neutral-0));
+  color: var(--tmd-text,  var(--sl-color-neutral-700));
 }
 .ABCLoverlay sl-radio-button::part(label) {
-  color: var(--tmd-text);
+  color: var(--tmd-text,  var(--sl-color-neutral-700));
 }
-.ABCLoverlay sl-tab::part(base) 
-  background-color: var(--tmd-element-hover);
+.ABCLoverlay sl-tab::part(base) {
+  color: var(--tmd-text, --sl-color-neutral-700);
+  background-color: var(--tmd-element-hover,  var(--sl-color-neutral-0));
 }
 .ABCLoverlay sl-tab::part(base):hover {
-  color: var(--tmd-text);
-  background-color: var(--tmd-element-hover);
+  color: var(--tmd-text, --sl-color-neutral-0);
+  background-color: var(--tmd-element-hover,  var(--sl-color-primary-600));
 }
 
 sl-radio-button::part(button), sl-tab::part(base) {
-  color: var(--tmd-text);
-  background-color: var(--tmd-element);
+  color: var(--tmd-text, --sl-color-neutral-700);
+  background-color: var(--tmd-element,  var(--sl-color-neutral-0));
   
 }
 sl-tab::part(base) {
   border-radius: 0;
 }
 sl-radio-button::part(button) {
-    border: var(--tmd-element) 1px solid;
+    border: var(--tmd-element,  var(--sl-color-neutral-200)) 1px solid;
 }
 
 sl-radio-button::part(button):hover, sl-tab::part(base):hover {
-  background-color: var(--tmd-element-hover);
+  color: var(--tmd-text, --sl-color-neutral-0);
+  background-color: var(--tmd-element-hover,  var(--sl-color-primary-600));
 }
 sl-radio-button::part(button):hover {
-  border: var(--tmd-element-hover) 1px solid;
+  border: var(--tmd-element-hover,  var(--sl-color-primary-600)) 1px solid;
 }
 
 sl-radio-button::part(button--checked), sl-tab[aria-selected="true"]::part(base) {
-
-  background-color: var(--tmd-accent);
+  color: var(--tmd-text, --sl-color-neutral-0);
+  background-color: var(--tmd-accent,  var(--sl-color-primary-600));
 }
 sl-radio-button::part(button--checked):hover ,sl-tab[aria-selected="true"]::part(base):hover {
   background-color: var(--tmd-accent-hover);
 }
 
 sl-button::part(base) {
-  background-color: var(--tmd-element);
-  border-color: var(--tmd-accent);
-
+  background-color: var(--tmd-element,  var(--sl-color-neutral-0));
+  border-color: var(--tmd-accent,  var(--sl-color-primary-600));
 }
 sl-button::part(base):hover {
-   background-color: var(--tmd-element-hover);
-   border-color: var(--tmd-accent-hover);
+   background-color: var(--tmd-element-hover,  var(--sl-color-primary-600));
+   border-color: var(--tmd-accent-hover,  var(--sl-color-primary-600));
 }
 sl-button::part(base):active {
-  background-color: var(--tmd-accent-hover);
-  border-color: var(--tmd-accent-hover)
+  background-color: var(--tmd-accent-hover,  var(--sl-color-primary-700));
+  border-color: var(--tmd-accent-hover,  var(--sl-color-primary-700));
 }
 sl-button::part(label) {
-  color: var(--tmd-text);
+  color: var(--tmd-text,  var(--sl-color-neutral-700));
 }
 sl-button::part(label) {
-  color: var(--tmd-text);
+  color: var(--tmd-text,  var(--sl-color-neutral-700));
 }
 sl-button {
     margin: 0.5em 0;
 }
-`
-}
-
 
 /* sorry fusam */
 #fusam-addon-manager-container {

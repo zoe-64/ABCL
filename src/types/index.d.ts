@@ -28,15 +28,23 @@ declare const modRepo: string;
 declare const modIdentifier: string;
 declare const publicURL: string;
 
-type MetabolismSettingValues = "Disabled" | "Normal" | "Slow" | "Fast" | "Faster" | "Fastest";
+type MetabolismSetting = "Disabled" | "Normal" | "Slow" | "Fast" | "Faster" | "Fastest";
+
+type DiaperChangePromptSetting = "Deny" | "Ask" | "Allow";
+
 interface ModSettings {
-  Metabolism: MetabolismSettingValues;
-  DisableWetting: boolean;
-  DisableSoiling: boolean;
+  PeeMetabolism: MetabolismSetting;
+  PoopMetabolism: MetabolismSetting;
+  OnDiaperChange: DiaperChangePromptSetting;
   OpenRemoteSettings: boolean;
   LockedOutOfSettings: boolean;
+  DisableWettingLeaks: boolean;
+  DisableSoilingLeaks: boolean;
 }
 interface ModStats {
+  PuddleSize: {
+    value: number;
+  };
   Bladder: {
     value: number;
     size: number;
@@ -66,7 +74,7 @@ interface ModStats {
 }
 
 interface ModStorageModel {
-  ModVersion?: string;
+  Version?: string;
   Settings: ModSettings;
   Stats: ModStats;
 }

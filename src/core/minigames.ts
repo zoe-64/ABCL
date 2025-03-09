@@ -1,6 +1,6 @@
 // from LSCG - https://github.com/littlesera/LSCG/blob/8072c4d636a66bf12473823722afbc82fda8f98e/src/MiniGames/minigames.ts#L3C1-L3C87
 
-import { hasDiaper, incontinenceOnAccident } from "./player/diaper";
+import { incontinenceOnAccident } from "./player/diaper";
 import { abclPlayer } from "./player/player";
 import { bcModSDK, sendChatLocal } from "./utils";
 
@@ -173,15 +173,7 @@ export class MessMinigame extends AccidentMiniGame {
       return;
     }
 
-    if (hasDiaper()) {
-      abclPlayer.stats.SoilinessValue += abclPlayer.stats.BowelValue;
-      sendChatLocal("You've had a messy accident!");
-    } else {
-      //TODO add soiling clothes
-      sendChatLocal("You've had an messy accident in your clothes! [not yet implemented]");
-    }
-    abclPlayer.stats.Incontinence += incontinenceOnAccident();
-    abclPlayer.stats.BowelValue = 0;
+    abclPlayer.soil();
     abclPlayer.onAccident();
   }
 }
@@ -200,16 +192,7 @@ export class WetMinigame extends AccidentMiniGame {
       return;
     }
 
-    if (hasDiaper()) {
-      abclPlayer.stats.WetnessValue += abclPlayer.stats.BladderValue;
-      sendChatLocal("You've had a wet accident!");
-    } else {
-      //TODO add wetting clothes
-      sendChatLocal("You've had a wet accident in your clothes! [not yet implemented]");
-    }
-
-    abclPlayer.stats.Incontinence += incontinenceOnAccident();
-    abclPlayer.stats.BladderValue = 0;
+    abclPlayer.wet();
     abclPlayer.onAccident();
   }
 }

@@ -1,13 +1,13 @@
-import { initActivitiesData } from "./data/activities-data";
+import { ABCLActivity, CombinedAction, HookListener } from "../types/types";
+import { changeDiaper } from "./actions/changeDiaper";
+import { checkDiaper } from "./actions/checkDiaper";
+import { sync, syncListeners } from "./actions/sync";
+import { toPee } from "./actions/toPee";
+import { toPoop } from "./actions/toPoop";
+import { usePotty } from "./actions/usePotty";
+import { useToilet } from "./actions/useToilet";
 import { bcModSDK, waitForElement } from "./utils";
-export type ABCLActivity = {
-  Name: string;
-  Image: string;
-  OnClick?: (player: Character, group: AssetGroupItemName) => void;
-  Target?: AssetGroupItemName[];
-  TargetSelf?: AssetGroupItemName[];
-  Criteria?: (player: Character) => boolean;
-};
+
 export const insertActivityButton = (
   name: string,
   id: string,
@@ -44,11 +44,8 @@ export const activityFitsCriteria = (activity: ABCLActivity, player: Character):
   }
   return Boolean((!activity.Criteria || activity.Criteria(player)) && player.FocusGroup && activityInGroup(activity, player.FocusGroup.Name));
 };
-export const activities: Record<string, ABCLActivity> = {};
 
-export const initActivities = (): void => {
-  /** clickedObj becomes null with custom activities */
-  initActivitiesData();
+export const initActions = (): void => {
   bcModSDK.hookFunction("DialogMenuMapping.activities.GetClickStatus", 1, (args, next) => {
     const [_C, _clickedObj, _equippedItem] = args;
     if (!_clickedObj) return null;
@@ -63,12 +60,20 @@ export const initActivities = (): void => {
     const activityGrid = await waitForElement("#dialog-activity-grid");
     const focusGroup = CurrentCharacter?.FocusGroup?.Name;
     if (!focusGroup) return;
-    Object.entries(activities).forEach(([id, activity]) => {
+
+    for (const { activity } of actions) {
+      if (!activity) continue;
+
       if (activityFitsCriteria(activity, CurrentCharacter ?? Player)) {
-        if (!activityIsInserted(id)) {
-          activityGrid.appendChild(insertActivityButton(activity.Name, id, activity.Image, activity.OnClick));
+        if (!activityIsInserted(activity.ID)) {
+          activityGrid.appendChild(insertActivityButton(activity.Name, activity.ID, activity.Image, activity.OnClick));
         }
       }
-    });
+    }
   });
+  CommandCombine(commands);
 };
+export const actions: CombinedAction[] = [changeDiaper, checkDiaper, toPee, toPoop, usePotty, useToilet];
+
+export const commands = actions.reduce((commands, { command }) => (command ? [...commands, command] : commands), [] as ICommand[]);
+export const activites = actions.reduce((activites, { activity }) => (activity ? [...activites, activity] : activites), [] as ABCLActivity[]);

@@ -2,6 +2,7 @@ import bcModSdkRef from "bondage-club-mod-sdk";
 import { ModName, ModRepo, ModVersion } from "../types/definitions";
 import { PermissionLevels } from "../types/types";
 import { syncData } from "./settings";
+import { logger } from "./logger";
 
 export const bcModSDK = bcModSdkRef.registerMod({
   name: ModName,
@@ -68,8 +69,8 @@ export class Saver {
   }
 }
 
-export const waitForElement = async (selector: string, options: { childCheck?: boolean } = {}): Promise<Element> => {
-  return new Promise((resolve) => {
+export const waitForElement = async (selector: string, options: { childCheck?: boolean; timeout?: number } = {}): Promise<Element> => {
+  return new Promise((resolve, reject) => {
     const element = document.querySelector(selector);
     if (element) {
       resolve(element);
@@ -80,11 +81,17 @@ export const waitForElement = async (selector: string, options: { childCheck?: b
       const target = document.querySelector(selector);
       if (target && (!options.childCheck || target.childElementCount > 0)) {
         observer.disconnect();
+        clearTimeout(timeoutId);
         resolve(target);
       }
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
+
+    const timeoutId = setTimeout(() => {
+      observer.disconnect();
+      console.warn(`Element with selector "${selector}" not found within timeout`);
+    }, options.timeout || 10000);
   });
 };
 export const generateUniqueID = (identifier?: string) => {
@@ -112,3 +119,24 @@ export class Debouncer {
     return Date.now() - this.lastCallTime > this.allowedCallInterval;
   }
 }
+
+// input can be "default", null, hex code, an array of hexes, an array of default
+// expect to be given the asset, in asset there's a default color
+// return a hex color
+export const isColorable = (color: string) => color !== "Default" && typeof color === "string";
+
+export const getColor = (color: ItemColor | null | "Default" | string[] | ItemColor, asset: Asset): string[] => {
+  if (typeof color === "string" && color !== "Default") logger.warn(`Unknown color: ${color}`);
+  if (!color || color === "Default") return [...asset.DefaultColor.map((color) => (color === "Default" ? "#FFFFFF" : color))];
+
+  if (Array.isArray(color)) {
+    return color.map((mappedColor) => {
+      if (mappedColor === "Default") {
+        return "#FFFFFF";
+      }
+      return mappedColor;
+    });
+  }
+
+  return [color];
+};

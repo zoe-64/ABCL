@@ -1,99 +1,44 @@
 import initHooks from "./core/hooks";
 import { logger } from "./core/logger";
 import { loadOrGenerateData } from "./core/settings";
-import { bcModSDK, HookPriority, isObject, waitForElement } from "./core/utils";
+import { bcModSDK, HookPriority } from "./core/utils";
 import { initScreens } from "./screens";
 import { initSettingsScreen } from "./screens/Settings";
-import abclData from "./assets/dictionary.json" assert { type: "json" };
-import { initActivities } from "./core/activities";
 import { initMinigames } from "./core/minigames";
 import { abclPlayer } from "./core/player/player";
 import "./core/global";
 import { initOverlay } from "./core/player/ui";
-import { initCommands } from "./core/commands";
-export type AbclData = typeof abclData;
-export const ABCLdata: AbclData = abclData;
-export const updateInterval = 60 * 1000;
+import { initActions } from "./core/actionLoader";
+import { loopInterval } from "./constants";
+
+const init = async () => {
+  ServerPlayerSync();
+  loadOrGenerateData();
+
+  initSettingsScreen();
+  initActions();
+  initScreens([]);
+  initHooks();
+  initMinigames();
+  initOverlay();
+
+  setInterval(loop, loopInterval);
+  logger.info(`Ready.`);
+};
 
 if (CurrentScreen == null || CurrentScreen === "Login") {
-  logger.info(`Waiting for possible login...`);
   bcModSDK.hookFunction("LoginResponse", HookPriority.OBSERVE, (args, next) => {
     next(args);
-    const { Name, AccountName } = args[0];
+    const response = args[0];
+    if (response === "InvalidNamePassword") return;
+    const { Name, AccountName } = response;
     if (typeof Name === "string" && typeof AccountName === "string") init();
   });
 } else init();
 
-
-const initWait = () => {
-  logger.info(`Waiting for possible login...`);
-    bcModSDK.hookFunction("LoginResponse", 0, (args, next) => {
-      next(args);
-      if (!isObject(args[0])) return;
-      const { Name, AccountName } = args[0];
-      if (typeof Name === "string" && typeof AccountName === "string") {
-        if (window.modLoadFlag) return;
-        init();
-      }
-    });
-    return;
-  }
-};
 const loop = () => {
   if (CurrentScreen !== "ChatRoom") {
     return;
   }
   abclPlayer.update();
 };
-
-const init = async () => {
-  const currentAccount = Player.MemberNumber;
-  if (currentAccount === null) {
-    logger.error("No player MemberNumber");
-    throw new Error("No player MemberNumber");
-  }
-
-  bcModSDK.hookFunction("LoginResponse", 0, (args, next) => {
-    const response = args[0];
-    if (isObject(response) && typeof response.Name === "string" && typeof response.AccountName === "string" && response.MemberNumber !== currentAccount) {
-      const error = `Attempting to load ${modIdentifier} with different account than already loaded (${response.MemberNumber} vs ${currentAccount}). This is not supported, please refresh the page.`;
-      logger.error(error);
-      alert(error);
-      throw new Error(error);
-    }
-    return next(args);
-  });
-
-  const isUsingFusam = () => bcModSdk.getModsInfo().some((mod: { name: string }) => mod.name === "FUSAM");
-  const isUsingThemed = () => bcModSdk.getModsInfo().some((mod: { name: string }) => mod.name === "Themed");
-  const isThemeLoaded = async () => {
-    if (isUsingFusam()) {
-      await waitForElement("#FUSAM");
-      if (isUsingThemed()) {
-        await new Promise((resolve) => {
-          const interval = setInterval(() => {
-            if ((<any>window).ThemedLoaded) {
-              clearInterval(interval);
-              resolve(true);
-            }
-          }, 100);
-        });
-      }
-    }
-  };
-  await isThemeLoaded();
-
-  ServerPlayerSync();
-  loadOrGenerateData();
-  initSettingsScreen();
-  initCommands();
-  initScreens([]);
-  initHooks();
-  logger.info(`Ready.`);
-  initActivities();
-  initMinigames();
-  initOverlay(isUsingThemed());
-  setInterval(loop, updateInterval);
-};
-
-initWait();

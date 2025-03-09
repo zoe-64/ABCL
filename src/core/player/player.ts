@@ -1,5 +1,4 @@
-import { merge } from "lodash-es";
-import { Debouncer, Saver, sendChatLocal } from "../utils";
+import { isColorable, Debouncer, getColor, Saver, sendChatLocal } from "../utils";
 import {
   incontinenceChanceFormula,
   getPlayerDiaperSize,
@@ -7,10 +6,17 @@ import {
   mentalRegressionOvertime,
   updateDiaperColor,
   incontinenceLimitFormula,
+  hasDiaper,
+  averageColor,
 } from "./diaper";
 import { abclStatsWindow } from "./ui";
-import { getCharacter } from "./playerUtils";
-import { metabolismValues } from "../settings";
+import { ABCLdata } from "../../constants";
+import { MetabolismSettingValues } from "../../types/types";
+
+export const updatePlayerClothes = () => {
+  CharacterRefresh(Player, true);
+  ChatRoomCharacterUpdate(Player);
+};
 
 export const abclPlayer = {
   onAccident: () => {
@@ -19,16 +25,85 @@ export const abclPlayer = {
   update: () => {
     // once per minute
     abclPlayer.stats.MentalRegression += mentalRegressionOvertime();
-    abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * abclPlayer.settings.MetabolismValue;
-    abclPlayer.stats.BowelValue += abclPlayer.stats.FoodIntake * abclPlayer.settings.MetabolismValue;
+    abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[abclPlayer.settings.PeeMetabolism];
+    abclPlayer.stats.BowelValue += abclPlayer.stats.FoodIntake * MetabolismSettingValues[abclPlayer.settings.PoopMetabolism];
 
     abclPlayer.attemptWetting();
     abclPlayer.attemptSoiling();
     playerSaver.save();
   },
-  attemptWetting: () => {
-    if (abclPlayer.settings.DisableWetting) return;
+  wetClothing: () => {
+    // panties -> pants -> floor
+    sendChatLocal("You've had a wet accident in your clothes!");
+    abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
+    abclPlayer.stats.BladderValue = 0;
+    const wetColor = "#96936C";
 
+    const panties = InventoryGet(Player, "Panties");
+    if (panties) {
+      const pantiesColors = getColor(panties.Color || (panties.Asset.DefaultColor as ItemColor), panties.Asset);
+      for (let i = 0; i < pantiesColors.length; i++) {
+        if (!isColorable(pantiesColors[i])) continue;
+        pantiesColors[i] = averageColor(pantiesColors[i], wetColor, 0.3);
+      }
+      panties.Color = pantiesColors;
+    }
+
+    for (const item of Player.Appearance) {
+      if (ABCLdata.ItemDefinitions.Pants.some((pants) => pants === item.Asset.Description)) {
+        const colors = getColor(item.Color || (item.Asset.DefaultColor as ItemColor), item.Asset);
+        for (let i = 0; i < colors.length; i++) {
+          if (!isColorable(colors[i])) continue;
+          colors[i] = averageColor(colors[i], wetColor, 0.3);
+        }
+        item.Color = colors;
+      }
+    }
+    abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
+    abclPlayer.stats.BladderFullness = 0;
+    updatePlayerClothes();
+  },
+  soilClothing: () => {
+    abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
+    abclPlayer.stats.BladderValue = 0;
+    const messColor = "#261a16";
+
+    const panties = InventoryGet(Player, "Panties");
+    if (panties) {
+      const pantiesColors = getColor(panties.Color || (panties.Asset.DefaultColor as ItemColor), panties.Asset);
+      for (let i = 0; i < pantiesColors.length; i++) {
+        if (!isColorable(pantiesColors[i])) continue;
+        pantiesColors[i] = averageColor(pantiesColors[i], messColor, 0.3);
+      }
+      panties.Color = pantiesColors;
+    }
+
+    sendChatLocal("You've had an messy accident in your clothes!");
+    updatePlayerClothes();
+  },
+  wetDiaper: () => {
+    const diaperSize = getPlayerDiaperSize();
+    const absorbedVolume = Math.min(abclPlayer.stats.BladderValue, diaperSize - abclPlayer.stats.WetnessValue);
+
+    abclPlayer.stats.BladderValue -= absorbedVolume;
+    abclPlayer.stats.WetnessValue += absorbedVolume;
+
+    if (abclPlayer.stats.WetnessValue >= diaperSize) {
+      abclPlayer.wetClothing();
+    }
+  },
+  soilDiaper: () => {
+    const diaperSize = getPlayerDiaperSize();
+    const absorbedVolume = Math.min(abclPlayer.stats.BowelValue, Math.max(0, diaperSize - abclPlayer.stats.SoilinessValue));
+
+    abclPlayer.stats.BowelValue -= absorbedVolume;
+    abclPlayer.stats.SoilinessValue += absorbedVolume;
+
+    if (abclPlayer.stats.SoilinessValue > 0) {
+      abclPlayer.soilClothing();
+    }
+  },
+  attemptWetting: () => {
     const limit = incontinenceLimitFormula(abclPlayer.stats.Incontinence);
     const chance = incontinenceChanceFormula(abclPlayer.stats.Incontinence, abclPlayer.stats.BladderFullness);
 
@@ -39,8 +114,6 @@ export const abclPlayer = {
     MiniGameStart("WetMinigame", 30 * chance, "noOp");
   },
   attemptSoiling: () => {
-    if (abclPlayer.settings.DisableSoiling) return;
-
     const limit = incontinenceLimitFormula(abclPlayer.stats.Incontinence);
     const chance = incontinenceChanceFormula(abclPlayer.stats.Incontinence, abclPlayer.stats.BowelFullness);
 
@@ -50,7 +123,7 @@ export const abclPlayer = {
 
     MiniGameStart("MessMinigame", 30 * chance, "noOp");
   },
-  releaseBladder: () => {
+  wet: (intentional: boolean = false) => {
     const isTooEarly = abclPlayer.stats.BladderFullness < 0.3;
     const isPossible = !isTooEarly;
     const isGood = abclPlayer.stats.BladderFullness > 0.6;
@@ -59,17 +132,16 @@ export const abclPlayer = {
       return;
     }
     if (isPossible) {
-      abclPlayer.stats.WetnessValue += abclPlayer.stats.BladderValue;
-      abclPlayer.stats.BladderFullness = 0;
+      hasDiaper() ? abclPlayer.wetDiaper() : abclPlayer.wetClothing();
       sendChatLocal("You feel a sense of release as you let go.");
     }
-    if (isGood) {
+    if (isGood && intentional) {
       abclPlayer.stats.Incontinence -= 0.01;
     } else {
       abclPlayer.stats.Incontinence += 0.02;
     }
   },
-  releaseBowel: () => {
+  soil: (intentional: boolean = false) => {
     const isTooEarly = abclPlayer.stats.BowelFullness < 0.3;
     const isPossible = !isTooEarly;
     const isGood = abclPlayer.stats.BowelFullness > 0.6;
@@ -78,18 +150,24 @@ export const abclPlayer = {
       return;
     }
     if (isPossible) {
-      abclPlayer.stats.SoilinessValue += abclPlayer.stats.BowelValue;
-      abclPlayer.stats.BowelFullness = 0;
+      hasDiaper() ? abclPlayer.soilDiaper() : abclPlayer.soilClothing();
       sendChatLocal("You feel a little relief as you let go.");
     }
-    if (isGood) {
+    if (isGood && intentional) {
       abclPlayer.stats.Incontinence -= 0.01;
     } else {
       abclPlayer.stats.Incontinence += 0.02;
     }
   },
-
   stats: {
+    set PuddleSize(value: number) {
+      if (value < 0) value = 0;
+      if (value > 250) value = 250;
+      Player[modIdentifier].Stats.PuddleSize.value = value;
+    },
+    get PuddleSize() {
+      return Player[modIdentifier].Stats.PuddleSize.value;
+    },
     set MentalRegression(value: number) {
       if (value < 0) value = 0;
       if (value > 1) value = 1;
@@ -128,7 +206,6 @@ export const abclPlayer = {
     // bladder
 
     set BladderValue(value: number) {
-      if (abclPlayer.settings.DisableWetting) return;
       if (value < 0) value = 0;
       Player[modIdentifier].Stats.Bladder.value = value;
       abclStatsWindow.update();
@@ -165,7 +242,6 @@ export const abclPlayer = {
 
     // bowel
     set BowelValue(value: number) {
-      if (abclPlayer.settings.DisableSoiling) return;
       if (value < 0) value = 0;
       Player[modIdentifier].Stats.Bowel.value = value;
       abclStatsWindow.update();
@@ -219,34 +295,32 @@ export const abclPlayer = {
     },
   },
   settings: {
-    set Metabolism(value: MetabolismSettingValues) {
-      Player[modIdentifier].Settings.Metabolism = value;
+    set PeeMetabolism(value: MetabolismSetting) {
+      Player[modIdentifier].Settings.PeeMetabolism = value;
     },
-    set DisableWetting(value: boolean) {
-      Player[modIdentifier].Settings.DisableWetting = value;
+    set PoopMetabolism(value: MetabolismSetting) {
+      Player[modIdentifier].Settings.PoopMetabolism = value;
     },
-    set DisableSoiling(value: boolean) {
-      Player[modIdentifier].Settings.DisableSoiling = value;
+    get PeeMetabolism(): MetabolismSetting {
+      return Player[modIdentifier].Settings.PeeMetabolism;
     },
+
+    get PoopMetabolism(): MetabolismSetting {
+      return Player[modIdentifier].Settings.PoopMetabolism;
+    },
+
+    get OnDiaperChange(): DiaperChangePromptSetting {
+      return Player[modIdentifier].Settings.OnDiaperChange;
+    },
+
+    set OnDiaperChange(value: DiaperChangePromptSetting) {
+      Player[modIdentifier].Settings.OnDiaperChange = value;
+    },
+
     set OpenRemoteSettings(value: boolean) {
       Player[modIdentifier].Settings.OpenRemoteSettings = value;
     },
-    get Metabolism(): MetabolismSettingValues {
-      return Player[modIdentifier].Settings.Metabolism;
-    },
-    get MetabolismValue(): number {
-      const metabolism = metabolismValues.get(Player[modIdentifier].Settings.Metabolism);
-      if (typeof metabolism == "undefined") {
-        throw new Error("Invalid metabolism value");
-      }
-      return metabolism;
-    },
-    get DisableWetting(): boolean {
-      return Player[modIdentifier].Settings.DisableWetting;
-    },
-    get DisableSoiling(): boolean {
-      return Player[modIdentifier].Settings.DisableSoiling;
-    },
+
     get OpenRemoteSettings(): boolean {
       return Player[modIdentifier].Settings.OpenRemoteSettings;
     },

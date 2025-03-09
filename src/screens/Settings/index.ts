@@ -16,27 +16,35 @@ const updateRemoteList = (list: HTMLElement) => {
     .map((character) => `<sl-option value="${character.MemberNumber}">${getCharacterName(character.MemberNumber)}</sl-option>`)
     .join("");
 };
+
 export const initSettingsScreen = async () => {
   htmlSettingPage.innerHTML = `<sl-tab-group>
   <sl-tab slot="nav" panel="general">General</sl-tab>
   <sl-tab slot="nav" panel="remote">Remote</sl-tab>
   <sl-tab-panel name="general">
-
-    <sl-radio-group class="${modIdentifier}MetabolismSelect" label="Select Metabolism" name="metabolism" value="${abclPlayer.settings.Metabolism}">
+    <sl-radio-group class="${modIdentifier}PeeMetabolismSelect" label="Select Pee Metabolism" name="pee-metabolism" value="${abclPlayer.settings.PeeMetabolism}">
+    <sl-radio-button value="Disabled">Disabled</sl-radio-button>
     <sl-radio-button value="Slow">Slow</sl-radio-button>
     <sl-radio-button value="Normal">Normal</sl-radio-button>
     <sl-radio-button value="Fast">Fast</sl-radio-button>
     <sl-radio-button value="Faster">Faster</sl-radio-button>
     <sl-radio-button value="Fastest">Fastest</sl-radio-button>
     </sl-radio-group>
-     
-    <sl-tooltip content="Disables wetting meaning you won't wet yourself" placement="right-start">
-      <sl-checkbox class="${modIdentifier}DisableWetting"> Disable Wetting </sl-checkbox>
-    </sl-tooltip>
 
-    <sl-tooltip content="Disables wetting meaning you won't soil yourself" placement="right-start">
-      <sl-checkbox class="${modIdentifier}DisableSoiling"> Disable Soiling </sl-checkbox>
-    </sl-tooltip>
+    <sl-radio-group class="${modIdentifier}PoopMetabolismSelect" label="Select Poop Metabolism" name="poop-metabolism" value="${abclPlayer.settings.PoopMetabolism}">
+    <sl-radio-button value="Disabled">Disabled</sl-radio-button>
+    <sl-radio-button value="Slow">Slow</sl-radio-button>
+    <sl-radio-button value="Normal">Normal</sl-radio-button>
+    <sl-radio-button value="Fast">Fast</sl-radio-button>
+    <sl-radio-button value="Faster">Faster</sl-radio-button>
+    <sl-radio-button value="Fastest">Fastest</sl-radio-button>
+    </sl-radio-group>
+
+    <sl-radio-group class="${modIdentifier}OnDiaperChangeSelect" label="Select On Diaper Change" name="on-diaper-change" value="${abclPlayer.settings.OnDiaperChange}">
+    <sl-radio-button value="Deny">Deny</sl-radio-button>
+    <sl-radio-button value="Ask">Ask</sl-radio-button>
+    <sl-radio-button value="Allow">Allow</sl-radio-button>
+    </sl-radio-group>
 
   </sl-tab-panel>
 
@@ -51,21 +59,28 @@ export const initSettingsScreen = async () => {
       <sl-tab slot="nav" panel="general">General</sl-tab>
       
       <sl-tab-panel name="general">
-        <sl-radio-group class="${modIdentifier}RemoteMetabolismSelect" label="Select Metabolism" name="metabolism" value="${abclPlayer.settings.Metabolism}">
+        <sl-radio-group class="${modIdentifier}RemotePeeMetabolismSelect" label="Select Pee Metabolism" name="pee-metabolism" value="${abclPlayer.settings.PeeMetabolism}">
+        <sl-radio-button value="Disabled">Disabled</sl-radio-button>
         <sl-radio-button value="Slow">Slow</sl-radio-button>
         <sl-radio-button value="Normal">Normal</sl-radio-button>
         <sl-radio-button value="Fast">Fast</sl-radio-button>
         <sl-radio-button value="Faster">Faster</sl-radio-button>
         <sl-radio-button value="Fastest">Fastest</sl-radio-button>
         </sl-radio-group>
-     
-        <sl-tooltip content="Disables wetting meaning you won't wet yourself" placement="right-start">
-          <sl-checkbox class="${modIdentifier}RemoteDisableWetting"> Disable Wetting </sl-checkbox>
-        </sl-tooltip>
 
-        <sl-tooltip content="Disables wetting meaning you won't soil yourself" placement="right-start">
-          <sl-checkbox class="${modIdentifier}RemoteDisableSoiling"> Disable Soiling </sl-checkbox>
-        </sl-tooltip>
+        <sl-radio-group class="${modIdentifier}RemotePoopMetabolismSelect" label="Select Poop Metabolism" name="poop-metabolism" value="${abclPlayer.settings.PoopMetabolism}">
+        <sl-radio-button value="Disabled">Disabled</sl-radio-button>
+        <sl-radio-button value="Slow">Slow</sl-radio-button>
+        <sl-radio-button value="Normal">Normal</sl-radio-button>
+        <sl-radio-button value="Fast">Fast</sl-radio-button>
+        <sl-radio-button value="Faster">Faster</sl-radio-button>
+        <sl-radio-button value="Fastest">Fastest</sl-radio-button>
+        </sl-radio-group>
+        <sl-radio-group class="${modIdentifier}RemoteOnDiaperChangeSelect" label="Select On Diaper Change" name="on-diaper-change" value="${abclPlayer.settings.OnDiaperChange}">
+        <sl-radio-button value="Deny">Deny</sl-radio-button>
+        <sl-radio-button value="Ask">Ask</sl-radio-button>
+        <sl-radio-button value="Allow">Allow</sl-radio-button>
+        </sl-radio-group>
       </sl-tab-panel>
     </sl-tab-group>
   </sl-tab-panel>
@@ -78,60 +93,61 @@ export const initSettingsScreen = async () => {
   const remotePushSettings: HTMLButtonElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemotePushSettings`);
 
   // remote general
-  const remoteMetabolismSelect: HTMLSelectElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemoteMetabolismSelect`);
-  const remoteDisableWetting: HTMLInputElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemoteDisableWetting`);
-  const remoteDisableSoiling: HTMLInputElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemoteDisableSoiling`);
+  const remotePeeMetabolismSelect: HTMLSelectElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemotePeeMetabolismSelect`);
+  const remotePoopMetabolismSelect: HTMLSelectElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemotePoopMetabolismSelect`);
+  const remoteOnDiaperChangeSelect: HTMLSelectElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemoteOnDiaperChangeSelect`);
 
   // general
-  const metabolismSelect = htmlSettingPage.querySelector(`.${modIdentifier}MetabolismSelect`);
-  const disableWetting: HTMLInputElement | null = htmlSettingPage.querySelector(`.${modIdentifier}DisableWetting`);
-  const disableSoiling: HTMLInputElement | null = htmlSettingPage.querySelector(`.${modIdentifier}DisableSoiling`);
+  const peeMetabolismSelect = htmlSettingPage.querySelector(`.${modIdentifier}PeeMetabolismSelect`);
+  const poopMetabolismSelect = htmlSettingPage.querySelector(`.${modIdentifier}PoopMetabolismSelect`);
+  const onDiaperChangeSelect = htmlSettingPage.querySelector(`.${modIdentifier}OnDiaperChangeSelect`);
 
   if (
-    //general
-    !metabolismSelect ||
-    !disableWetting ||
-    !disableSoiling ||
+    // general
+    !peeMetabolismSelect ||
+    !poopMetabolismSelect ||
+    !onDiaperChangeSelect ||
     // remote
     !remotePlayerSelect ||
     !refreshRemotes ||
     !remotePushSettings ||
     // remote general
-    !remoteMetabolismSelect ||
-    !remoteDisableWetting ||
-    !remoteDisableSoiling
+    !remotePeeMetabolismSelect ||
+    !remotePoopMetabolismSelect ||
+    !remoteOnDiaperChangeSelect
   )
     throw new Error("Could not find elements");
 
   // general
-  metabolismSelect.addEventListener("sl-change", (e: any) => {
-    abclPlayer.settings.Metabolism = e.target.value;
+  peeMetabolismSelect.addEventListener("sl-change", (e: any) => {
+    abclPlayer.settings.PeeMetabolism = e.target.value;
   });
-  disableWetting.addEventListener("sl-change", (e: any) => {
-    abclPlayer.settings.DisableWetting = e.target.checked;
+  poopMetabolismSelect.addEventListener("sl-change", (e: any) => {
+    abclPlayer.settings.PoopMetabolism = e.target.value;
   });
-  disableSoiling.addEventListener("sl-change", (e: any) => {
-    abclPlayer.settings.DisableSoiling = e.target.checked;
+  onDiaperChangeSelect.addEventListener("sl-change", (e: any) => {
+    abclPlayer.settings.OnDiaperChange = e.target.value;
   });
-
   // remote
   const updateSelectedRemotePlayer = (memberNumber: MemberNumber) => {
     const character: Character | undefined = getCharacter(memberNumber);
     if (!character || !character.ABCL) return;
-    remoteMetabolismSelect.value = character.ABCL.Settings.Metabolism;
-    remoteDisableWetting.checked = character.ABCL.Settings.DisableWetting;
-    remoteDisableSoiling.checked = character.ABCL.Settings.DisableSoiling;
-  };
-  const pushSettings = (memberNumber: MemberNumber) => {
-    // let settings: Partial<ModSettings> = {};
-    //settings.Metabolism.value = remoteMetabolismSelect.value;
-    // settings.DisableWetting = remoteDisableWetting.checked;
-    // settings.DisableSoiling = remoteDisableSoiling.checked;
-    // sendNewSettingsPacket(, memberNumber);
-  };
 
-  remotePushSettings.addEventListener("click", () => {});
-  remotePlayerSelect.addEventListener("sl-change", (e: any) => {});
+    remotePeeMetabolismSelect.value = character.ABCL.Settings.PeeMetabolism;
+    remotePoopMetabolismSelect.value = character.ABCL.Settings.PoopMetabolism;
+    remoteOnDiaperChangeSelect.value = character.ABCL.Settings.OnDiaperChange;
+  };
+  const pushSettings = (memberNumber: MemberNumber) => {};
+
+  remotePushSettings.addEventListener("click", () => {
+    const memberNumber = parseInt(remotePlayerSelect.value, 10);
+    if (!isNaN(memberNumber)) {
+      //pushSettings(memberNumber);
+    }
+  });
+  remotePlayerSelect.addEventListener("sl-change", (e: any) => {
+    updateSelectedRemotePlayer(parseInt(e.target.value, 10));
+  });
   refreshRemotes.addEventListener("click", () => {
     updateRemoteList(remotePlayerSelect);
   });
@@ -163,18 +179,9 @@ export const initSettingsScreen = async () => {
       updateRemoteList(remotePlayerSelect);
       // fill select ChatRoomCharacter
 
-      metabolismSelect.setAttribute("value", abclPlayer.settings.Metabolism);
-      if (abclPlayer.settings.DisableWetting) {
-        disableWetting.setAttribute("checked", "true");
-      } else {
-        disableWetting.removeAttribute("checked");
-      }
-
-      if (abclPlayer.settings.DisableSoiling) {
-        disableSoiling.setAttribute("checked", "true");
-      } else {
-        disableSoiling.removeAttribute("checked");
-      }
+      peeMetabolismSelect.setAttribute("value", abclPlayer.settings.PeeMetabolism);
+      poopMetabolismSelect.setAttribute("value", abclPlayer.settings.PoopMetabolism);
+      onDiaperChangeSelect.setAttribute("value", abclPlayer.settings.OnDiaperChange);
     },
   });
 };
