@@ -500,6 +500,9 @@ sl-button::part(label) {
 sl-button {
     margin: 0.5em 0;
 }
+sl-drawer::part(panel) {
+  background-color: var(--tmd-element,  var(--sl-color-neutral-0));
+}
 
 /* sorry fusam */
 #fusam-addon-manager-container {
