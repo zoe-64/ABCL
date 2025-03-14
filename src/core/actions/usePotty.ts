@@ -31,12 +31,16 @@ export const usePotty: CombinedAction = {
     ID: "potty",
     Name: "Sit and Use Potty",
     Image: `${publicURL}/activity/potty-temp.png`,
-    OnClick: (player: Character) => usePottyFunction,
+    OnClick: (player: Character) => {
+      usePottyFunction();
+    },
     TargetSelf: ["ItemButt"],
   },
   command: {
     Tag: "use-potty",
     Description: ` Sit down and use the potty.`,
-    Action: (args, msg, parsed) => usePottyFunction,
+    Action: (args, msg, parsed) => {
+      usePottyFunction();
+    },
   },
 };

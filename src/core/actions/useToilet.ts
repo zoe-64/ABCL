@@ -23,11 +23,12 @@ export const useToilet: CombinedAction = {
     ID: "toilet",
     Name: "Sit and Use Toilet",
     Image: `${publicURL}/activity/toilet-temp.png`,
-    OnClick: (player: Character) => useToiletFunction,
+    OnClick: (player: Character) => {
+      useToiletFunction();
+    },
     TargetSelf: ["ItemButt"],
     Criteria: (player: Character) => {
       if (abclPlayer.stats.MentalRegression > 0.3) {
-        sendChatLocal("You try to use the toilet but you can't seem to get anything out.");
       }
       return abclPlayer.stats.MentalRegression < 0.3;
     },
@@ -36,6 +37,7 @@ export const useToilet: CombinedAction = {
     Tag: "use-toilet",
     Description: ` Sit down and use the toilet.`,
     Action: () => {
+      if (!useToilet.activity!.Criteria!(Player)) sendChatLocal("You try to use the toilet but you can't seem to get anything out.");
       useToilet.activity!.Criteria!(Player) && useToiletFunction();
     },
   },

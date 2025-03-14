@@ -22,7 +22,9 @@ export const wipePuddle: CombinedAction = {
     ID: "wipe-puddle",
     Name: "Wipe Puddle",
     Image: `./Assets/Female3DCG/ItemHandheld/Preview/Towel.png`,
-    OnClick: (player: Character, group: AssetGroupItemName) => WipePuddleFunction(player),
+    OnClick: (player: Character, group: AssetGroupItemName) => {
+      WipePuddleFunction(player);
+    },
     Target: ["ItemBoots"],
     Criteria: (player: Character) => {
       return isABCLPlayer(player) && player.ABCL!.Stats.PuddleSize.value > 0;

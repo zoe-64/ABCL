@@ -1,13 +1,16 @@
 import { CombinedAction } from "../../types/types";
 import { sendDataToAction, sendUpdateMyData } from "../hooks";
 import { abclPlayer, updatePlayerClothes } from "../player/player";
-import { getCharacter, isABCLPlayer } from "../player/playerUtils";
+import { getCharacter, isABCLPlayer, replace_template, SendAction } from "../player/playerUtils";
 import { sendChatLocal } from "../utils";
 
 const LickPuddleFunction = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) {
     sendDataToAction("lick-puddle", undefined, player.MemberNumber);
+    SendAction(replace_template("%NAME% licks %OPP_NAME%'s puddle of pee.", player));
     return;
+  } else {
+    SendAction(replace_template("%NAME% licks %INTENSIVE% puddle of pee.", player));
   }
   abclPlayer.stats.PuddleSize -= 50;
   sendUpdateMyData();
