@@ -8,7 +8,7 @@ const htmlSettingPage = document.createElement("div");
 htmlSettingPage.classList.add(`${modIdentifier}SettingPage`, `${modIdentifier}Hidden`);
 
 const updateRemoteList = (list: HTMLElement) => {
-  if ((<any>window)?.LITTLISH_CLUB) return;
+  if (!(<any>window)?.LITTLISH_CLUB) return;
   const caregivers = window.LITTLISH_CLUB.getCaregiversOf(Player);
   list.innerHTML = ChatRoomCharacter.filter(
     (character) => character.ABCL && character.MemberNumber !== Player.MemberNumber && caregivers.includes(Player.MemberNumber!)

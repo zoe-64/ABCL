@@ -10,9 +10,10 @@ import "./core/global";
 import { initOverlay } from "./core/player/ui";
 import { initActions } from "./core/actionLoader";
 import { loopInterval } from "./constants";
+import { initApi } from "./core/api";
 
 const init = async () => {
-  ServerPlayerSync();
+  //  ServerPlayerSync();
   loadOrGenerateData();
 
   initSettingsScreen();
@@ -21,6 +22,7 @@ const init = async () => {
   initHooks();
   initMinigames();
   initOverlay();
+  initApi();
 
   setInterval(loop, loopInterval);
   logger.info(`Ready.`);

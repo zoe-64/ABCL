@@ -1,11 +1,13 @@
 import { ABCLActivity, CombinedAction, HookListener } from "../types/types";
 import { changeDiaper } from "./actions/changeDiaper";
 import { checkDiaper } from "./actions/checkDiaper";
+import { lickPuddle } from "./actions/lickPuddle";
 import { sync, syncListeners } from "./actions/sync";
 import { toPee } from "./actions/toPee";
 import { toPoop } from "./actions/toPoop";
 import { usePotty } from "./actions/usePotty";
 import { useToilet } from "./actions/useToilet";
+import { wipePuddle } from "./actions/wipePuddle";
 import { bcModSDK, waitForElement } from "./utils";
 
 export const insertActivityButton = (
@@ -56,15 +58,15 @@ export const initActions = (): void => {
     const [_mode] = args;
     next(args);
     if (_mode !== "activities") return;
-
+    const character = CurrentCharacter?.FocusGroup ? CurrentCharacter : Player;
     const activityGrid = await waitForElement("#dialog-activity-grid");
-    const focusGroup = CurrentCharacter?.FocusGroup?.Name;
+    const focusGroup = character.FocusGroup?.Name;
     if (!focusGroup) return;
 
     for (const { activity } of actions) {
       if (!activity) continue;
 
-      if (activityFitsCriteria(activity, CurrentCharacter ?? Player)) {
+      if (activityFitsCriteria(activity, character)) {
         if (!activityIsInserted(activity.ID)) {
           activityGrid.appendChild(insertActivityButton(activity.Name, activity.ID, activity.Image, activity.OnClick));
         }
@@ -73,7 +75,7 @@ export const initActions = (): void => {
   });
   CommandCombine(commands);
 };
-export const actions: CombinedAction[] = [changeDiaper, checkDiaper, toPee, toPoop, usePotty, useToilet];
+export const actions: CombinedAction[] = [changeDiaper, checkDiaper, toPee, toPoop, usePotty, useToilet, sync, lickPuddle, wipePuddle];
 
 export const commands = actions.reduce((commands, { command }) => (command ? [...commands, command] : commands), [] as ICommand[]);
 export const activites = actions.reduce((activites, { activity }) => (activity ? [...activites, activity] : activites), [] as ABCLActivity[]);

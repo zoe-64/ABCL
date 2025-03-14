@@ -5,13 +5,15 @@ import { getCharacter } from "../player/playerUtils";
 
 export type syncListeners = {
   sync: { settings: ModSettings; stats: ModStats; version: typeof modVersion; target?: number };
-  init: undefined;
+  init: never;
 };
 
 export const sync: CombinedAction = {
   listeners: {
     sync: ({ Sender }, data) => {
       if (!Sender) return;
+      console.log("sync:" + modIdentifier);
+
       logger.debug({
         message: `Received updated data`,
         data,
@@ -27,6 +29,7 @@ export const sync: CombinedAction = {
       };
     },
     init: ({ Sender }) => {
+      console.log("init");
       logger.debug(`Received request for data`);
       sendUpdateMyData(Sender);
     },

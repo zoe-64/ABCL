@@ -14,7 +14,7 @@ export const checkDiaper: CombinedAction = {
     },
     Target: ["ItemPelvis"],
     Criteria: (player: Character) => {
-      return hasDiaper(player) && isABCLPlayer(player);
+      return isABCLPlayer(player);
     },
   },
   command: {

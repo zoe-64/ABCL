@@ -28,8 +28,8 @@ export const abclPlayer = {
     abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[abclPlayer.settings.PeeMetabolism];
     abclPlayer.stats.BowelValue += abclPlayer.stats.FoodIntake * MetabolismSettingValues[abclPlayer.settings.PoopMetabolism];
 
-    abclPlayer.attemptWetting();
-    abclPlayer.attemptSoiling();
+    abclPlayer.settings.PeeMetabolism !== "Disabled" && abclPlayer.attemptWetting();
+    abclPlayer.settings.PoopMetabolism !== "Disabled" && abclPlayer.attemptSoiling();
     playerSaver.save();
   },
   wetClothing: () => {

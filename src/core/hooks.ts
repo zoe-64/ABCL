@@ -21,6 +21,7 @@ export const sendDataToAction = (type: string, data?: any, target?: number) => {
     ],
   };
   ServerSend("ChatRoomChat", ChatRoomMessage as ServerChatRoomMessage);
+  console.log("sendDataToAction", type, data, target);
 };
 
 /**
@@ -29,6 +30,7 @@ export const sendDataToAction = (type: string, data?: any, target?: number) => {
  * @param {number} [target] - The MemberNumber of the target player. If not specified, the update is sent to all players.
  */
 export const sendUpdateMyData = (target?: number) => {
+  console.log("sendUpdateMyData target", target);
   sendDataToAction(
     "sync",
     {
@@ -47,7 +49,7 @@ export const sendUpdateMyData = (target?: number) => {
  * Sends a request packet to other players in the chat room to retrieve their data.
  */
 export const sendRequestOtherDataPacket = () => {
-  sendDataToAction("init");
+  sendDataToAction("init", 1);
 
   logger.debug(`Requesting data from others.`);
 };
@@ -63,7 +65,7 @@ const receivePacket = (receivedMessage: PluginServerChatRoomMessage) => {
   if (!receivedMessage.Sender || !receivedMessage.Dictionary) return;
   if (receivedMessage.Sender === Player.MemberNumber) return;
   if (receivedMessage.Type !== "Hidden") return;
-  if (!receivedMessage.Dictionary[0]?.data) return;
+  if (!receivedMessage.Dictionary[0]?.type) return;
 
   const type = receivedMessage.Dictionary[0]?.type as keyof ListenerTypeMap;
   const data = receivedMessage.Dictionary[0]?.data as ListenerTypeMap[typeof type];
@@ -74,6 +76,7 @@ const receivePacket = (receivedMessage: PluginServerChatRoomMessage) => {
       (listener as HookListener<ListenerTypeMap[typeof type]>)(receivedMessage, data);
     }
   }
+  console.log("receivePacket", type, data, receivedMessage.Sender);
 };
 
 /**

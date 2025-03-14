@@ -319,8 +319,8 @@ export const initOverlay = () => {
   overlay.style.color = (Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ? "var(--tmd-text,black)" : "var(--tmd-text,white)";
   document.body.appendChild(overlay);
 
-  waitForElement("#chat-room-div", { childCheck: true }).then(() => {
-    waitForElement(`.${modIdentifier}Overlay`).then(() => {
+  waitForElement("#chat-room-div", { childCheck: true, timeout: 9999999999999999999999 }).then(() => {
+    waitForElement(`.${modIdentifier}Overlay`, { timeout: 9999999999999999999999 }).then(() => {
       document.removeChild(overlay);
       setTimeout(() => {
         document.appendChild(overlay);
