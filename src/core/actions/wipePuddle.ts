@@ -17,7 +17,7 @@ const WipePuddleFunction = (player: Character) => {
   } else {
     SendAction(replace_template("%NAME% wipes %INTENSIVE% puddle of pee.", player));
   }
-  abclPlayer.stats.PuddleSize -= 50;
+  abclPlayer.stats.PuddleSize = 0;
   sendUpdateMyData();
   updatePlayerClothes();
 };
@@ -42,7 +42,11 @@ export const wipePuddle: CombinedAction = {
     Tag: "wipe-puddle",
     Description: ` [MemberNumber|Name|Nickname]: Wipes a puddle of pee.`,
     Action: (args, msg, parsed) => {
-      const character = getCharacter(parsed[1]) ?? Player;
+      const character = getCharacter(parsed[0]);
+      if (!character) {
+        sendChatLocal(`Could not find character: "${parsed[0]}"`);
+        return;
+      }
       if (!wipePuddle.activity!.Criteria!(character)) {
         sendChatLocal("Is either not an ABCL player or has no puddle.");
       }

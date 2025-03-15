@@ -47,7 +47,11 @@ export const changeDiaper: CombinedAction = {
     Tag: "diaper-change",
     Description: ` [MemberNumber|Name|Nickname]: Changes someone's diaper.`,
     Action: (args, msg, parsed) => {
-      const character = getCharacter(parsed[1]) ?? Player;
+      const character = getCharacter(parsed[0]);
+      if (!character) {
+        sendChatLocal(`Could not find character: "${parsed[0]}"`);
+        return;
+      }
       if (!changeDiaper.activity!.Criteria!(character)) {
         sendChatLocal("Is either not diapered or not an ABCL player.");
       }
@@ -70,7 +74,7 @@ export const changeDiaper: CombinedAction = {
           new ABCLYesNoPrompt(
             `${getCharacterName(Sender)} wants to change your diaper.`,
             () => {
-              changeDiaperRequest(getCharacter(Sender!) ?? Player);
+              changeDiaperFunction(getCharacter(Sender!) ?? Player);
               sendDataToAction("changeDiaper-accepted", undefined, Sender);
             },
             () => {

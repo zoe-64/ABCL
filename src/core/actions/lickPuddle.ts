@@ -7,10 +7,7 @@ import { sendChatLocal } from "../utils";
 const lickPuddleRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) {
     sendDataToAction("lick-puddle", undefined, player.MemberNumber);
-    SendAction(replace_template("%NAME% licks %OPP_NAME%'s puddle of pee.", player));
     return;
-  } else {
-    SendAction(replace_template("%NAME% licks %INTENSIVE% puddle of pee.", player));
   }
   LickPuddleFunction(Player);
 };
@@ -43,7 +40,11 @@ export const lickPuddle: CombinedAction = {
     Tag: "lick-puddle",
     Description: ` [MemberNumber|Name|Nickname]: Licks a puddle of pee.`,
     Action: (args, msg, parsed) => {
-      const character = getCharacter(parsed[1]) ?? Player;
+      const character = getCharacter(parsed[0]);
+      if (!character) {
+        sendChatLocal(`Could not find character: "${parsed[0]}"`);
+        return;
+      }
       if (!lickPuddle.activity!.Criteria!(character)) {
         sendChatLocal("Is either not an ABCL player or has no puddle.");
       }
@@ -52,7 +53,7 @@ export const lickPuddle: CombinedAction = {
   },
   listeners: {
     "lick-puddle": ({ Sender }) => {
-      lickPuddleRequest(getCharacter(Sender!) ?? Player);
+      LickPuddleFunction(getCharacter(Sender!) ?? Player);
     },
   },
 };

@@ -36,7 +36,11 @@ export const checkDiaper: CombinedAction = {
     Tag: "check-diaper",
     Description: ` [MemberNumber|Name|Nickname]: Checks someone's diaper.`,
     Action: (args, msg, parsed) => {
-      const character = getCharacter(parsed[1]) ?? Player;
+      const character = getCharacter(parsed[0]);
+      if (!character) {
+        sendChatLocal(`Could not find character: "${parsed[0]}"`);
+        return;
+      }
       if (!checkDiaper.activity!.Criteria!(character)) {
         sendChatLocal("Is either not diapered or not an ABCL player.");
       }
