@@ -1,7 +1,6 @@
 import { CombinedAction } from "../../types/types";
 import { abclPlayer } from "../player/player";
 import { SendAction } from "../player/playerUtils";
-import { sendChatLocal } from "../utils";
 
 const usePottyFunction = () => {
   const isTooEarly = abclPlayer.stats.BladderFullness < 0.3 && abclPlayer.stats.BowelFullness < 0.3;

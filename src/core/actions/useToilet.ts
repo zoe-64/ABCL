@@ -5,7 +5,6 @@ import { sendChatLocal } from "../utils";
 
 const useToiletFunction = () => {
   const isTooEarly = abclPlayer.stats.BladderFullness < 0.3 && abclPlayer.stats.BowelFullness < 0.3;
-  const isPossible = !isTooEarly;
   const isGood = abclPlayer.stats.BladderFullness > 0.6 || abclPlayer.stats.BowelFullness > 0.6;
   if (isTooEarly) {
     return sendChatLocal("You try to use the toilet but you can't seem to get anything out.");
@@ -18,7 +17,7 @@ const useToiletFunction = () => {
     abclPlayer.stats.MentalRegression -= 0.02;
     abclPlayer.stats.Incontinence -= 0.02;
   }
-  SendAction("%NAME% goes to the bathroom uses the toilet " + ".");
+  SendAction("%NAME% goes to the bathroom uses the toilet " + additionalText + ".");
 };
 
 export const useToilet: CombinedAction = {

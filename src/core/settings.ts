@@ -71,12 +71,7 @@ export const loadOrGenerateData = async () => {
         Settings: {},
         Stats: {},
       };
-  if (data.Version && Number(data.Version.replaceAll(".", "")) > Number(modVersion.replaceAll(".", ""))) {
-    const result = confirm(`Your version is ${data.Version} but the current version is ${modVersion}. Click OK to downgrade. Click Cancel to abort.`);
-    if (!result) {
-      return;
-    }
-  }
+
   // migrations
   if (data.ModVersion === "2.0.0") {
     const metabolismValue = data.Settings.Metabolism;

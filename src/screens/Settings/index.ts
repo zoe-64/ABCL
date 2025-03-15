@@ -22,7 +22,9 @@ export const initSettingsScreen = async () => {
   <sl-tab slot="nav" panel="general">General</sl-tab>
   <sl-tab slot="nav" panel="remote">Remote</sl-tab>
   <sl-tab-panel name="general">
-    <sl-radio-group class="${modIdentifier}PeeMetabolismSelect" label="Select Pee Metabolism" name="pee-metabolism" value="${abclPlayer.settings.PeeMetabolism}">
+    <sl-radio-group class="${modIdentifier}PeeMetabolismSelect" label="Select Pee Metabolism" name="pee-metabolism" value="${
+    abclPlayer.settings.PeeMetabolism
+  }">
     <sl-radio-button value="Disabled">Disabled</sl-radio-button>
     <sl-radio-button value="Slow">Slow</sl-radio-button>
     <sl-radio-button value="Normal">Normal</sl-radio-button>
@@ -31,7 +33,9 @@ export const initSettingsScreen = async () => {
     <sl-radio-button value="Fastest">Fastest</sl-radio-button>
     </sl-radio-group>
 
-    <sl-radio-group class="${modIdentifier}PoopMetabolismSelect" label="Select Poop Metabolism" name="poop-metabolism" value="${abclPlayer.settings.PoopMetabolism}">
+    <sl-radio-group class="${modIdentifier}PoopMetabolismSelect" label="Select Poop Metabolism" name="poop-metabolism" value="${
+    abclPlayer.settings.PoopMetabolism
+  }">
     <sl-radio-button value="Disabled">Disabled</sl-radio-button>
     <sl-radio-button value="Slow">Slow</sl-radio-button>
     <sl-radio-button value="Normal">Normal</sl-radio-button>
@@ -40,7 +44,9 @@ export const initSettingsScreen = async () => {
     <sl-radio-button value="Fastest">Fastest</sl-radio-button>
     </sl-radio-group>
 
-    <sl-radio-group class="${modIdentifier}OnDiaperChangeSelect" label="Select On Diaper Change" name="on-diaper-change" value="${abclPlayer.settings.OnDiaperChange}">
+    <sl-radio-group class="${modIdentifier}OnDiaperChangeSelect" label="Select On Diaper Change" name="on-diaper-change" value="${
+    abclPlayer.settings.OnDiaperChange
+  }">
     <sl-radio-button value="Deny">Deny</sl-radio-button>
     <sl-radio-button value="Ask">Ask</sl-radio-button>
     <sl-radio-button value="Allow">Allow</sl-radio-button>
@@ -49,7 +55,8 @@ export const initSettingsScreen = async () => {
   </sl-tab-panel>
 
   <sl-tab-panel name="remote">
-    <sl-select class="${modIdentifier}RemotePlayerSelect" label="Select Player" name="player" value="">
+    ${
+      /* <sl-select class="${modIdentifier}RemotePlayerSelect" label="Select Player" name="player" value="">
     </sl-select>
     <sl-button class="${modIdentifier}RefreshRemotes">Refresh Remotes</sl-button>
     <sl-tab-group>
@@ -80,7 +87,8 @@ export const initSettingsScreen = async () => {
         <sl-radio-button value="Deny">Deny</sl-radio-button>
         <sl-radio-button value="Ask">Ask</sl-radio-button>
         <sl-radio-button value="Allow">Allow</sl-radio-button>
-        </sl-radio-group>
+        </sl-radio-group> */ "In development"
+    }
       </sl-tab-panel>
     </sl-tab-group>
   </sl-tab-panel>
@@ -88,15 +96,15 @@ export const initSettingsScreen = async () => {
   `;
 
   // remote
-  const remotePlayerSelect: HTMLSelectElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemotePlayerSelect`);
+  /*  const remotePlayerSelect: HTMLSelectElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemotePlayerSelect`);
   const refreshRemotes: HTMLButtonElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RefreshRemotes`);
   const remotePushSettings: HTMLButtonElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemotePushSettings`);
-
+ */
   // remote general
-  const remotePeeMetabolismSelect: HTMLSelectElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemotePeeMetabolismSelect`);
+  /*   const remotePeeMetabolismSelect: HTMLSelectElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemotePeeMetabolismSelect`);
   const remotePoopMetabolismSelect: HTMLSelectElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemotePoopMetabolismSelect`);
   const remoteOnDiaperChangeSelect: HTMLSelectElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemoteOnDiaperChangeSelect`);
-
+ */
   // general
   const peeMetabolismSelect = htmlSettingPage.querySelector(`.${modIdentifier}PeeMetabolismSelect`);
   const poopMetabolismSelect = htmlSettingPage.querySelector(`.${modIdentifier}PoopMetabolismSelect`);
@@ -106,15 +114,15 @@ export const initSettingsScreen = async () => {
     // general
     !peeMetabolismSelect ||
     !poopMetabolismSelect ||
-    !onDiaperChangeSelect ||
+    !onDiaperChangeSelect
     // remote
-    !remotePlayerSelect ||
-    !refreshRemotes ||
-    !remotePushSettings ||
+    //!remotePlayerSelect ||
+    //!refreshRemotes ||
+    //!remotePushSettings ||
     // remote general
-    !remotePeeMetabolismSelect ||
-    !remotePoopMetabolismSelect ||
-    !remoteOnDiaperChangeSelect
+    //!remotePeeMetabolismSelect
+    //!remotePoopMetabolismSelect ||
+    //!remoteOnDiaperChangeSelect
   )
     throw new Error("Could not find elements");
 
@@ -133,24 +141,24 @@ export const initSettingsScreen = async () => {
     const character: Character | undefined = getCharacter(memberNumber);
     if (!character || !character.ABCL) return;
 
-    remotePeeMetabolismSelect.value = character.ABCL.Settings.PeeMetabolism;
-    remotePoopMetabolismSelect.value = character.ABCL.Settings.PoopMetabolism;
-    remoteOnDiaperChangeSelect.value = character.ABCL.Settings.OnDiaperChange;
+    // remotePeeMetabolismSelect.value = character.ABCL.Settings.PeeMetabolism;
+    //remotePoopMetabolismSelect.value = character.ABCL.Settings.PoopMetabolism;
+    //remoteOnDiaperChangeSelect.value = character.ABCL.Settings.OnDiaperChange;
   };
   const pushSettings = (memberNumber: MemberNumber) => {};
 
-  remotePushSettings.addEventListener("click", () => {
+  /*   remotePushSettings.addEventListener("click", () => {
     const memberNumber = parseInt(remotePlayerSelect.value, 10);
     if (!isNaN(memberNumber)) {
       //pushSettings(memberNumber);
     }
-  });
-  remotePlayerSelect.addEventListener("sl-change", (e: any) => {
+  }); */
+  /*  remotePlayerSelect.addEventListener("sl-change", (e: any) => {
     updateSelectedRemotePlayer(parseInt(e.target.value, 10));
   });
   refreshRemotes.addEventListener("click", () => {
     updateRemoteList(remotePlayerSelect);
-  });
+  }); */
 
   overlay.appendChild(htmlSettingPage);
   PreferenceRegisterExtensionSetting({
@@ -171,13 +179,13 @@ export const initSettingsScreen = async () => {
     load: () => {
       htmlSettingPage.classList.remove(`${modIdentifier}Hidden`);
 
-      let selectedCharacter: Character | undefined = getCharacter(remotePlayerSelect.value);
+      /*    let selectedCharacter: Character | undefined = getCharacter(remotePlayerSelect.value);
       if (!selectedCharacter || !selectedCharacter?.ABCL) {
         selectedCharacter = Player;
       }
 
       updateRemoteList(remotePlayerSelect);
-      // fill select ChatRoomCharacter
+      // fill select ChatRoomCharacter */
 
       peeMetabolismSelect.setAttribute("value", abclPlayer.settings.PeeMetabolism);
       poopMetabolismSelect.setAttribute("value", abclPlayer.settings.PoopMetabolism);

@@ -87,14 +87,14 @@ export const abclPlayer = {
     if (hasDiaper()) {
       SendAction("%NAME%'s diaper leaks and soils %INTENSIVE% clothes and the floor.");
     } else {
-      SendAction("%NAME soils %INTENSIVE% clothes and the floor.");
+      SendAction("%NAME% soils %INTENSIVE% clothes and the floor.");
     }
     updatePlayerClothes();
   },
   wetDiaper: () => {
     const diaperSize = getPlayerDiaperSize();
     const absorbedVolume = Math.min(abclPlayer.stats.BladderValue, diaperSize - abclPlayer.stats.WetnessValue);
-    SendAction("%NAME wets %INTENSIVE% diaper.");
+    SendAction("%NAME% wets %INTENSIVE% diaper.");
 
     abclPlayer.stats.BladderValue -= absorbedVolume;
     abclPlayer.stats.WetnessValue += absorbedVolume;
@@ -106,7 +106,7 @@ export const abclPlayer = {
   soilDiaper: () => {
     const diaperSize = getPlayerDiaperSize();
     const absorbedVolume = Math.min(abclPlayer.stats.BowelValue, Math.max(0, diaperSize - abclPlayer.stats.SoilinessValue));
-    SendAction("%NAME soils %INTENSIVE% diaper.");
+    SendAction("%NAME% soils %INTENSIVE% diaper.");
     abclPlayer.stats.BowelValue -= absorbedVolume;
     abclPlayer.stats.SoilinessValue += absorbedVolume;
 
