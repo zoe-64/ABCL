@@ -62,6 +62,12 @@ export const abclPlayer = {
     }
     abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
     abclPlayer.stats.BladderFullness = 0;
+
+    if (hasDiaper()) {
+      SendAction("%NAME%'s diaper leaks and wet %INTENSIVE% clothes causing a puddle to form.");
+    } else {
+      SendAction("%NAME%'s wets %INTENSIVE% clothes leaks onto the floor.");
+    }
     updatePlayerClothes();
   },
   soilClothing: () => {

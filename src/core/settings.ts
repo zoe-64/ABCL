@@ -71,7 +71,7 @@ export const loadOrGenerateData = async () => {
         Settings: {},
         Stats: {},
       };
-  if (data.Version > modVersion) {
+  if (data.Version && Number(data.Version.replaceAll(".", "")) > Number(modVersion.replaceAll(".", ""))) {
     const result = confirm(`Your version is ${data.Version} but the current version is ${modVersion}. Click OK to downgrade. Click Cancel to abort.`);
     if (!result) {
       return;
