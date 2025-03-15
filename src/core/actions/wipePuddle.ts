@@ -1,13 +1,21 @@
 import { CombinedAction } from "../../types/types";
 import { sendDataToAction, sendUpdateMyData } from "../hooks";
 import { abclPlayer, updatePlayerClothes } from "../player/player";
-import { getCharacter, isABCLPlayer } from "../player/playerUtils";
+import { getCharacter, isABCLPlayer, replace_template, SendAction } from "../player/playerUtils";
 import { sendChatLocal } from "../utils";
 
+const WipePuddleRequest = (player: Character) => {
+  if (player.MemberNumber !== Player.MemberNumber) {
+    sendDataToAction("wipe-puddle", undefined, player.MemberNumber);
+    return;
+  }
+  WipePuddleFunction(Player);
+};
 const WipePuddleFunction = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) {
-    sendDataToAction("lick-puddle", undefined, player.MemberNumber);
-    return;
+    SendAction(replace_template("%OPP_NAME% wipes %NAME%'s puddle of pee.", player));
+  } else {
+    SendAction(replace_template("%NAME% wipes %INTENSIVE% puddle of pee.", player));
   }
   abclPlayer.stats.PuddleSize -= 50;
   sendUpdateMyData();
@@ -22,7 +30,9 @@ export const wipePuddle: CombinedAction = {
     ID: "wipe-puddle",
     Name: "Wipe Puddle",
     Image: `./Assets/Female3DCG/ItemHandheld/Preview/Towel.png`,
-    OnClick: (player: Character, group: AssetGroupItemName) => WipePuddleFunction(player),
+    OnClick: (player: Character, group: AssetGroupItemName) => {
+      WipePuddleRequest(player);
+    },
     Target: ["ItemBoots"],
     Criteria: (player: Character) => {
       return isABCLPlayer(player) && player.ABCL!.Stats.PuddleSize.value > 0;
@@ -36,12 +46,12 @@ export const wipePuddle: CombinedAction = {
       if (!wipePuddle.activity!.Criteria!(character)) {
         sendChatLocal("Is either not an ABCL player or has no puddle.");
       }
-      WipePuddleFunction(character);
+      WipePuddleRequest(character);
     },
   },
   listeners: {
     "wipe-puddle": ({ Sender }) => {
-      WipePuddleFunction(Player);
+      WipePuddleFunction(getCharacter(Sender!) ?? Player);
     },
   },
 };

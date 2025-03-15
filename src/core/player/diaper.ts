@@ -1,5 +1,6 @@
 import { ABCLdata } from "../../constants";
 import { abclPlayer, updatePlayerClothes } from "./player";
+import { SendAction } from "./playerUtils";
 
 // Is/Has
 export const isLeaking = (type: "pee" | "poop" | "any" = "any") => {

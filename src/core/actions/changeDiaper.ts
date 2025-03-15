@@ -2,14 +2,22 @@ import { CombinedAction, DiaperSettingValues } from "../../types/types";
 import { sendDataToAction } from "../hooks";
 import { hasDiaper, updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, getCharacterName, isABCLPlayer } from "../player/playerUtils";
+import { getCharacter, getCharacterName, isABCLPlayer, replace_template, SendAction } from "../player/playerUtils";
 import { ABCLYesNoPrompt } from "../player/ui";
 import { sendChatLocal } from "../utils";
 
-export const changeDiaperFunction = (memberNumber: number | undefined = Player.MemberNumber) => {
-  if (memberNumber !== Player.MemberNumber) {
-    sendDataToAction("changeDiaper-pending", undefined, memberNumber);
+const changeDiaperRequest = (player: Character) => {
+  if (player.MemberNumber !== Player.MemberNumber) {
+    sendDataToAction("changeDiaper-pending", undefined, player.MemberNumber);
     return;
+  }
+  changeDiaperFunction(player);
+};
+export const changeDiaperFunction = (player: Character) => {
+  if (player.MemberNumber !== Player.MemberNumber) {
+    SendAction(replace_template("%OPP_NAME% changes %NAME%'s diaper.", player));
+  } else {
+    SendAction(replace_template("%NAME% changes %INTENSIVE% diaper.", player));
   }
   abclPlayer.stats.SoilinessValue = 0;
   abclPlayer.stats.WetnessValue = 0;
@@ -28,7 +36,7 @@ export const changeDiaper: CombinedAction = {
     Name: "Change Diaper",
     Image: `${publicURL}/activity/changeDiaper.svg`,
     OnClick: (player: Character, group: AssetGroupItemName) => {
-      changeDiaperFunction(player.MemberNumber);
+      changeDiaperRequest(player);
     },
     Target: ["ItemPelvis"],
     Criteria: (player: Character) => {
@@ -44,7 +52,7 @@ export const changeDiaper: CombinedAction = {
         sendChatLocal("Is either not diapered or not an ABCL player.");
       }
 
-      changeDiaperFunction(character.MemberNumber);
+      changeDiaperRequest(character);
     },
   },
   listeners: {
@@ -62,8 +70,7 @@ export const changeDiaper: CombinedAction = {
           new ABCLYesNoPrompt(
             `${getCharacterName(Sender)} wants to change your diaper.`,
             () => {
-              sendChatLocal(`${getCharacterName(Sender)} changed your diaper.`);
-              changeDiaperFunction();
+              changeDiaperRequest(getCharacter(Sender!) ?? Player);
               sendDataToAction("changeDiaper-accepted", undefined, Sender);
             },
             () => {
@@ -73,8 +80,7 @@ export const changeDiaper: CombinedAction = {
           );
           break;
         case DiaperSettingValues.Allow:
-          sendChatLocal(`${getCharacterName(Sender)} changed your diaper.`);
-          changeDiaperFunction();
+          changeDiaperRequest(getCharacter(Sender!) ?? Player);
           sendDataToAction("changeDiaper-accepted", undefined, Sender);
           break;
         case DiaperSettingValues.Deny:

@@ -1,21 +1,24 @@
 import { CombinedAction } from "../../types/types";
 import { abclPlayer } from "../player/player";
+import { SendAction } from "../player/playerUtils";
 import { sendChatLocal } from "../utils";
 
 const useToiletFunction = () => {
   const isTooEarly = abclPlayer.stats.BladderFullness < 0.3 && abclPlayer.stats.BowelFullness < 0.3;
   const isPossible = !isTooEarly;
   const isGood = abclPlayer.stats.BladderFullness > 0.6 || abclPlayer.stats.BowelFullness > 0.6;
-  if (isTooEarly) return;
-  if (isPossible) {
-    abclPlayer.stats.BladderFullness = 0;
-    abclPlayer.stats.BowelFullness = 0;
-    sendChatLocal("You sit down and use the toilet.");
+  if (isTooEarly) {
+    return sendChatLocal("You try to use the toilet but you can't seem to get anything out.");
   }
+  abclPlayer.stats.BladderFullness = 0;
+  abclPlayer.stats.BowelFullness = 0;
+  let additionalText = "";
   if (isGood) {
+    additionalText = "and feels releaved";
     abclPlayer.stats.MentalRegression -= 0.02;
     abclPlayer.stats.Incontinence -= 0.02;
   }
+  SendAction("%NAME% goes to the bathroom uses the toilet " + ".");
 };
 
 export const useToilet: CombinedAction = {
