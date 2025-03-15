@@ -13,6 +13,7 @@ import { abclStatsWindow } from "./ui";
 import { ABCLdata } from "../../constants";
 import { MetabolismSettingValues } from "../../types/types";
 import { SendAction } from "./playerUtils";
+import { sendUpdateMyData } from "../hooks";
 
 export const updatePlayerClothes = () => {
   CharacterRefresh(Player, true);
@@ -69,6 +70,7 @@ export const abclPlayer = {
       SendAction("%NAME%'s wets %INTENSIVE% clothes leaks onto the floor.");
     }
     updatePlayerClothes();
+    sendUpdateMyData();
   },
   soilClothing: () => {
     abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
