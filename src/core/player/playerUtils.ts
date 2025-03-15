@@ -1,10 +1,35 @@
+import { sendChatLocal } from "../utils";
+
 // luv you zoi <3
 export const getCharacter = (identifier: string | number | Character): Character | undefined => {
   if (!identifier) return;
   if (typeof identifier === "object") return identifier;
-  return ChatRoomCharacter.find((Character) => {
-    return Character.MemberNumber == identifier || Character.Name.toLowerCase() === identifier || Character.Nickname?.toLowerCase() === identifier;
+
+  const characters = ChatRoomCharacter.filter(Character => {
+    const name = Character.Name.toLowerCase();
+    const nickname = Character.Nickname?.toLowerCase();
+    const identifierString = `${identifier}`.toLowerCase();
+
+    return (
+      Character.MemberNumber == identifier ||
+      name === identifierString ||
+      nickname === identifierString ||
+      name.startsWith(identifierString) ||
+      nickname?.startsWith(identifierString)
+    );
   });
+
+  return characters[0];
+};
+
+export const targetInputExtractor = (parsed: string[]): Character | undefined => {
+  const name = parsed.join(" ");
+  const character = getCharacter(name);
+  if (!character) {
+    return;
+  }
+
+  return character;
 };
 
 export const isABCLPlayer = (character: Character, version = Player.ABCL.Version): boolean => {

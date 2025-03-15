@@ -1,25 +1,23 @@
 import { CombinedAction } from "../../types/types";
 import { sendDataToAction, sendUpdateMyData } from "../hooks";
 import { abclPlayer, updatePlayerClothes } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, SendAction } from "../player/playerUtils";
+import { getCharacter, isABCLPlayer, replace_template, SendAction, targetInputExtractor } from "../player/playerUtils";
 import { sendChatLocal } from "../utils";
 
 const lickPuddleRequest = (player: Character) => {
-  if (player.MemberNumber !== Player.MemberNumber) {
-    sendDataToAction("lick-puddle", undefined, player.MemberNumber);
-    return;
-  }
+  const isSelf = player.MemberNumber === Player.MemberNumber;
+  if (!isSelf) return sendDataToAction("lick-puddle", undefined, player.MemberNumber);
   LickPuddleFunction(Player);
 };
 const LickPuddleFunction = (player: Character) => {
-  if (player.MemberNumber !== Player.MemberNumber) {
-    SendAction(replace_template("%OPP_NAME% licks %NAME%'s puddle of pee.", player));
-  } else {
-    SendAction(replace_template("%NAME% licks %INTENSIVE% puddle of pee.", player));
-  }
-  abclPlayer.stats.PuddleSize -= 50;
+  const isSelf = player.MemberNumber === Player.MemberNumber;
+  const selfMessage = "%NAME% licks %INTENSIVE% puddle of pee.";
+  const otherMessage = "%OPP_NAME% licks %NAME%'s puddle of pee.";
+  SendAction(replace_template(isSelf ? selfMessage : otherMessage, player));
+
   sendUpdateMyData();
   updatePlayerClothes();
+  abclPlayer.stats.PuddleSize -= 50;
 };
 export type lickPuddleListeners = {
   "lick-puddle": undefined;
@@ -30,30 +28,20 @@ export const lickPuddle: CombinedAction = {
     ID: "lick-puddle",
     Name: "Lick Puddle",
     Image: `${publicURL}/activity/lickPuddle.png`,
-    OnClick: (player: Character, group: AssetGroupItemName) => lickPuddleRequest(player),
     Target: ["ItemBoots"],
-    Criteria: (player: Character) => {
-      return isABCLPlayer(player) && player.ABCL!.Stats.PuddleSize.value > 0;
-    },
+    OnClick: (player: Character, group: AssetGroupItemName) => lickPuddleRequest(player),
+    Criteria: (player: Character) => isABCLPlayer(player) && player.ABCL!.Stats.PuddleSize.value > 0,
   },
   command: {
     Tag: "lick-puddle",
-    Description: ` [MemberNumber|Name|Nickname]: Licks a puddle of pee.`,
     Action: (args, msg, parsed) => {
-      const character = getCharacter(parsed[0]);
-      if (!character) {
-        sendChatLocal(`Could not find character: "${parsed[0]}"`);
-        return;
-      }
-      if (!lickPuddle.activity!.Criteria!(character)) {
-        sendChatLocal("Is either not an ABCL player or has no puddle.");
-      }
+      const character = targetInputExtractor(parsed) ?? Player;
+      if (!lickPuddle.activity!.Criteria!(character)) return sendChatLocal("Is either not an ABCL player or has no puddle.");
       lickPuddleRequest(character);
     },
+    Description: ` [MemberNumber|Name|Nickname]: Licks a puddle of pee.`,
   },
   listeners: {
-    "lick-puddle": ({ Sender }) => {
-      LickPuddleFunction(getCharacter(Sender!) ?? Player);
-    },
+    "lick-puddle": ({ Sender }) => LickPuddleFunction(getCharacter(Sender!) ?? Player),
   },
 };

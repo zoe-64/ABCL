@@ -1,21 +1,21 @@
 import { CombinedAction } from "../../types/types";
 import { hasDiaper } from "../player/diaper";
-import { getCharacter, isABCLPlayer, replace_template, SendAction } from "../player/playerUtils";
+import { isABCLPlayer, replace_template, SendAction, targetInputExtractor } from "../player/playerUtils";
 import { abclStatsWindow } from "../player/ui";
 import { sendChatLocal } from "../utils";
 
 const diaperCheckFunction = (player: Character) => {
+  const isSelf = player.MemberNumber === Player.MemberNumber;
+  const selfDiaperMessage = "%NAME% checks %INTENSIVE% diaper.";
+  const otherDiaperMessage = "%NAME% checks %OPP_NAME%'s diaper.";
+  const selfClothesMessage = "%NAME% checks %INTENSIVE% clothes for any accidents.";
+  const otherClothesMessage = "%NAME% checks %OPP_NAME%'s clothes for any accidents.";
+  
+  abclStatsWindow.open(player.MemberNumber);
   if (Math.random() < 0.75) return;
 
-  if (hasDiaper(player)) {
-    if (player.MemberNumber !== Player.MemberNumber) return SendAction(replace_template("%OPP_NAME% checks %NAME%'s diaper.", player));
-
-    return SendAction(replace_template("%NAME% checks %INTENSIVE% diaper.", player));
-  }
-  if (player.MemberNumber !== Player.MemberNumber) {
-    SendAction(replace_template("%OPP_NAME% checks %NAME%'s clothes for any accidents.", player));
-  }
-  return SendAction(replace_template("%NAME% checks %INTENSIVE% clothes for any accidents.", player));
+  if (hasDiaper(player)) return SendAction(replace_template(isSelf ? selfDiaperMessage : otherDiaperMessage, player));
+  return SendAction(replace_template(isSelf ? selfClothesMessage : otherClothesMessage, player));
 };
 
 export const checkDiaper: CombinedAction = {
@@ -23,29 +23,18 @@ export const checkDiaper: CombinedAction = {
     ID: "check-diaper",
     Name: "Check Diaper",
     Image: `${publicURL}/activity/diaperCheck.png`,
-    OnClick: (player: Character, group: AssetGroupItemName) => {
-      diaperCheckFunction(player);
-      abclStatsWindow.open(player.MemberNumber);
-    },
+    OnClick: (player: Character, group: AssetGroupItemName) => diaperCheckFunction(player),
     Target: ["ItemPelvis"],
-    Criteria: (player: Character) => {
-      return isABCLPlayer(player);
-    },
+    Criteria: (player: Character) => isABCLPlayer(player),
   },
   command: {
     Tag: "check-diaper",
     Description: ` [MemberNumber|Name|Nickname]: Checks someone's diaper.`,
     Action: (args, msg, parsed) => {
-      const character = getCharacter(parsed[0]);
-      if (!character) {
-        sendChatLocal(`Could not find character: "${parsed[0]}"`);
-        return;
-      }
-      if (!checkDiaper.activity!.Criteria!(character)) {
-        sendChatLocal("Is either not diapered or not an ABCL player.");
-      }
+      const character = targetInputExtractor(parsed) ?? Player;
+      if (!checkDiaper.activity!.Criteria!(character)) sendChatLocal("Is not an ABCL player.");
+
       diaperCheckFunction(character);
-      abclStatsWindow.open(character.MemberNumber);
     },
   },
 };

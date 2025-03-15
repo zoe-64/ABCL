@@ -2,26 +2,24 @@ import { CombinedAction, DiaperSettingValues } from "../../types/types";
 import { sendDataToAction } from "../hooks";
 import { hasDiaper, updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, getCharacterName, isABCLPlayer, replace_template, SendAction } from "../player/playerUtils";
+import { getCharacter, getCharacterName, isABCLPlayer, replace_template, SendAction, targetInputExtractor } from "../player/playerUtils";
 import { ABCLYesNoPrompt } from "../player/ui";
 import { sendChatLocal } from "../utils";
 
 const changeDiaperRequest = (player: Character) => {
-  if (player.MemberNumber !== Player.MemberNumber) {
-    sendDataToAction("changeDiaper-pending", undefined, player.MemberNumber);
-    return;
-  }
+  if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("changeDiaper-pending", undefined, player.MemberNumber);
+
   changeDiaperFunction(player);
 };
 export const changeDiaperFunction = (player: Character) => {
-  if (player.MemberNumber !== Player.MemberNumber) {
-    SendAction(replace_template("%OPP_NAME% changes %NAME%'s diaper.", player));
-  } else {
-    SendAction(replace_template("%NAME% changes %INTENSIVE% diaper.", player));
-  }
-  abclPlayer.stats.SoilinessValue = 0;
-  abclPlayer.stats.WetnessValue = 0;
+  const isSelf = player.MemberNumber === Player.MemberNumber;
+  const selfMessage = "%NAME% changes %INTENSIVE% diaper.";
+  const otherMessage = "%NAME% changes %OPP_NAME%'s diaper.";
+  SendAction(replace_template(isSelf ? selfMessage : otherMessage, player));
+
   updateDiaperColor();
+  abclPlayer.stats.WetnessValue = 0;
+  abclPlayer.stats.SoilinessValue = 0;
 };
 
 export type changeDiaperListeners = {
@@ -35,39 +33,23 @@ export const changeDiaper: CombinedAction = {
     ID: "diaper-change",
     Name: "Change Diaper",
     Image: `${publicURL}/activity/changeDiaper.svg`,
-    OnClick: (player: Character, group: AssetGroupItemName) => {
-      changeDiaperRequest(player);
-    },
     Target: ["ItemPelvis"],
-    Criteria: (player: Character) => {
-      return hasDiaper(player) && isABCLPlayer(player);
-    },
+    OnClick: (player: Character, group: AssetGroupItemName) => changeDiaperRequest(player),
+    Criteria: (player: Character) => hasDiaper(player) && isABCLPlayer(player),
   },
   command: {
     Tag: "diaper-change",
-    Description: ` [MemberNumber|Name|Nickname]: Changes someone's diaper.`,
     Action: (args, msg, parsed) => {
-      const character = getCharacter(parsed[0]);
-      if (!character) {
-        sendChatLocal(`Could not find character: "${parsed[0]}"`);
-        return;
-      }
-      if (!changeDiaper.activity!.Criteria!(character)) {
-        sendChatLocal("Is either not diapered or not an ABCL player.");
-      }
+      const character = targetInputExtractor(parsed) ?? Player;
+      if (!changeDiaper.activity!.Criteria!(character)) return sendChatLocal("Is either not diapered or not an ABCL player.");
 
       changeDiaperRequest(character);
     },
+    Description: ` [MemberNumber|Name|Nickname]: Changes someone's diaper.`,
   },
   listeners: {
-    "changeDiaper-accepted": ({ Sender }) => {
-      sendChatLocal(`${getCharacterName(Sender)} accepted your change diaper request.`);
-    },
-
-    "changeDiaper-rejected": ({ Sender }) => {
-      sendChatLocal(`${getCharacterName(Sender)} rejected your change diaper request.`);
-    },
-
+    "changeDiaper-accepted": ({ Sender }) => sendChatLocal(`${getCharacterName(Sender)} accepted your change diaper request.`),
+    "changeDiaper-rejected": ({ Sender }) => sendChatLocal(`${getCharacterName(Sender)} rejected your change diaper request.`),
     "changeDiaper-pending": ({ Sender }) => {
       switch (abclPlayer.settings.OnDiaperChange) {
         case DiaperSettingValues.Ask:
@@ -77,14 +59,12 @@ export const changeDiaper: CombinedAction = {
               changeDiaperFunction(getCharacter(Sender!) ?? Player);
               sendDataToAction("changeDiaper-accepted", undefined, Sender);
             },
-            () => {
-              sendDataToAction("changeDiaper-rejected", undefined, Sender);
-            },
-            10 * 1000
+            () => sendDataToAction("changeDiaper-rejected", undefined, Sender),
+            10 * 1000,
           );
           break;
         case DiaperSettingValues.Allow:
-          changeDiaperRequest(getCharacter(Sender!) ?? Player);
+          changeDiaperFunction(getCharacter(Sender!) ?? Player);
           sendDataToAction("changeDiaper-accepted", undefined, Sender);
           break;
         case DiaperSettingValues.Deny:

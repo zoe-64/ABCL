@@ -5,21 +5,16 @@ import { getCharacter, isABCLPlayer, replace_template, SendAction } from "../pla
 import { sendChatLocal } from "../utils";
 
 const WipePuddleRequest = (player: Character) => {
-  if (player.MemberNumber !== Player.MemberNumber) {
-    sendDataToAction("wipe-puddle", undefined, player.MemberNumber);
-    return;
-  }
+  if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("wipe-puddle", undefined, player.MemberNumber);
   WipePuddleFunction(Player);
 };
 const WipePuddleFunction = (player: Character) => {
-  if (player.MemberNumber !== Player.MemberNumber) {
-    SendAction(replace_template("%OPP_NAME% wipes %NAME%'s puddle of pee.", player));
-  } else {
-    SendAction(replace_template("%NAME% wipes %INTENSIVE% puddle of pee.", player));
-  }
   abclPlayer.stats.PuddleSize = 0;
   sendUpdateMyData();
   updatePlayerClothes();
+  if (player.MemberNumber !== Player.MemberNumber) return SendAction(replace_template("%OPP_NAME% wipes %NAME%'s puddle of pee.", player));
+
+  SendAction(replace_template("%NAME% wipes %INTENSIVE% puddle of pee.", player));
 };
 export type wipePuddleListeners = {
   "wipe-puddle": undefined;
@@ -30,28 +25,19 @@ export const wipePuddle: CombinedAction = {
     ID: "wipe-puddle",
     Name: "Wipe Puddle",
     Image: `./Assets/Female3DCG/ItemHandheld/Preview/Towel.png`,
-    OnClick: (player: Character, group: AssetGroupItemName) => {
-      WipePuddleRequest(player);
-    },
     Target: ["ItemBoots"],
-    Criteria: (player: Character) => {
-      return isABCLPlayer(player) && player.ABCL!.Stats.PuddleSize.value > 0;
-    },
+    OnClick: (player: Character, group: AssetGroupItemName) => WipePuddleRequest(player),
+    Criteria: (player: Character) => isABCLPlayer(player) && player.ABCL!.Stats.PuddleSize.value > 0,
   },
   command: {
     Tag: "wipe-puddle",
-    Description: ` [MemberNumber|Name|Nickname]: Wipes a puddle of pee.`,
     Action: (args, msg, parsed) => {
-      const character = getCharacter(parsed[0]);
-      if (!character) {
-        sendChatLocal(`Could not find character: "${parsed[0]}"`);
-        return;
-      }
-      if (!wipePuddle.activity!.Criteria!(character)) {
-        sendChatLocal("Is either not an ABCL player or has no puddle.");
-      }
+      const character = getCharacter(parsed[0]) ?? Player;
+      if (!wipePuddle.activity!.Criteria!(character)) return sendChatLocal("Is either not an ABCL player or has no puddle.");
+
       WipePuddleRequest(character);
     },
+    Description: ` [MemberNumber|Name|Nickname]: Wipes a puddle of pee.`,
   },
   listeners: {
     "wipe-puddle": ({ Sender }) => {
