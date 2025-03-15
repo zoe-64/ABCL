@@ -12,6 +12,7 @@ import {
 import { abclStatsWindow } from "./ui";
 import { ABCLdata } from "../../constants";
 import { MetabolismSettingValues } from "../../types/types";
+import { SendAction } from "./playerUtils";
 
 export const updatePlayerClothes = () => {
   CharacterRefresh(Player, true);
@@ -77,13 +78,17 @@ export const abclPlayer = {
       }
       panties.Color = pantiesColors;
     }
-
-    sendChatLocal("You've had an messy accident in your clothes!");
+    if (hasDiaper()) {
+      SendAction("%NAME%'s diaper leaks and soils %INTENSIVE% clothes and the floor.");
+    } else {
+      SendAction("%NAME soils %INTENSIVE% clothes and the floor.");
+    }
     updatePlayerClothes();
   },
   wetDiaper: () => {
     const diaperSize = getPlayerDiaperSize();
     const absorbedVolume = Math.min(abclPlayer.stats.BladderValue, diaperSize - abclPlayer.stats.WetnessValue);
+    SendAction("%NAME wets %INTENSIVE% diaper.");
 
     abclPlayer.stats.BladderValue -= absorbedVolume;
     abclPlayer.stats.WetnessValue += absorbedVolume;
@@ -95,7 +100,7 @@ export const abclPlayer = {
   soilDiaper: () => {
     const diaperSize = getPlayerDiaperSize();
     const absorbedVolume = Math.min(abclPlayer.stats.BowelValue, Math.max(0, diaperSize - abclPlayer.stats.SoilinessValue));
-
+    SendAction("%NAME soils %INTENSIVE% diaper.");
     abclPlayer.stats.BowelValue -= absorbedVolume;
     abclPlayer.stats.SoilinessValue += absorbedVolume;
 
@@ -133,7 +138,6 @@ export const abclPlayer = {
     }
     if (isPossible) {
       hasDiaper() ? abclPlayer.wetDiaper() : abclPlayer.wetClothing();
-      sendChatLocal("You feel a sense of release as you let go.");
     }
     if (isGood && intentional) {
       abclPlayer.stats.Incontinence -= 0.01;
@@ -151,7 +155,6 @@ export const abclPlayer = {
     }
     if (isPossible) {
       hasDiaper() ? abclPlayer.soilDiaper() : abclPlayer.soilClothing();
-      sendChatLocal("You feel a little relief as you let go.");
     }
     if (isGood && intentional) {
       abclPlayer.stats.Incontinence -= 0.01;
