@@ -2,6 +2,7 @@ import { merge, debounce } from "lodash-es";
 import { DiaperSettingValues, MetabolismSettings, PartialDeep } from "../types/types";
 import { sendUpdateMyData as sendUpdateMyData } from "./hooks";
 import { logger } from "./logger";
+import { waitFor } from "./utils";
 
 export const defaultSettings: ModSettings = {
   PeeMetabolism: MetabolismSettings.Normal,
@@ -62,7 +63,7 @@ export const syncData = debounce(() => {
 }, 1000);
 
 //const devMode = false; use clearData() // Manually toggle during local development if needed to clear settings
-export const loadOrGenerateData = () => {
+export const loadOrGenerateData = async () => {
   const dataString = LZString.decompressFromBase64(Player.ExtensionSettings[modIdentifier]);
   const data = dataString
     ? JSON.parse(dataString)
@@ -70,7 +71,12 @@ export const loadOrGenerateData = () => {
         Settings: {},
         Stats: {},
       };
-
+  if (data.Version > modVersion) {
+    const result = confirm(`Your version is ${data.Version} but the current version is ${modVersion}. Click OK to downgrade. Click Cancel to abort.`);
+    if (!result) {
+      return;
+    }
+  }
   // migrations
   if (data.ModVersion === "2.0.0") {
     const metabolismValue = data.Settings.Metabolism;
