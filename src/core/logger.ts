@@ -1,5 +1,5 @@
 class Logger {
-  private logs: Array<{
+  private logsArray: Array<{
     level: string;
     timestamp: string;
     message: any;
@@ -17,10 +17,10 @@ class Logger {
 
     logFunction(`%c${modIdentifier}:`, `font-weight: bold; color: #f6cbde;`, logEntry);
 
-    this.logs.push(logEntry);
+    this.logsArray.push(logEntry);
 
-    if (this.logs.length > this.maxLogSize) {
-      this.logs.shift();
+    if (this.logsArray.length > this.maxLogSize) {
+      this.logsArray.shift();
     }
   }
 
@@ -41,7 +41,7 @@ class Logger {
   }
 
   getLogs() {
-    return this.logs;
+    return this.logsArray;
   }
 }
 

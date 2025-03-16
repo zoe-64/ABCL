@@ -15,8 +15,7 @@
     "noUnusedLocals": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "jsx": "react-jsx",
-    "jsxImportSource": "tsx-dom"
+    "allowJs": true
   },
-  "include": ["node_modules/bc-stubs/bc/**/*.d.ts", "./src/**/*"],
+  "include": ["node_modules/bc-stubs/bc/**/*.d.ts", "./src/**/*", "./bc-modding-utilities/src/Typedef.d.ts"]
 }

@@ -11,11 +11,13 @@ import { initOverlay } from "./core/player/ui";
 import { initActions } from "./core/actionLoader";
 import { loopInterval } from "./constants";
 import { initApi } from "./core/api";
+import { initCustomItems } from "./core/customItems";
 
 const init = async () => {
   //  ServerPlayerSync();
-  loadOrGenerateData();
+  initCustomItems();
 
+  loadOrGenerateData();
   initSettingsScreen();
   initActions();
   initScreens([]);

@@ -70,7 +70,7 @@ export class ABCLStatsWindow {
       const label: HTMLLabelElement | null = this.statsDrawer.querySelector(`#${className}`);
       if (!input || !label) return;
       const valueRounded = Math.round((value + Number.EPSILON) * 10) / 10;
-      if (value >= 100) {
+      if (value > 100) {
         input.value = "100";
         input.innerText = `overflowing ${Math.round((value - 100) / (value / 100))}%`;
         label.innerText = `${label.innerText.split(":")[0]}: overflowing ${valueRounded - 100}%`;
