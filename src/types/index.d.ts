@@ -40,6 +40,18 @@ interface ModSettings {
   LockedOutOfSettings: boolean;
   DisableWettingLeaks: boolean;
   DisableSoilingLeaks: boolean;
+  visibleMessages: {
+    changeDiaper: boolean;
+    checkDiaper: boolean;
+    lickPuddle: boolean;
+    wetDiaper: boolean;
+    wetClothing: boolean;
+    soilDiaper: boolean;
+    soilClothing: boolean;
+    usePotty: boolean;
+    useToilet: boolean;
+    wipePuddle: boolean;
+  };
 }
 interface ModStats {
   PuddleSize: {

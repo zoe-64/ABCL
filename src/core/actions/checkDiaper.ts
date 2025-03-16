@@ -10,12 +10,12 @@ const diaperCheckFunction = (player: Character) => {
   const otherDiaperMessage = "%NAME% checks %OPP_NAME%'s diaper.";
   const selfClothesMessage = "%NAME% checks %INTENSIVE% clothes for any accidents.";
   const otherClothesMessage = "%NAME% checks %OPP_NAME%'s clothes for any accidents.";
-  
+
   abclStatsWindow.open(player.MemberNumber);
   if (Math.random() < 0.75) return;
 
-  if (hasDiaper(player)) return SendAction(replace_template(isSelf ? selfDiaperMessage : otherDiaperMessage, player));
-  return SendAction(replace_template(isSelf ? selfClothesMessage : otherClothesMessage, player));
+  if (hasDiaper(player)) return SendAction(replace_template(isSelf ? selfDiaperMessage : otherDiaperMessage, player), undefined, "checkDiaper", player);
+  return SendAction(replace_template(isSelf ? selfClothesMessage : otherClothesMessage, player), undefined, "checkDiaper", player);
 };
 
 export const checkDiaper: CombinedAction = {

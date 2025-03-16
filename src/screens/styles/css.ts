@@ -422,7 +422,9 @@ export const createCSS = () => {
 
 
 
-
+.ABCLMessageVisibility {
+  margin-top: 1em
+}
 
 ${cssSliders}
 
@@ -502,6 +504,10 @@ sl-button {
 }
 sl-drawer::part(panel) {
   background-color: var(--tmd-element,  var(--sl-color-neutral-0));
+}
+sl-checkbox::part(control--checked) {
+  border-color: var(--tmd-accent-hover,  var(--sl-color-primary-600));
+  background-color: var(--tmd-accent,  var(--sl-color-primary-600))
 }
 
 /* sorry fusam */

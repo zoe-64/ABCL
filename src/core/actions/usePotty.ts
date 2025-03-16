@@ -8,7 +8,7 @@ const usePottyFunction = () => {
   const isTooFarGone = abclPlayer.stats.MentalRegression > 0.9;
   const isEmbarrassed = abclPlayer.stats.MentalRegression < 0.3;
   if (isTooEarly) {
-    SendAction("%NAME% tries to use the potty but can't seem to get anything out.");
+    SendAction("%NAME% tries to use the potty but can't seem to get anything out.", undefined, "usePotty");
     return;
   }
   abclPlayer.stats.BowelFullness = 0;
@@ -24,7 +24,7 @@ const usePottyFunction = () => {
     abclPlayer.stats.Incontinence -= 0.02;
     abclPlayer.stats.MentalRegression -= 0.02;
   }
-  SendAction("%NAME% sits down uses the potty " + additionalText + ".");
+  SendAction("%NAME% sits down uses the potty " + additionalText + ".", undefined, "usePotty");
 };
 
 export const usePotty: CombinedAction = {

@@ -2,7 +2,6 @@ import { merge, debounce } from "lodash-es";
 import { DiaperSettingValues, MetabolismSettings, PartialDeep } from "../types/types";
 import { sendUpdateMyData as sendUpdateMyData } from "./hooks";
 import { logger } from "./logger";
-import { waitFor } from "./utils";
 
 export const defaultSettings: ModSettings = {
   PeeMetabolism: MetabolismSettings.Normal,
@@ -12,6 +11,18 @@ export const defaultSettings: ModSettings = {
   DisableWettingLeaks: false,
   DisableSoilingLeaks: true,
   OnDiaperChange: DiaperSettingValues.Ask,
+  visibleMessages: {
+    changeDiaper: true,
+    checkDiaper: true,
+    lickPuddle: true,
+    wetDiaper: true,
+    wetClothing: true,
+    soilDiaper: true,
+    soilClothing: true,
+    usePotty: true,
+    useToilet: true,
+    wipePuddle: true,
+  },
 };
 
 export const defaultStats: ModStats = {
@@ -80,7 +91,7 @@ export const loadOrGenerateData = async () => {
       ...Object.fromEntries(
         Object.entries(data.Settings as Record<string, { value: any }>)
           .filter(([key]) => !["DisableWetting", "DisableSoiling", "Metabolism", "CaregiverIDs"].includes(key))
-          .map(([key, { value }]) => [key, value])
+          .map(([key, { value }]) => [key, value]),
       ),
       PeeMetabolism: disableWetting ? "Disabled" : metabolismValue,
       PoopMetabolism: disableWetting ? "Disabled" : metabolismValue,
@@ -95,7 +106,7 @@ export const loadOrGenerateData = async () => {
       Stats: defaultStats,
       Version: modVersion,
     },
-    data
+    data,
   );
   logger.debug({ message: "Merged settings object", modStorageObject });
   Player[modIdentifier] = modStorageObject;

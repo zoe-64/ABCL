@@ -1,6 +1,7 @@
 import { changeDiaper, changeDiaperListeners } from "../core/actions/changeDiaper";
 import { checkDiaper } from "../core/actions/checkDiaper";
 import { lickPuddleListeners } from "../core/actions/lickPuddle";
+import { onABCLMessageListeners } from "../core/actions/onABCLMessage";
 import { sync, syncListeners } from "../core/actions/sync";
 import { toPee } from "../core/actions/toPee";
 import { toPoop } from "../core/actions/toPoop";
@@ -104,7 +105,7 @@ export type ABCLActivity = {
 };
 
 export type HookListener<T> = (raw: PluginServerChatRoomMessage, data: T) => void;
-export type ListenerTypeMap = syncListeners & wipePuddleListeners & lickPuddleListeners & changeDiaperListeners;
+export type ListenerTypeMap = syncListeners & wipePuddleListeners & lickPuddleListeners & changeDiaperListeners & onABCLMessageListeners;
 
 export type CombinedAction = {
   activity?: ABCLActivity;
@@ -113,5 +114,3 @@ export type CombinedAction = {
     [K in keyof ListenerTypeMap]: HookListener<ListenerTypeMap[K]>;
   }>;
 };
-
-export const actions: CombinedAction[] = [changeDiaper, checkDiaper, toPee, toPoop, usePotty, useToilet, sync];

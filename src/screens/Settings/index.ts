@@ -2,6 +2,7 @@ import { abclPlayer } from "../../core/player/player";
 import { getCharacter, getCharacterName } from "../../core/player/playerUtils";
 import { overlay } from "../../core/player/ui";
 import { syncData } from "../../core/settings";
+import { getElement } from "../../core/utils";
 import { ModName } from "../../types/definitions";
 
 const htmlSettingPage = document.createElement("div");
@@ -11,9 +12,9 @@ const updateRemoteList = (list: HTMLElement) => {
   if (!(<any>window)?.LITTLISH_CLUB) return;
   const caregivers = window.LITTLISH_CLUB.getCaregiversOf(Player);
   list.innerHTML = ChatRoomCharacter.filter(
-    (character) => character.ABCL && character.MemberNumber !== Player.MemberNumber && caregivers.includes(Player.MemberNumber!)
+    character => character.ABCL && character.MemberNumber !== Player.MemberNumber && caregivers.includes(Player.MemberNumber!),
   )
-    .map((character) => `<sl-option value="${character.MemberNumber}">${getCharacterName(character.MemberNumber)}</sl-option>`)
+    .map(character => `<sl-option value="${character.MemberNumber}">${getCharacterName(character.MemberNumber)}</sl-option>`)
     .join("");
 };
 
@@ -51,7 +52,40 @@ export const initSettingsScreen = async () => {
     <sl-radio-button value="Ask">Ask</sl-radio-button>
     <sl-radio-button value="Allow">Allow</sl-radio-button>
     </sl-radio-group>
-
+  
+  <h1 class="${modIdentifier}MessageVisibility"> Message visibility for others: </h1>
+  <div style="margin-left: 1em;"> 
+    <sl-checkbox class="${modIdentifier}ChangeDiaperVisibility" name="change-diaper-visibility" checked="${abclPlayer.settings.getPublicMessage(
+    "changeDiaper",
+  )}">Change Diaper</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}CheckDiaperVisibility" name="check-diaper-visibility" checked="${abclPlayer.settings.getPublicMessage(
+    "checkDiaper",
+  )}">Check Diaper</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}LickPuddleVisibility" name="lick-puddle-visibility" checked="${abclPlayer.settings.getPublicMessage(
+    "lickPuddle",
+  )}">Lick Puddle</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}WetDiaperVisibility" name="wet-diaper-visibility" checked="${abclPlayer.settings.getPublicMessage(
+    "wetDiaper",
+  )}">Wet Diaper</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}WetClothingVisibility" name="wet-clothing-visibility" checked="${abclPlayer.settings.getPublicMessage(
+    "wetClothing",
+  )}">Wet Clothing</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}SoilDiaperVisibility" name="soil-diaper-visibility" checked="${abclPlayer.settings.getPublicMessage(
+    "soilDiaper",
+  )}">Soil Diaper</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}SoilClothingVisibility" name="soil-clothing-visibility" checked="${abclPlayer.settings.getPublicMessage(
+    "soilClothing",
+  )}">Soil Clothing</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}UsePottyVisibility" name="use-potty-visibility" checked="${abclPlayer.settings.getPublicMessage(
+    "usePotty",
+  )}">Use Potty</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}UseToiletVisibility" name="use-toilet-visibility" checked="${abclPlayer.settings.getPublicMessage(
+    "useToilet",
+  )}">Use Toilet</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}WipePuddleVisibility" name="wipe-puddle-visibility" checked="${abclPlayer.settings.getPublicMessage(
+    "wipePuddle",
+  )}">Wipe Puddle</sl-checkbox>
+  </div>
   </sl-tab-panel>
 
   <sl-tab-panel name="remote">
@@ -106,25 +140,22 @@ export const initSettingsScreen = async () => {
   const remoteOnDiaperChangeSelect: HTMLSelectElement | null = htmlSettingPage.querySelector(`.${modIdentifier}RemoteOnDiaperChangeSelect`);
  */
   // general
-  const peeMetabolismSelect = htmlSettingPage.querySelector(`.${modIdentifier}PeeMetabolismSelect`);
-  const poopMetabolismSelect = htmlSettingPage.querySelector(`.${modIdentifier}PoopMetabolismSelect`);
-  const onDiaperChangeSelect = htmlSettingPage.querySelector(`.${modIdentifier}OnDiaperChangeSelect`);
+  const peeMetabolismSelect = getElement(htmlSettingPage, `.${modIdentifier}PeeMetabolismSelect`);
+  const poopMetabolismSelect = getElement(htmlSettingPage, `.${modIdentifier}PoopMetabolismSelect`);
+  const onDiaperChangeSelect = getElement(htmlSettingPage, `.${modIdentifier}OnDiaperChangeSelect`);
 
-  if (
-    // general
-    !peeMetabolismSelect ||
-    !poopMetabolismSelect ||
-    !onDiaperChangeSelect
-    // remote
-    //!remotePlayerSelect ||
-    //!refreshRemotes ||
-    //!remotePushSettings ||
-    // remote general
-    //!remotePeeMetabolismSelect
-    //!remotePoopMetabolismSelect ||
-    //!remoteOnDiaperChangeSelect
-  )
-    throw new Error("Could not find elements");
+  const visibilityElements: Record<keyof ModSettings["visibleMessages"], Element> = {
+    useToilet: getElement(htmlSettingPage, `.${modIdentifier}UseToiletVisibility`),
+    wipePuddle: getElement(htmlSettingPage, `.${modIdentifier}WipePuddleVisibility`),
+    changeDiaper: getElement(htmlSettingPage, `.${modIdentifier}ChangeDiaperVisibility`),
+    checkDiaper: getElement(htmlSettingPage, `.${modIdentifier}CheckDiaperVisibility`),
+    lickPuddle: getElement(htmlSettingPage, `.${modIdentifier}LickPuddleVisibility`),
+    wetDiaper: getElement(htmlSettingPage, `.${modIdentifier}WetDiaperVisibility`),
+    wetClothing: getElement(htmlSettingPage, `.${modIdentifier}WetClothingVisibility`),
+    soilDiaper: getElement(htmlSettingPage, `.${modIdentifier}SoilDiaperVisibility`),
+    soilClothing: getElement(htmlSettingPage, `.${modIdentifier}SoilClothingVisibility`),
+    usePotty: getElement(htmlSettingPage, `.${modIdentifier}UsePottyVisibility`),
+  };
 
   // general
   peeMetabolismSelect.addEventListener("sl-change", (e: any) => {
@@ -136,6 +167,14 @@ export const initSettingsScreen = async () => {
   onDiaperChangeSelect.addEventListener("sl-change", (e: any) => {
     abclPlayer.settings.OnDiaperChange = e.target.value;
   });
+  for (const key of Object.keys(visibilityElements) as (keyof ModSettings["visibleMessages"])[]) {
+    if (visibilityElements.hasOwnProperty(key)) {
+      visibilityElements[key].addEventListener("sl-change", (e: any) => {
+        abclPlayer.settings.setPublicMessage(key, e.target.checked);
+      });
+    }
+  }
+
   // remote
   const updateSelectedRemotePlayer = (memberNumber: MemberNumber) => {
     const character: Character | undefined = getCharacter(memberNumber);

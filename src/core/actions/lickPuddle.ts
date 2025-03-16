@@ -13,7 +13,7 @@ const LickPuddleFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfMessage = "%NAME% licks %INTENSIVE% puddle of pee.";
   const otherMessage = "%OPP_NAME% licks %NAME%'s puddle of pee.";
-  SendAction(replace_template(isSelf ? selfMessage : otherMessage, player));
+  SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "lickPuddle", player);
 
   sendUpdateMyData();
   updatePlayerClothes();

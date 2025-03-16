@@ -25,19 +25,22 @@ export function isObject(obj: unknown): obj is Record<string, any> {
 export async function waitFor(func: { (): any; (): boolean; (): any }, cancelFunc = () => false) {
   while (!func()) {
     if (cancelFunc()) return false;
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    await new Promise(resolve => setTimeout(resolve, 10));
   }
   return true;
 }
 
-export const sendChatLocal = (message: string): void => {
+export const sendChatLocal = (message: string, classes: string[] = [], style?: string): void => {
   if (!ServerPlayerIsInChatRoom()) return;
   const msgElement = document.createElement("div");
   msgElement.innerHTML = message
     .split("\n")
-    .map((line) => line.trim())
+    .map(line => line.trim())
     .join("<br/>");
-  msgElement.classList.add(`${modIdentifier}LocalMessage`);
+  msgElement.classList.add(`${modIdentifier}LocalMessage`, "ChatMessage", ...classes);
+  if (style) {
+    msgElement.style.cssText = style;
+  }
   document.querySelector("#TextAreaChatLog")?.appendChild(msgElement);
   ElementScrollToEnd("TextAreaChatLog");
 };
@@ -127,10 +130,10 @@ export const isColorable = (color: string) => color !== "Default" && typeof colo
 
 export const getColor = (color: ItemColor | null | "Default" | string[] | ItemColor, asset: Asset): string[] => {
   if (typeof color === "string" && color !== "Default") logger.warn(`Unknown color: ${color}`);
-  if (!color || color === "Default") return [...asset.DefaultColor.map((color) => (color === "Default" ? "#FFFFFF" : color))];
+  if (!color || color === "Default") return [...asset.DefaultColor.map(color => (color === "Default" ? "#FFFFFF" : color))];
 
   if (Array.isArray(color)) {
-    return color.map((mappedColor) => {
+    return color.map(mappedColor => {
       if (mappedColor === "Default") {
         return "#FFFFFF";
       }
@@ -139,4 +142,9 @@ export const getColor = (color: ItemColor | null | "Default" | string[] | ItemCo
   }
 
   return [color];
+};
+export const getElement = (parent: HTMLElement, selector: string): Element => {
+  const element = parent.querySelector(selector);
+  if (element) return element;
+  throw new Error(`Element with selector "${selector}" not found`);
 };

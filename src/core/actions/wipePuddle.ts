@@ -12,9 +12,10 @@ const WipePuddleFunction = (player: Character) => {
   abclPlayer.stats.PuddleSize = 0;
   sendUpdateMyData();
   updatePlayerClothes();
-  if (player.MemberNumber !== Player.MemberNumber) return SendAction(replace_template("%OPP_NAME% wipes %NAME%'s puddle of pee.", player));
+  if (player.MemberNumber !== Player.MemberNumber)
+    return SendAction(replace_template("%OPP_NAME% wipes %NAME%'s puddle of pee.", player), undefined, "wipePuddle", player);
 
-  SendAction(replace_template("%NAME% wipes %INTENSIVE% puddle of pee.", player));
+  SendAction(replace_template("%NAME% wipes %INTENSIVE% puddle of pee.", player), undefined, "wipePuddle", player);
 };
 export type wipePuddleListeners = {
   "wipe-puddle": undefined;

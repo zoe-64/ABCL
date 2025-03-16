@@ -1,4 +1,6 @@
+import { sendDataToAction } from "../hooks";
 import { sendChatLocal } from "../utils";
+import { abclPlayer } from "./player";
 
 // luv you zoi <3
 export const getCharacter = (identifier: string | number | Character): Character | undefined => {
@@ -85,22 +87,32 @@ export function replace_template(text: string, source: Character | null = null, 
     .replaceAll("%CAP_OPP_INTENSIVE%", oppIntensive);
 }
 
-export function SendAction(action: string, sender: Character | null = null) {
+export function SendAction(action: string, sender: Character | null = null, messageType: keyof ModSettings["visibleMessages"], target?: Character) {
   let msg = replace_template(action, sender);
-  ServerSend("ChatRoomChat", {
-    Content: "Beep",
-    Type: "Action",
-    Dictionary: [
-      // EN
-      { Tag: "Beep", Text: "msg" },
-      // CN
-      { Tag: "发送私聊", Text: "msg" },
-      // DE
-      { Tag: "Biep", Text: "msg" },
-      // FR
-      { Tag: "Sonner", Text: "msg" },
-      // Message itself
-      { Tag: "msg", Text: msg },
-    ],
-  });
+  if (!messageType) {
+    ServerSend("ChatRoomChat", {
+      Content: "Beep",
+      Type: "Action",
+      Dictionary: [
+        // EN
+        { Tag: "Beep", Text: "msg" },
+        // CN
+        { Tag: "发送私聊", Text: "msg" },
+        // DE
+        { Tag: "Biep", Text: "msg" },
+        // FR
+        { Tag: "Sonner", Text: "msg" },
+        // Message itself
+        { Tag: "msg", Text: msg },
+      ],
+    });
+    return;
+  }
+  sendChatLocal(msg, ["ChatMessageAction", "ChatMessageNonDialogue"], "--label-color:#ff4949");
+
+  if (abclPlayer.settings.getPublicMessage(messageType)) {
+    sendDataToAction("onABCLMessage", msg);
+  } else if (target && target.MemberNumber !== Player.MemberNumber) {
+    sendDataToAction("onABCLMessage", msg, target.MemberNumber);
+  }
 }

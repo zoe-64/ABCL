@@ -15,7 +15,7 @@ export const changeDiaperFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfMessage = "%NAME% changes %INTENSIVE% diaper.";
   const otherMessage = "%NAME% changes %OPP_NAME%'s diaper.";
-  SendAction(replace_template(isSelf ? selfMessage : otherMessage, player));
+  SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "changeDiaper", player);
 
   updateDiaperColor();
   abclPlayer.stats.WetnessValue = 0;

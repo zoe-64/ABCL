@@ -2,6 +2,7 @@ import { ABCLActivity, CombinedAction, HookListener } from "../types/types";
 import { changeDiaper } from "./actions/changeDiaper";
 import { checkDiaper } from "./actions/checkDiaper";
 import { lickPuddle } from "./actions/lickPuddle";
+import { onABCLMessage } from "./actions/onABCLMessage";
 import { sync, syncListeners } from "./actions/sync";
 import { toPee } from "./actions/toPee";
 import { toPoop } from "./actions/toPoop";
@@ -18,13 +19,13 @@ class Activity {
     public onClick?: (player: Character, group: AssetGroupItemName) => void,
     private target?: AssetGroupItemName[],
     private targetSelf?: AssetGroupItemName[],
-    private criteria?: (player: Character) => boolean
+    private criteria?: (player: Character) => boolean,
   ) {}
 
   fitsCriteria(player: Character, focusGroup: AssetGroupItemName): boolean {
     return Boolean(
       (!this.criteria || this.criteria(player)) &&
-        (this.target?.includes(focusGroup) || (this.targetSelf?.includes(focusGroup) && Player.MemberNumber === player?.MemberNumber))
+        (this.target?.includes(focusGroup) || (this.targetSelf?.includes(focusGroup) && Player.MemberNumber === player?.MemberNumber)),
     );
   }
 
@@ -36,7 +37,7 @@ class Activity {
     button.className = `blank-button button button-styling HideOnPopup dialog-grid-button`;
     button.innerHTML = `<img decoding="async" loading="lazy" src="${this.image}" class="button-image"><span class="button-label button-label-bottom">${this.name}</span>`;
 
-    button.addEventListener("click", (e) => {
+    button.addEventListener("click", e => {
       const player = CurrentCharacter?.FocusGroup ? CurrentCharacter : Player;
       const focusGroup = player?.FocusGroup?.Name;
       if (!this.onClick || !focusGroup) return;
@@ -77,7 +78,7 @@ export const initActions = (): void => {
         activity.OnClick,
         activity.Target,
         activity.TargetSelf,
-        activity.Criteria
+        activity.Criteria,
       );
       if (activityInstance.fitsCriteria(player, focusGroup)) {
         if (!Activity.isInserted(activity.ID)) {
@@ -88,7 +89,7 @@ export const initActions = (): void => {
   });
   CommandCombine(commands);
 };
-export const actions: CombinedAction[] = [changeDiaper, checkDiaper, toPee, toPoop, usePotty, useToilet, sync, lickPuddle, wipePuddle];
+export const actions: CombinedAction[] = [changeDiaper, checkDiaper, toPee, toPoop, usePotty, useToilet, sync, lickPuddle, wipePuddle, onABCLMessage];
 
 export const commands = actions.reduce((commands, { command }) => (command ? [...commands, command] : commands), [] as ICommand[]);
 export const activites = actions.reduce((activites, { activity }) => (activity ? [...activites, activity] : activites), [] as ABCLActivity[]);

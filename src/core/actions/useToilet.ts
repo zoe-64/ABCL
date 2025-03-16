@@ -15,7 +15,7 @@ const useToiletFunction = () => {
   }
   abclPlayer.stats.BladderFullness = 0;
   abclPlayer.stats.BowelFullness = 0;
-  SendAction("%NAME% goes to the bathroom uses the toilet " + additionalText + ".");
+  SendAction("%NAME% goes to the bathroom uses the toilet " + additionalText + ".", undefined, "useToilet");
 };
 
 export const useToilet: CombinedAction = {

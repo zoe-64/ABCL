@@ -52,7 +52,7 @@ export const abclPlayer = {
     }
 
     for (const item of Player.Appearance) {
-      if (ABCLdata.ItemDefinitions.Pants.some((pants) => pants === item.Asset.Description)) {
+      if (ABCLdata.ItemDefinitions.Pants.some(pants => pants === item.Asset.Description)) {
         const colors = getColor(item.Color || (item.Asset.DefaultColor as ItemColor), item.Asset);
         for (let i = 0; i < colors.length; i++) {
           if (!isColorable(colors[i])) continue;
@@ -65,9 +65,9 @@ export const abclPlayer = {
     abclPlayer.stats.BladderFullness = 0;
 
     if (hasDiaper()) {
-      SendAction("%NAME%'s diaper leaks and wet %INTENSIVE% clothes causing a puddle to form.");
+      SendAction("%NAME%'s diaper leaks and wet %INTENSIVE% clothes causing a puddle to form.", undefined, "wetClothing");
     } else {
-      SendAction("%NAME%'s wets %INTENSIVE% clothes leaks onto the floor.");
+      SendAction("%NAME%'s wets %INTENSIVE% clothes leaks onto the floor.", undefined, "wetClothing");
     }
     updatePlayerClothes();
     sendUpdateMyData();
@@ -87,16 +87,16 @@ export const abclPlayer = {
       panties.Color = pantiesColors;
     }
     if (hasDiaper()) {
-      SendAction("%NAME%'s diaper leaks and soils %INTENSIVE% clothes and the floor.");
+      SendAction("%NAME%'s diaper leaks and soils %INTENSIVE% clothes and the floor.", undefined, "soilClothing");
     } else {
-      SendAction("%NAME% soils %INTENSIVE% clothes and the floor.");
+      SendAction("%NAME% soils %INTENSIVE% clothes and the floor.", undefined, "soilClothing");
     }
     updatePlayerClothes();
   },
   wetDiaper: () => {
     const diaperSize = getPlayerDiaperSize();
     const absorbedVolume = Math.min(abclPlayer.stats.BladderValue, diaperSize - abclPlayer.stats.WetnessValue);
-    SendAction("%NAME% wets %INTENSIVE% diaper.");
+    SendAction("%NAME% wets %INTENSIVE% diaper.", undefined, "wetDiaper");
 
     abclPlayer.stats.BladderValue -= absorbedVolume;
     abclPlayer.stats.WetnessValue += absorbedVolume;
@@ -108,7 +108,7 @@ export const abclPlayer = {
   soilDiaper: () => {
     const diaperSize = getPlayerDiaperSize();
     const absorbedVolume = Math.min(abclPlayer.stats.BowelValue, Math.max(0, diaperSize - abclPlayer.stats.SoilinessValue));
-    SendAction("%NAME% soils %INTENSIVE% diaper.");
+    SendAction("%NAME% soils %INTENSIVE% diaper.", undefined, "soilDiaper");
     abclPlayer.stats.BowelValue -= absorbedVolume;
     abclPlayer.stats.SoilinessValue += absorbedVolume;
 
@@ -306,6 +306,22 @@ export const abclPlayer = {
     },
   },
   settings: {
+    publicMessages: {
+      changeDiaper: true,
+      checkDiaper: true,
+      lickPuddle: true,
+      toPee: true,
+      toPoop: true,
+      usePotty: true,
+      useToilet: true,
+      wipePuddle: true,
+    },
+    setPublicMessage(key: keyof ModSettings["visibleMessages"], value: boolean) {
+      Player[modIdentifier].Settings.visibleMessages[key] = value;
+    },
+    getPublicMessage(key: keyof ModSettings["visibleMessages"]): boolean {
+      return Player[modIdentifier].Settings.visibleMessages[key];
+    },
     set PeeMetabolism(value: MetabolismSetting) {
       Player[modIdentifier].Settings.PeeMetabolism = value;
     },
