@@ -1,6 +1,5 @@
 import { ABCLdata } from "../../constants";
 import { abclPlayer, updatePlayerClothes } from "./player";
-import { SendAction } from "./playerUtils";
 
 // Is/Has
 export const isLeaking = (type: "pee" | "poop" | "any" = "any") => {
@@ -27,7 +26,7 @@ export function hasDiaper(player: Character = Player): boolean {
   return Boolean((pelvisItem && isDiaper(pelvisItem)) || (panties && isDiaper(panties)));
 }
 export const isWearingBabyClothes = () => {
-  return Player.Appearance.some((clothing) => {
+  return Player.Appearance.some(clothing => {
     return ABCLdata.ItemDefinitions.BabyItems.includes(clothing.Asset.Description);
   });
 };
@@ -51,24 +50,22 @@ export function mixLevels(level: number, highLevel: string, midLevel: string, lo
   }
 }
 
-export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, secondaryColor: string, player: Character = Player) => {
+export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, player: Character = Player) => {
+  if (abclPlayer.settings.DisableDiaperStains) return;
   const item = InventoryGet(player, slot);
   if (item && isDiaper(item)) {
-    const type = typeof item.Asset.DefaultColor;
+    const color = (item.Color ?? item.Asset.DefaultColor) as string[];
     const diaper = ABCLdata.Diapers[item.Asset.Description as keyof typeof ABCLdata.Diapers];
-
-    if (type !== typeof item.Color) {
-      item.Color = item.Asset.DefaultColor as ItemColor;
-    }
-    if (type === "object" && JSON.stringify(item.Color).includes('"Default"')) {
-      item.Color = JSON.parse(JSON.stringify(item.Color).replaceAll(/"Default"/g, '"#FFFFFF"'));
-    }
-    const color: string[] = (item.Color ?? item.Asset.DefaultColor) as string[];
-    if ("primaryColor" in diaper) {
-      color[diaper.primaryColor] = primaryColor;
-    }
-    if ("secondaryColor" in diaper) {
-      color[diaper.secondaryColor] = secondaryColor;
+    if ("color" in diaper) {
+      for (const index of diaper.color) {
+        if (!color[index]) {
+          color[index] = item.Asset.DefaultColor[index];
+        }
+        if (color[index] === "Default") {
+          color[index] = "#FFFFFF";
+        }
+        color[index] = averageColor(color[index], primaryColor, 0.5);
+      }
     }
     item.Color = color;
   }
@@ -81,10 +78,9 @@ export const updateDiaperColor = () => {
   const wetColor = mixLevels(wetLevel, ABCLdata.DiaperColors["maximumwet"], ABCLdata.DiaperColors["middlewet"], ABCLdata.DiaperColors["clean"]);
 
   const primaryColor = averageColor(messColor, wetColor, 0.7);
-  const secondaryColor = averageColor(messColor, wetColor, 0.9);
 
-  setDiaperColor("ItemPelvis", primaryColor, secondaryColor, Player);
-  setDiaperColor("Panties", primaryColor, secondaryColor, Player);
+  setDiaperColor("ItemPelvis", primaryColor, Player);
+  setDiaperColor("Panties", primaryColor, Player);
   updatePlayerClothes();
 };
 
@@ -142,9 +138,9 @@ export function incontinenceChanceFormula(incontinence: number, fullness: number
 
 // mental regression
 export const mentalRegressionBonus = () => {
-  const assetDescriptions = Player.Appearance.map((clothing) => clothing.Asset.Description);
-  const matches = ABCLdata.ItemDefinitions.BabyItems.concat(["milk", "pacifier", "bib"]).filter((description) =>
-    assetDescriptions.some((assetDescription) => assetDescription.toLocaleLowerCase().includes(description))
+  const assetDescriptions = Player.Appearance.map(clothing => clothing.Asset.Description);
+  const matches = ABCLdata.ItemDefinitions.BabyItems.concat(["milk", "pacifier", "bib"]).filter(description =>
+    assetDescriptions.some(assetDescription => assetDescription.toLocaleLowerCase().includes(description)),
   );
   return Math.min(matches.length * 0.25, 1);
 };

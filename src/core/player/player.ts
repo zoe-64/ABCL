@@ -8,11 +8,12 @@ import {
   incontinenceLimitFormula,
   hasDiaper,
   averageColor,
+  isDiaper,
 } from "./diaper";
 import { abclStatsWindow } from "./ui";
 import { ABCLdata } from "../../constants";
 import { MetabolismSettingValues } from "../../types/types";
-import { SendAction } from "./playerUtils";
+import { SendAction, SendStatusMessage } from "./playerUtils";
 import { sendUpdateMyData } from "../hooks";
 
 export const updatePlayerClothes = () => {
@@ -39,10 +40,17 @@ export const abclPlayer = {
     sendChatLocal("You've had a wet accident in your clothes!");
     abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
     abclPlayer.stats.BladderValue = 0;
+    if (hasDiaper()) {
+      SendAction("%NAME%'s diaper leaks and wet %INTENSIVE% clothes causing a puddle to form.", undefined, "wetClothing");
+    } else {
+      SendAction("%NAME%'s wets %INTENSIVE% clothes leaks onto the floor.", undefined, "wetClothing");
+    }
+    sendUpdateMyData();
+    if (abclPlayer.settings.DisableClothingStains) return;
     const wetColor = "#96936C";
 
     const panties = InventoryGet(Player, "Panties");
-    if (panties) {
+    if (panties && !isDiaper(panties)) {
       const pantiesColors = getColor(panties.Color || (panties.Asset.DefaultColor as ItemColor), panties.Asset);
       for (let i = 0; i < pantiesColors.length; i++) {
         if (!isColorable(pantiesColors[i])) continue;
@@ -61,24 +69,23 @@ export const abclPlayer = {
         item.Color = colors;
       }
     }
-    abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
-    abclPlayer.stats.BladderFullness = 0;
 
-    if (hasDiaper()) {
-      SendAction("%NAME%'s diaper leaks and wet %INTENSIVE% clothes causing a puddle to form.", undefined, "wetClothing");
-    } else {
-      SendAction("%NAME%'s wets %INTENSIVE% clothes leaks onto the floor.", undefined, "wetClothing");
-    }
     updatePlayerClothes();
-    sendUpdateMyData();
   },
   soilClothing: () => {
-    abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
-    abclPlayer.stats.BladderValue = 0;
+    abclPlayer.stats.BowelValue = 0;
+    if (hasDiaper()) {
+      SendAction("%NAME%'s diaper leaks and soils %INTENSIVE% clothes.", undefined, "soilClothing");
+    } else {
+      SendAction("%NAME% soils %INTENSIVE% clothes.", undefined, "soilClothing");
+    }
+    sendUpdateMyData();
+    if (abclPlayer.settings.DisableClothingStains) return;
+
     const messColor = "#261a16";
 
     const panties = InventoryGet(Player, "Panties");
-    if (panties) {
+    if (panties && !isDiaper(panties)) {
       const pantiesColors = getColor(panties.Color || (panties.Asset.DefaultColor as ItemColor), panties.Asset);
       for (let i = 0; i < pantiesColors.length; i++) {
         if (!isColorable(pantiesColors[i])) continue;
@@ -86,16 +93,22 @@ export const abclPlayer = {
       }
       panties.Color = pantiesColors;
     }
-    if (hasDiaper()) {
-      SendAction("%NAME%'s diaper leaks and soils %INTENSIVE% clothes and the floor.", undefined, "soilClothing");
-    } else {
-      SendAction("%NAME% soils %INTENSIVE% clothes and the floor.", undefined, "soilClothing");
+
+    for (const item of Player.Appearance) {
+      if (ABCLdata.ItemDefinitions.Pants.some(pants => pants === item.Asset.Description)) {
+        const colors = getColor(item.Color || (item.Asset.DefaultColor as ItemColor), item.Asset);
+        for (let i = 0; i < colors.length; i++) {
+          if (!isColorable(colors[i])) continue;
+          colors[i] = averageColor(colors[i], messColor, 0.3);
+        }
+        item.Color = colors;
+      }
     }
     updatePlayerClothes();
   },
   wetDiaper: () => {
     const diaperSize = getPlayerDiaperSize();
-    const absorbedVolume = Math.min(abclPlayer.stats.BladderValue, diaperSize - abclPlayer.stats.WetnessValue);
+    const absorbedVolume = Math.min(abclPlayer.stats.BladderValue, Math.max(0, diaperSize - abclPlayer.stats.WetnessValue));
     SendAction("%NAME% wets %INTENSIVE% diaper.", undefined, "wetDiaper");
 
     abclPlayer.stats.BladderValue -= absorbedVolume;
@@ -112,7 +125,7 @@ export const abclPlayer = {
     abclPlayer.stats.BowelValue -= absorbedVolume;
     abclPlayer.stats.SoilinessValue += absorbedVolume;
 
-    if (abclPlayer.stats.SoilinessValue > 0) {
+    if (abclPlayer.stats.SoilinessValue >= diaperSize) {
       abclPlayer.soilClothing();
     }
   },
@@ -137,10 +150,11 @@ export const abclPlayer = {
     MiniGameStart("MessMinigame", 30 * chance, "noOp");
   },
   wet: (intentional: boolean = false) => {
-    const isTooEarly = abclPlayer.stats.BladderFullness < 0.3;
+    const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;
+    const isTooEarly = abclPlayer.stats.BladderFullness < 0.3 - incontinenceOffset;
     const isPossible = !isTooEarly;
-    const isGood = abclPlayer.stats.BladderFullness > 0.6;
-    if (isTooEarly) {
+    const isGood = abclPlayer.stats.BladderFullness > 0.6 - incontinenceOffset;
+    if (isTooEarly && intentional) {
       sendChatLocal("You try to pee, but it doesn't seem to be working.");
       return;
     }
@@ -154,10 +168,11 @@ export const abclPlayer = {
     }
   },
   soil: (intentional: boolean = false) => {
-    const isTooEarly = abclPlayer.stats.BowelFullness < 0.3;
+    const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;
+    const isTooEarly = abclPlayer.stats.BowelFullness < 0.3 - incontinenceOffset;
     const isPossible = !isTooEarly;
-    const isGood = abclPlayer.stats.BowelFullness > 0.6;
-    if (isTooEarly) {
+    const isGood = abclPlayer.stats.BowelFullness > 0.6 - incontinenceOffset;
+    if (isTooEarly && intentional) {
       sendChatLocal("You try to let go, but nothing seems to happen.");
       return;
     }
@@ -174,6 +189,8 @@ export const abclPlayer = {
     set PuddleSize(value: number) {
       if (value < 0) value = 0;
       if (value > 250) value = 250;
+      const delta = value - Player[modIdentifier].Stats.PuddleSize.value;
+      SendStatusMessage("PuddleSize", delta);
       Player[modIdentifier].Stats.PuddleSize.value = value;
     },
     get PuddleSize() {
@@ -182,6 +199,8 @@ export const abclPlayer = {
     set MentalRegression(value: number) {
       if (value < 0) value = 0;
       if (value > 1) value = 1;
+      const delta = value - Player[modIdentifier].Stats.MentalRegression.value;
+      SendStatusMessage("MentalRegression", delta, true);
       Player[modIdentifier].Stats.MentalRegression.value = value;
       abclStatsWindow.update();
     },
@@ -191,6 +210,8 @@ export const abclPlayer = {
     set Incontinence(value: number) {
       if (value < 0) value = 0;
       if (value > 1) value = 1;
+      const delta = value - Player[modIdentifier].Stats.Incontinence.value;
+      SendStatusMessage("Incontinence", delta, true);
       Player[modIdentifier].Stats.Incontinence.value = value;
       abclStatsWindow.update();
     },
@@ -244,6 +265,8 @@ export const abclPlayer = {
     // computed
     set BladderFullness(value: number) {
       if (value < 0) value = 0;
+      const delta = value - this.BladderFullness;
+      SendStatusMessage("Bladder", delta, true);
       this.BladderValue = value * this.BladderSize;
       abclStatsWindow.update();
     },
@@ -254,6 +277,7 @@ export const abclPlayer = {
     // bowel
     set BowelValue(value: number) {
       if (value < 0) value = 0;
+      const delta = value - Player[modIdentifier].Stats.Bowel.value;
       Player[modIdentifier].Stats.Bowel.value = value;
       abclStatsWindow.update();
     },
@@ -281,6 +305,8 @@ export const abclPlayer = {
     // computed
     set BowelFullness(value: number) {
       if (value < 0) value = 0;
+      const delta = value - this.BowelFullness;
+      SendStatusMessage("Bowel", delta, true);
       this.BowelValue = value * this.BowelSize;
       abclStatsWindow.update();
     },
@@ -294,6 +320,8 @@ export const abclPlayer = {
     },
     set SoilinessPercentage(value: number) {
       if (value < 0) value = 0;
+      const delta = value - this.SoilinessPercentage;
+      SendStatusMessage("Soiliness", delta, true);
       this.SoilinessValue = value * getPlayerDiaperSize();
     },
     get WetnessPercentage(): number {
@@ -302,25 +330,35 @@ export const abclPlayer = {
     },
     set WetnessPercentage(value: number) {
       if (value < 0) value = 0;
+      const delta = value - this.WetnessPercentage;
+      SendStatusMessage("Wetness", delta, true);
       this.WetnessValue = value * getPlayerDiaperSize();
     },
   },
   settings: {
-    publicMessages: {
-      changeDiaper: true,
-      checkDiaper: true,
-      lickPuddle: true,
-      toPee: true,
-      toPoop: true,
-      usePotty: true,
-      useToilet: true,
-      wipePuddle: true,
+    set DisableClothingStains(value: boolean) {
+      Player[modIdentifier].Settings.DisableClothingStains = value;
     },
-    setPublicMessage(key: keyof ModSettings["visibleMessages"], value: boolean) {
-      Player[modIdentifier].Settings.visibleMessages[key] = value;
+    set DisableDiaperStains(value: boolean) {
+      Player[modIdentifier].Settings.DisableDiaperStains = value;
     },
-    getPublicMessage(key: keyof ModSettings["visibleMessages"]): boolean {
-      return Player[modIdentifier].Settings.visibleMessages[key];
+    get DisableClothingStains(): boolean {
+      return Player[modIdentifier].Settings.DisableClothingStains;
+    },
+    get DisableDiaperStains(): boolean {
+      return Player[modIdentifier].Settings.DisableDiaperStains;
+    },
+    getStatusMessageSetting(key: keyof ModStats) {
+      return Player[modIdentifier].Settings.StatusMessages[key];
+    },
+    setStatusMessageSetting(key: keyof ModStats, value: boolean) {
+      Player[modIdentifier].Settings.StatusMessages[key] = value;
+    },
+    setPublicMessage(key: keyof ModSettings["VisibleMessages"], value: boolean) {
+      Player[modIdentifier].Settings.VisibleMessages[key] = value;
+    },
+    getPublicMessage(key: keyof ModSettings["VisibleMessages"]): boolean {
+      return Player[modIdentifier].Settings.VisibleMessages[key];
     },
     set PeeMetabolism(value: MetabolismSetting) {
       Player[modIdentifier].Settings.PeeMetabolism = value;

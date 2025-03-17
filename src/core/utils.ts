@@ -30,13 +30,15 @@ export async function waitFor(func: { (): any; (): boolean; (): any }, cancelFun
   return true;
 }
 
-export const sendChatLocal = (message: string, classes: string[] = [], style?: string): void => {
+export const sendChatLocal = (message: string, classes: string[] = [], style?: string, local: boolean = true): void => {
   if (!ServerPlayerIsInChatRoom()) return;
   const msgElement = document.createElement("div");
-  msgElement.innerHTML = message
-    .split("\n")
-    .map(line => line.trim())
-    .join("<br/>");
+  msgElement.innerHTML =
+    ((local && "(local) ") || "") +
+    message
+      .split("\n")
+      .map(line => line.trim())
+      .join("<br/>");
   msgElement.classList.add(`${modIdentifier}LocalMessage`, "ChatMessage", ...classes);
   if (style) {
     msgElement.style.cssText = style;

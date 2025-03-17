@@ -87,7 +87,29 @@ export function replace_template(text: string, source: Character | null = null, 
     .replaceAll("%CAP_OPP_INTENSIVE%", oppIntensive);
 }
 
-export function SendAction(action: string, sender: Character | null = null, messageType: keyof ModSettings["visibleMessages"], target?: Character) {
+export const SendStatusMessage = (type: keyof ModStats, delta: number, percent: boolean = false) => {
+  if (delta === 0) return;
+  if (percent) delta = delta * 100;
+  delta = Number(delta.toPrecision(2));
+  if (!abclPlayer.settings.getStatusMessageSetting(type)) return;
+  const isLocal = !abclPlayer.settings.getPublicMessage("statusMessages");
+  const wordConversion: Partial<Record<keyof ModStats, string>> = {
+    Bladder: "PEE",
+    Bowel: "POO",
+    Incontinence: "INCON",
+    MentalRegression: "REG",
+    Soiliness: "MESS",
+    Wetness: "WET",
+    PuddleSize: "PUDL",
+  };
+  const message = `[${delta > 0 ? "+" : "-"}${Math.abs(delta)}${percent ? "%" : ""} ${wordConversion[type]}]`;
+  if (isLocal) {
+    sendChatLocal(message, ["ChatMessageAction", "ChatMessageNonDialogue"], `--label-color:#ff4949`);
+  } else {
+    sendDataToAction("onABCLMessage", { message: `${getCharacterName(Player.MemberNumber)}: ${message}`, local: isLocal });
+  }
+};
+export function SendAction(action: string, sender: Character | null = null, messageType: keyof ModSettings["VisibleMessages"], target?: Character) {
   let msg = replace_template(action, sender);
   if (!messageType) {
     ServerSend("ChatRoomChat", {
@@ -108,11 +130,12 @@ export function SendAction(action: string, sender: Character | null = null, mess
     });
     return;
   }
-  sendChatLocal(msg, ["ChatMessageAction", "ChatMessageNonDialogue"], "--label-color:#ff4949");
+  const isLocal = !abclPlayer.settings.getPublicMessage(messageType);
+  sendChatLocal(msg, ["ChatMessageAction", "ChatMessageNonDialogue"], "--label-color:#ff4949", isLocal);
 
-  if (abclPlayer.settings.getPublicMessage(messageType)) {
-    sendDataToAction("onABCLMessage", msg);
+  if (!isLocal) {
+    sendDataToAction("onABCLMessage", { message: msg, local: isLocal });
   } else if (target && target.MemberNumber !== Player.MemberNumber) {
-    sendDataToAction("onABCLMessage", msg, target.MemberNumber);
+    sendDataToAction("onABCLMessage", { message: msg, local: isLocal }, target.MemberNumber);
   }
 }

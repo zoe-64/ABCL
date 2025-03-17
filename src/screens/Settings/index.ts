@@ -21,6 +21,7 @@ const updateRemoteList = (list: HTMLElement) => {
 export const initSettingsScreen = async () => {
   htmlSettingPage.innerHTML = `<sl-tab-group>
   <sl-tab slot="nav" panel="general">General</sl-tab>
+  <sl-tab slot="nav" panel="messages">Messages</sl-tab>
   <sl-tab slot="nav" panel="remote">Remote</sl-tab>
   <sl-tab-panel name="general">
     <sl-radio-group class="${modIdentifier}PeeMetabolismSelect" label="Select Pee Metabolism" name="pee-metabolism" value="${
@@ -52,7 +53,42 @@ export const initSettingsScreen = async () => {
     <sl-radio-button value="Ask">Ask</sl-radio-button>
     <sl-radio-button value="Allow">Allow</sl-radio-button>
     </sl-radio-group>
-  
+
+    <sl-checkbox class="${modIdentifier}DisableClothingStains" name="disable-clothing-stains" checked="${
+    abclPlayer.settings.DisableClothingStains
+  }">Disable Clothing Stains</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}DisableDiaperStains" name="disable-diaper-stains" checked="${
+    abclPlayer.settings.DisableDiaperStains
+  }">Disable Diaper Stains</sl-checkbox>
+  </sl-tab-panel>
+  <sl-tab-panel name="messages">
+  <div>
+  <h1 class="${modIdentifier}MessageVisibility"> Status messages for self: </h1>
+  <div style="margin-left: 1em;">
+    <sl-checkbox class="${modIdentifier}BladderStatusMessage" name="bladder-StatusMessage" checked="${abclPlayer.settings.getStatusMessageSetting(
+    "Bladder",
+  )}">Bladder</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}BowelStatusMessage" name="bowel-StatusMessage" checked="${abclPlayer.settings.getStatusMessageSetting(
+    "Bowel",
+  )}">Bowel</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}SoilinessStatusMessage" name="soiliness-StatusMessage" checked="${abclPlayer.settings.getStatusMessageSetting(
+    "Soiliness",
+  )}">Soiliness</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}WetnessStatusMessage" name="wetness-StatusMessage" checked="${abclPlayer.settings.getStatusMessageSetting(
+    "Wetness",
+  )}">Wetness</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}MentalRegressionStatusMessage" name="mental-regression-StatusMessage" checked="${abclPlayer.settings.getStatusMessageSetting(
+    "MentalRegression",
+  )}">Mental Regression</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}IncontinenceStatusMessage" name="incontinence-StatusMessage" checked="${abclPlayer.settings.getStatusMessageSetting(
+    "Incontinence",
+  )}">Incontinence</sl-checkbox>
+    <sl-checkbox class="${modIdentifier}PuddleSizeStatusMessage" name="puddle-size-StatusMessage" checked="${abclPlayer.settings.getStatusMessageSetting(
+    "PuddleSize",
+  )}">Puddle Size</sl-checkbox>
+  </div>
+  </div>
+  <div>
   <h1 class="${modIdentifier}MessageVisibility"> Message visibility for others: </h1>
   <div style="margin-left: 1em;"> 
     <sl-checkbox class="${modIdentifier}ChangeDiaperVisibility" name="change-diaper-visibility" checked="${abclPlayer.settings.getPublicMessage(
@@ -85,6 +121,10 @@ export const initSettingsScreen = async () => {
     <sl-checkbox class="${modIdentifier}WipePuddleVisibility" name="wipe-puddle-visibility" checked="${abclPlayer.settings.getPublicMessage(
     "wipePuddle",
   )}">Wipe Puddle</sl-checkbox>
+  <sl-checkbox class="${modIdentifier}StatusMessagesVisibility" name="status-messages-visibility" checked="${abclPlayer.settings.getPublicMessage(
+    "statusMessages",
+  )}">Status Messages</sl-checkbox>
+  </div>
   </div>
   </sl-tab-panel>
 
@@ -143,8 +183,11 @@ export const initSettingsScreen = async () => {
   const peeMetabolismSelect = getElement(htmlSettingPage, `.${modIdentifier}PeeMetabolismSelect`);
   const poopMetabolismSelect = getElement(htmlSettingPage, `.${modIdentifier}PoopMetabolismSelect`);
   const onDiaperChangeSelect = getElement(htmlSettingPage, `.${modIdentifier}OnDiaperChangeSelect`);
+  const disableDiaperStainsCheckbox = getElement(htmlSettingPage, `.${modIdentifier}DisableDiaperStains`);
+  const disableClothingStainsCheckbox = getElement(htmlSettingPage, `.${modIdentifier}DisableClothingStains`);
 
-  const visibilityElements: Record<keyof ModSettings["visibleMessages"], Element> = {
+  // messages
+  const visibilityElements: Record<keyof ModSettings["VisibleMessages"], Element> = {
     useToilet: getElement(htmlSettingPage, `.${modIdentifier}UseToiletVisibility`),
     wipePuddle: getElement(htmlSettingPage, `.${modIdentifier}WipePuddleVisibility`),
     changeDiaper: getElement(htmlSettingPage, `.${modIdentifier}ChangeDiaperVisibility`),
@@ -155,6 +198,16 @@ export const initSettingsScreen = async () => {
     soilDiaper: getElement(htmlSettingPage, `.${modIdentifier}SoilDiaperVisibility`),
     soilClothing: getElement(htmlSettingPage, `.${modIdentifier}SoilClothingVisibility`),
     usePotty: getElement(htmlSettingPage, `.${modIdentifier}UsePottyVisibility`),
+    statusMessages: getElement(htmlSettingPage, `.${modIdentifier}StatusMessagesVisibility`),
+  };
+  const StatusMessageElements: Partial<Record<keyof ModSettings["StatusMessages"], Element>> = {
+    Bladder: getElement(htmlSettingPage, `.${modIdentifier}BladderStatusMessage`),
+    Bowel: getElement(htmlSettingPage, `.${modIdentifier}BowelStatusMessage`),
+    Incontinence: getElement(htmlSettingPage, `.${modIdentifier}IncontinenceStatusMessage`),
+    MentalRegression: getElement(htmlSettingPage, `.${modIdentifier}MentalRegressionStatusMessage`),
+    PuddleSize: getElement(htmlSettingPage, `.${modIdentifier}PuddleSizeStatusMessage`),
+    Soiliness: getElement(htmlSettingPage, `.${modIdentifier}SoilinessStatusMessage`),
+    Wetness: getElement(htmlSettingPage, `.${modIdentifier}WetnessStatusMessage`),
   };
 
   // general
@@ -167,7 +220,20 @@ export const initSettingsScreen = async () => {
   onDiaperChangeSelect.addEventListener("sl-change", (e: any) => {
     abclPlayer.settings.OnDiaperChange = e.target.value;
   });
-  for (const key of Object.keys(visibilityElements) as (keyof ModSettings["visibleMessages"])[]) {
+  disableDiaperStainsCheckbox.addEventListener("sl-change", (e: any) => {
+    abclPlayer.settings.DisableDiaperStains = e.target.checked;
+  });
+  disableClothingStainsCheckbox.addEventListener("sl-change", (e: any) => {
+    abclPlayer.settings.DisableClothingStains = e.target.checked;
+  });
+  for (const key of Object.keys(StatusMessageElements) as (keyof ModSettings["StatusMessages"])[]) {
+    if (StatusMessageElements.hasOwnProperty(key)) {
+      StatusMessageElements[key]?.addEventListener("sl-change", (e: any) => {
+        abclPlayer.settings.setStatusMessageSetting(key, e.target.value);
+      });
+    }
+  }
+  for (const key of Object.keys(visibilityElements) as (keyof ModSettings["VisibleMessages"])[]) {
     if (visibilityElements.hasOwnProperty(key)) {
       visibilityElements[key].addEventListener("sl-change", (e: any) => {
         abclPlayer.settings.setPublicMessage(key, e.target.checked);
@@ -217,7 +283,9 @@ export const initSettingsScreen = async () => {
     },
     load: () => {
       htmlSettingPage.classList.remove(`${modIdentifier}Hidden`);
-
+      function setCheckbox(element: Element, value: boolean) {
+        value ? element.setAttribute("checked", "true") : element.removeAttribute("checked");
+      }
       /*    let selectedCharacter: Character | undefined = getCharacter(remotePlayerSelect.value);
       if (!selectedCharacter || !selectedCharacter?.ABCL) {
         selectedCharacter = Player;
@@ -229,6 +297,21 @@ export const initSettingsScreen = async () => {
       peeMetabolismSelect.setAttribute("value", abclPlayer.settings.PeeMetabolism);
       poopMetabolismSelect.setAttribute("value", abclPlayer.settings.PoopMetabolism);
       onDiaperChangeSelect.setAttribute("value", abclPlayer.settings.OnDiaperChange);
+      setCheckbox(disableClothingStainsCheckbox, abclPlayer.settings.DisableClothingStains);
+      setCheckbox(disableDiaperStainsCheckbox, abclPlayer.settings.DisableDiaperStains);
+
+      for (const key of Object.keys(StatusMessageElements) as (keyof ModSettings["StatusMessages"])[]) {
+        if (StatusMessageElements.hasOwnProperty(key)) {
+          const value = abclPlayer.settings.getStatusMessageSetting(key);
+          StatusMessageElements[key] && setCheckbox(StatusMessageElements[key], value ?? false);
+        }
+      }
+      for (const key of Object.keys(visibilityElements) as (keyof ModSettings["VisibleMessages"])[]) {
+        if (visibilityElements.hasOwnProperty(key)) {
+          const value = abclPlayer.settings.getPublicMessage(key);
+          setCheckbox(visibilityElements[key], value);
+        }
+      }
     },
   });
 };

@@ -509,7 +509,10 @@ sl-checkbox::part(control--checked) {
   border-color: var(--tmd-accent-hover,  var(--sl-color-primary-600));
   background-color: var(--tmd-accent,  var(--sl-color-primary-600))
 }
-
+sl-tab-group sl-tab-panel[name="messages"]::part(base) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
 /* sorry fusam */
 #fusam-addon-manager-container {
   position: absolute;
