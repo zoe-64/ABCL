@@ -50,6 +50,18 @@ export function mixLevels(level: number, highLevel: string, midLevel: string, lo
   }
 }
 
+export const isDiaperLocked = (player: Character = Player): boolean => {
+  if (!hasDiaper()) return false;
+  const diaper = InventoryGet(player, "ItemPelvis");
+
+  return Boolean(
+    diaper &&
+      isDiaper(diaper) &&
+      (Player.MemberNumber === player.MemberNumber
+        ? diaper.Property?.LockedBy
+        : !(diaper.Property?.LockMemberNumber === player.MemberNumber || diaper.Property?.LockedBy === "ExclusivePadlock")),
+  );
+};
 export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, player: Character = Player) => {
   if (abclPlayer.settings.DisableDiaperStains) return;
   const item = InventoryGet(player, slot);
@@ -58,18 +70,13 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
     const diaper = ABCLdata.Diapers[item.Asset.Description as keyof typeof ABCLdata.Diapers];
     if ("color" in diaper) {
       for (const index of diaper.color) {
-        if (!color[index]) {
+        /*   if (!color[index]) {
           color[index] = item.Asset.DefaultColor[index];
         }
         if (color[index] === "Default") {
           color[index] = "#FFFFFF";
-        }
-        color[index] = averageColor(
-          primaryColor,
-          color[index],
-
-          abclPlayer.stats.WetnessPercentage > abclPlayer.stats.SoilinessPercentage ? abclPlayer.stats.WetnessPercentage : abclPlayer.stats.SoilinessPercentage,
-        );
+        } */
+        color[index] = primaryColor;
       }
     }
     item.Color = color;

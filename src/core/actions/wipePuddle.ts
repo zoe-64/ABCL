@@ -28,13 +28,13 @@ export const wipePuddle: CombinedAction = {
     Image: `./Assets/Female3DCG/ItemHandheld/Preview/Towel.png`,
     Target: ["ItemBoots"],
     OnClick: (player: Character, group: AssetGroupItemName) => WipePuddleRequest(player),
-    Criteria: (player: Character) => isABCLPlayer(player) && player.ABCL!.Stats.PuddleSize.value > 0,
+    Criteria: (player: Character) => isABCLPlayer(player) && player.ABCL!.Stats.PuddleSize.value > 0 && !Player.IsRestrained(),
   },
   command: {
     Tag: "wipe-puddle",
     Action: (args, msg, parsed) => {
       const character = getCharacter(parsed[0]) ?? Player;
-      if (!wipePuddle.activity!.Criteria!(character)) return sendChatLocal("Is either not an ABCL player or has no puddle.");
+      if (!wipePuddle.activity!.Criteria!(character)) return sendChatLocal("Is either not an ABCL player or has no puddle. Or you are restrained.");
 
       WipePuddleRequest(character);
     },

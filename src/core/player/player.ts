@@ -255,6 +255,8 @@ export const abclPlayer = {
     },
     set WetnessValue(value: number) {
       if (value < 0) value = 0;
+      const delta = value / getPlayerDiaperSize() - this.WetnessPercentage;
+      SendStatusMessage("Wetness", delta, true);
       Player[modIdentifier].Stats.Wetness.value = value;
       updateDiaperColor();
       abclStatsWindow.update();
@@ -277,7 +279,6 @@ export const abclPlayer = {
     // bowel
     set BowelValue(value: number) {
       if (value < 0) value = 0;
-      const delta = value - Player[modIdentifier].Stats.Bowel.value;
       Player[modIdentifier].Stats.Bowel.value = value;
       abclStatsWindow.update();
     },
@@ -295,6 +296,8 @@ export const abclPlayer = {
     },
     set SoilinessValue(value: number) {
       if (value < 0) value = 0;
+      const delta = value / getPlayerDiaperSize() - this.SoilinessPercentage;
+      SendStatusMessage("Soiliness", delta, true);
       Player[modIdentifier].Stats.Soiliness.value = value;
       updateDiaperColor();
       abclStatsWindow.update();
@@ -320,8 +323,7 @@ export const abclPlayer = {
     },
     set SoilinessPercentage(value: number) {
       if (value < 0) value = 0;
-      const delta = value - this.SoilinessPercentage;
-      SendStatusMessage("Soiliness", delta, true);
+
       this.SoilinessValue = value * getPlayerDiaperSize();
     },
     get WetnessPercentage(): number {
@@ -330,8 +332,7 @@ export const abclPlayer = {
     },
     set WetnessPercentage(value: number) {
       if (value < 0) value = 0;
-      const delta = value - this.WetnessPercentage;
-      SendStatusMessage("Wetness", delta, true);
+
       this.WetnessValue = value * getPlayerDiaperSize();
     },
   },
