@@ -33,10 +33,6 @@ If you use [TamperMonkey](https://www.tampermonkey.net/) or [ViolentMonkey](http
 3. Before login, activate the bookmark
 4. Login!
 
-## Incompatibilities
-
-BCC is not compatable with ABCL.
-
 ## Credits
 
 Special thanks to tetris245 for helping me get into modding!<br>
