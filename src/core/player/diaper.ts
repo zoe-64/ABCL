@@ -64,7 +64,12 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
         if (color[index] === "Default") {
           color[index] = "#FFFFFF";
         }
-        color[index] = averageColor(color[index], primaryColor, 0.5);
+        color[index] = averageColor(
+          primaryColor,
+          color[index],
+
+          abclPlayer.stats.WetnessPercentage > abclPlayer.stats.SoilinessPercentage ? abclPlayer.stats.WetnessPercentage : abclPlayer.stats.SoilinessPercentage,
+        );
       }
     }
     item.Color = color;
@@ -77,7 +82,12 @@ export const updateDiaperColor = () => {
   const messColor = mixLevels(messLevel, ABCLdata.DiaperColors["maximummess"], ABCLdata.DiaperColors["middlemess"], ABCLdata.DiaperColors["clean"]);
   const wetColor = mixLevels(wetLevel, ABCLdata.DiaperColors["maximumwet"], ABCLdata.DiaperColors["middlewet"], ABCLdata.DiaperColors["clean"]);
 
-  const primaryColor = averageColor(messColor, wetColor, 0.7);
+  // lower is more mess higher is more wet
+  // when both are equal it should be 0.5
+  // if wet is 0 and mess is one then it should be 1
+  // if wet is 1 and mess is 0 then it should be 0
+  const mixedLevel = messLevel / (messLevel + wetLevel);
+  const primaryColor = averageColor(messColor, wetColor, mixedLevel);
 
   setDiaperColor("ItemPelvis", primaryColor, Player);
   setDiaperColor("Panties", primaryColor, Player);
