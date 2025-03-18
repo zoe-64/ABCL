@@ -17,9 +17,9 @@ export const changeDiaperFunction = (player: Character) => {
   const otherMessage = "%OPP_NAME% changes %NAME%'s diaper.";
   SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "changeDiaper", player);
 
-  updateDiaperColor();
   abclPlayer.stats.WetnessValue = 0;
   abclPlayer.stats.SoilinessValue = 0;
+  updateDiaperColor();
 };
 
 export type changeDiaperListeners = {
@@ -30,15 +30,15 @@ export type changeDiaperListeners = {
 
 export const changeDiaper: CombinedAction = {
   activity: {
-    ID: "diaper-change",
+    ID: "change-diaper",
     Name: "Change Diaper",
     Image: `${publicURL}/activity/changeDiaper.svg`,
     Target: ["ItemPelvis"],
     OnClick: (player: Character, group: AssetGroupItemName) => changeDiaperRequest(player),
-    Criteria: (player: Character) => hasDiaper(player) && isABCLPlayer(player) && (!Player.IsRestrained() || isDiaperLocked()),
+    Criteria: (player: Character) => hasDiaper(player) && isABCLPlayer(player) && !Player.IsRestrained() && !isDiaperLocked(),
   },
   command: {
-    Tag: "diaper-change",
+    Tag: "change-diaper",
     Action: (args, msg, parsed) => {
       const character = targetInputExtractor(parsed) ?? Player;
       if (!changeDiaper.activity!.Criteria!(character))

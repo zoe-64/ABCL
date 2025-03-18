@@ -1,3 +1,4 @@
+import { INCONTINENCE_ON_POTTY_USE, INCONTINENCE_ON_TOILET_USE } from "../../constants";
 import { CombinedAction } from "../../types/types";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
@@ -24,7 +25,7 @@ const usePottyFunction = () => {
   if (isGood && !isTooFarGone) {
     additionalText += isEmbarrassed ? " but is releaved" : "and feels releaved";
 
-    abclPlayer.stats.Incontinence -= 0.02;
+    abclPlayer.stats.Incontinence += INCONTINENCE_ON_POTTY_USE;
     abclPlayer.stats.MentalRegression -= 0.02;
   }
   SendAction("%NAME% sits down uses the potty " + additionalText + ".", undefined, "usePotty");
@@ -37,7 +38,7 @@ export const usePotty: CombinedAction = {
     Image: `${publicURL}/activity/potty-temp.png`,
     OnClick: (player: Character) => usePottyFunction(),
     TargetSelf: ["ItemButt"],
-    Criteria: (player: Character) => !(hasDiaper(player) && (Player.IsRestrained() || isDiaperLocked(player))),
+    Criteria: (player: Character) => !(hasDiaper(player) && isDiaperLocked()) && !Player.IsRestrained(),
   },
   command: {
     Tag: "use-potty",

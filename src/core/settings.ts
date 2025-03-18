@@ -35,6 +35,7 @@ export const defaultSettings: ModSettings = {
   },
   DisableClothingStains: false,
   DisableDiaperStains: false,
+  AccidentsByActivities: true,
 };
 
 export const defaultStats: ModStats = {

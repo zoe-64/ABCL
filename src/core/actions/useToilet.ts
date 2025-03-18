@@ -1,3 +1,4 @@
+import { INCONTINENCE_ON_TOILET_USE } from "../../constants";
 import { CombinedAction } from "../../types/types";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
@@ -13,7 +14,7 @@ const useToiletFunction = () => {
   if (isGood) {
     additionalText = "and feels releaved";
     abclPlayer.stats.MentalRegression -= 0.02;
-    abclPlayer.stats.Incontinence -= 0.02;
+    abclPlayer.stats.Incontinence += INCONTINENCE_ON_TOILET_USE;
   }
   abclPlayer.stats.BladderFullness = 0;
   abclPlayer.stats.BowelFullness = 0;
@@ -26,7 +27,7 @@ export const useToilet: CombinedAction = {
     Name: "Sit and Use Toilet",
     Image: `${publicURL}/activity/toilet-temp.png`,
     OnClick: (player: Character) => useToiletFunction(),
-    Criteria: (player: Character) => abclPlayer.stats.MentalRegression < 0.3 || !(hasDiaper(player) && (Player.IsRestrained() || isDiaperLocked(player))),
+    Criteria: (player: Character) => abclPlayer.stats.MentalRegression < 0.3 && !(hasDiaper(player) && isDiaperLocked()) && !Player.IsRestrained(),
     TargetSelf: ["ItemButt"],
   },
   command: {

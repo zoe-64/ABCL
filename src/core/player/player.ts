@@ -9,12 +9,14 @@ import {
   hasDiaper,
   averageColor,
   isDiaper,
+  incontinenceOnAccident,
 } from "./diaper";
 import { abclStatsWindow } from "./ui";
 import { ABCLdata } from "../../constants";
 import { MetabolismSettingValues } from "../../types/types";
 import { SendAction, SendStatusMessage } from "./playerUtils";
 import { sendUpdateMyData } from "../hooks";
+import { throttle } from "lodash-es";
 
 export const updatePlayerClothes = () => {
   CharacterRefresh(Player, true);
@@ -23,11 +25,11 @@ export const updatePlayerClothes = () => {
 
 export const abclPlayer = {
   onAccident: () => {
-    abclPlayer.stats.MentalRegression += mentalRegressionOnAccident();
+    abclPlayer.stats.MentalRegression += mentalRegressionOnAccident() ?? 0;
   },
   update: () => {
     // once per minute
-    abclPlayer.stats.MentalRegression += mentalRegressionOvertime();
+    abclPlayer.stats.MentalRegression += mentalRegressionOvertime() ?? 0;
     abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[abclPlayer.settings.PeeMetabolism];
     abclPlayer.stats.BowelValue += abclPlayer.stats.FoodIntake * MetabolismSettingValues[abclPlayer.settings.PoopMetabolism];
 
@@ -162,9 +164,9 @@ export const abclPlayer = {
       hasDiaper() ? abclPlayer.wetDiaper() : abclPlayer.wetClothing();
     }
     if (isGood && intentional) {
-      abclPlayer.stats.Incontinence -= 0.01;
+      abclPlayer.stats.Incontinence -= incontinenceOnAccident(abclPlayer.stats.Incontinence);
     } else {
-      abclPlayer.stats.Incontinence += 0.02;
+      abclPlayer.stats.Incontinence += incontinenceOnAccident(abclPlayer.stats.Incontinence);
     }
   },
   soil: (intentional: boolean = false) => {
@@ -239,6 +241,8 @@ export const abclPlayer = {
 
     set BladderValue(value: number) {
       if (value < 0) value = 0;
+      const delta = value / this.BladderSize - this.BladderFullness;
+      SendStatusMessage("Bladder", delta, true);
       Player[modIdentifier].Stats.Bladder.value = value;
       abclStatsWindow.update();
     },
@@ -267,8 +271,7 @@ export const abclPlayer = {
     // computed
     set BladderFullness(value: number) {
       if (value < 0) value = 0;
-      const delta = value - this.BladderFullness;
-      SendStatusMessage("Bladder", delta, true);
+
       this.BladderValue = value * this.BladderSize;
       abclStatsWindow.update();
     },
@@ -279,6 +282,8 @@ export const abclPlayer = {
     // bowel
     set BowelValue(value: number) {
       if (value < 0) value = 0;
+      const delta = value / this.BowelSize - this.BowelFullness;
+      SendStatusMessage("Bowel", delta, true);
       Player[modIdentifier].Stats.Bowel.value = value;
       abclStatsWindow.update();
     },
@@ -308,8 +313,6 @@ export const abclPlayer = {
     // computed
     set BowelFullness(value: number) {
       if (value < 0) value = 0;
-      const delta = value - this.BowelFullness;
-      SendStatusMessage("Bowel", delta, true);
       this.BowelValue = value * this.BowelSize;
       abclStatsWindow.update();
     },
@@ -337,6 +340,12 @@ export const abclPlayer = {
     },
   },
   settings: {
+    get AccidentsByActivities(): boolean {
+      return Player[modIdentifier].Settings.AccidentsByActivities;
+    },
+    set AccidentsByActivities(value: boolean) {
+      Player[modIdentifier].Settings.AccidentsByActivities = value;
+    },
     set DisableClothingStains(value: boolean) {
       Player[modIdentifier].Settings.DisableClothingStains = value;
     },

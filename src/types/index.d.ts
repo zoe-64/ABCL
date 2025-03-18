@@ -56,6 +56,7 @@ interface ModSettings {
   DisableSoilingLeaks: boolean;
   DisableClothingStains: boolean;
   DisableDiaperStains: boolean;
+  AccidentsByActivities: boolean;
 }
 interface ModStats {
   PuddleSize: {
