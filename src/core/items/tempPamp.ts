@@ -11,7 +11,7 @@ const assetDefintion: CustomAssetDefinition = {
   Top: 411,
   // the drawing order of the item, higher number means drawn later, and on top of other items
   Priority: 20,
-  DefaultColor: ["#d6efff", "#fdfdfd", "#9fbbce", "#5ba2e9", "#f4e270", "#c6c397"],
+  DefaultColor: ["#d6efff", "#7B7B7B", "#8197A7", "#4880B9", "#B5A95B", "#AAA44E"],
   // @ts-expect-error
   ParentGroup: {},
   // Asset layers, picture resource names

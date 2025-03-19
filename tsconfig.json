@@ -6,7 +6,7 @@
     "moduleResolution": "Node",
     "sourceMap": true,
     "removeComments": false,
-    "outDir": "./dist",
+    "outDir": "./versons/dev",
     "strict": true,
     "noEmit": true,
     "noImplicitReturns": true,

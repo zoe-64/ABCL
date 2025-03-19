@@ -38,7 +38,7 @@ export const sendUpdateMyData = (target?: number) => {
       stats: Player[ModIdentifier].Stats,
       version: ModVersion,
     },
-    target
+    target,
   );
   logger.debug({
     message: `Sending updated data to ${target ?? "everyone"}`,
@@ -154,7 +154,7 @@ export default initHooks;
 const reportWebhookURL = `https://discord.com/api/webhooks/1340000414506029162/aqt7qruFnzDMM5BN_kLtv9gCcallIF-JeRVYl9k23uSIlxrHRvcFMy5mtPUPGDpWZhHX`;
 const lastDetectedErrors: string[] = [];
 
-window.addEventListener("error", async (e) => {
+window.addEventListener("error", async e => {
   console.error(e.filename);
   if (!e.filename.toLowerCase().includes("abcl")) return;
   const detectedError = `${e.message} at ${e.filename} ${e.lineno}`;
@@ -170,7 +170,7 @@ ${e.error.stack}
 \`\`\`
 mods: ${bcModSdk
       .getModsInfo()
-      .map((m) => m.name)
+      .map(m => m.name)
       .join(", ")}`,
   };
   await fetch(reportWebhookURL, {

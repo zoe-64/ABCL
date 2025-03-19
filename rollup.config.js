@@ -28,20 +28,16 @@ const modInfo = {
   identifier: `"${pkg.buildSettings.identifier.replace(/[^A-Za-z0-9]/g, "")}"`,
   repo: (() => {
     if (!pkg.repository || !pkg.repository.url) return "undefined";
-    if (pkg.repository.url.startsWith("git+"))
-      return `"${pkg.repository.url.replace("git+", "").replace(".git", "")}"`;
+    if (pkg.repository.url.startsWith("git+")) return `"${pkg.repository.url.replace("git+", "").replace(".git", "")}"`;
     return `"${pkg.repository.url.replace(".git", "")}"`;
   })(),
 };
 
 const scriptId = `"${buildSettings.scriptId ?? ""}"`;
-const loadFlag = `${pkg.buildSettings.identifier.replace(
-  /[^A-Za-z0-9]/g,
-  ""
-)}_Loaded`;
-const destDir = `${process.env.INIT_CWD}/public/`;
+const loadFlag = `${pkg.buildSettings.identifier.replace(/[^A-Za-z0-9]/g, "")}_Loaded`;
+const destDir = `${process.env.INIT_CWD}/versions/${pkg.version}`;
 
-const default_config = (debug) => ({
+const default_config = debug => ({
   input: `src/${buildSettings.input}`,
   output: {
     file: `${destDir}/${deployFileName}`,
@@ -52,19 +48,16 @@ const default_config = (debug) => ({
   treeshake: true,
 });
 
-const plugins_debug = (deploySite) => [
+const plugins_debug = deploySite => [
   copy({
     targets: [
       {
         src: `loader.user.js`,
         dest: destDir,
-        transform: (contents) =>
+        transform: contents =>
           contents
             .toString()
-            .replace(
-              "__DEPLOY_SITE__",
-              `${deploySite}/${loaderFileInfo.deploy}`
-            )
+            .replace("__DEPLOY_SITE__", `${deploySite}/${deployFileName}`)
             .replace("__FAVICON__", `${deploySite}/assets/favicon.ico`)
             .replace("__DESCRIPTION__", loaderFileInfo.description)
             .replace(
@@ -73,7 +66,7 @@ const plugins_debug = (deploySite) => [
                 ? loaderFileInfo.name + " (Local)"
                 : deploySite.indexOf("/dev/") > -1
                 ? loaderFileInfo.name + " (Dev)"
-                : loaderFileInfo.name
+                : loaderFileInfo.name,
             )
             .replace("__AUTHOR__", loaderFileInfo.author)
             .replace("__LOAD_FLAG__", loadFlag)
@@ -106,18 +99,14 @@ const plugins_debug = (deploySite) => [
   json(),
 ];
 
-const plugins = (deploySite) => [
-  ...plugins_debug(deploySite),
-  terser({ sourceMap: true }),
-];
+const plugins = deploySite => [...plugins_debug(deploySite), terser({ sourceMap: true })];
 
-module.exports = (cliArgs) => {
+module.exports = cliArgs => {
   const debug = !!cliArgs.configDebug;
   const deploy = cliArgs.configDeploy;
   if (!deploy) throw new Error("No deploy site specified");
   console.log(`${debug ? "dev" : "release"} is set deployed to ${deploy}`);
 
-  if (debug)
-    return { ...default_config(debug), plugins: plugins_debug(deploy) };
+  if (debug) return { ...default_config(debug), plugins: plugins_debug(deploy) };
   return { ...default_config(debug), plugins: plugins(deploy) };
 };
