@@ -3,7 +3,7 @@ import { sendDataToAction, sendUpdateMyData } from "../hooks";
 import { abclPlayer, updatePlayerClothes } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, SendAction } from "../player/playerUtils";
 import { sendChatLocal } from "../utils";
-
+import { AssetManager } from "@sugarch/bc-asset-manager";
 const WipePuddleRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("wipe-puddle", undefined, player.MemberNumber);
   WipePuddleFunction(Player);
@@ -35,7 +35,6 @@ export const wipePuddle: CombinedAction = {
     Action: (args, msg, parsed) => {
       const character = getCharacter(parsed[0]) ?? Player;
       if (!wipePuddle.activity!.Criteria!(character)) return sendChatLocal("Is either not an ABCL player or has no puddle.");
-
       WipePuddleRequest(character);
     },
     Description: ` [MemberNumber|Name|Nickname]: Wipes a puddle of pee.`,
