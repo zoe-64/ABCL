@@ -38,8 +38,14 @@ export const pampsAssetDefintion: CustomAssetDefinition = {
       AllowColorize: true,
     },
     {
+      Name: "Tint",
+      AllowColorize: true,
+      EditOpacity: true,
+    },
+    {
       Name: "Indicator",
       AllowColorize: true,
+      EditOpacity: true,
     },
     {
       Name: "Tabs",
@@ -54,14 +60,14 @@ const translations = {
 };
 export default function () {
   AssetManager.addImageMapping({
-    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Base.png": `${publicURL}/items/diapers/Untrainers_Pamp_Base.png`,
-    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Patch.png": `${publicURL}/items/diapers/Untrainers_Pamp_Patch.png`,
-    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Detail_1.png": `${publicURL}/items/diapers/Untrainers_Pamp_Detail_1.png`,
-    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Detail_2.png": `${publicURL}/items/diapers/Untrainers_Pamp_Detail_2.png`,
-    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Detail_3.png": `${publicURL}/items/diapers/Untrainers_Pamp_Detail_3.png`,
-    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Indicator.png": `${publicURL}/items/diapers/Untrainers_Pamp_Indicator.png`,
-    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Tabs.png": `${publicURL}/items/diapers/Untrainers_Pamp_Tabs.png`,
-    "Assets/Female3DCG/ItemPelvis/Preview/Untrainers_Pamp.png": `${publicURL}/items/diapers/Untrainers_Pamp_Preview.png`,
+    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Base.png": `${publicURL}/items/diapers/Untrainer_Pamp/Untrainers_Pamp_Base.png`,
+    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Patch.png": `${publicURL}/items/diapers/Untrainer_Pamp/Untrainers_Pamp_Patch.png`,
+    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Detail_1.png": `${publicURL}/items/diapers/Untrainer_Pamp/Untrainers_Pamp_Detail_1.png`,
+    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Detail_2.png": `${publicURL}/items/diapers/Untrainer_Pamp/Untrainers_Pamp_Detail_2.png`,
+    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Detail_3.png": `${publicURL}/items/diapers/Untrainer_Pamp/Untrainers_Pamp_Detail_3.png`,
+    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Indicator.png": `${publicURL}/items/diapers/Untrainer_Pamp/Untrainers_Pamp_Indicator.png`,
+    "Assets/Female3DCG/ItemPelvis/Untrainers_Pamp_Tabs.png": `${publicURL}/items/diapers/Untrainer_Pamp/Untrainers_Pamp_Tabs.png`,
+    "Assets/Female3DCG/ItemPelvis/Preview/Untrainers_Pamp.png": `${publicURL}/items/diapers/Untrainer_Pamp/Untrainers_Pamp_Preview.png`,
   });
   AssetManager.addAsset("ItemPelvis", pampsAssetDefintion, undefined, translations);
 }
