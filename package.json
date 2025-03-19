@@ -1,7 +1,7 @@
 {
   "name": "abcl",
   "displayName": "ABCL",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "description": "An addon for [Bondage Club](https://www.bondageprojects.com/club_game/). Stands for \"Adult baby club lover\"~",
   "repository": {
     "type": "git",
@@ -14,10 +14,9 @@
     "input": "main.ts"
   },
   "scripts": {
-    "build": "rollup -c rollup.config.js --configDeploy https://zoe-64.github.io/ABCL/",
-    "build:local": "rollup -c rollup.config.js --configDebug --configDeploy http://localhost:3042",
-    "dev": "npm run build:local && http-server ./versions -p 3042 --cors",
-    "watch": "node watch.js"
+    "release": "node release.js",
+    "generate released version": "node generate.js",
+    "watch": "nodemon --exec \"rollup -c rollup.config.js --configDebug --configDeploy http://localhost:3042 --configVersion dev && http-server ./versions/dev -p 3042 --cors\" -e js,ts --ignore ./versions"
   },
   "license": "MIT",
   "dependencies": {

@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name ABCL (Loader) (Local)
+// @name ABCL (Loader)
 // @namespace https://www.bondageprojects.com/
 // @version 2.0.0-beta
 // @description An addon for [Bondage Club](https://www.bondageprojects.com/club_game/). Stands for "Adult baby club lover"~
@@ -8,14 +8,14 @@
 // @match https://*.bondage-europe.com/R*/*
 // @match https://*.bondageprojects.com/R*/*
 // @match http://localhost:*/*
-// @icon  http://localhost:3042/assets/favicon.ico
+// @icon  https://zoe-64.github.io/ABCL/versions/latest/assets/favicon.ico
 // @grant none
 // @run-at document-end
 // ==/UserScript==
 
 (function () {
   "use strict";
-  const src = `http://localhost:3042/abcl.js?v=${Date.now()}`;
+  const src = `https://zoe-64.github.io/ABCL/versions/latest/abcl.js?v=${Date.now()}`;
   if (typeof ABCL_Loaded === "undefined") {
     const script = document.createElement("script");
     script.src = src;

@@ -69,14 +69,22 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
   if (item && isDiaper(item)) {
     const color = (item.Color ?? item.Asset.DefaultColor) as string[];
     const diaper = ABCLdata.Diapers[item.Asset.Description as keyof typeof ABCLdata.Diapers];
+    const dirtiness = Math.min(abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue / getPlayerDiaperSize(), 1);
+    if ("indicator" in diaper) {
+      for (const index of diaper.indicator) {
+        color[index] = averageColor(ABCLdata.DiaperColors.indicatorAccident, item.Asset.DefaultColor[index], dirtiness);
+      }
+    }
+    if ("gradients" in diaper) {
+      for (const index of diaper.gradients) {
+        if (item.Property?.Opacity && typeof item.Property.Opacity === "object") {
+          item.Property.Opacity[index] = dirtiness;
+          color[index] = primaryColor;
+        }
+      }
+    }
     if ("color" in diaper) {
       for (const index of diaper.color) {
-        /*   if (!color[index]) {
-          color[index] = item.Asset.DefaultColor[index];
-        }
-        if (color[index] === "Default") {
-          color[index] = "#FFFFFF";
-        } */
         color[index] = primaryColor;
       }
     }
@@ -95,7 +103,7 @@ export const updateDiaperColor = () => {
   // when both are equal it should be 0.5
   // if wet is 0 and mess is one then it should be 1
   // if wet is 1 and mess is 0 then it should be 0
-  const mixedLevel = (messLevel + (1 - wetLevel)) / 2;
+  const mixedLevel = Math.max(Math.min((messLevel + (1 - wetLevel)) / 2, 2), 0);
   const primaryColor = averageColor(messColor, wetColor, mixedLevel);
   console.log(mixedLevel, primaryColor);
   setDiaperColor("ItemPelvis", primaryColor, Player);
@@ -107,7 +115,7 @@ export const updateDiaperColor = () => {
 export function getPlayerDiaperSize(player: Character = Player): number {
   const pelvisItem = InventoryGet(player, "ItemPelvis");
   const panties = InventoryGet(player, "Panties");
-  let size = 0;
+  let size = 50;
   if (pelvisItem && isDiaper(pelvisItem)) {
     size += getDiaperSize(pelvisItem);
   }

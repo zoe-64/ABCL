@@ -35,9 +35,8 @@ const modInfo = {
 
 const scriptId = `"${buildSettings.scriptId ?? ""}"`;
 const loadFlag = `${pkg.buildSettings.identifier.replace(/[^A-Za-z0-9]/g, "")}_Loaded`;
-const destDir = `${process.env.INIT_CWD}/versions/${pkg.version}`;
 
-const default_config = debug => ({
+const default_config = (debug, destDir) => ({
   input: `src/${buildSettings.input}`,
   output: {
     file: `${destDir}/${deployFileName}`,
@@ -48,7 +47,7 @@ const default_config = debug => ({
   treeshake: true,
 });
 
-const plugins_debug = deploySite => [
+const plugins_debug = (deploySite, destDir) => [
   copy({
     targets: [
       {
@@ -99,14 +98,18 @@ const plugins_debug = deploySite => [
   json(),
 ];
 
-const plugins = deploySite => [...plugins_debug(deploySite), terser({ sourceMap: true })];
+const plugins = (deploySite, destDir) => [...plugins_debug(deploySite, destDir), terser({ sourceMap: true })];
 
 module.exports = cliArgs => {
+  const version = cliArgs.configVersion;
+  const destDir = `${process.env.INIT_CWD}/versions/${version}`;
+  console.log(`Version ${version} is set to be published`);
+  if (!version) throw new Error("No version specified");
   const debug = !!cliArgs.configDebug;
   const deploy = cliArgs.configDeploy;
   if (!deploy) throw new Error("No deploy site specified");
   console.log(`${debug ? "dev" : "release"} is set deployed to ${deploy}`);
 
-  if (debug) return { ...default_config(debug), plugins: plugins_debug(deploy) };
-  return { ...default_config(debug), plugins: plugins(deploy) };
+  if (debug) return { ...default_config(debug, destDir), plugins: plugins_debug(deploy, destDir) };
+  return { ...default_config(debug, destDir), plugins: plugins(deploy + `/versions/${version}`, destDir) };
 };

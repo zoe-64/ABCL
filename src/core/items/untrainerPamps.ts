@@ -55,7 +55,7 @@ export const pampsAssetDefintion: CustomAssetDefinition = {
 };
 const translations = {
   CN: "Pampers尿布",
-  EN: "Pampers Diaper",
+  EN: "Untrainers Diaper",
   RU: "Памперсовые диаперы",
 };
 export default function () {

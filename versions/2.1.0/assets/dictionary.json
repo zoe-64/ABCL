@@ -28,7 +28,8 @@
     "middlemess": "#423019",
     "maximummess": "#3C302C",
     "selfwet": "#242103",
-    "selfmess": "#1f170d"
+    "selfmess": "#1f170d",
+    "indicatorAccident": "#1e47a6"
   },
   "DiaperSizeScale": {
     "none": 0,
@@ -42,40 +43,35 @@
   },
   "Diapers": {
     "Patterned Diaper": {
-      "primaryColor": 1,
+      "color": [0],
       "size": "overnight"
     },
     "Bulky Diaper": {
-      "primaryColor": 1,
-      "secondaryColor": 0,
+      "color": [0, 1],
       "size": "light_adult"
     },
     "Bulky Chastity Diaper": {
-      "primaryColor": 1,
-      "secondaryColor": 0,
+      "color": [1, 0],
       "size": "moderate_adult"
     },
     "Poofy Diaper": {
-      "primaryColor": 1,
-      "secondaryColor": 0,
+      "color": [1, 0],
       "size": "light_adult"
     },
     "Poofy Chastity Diaper 1": {
-      "primaryColor": 1,
-      "secondaryColor": 0,
+      "color": [1, 0],
       "size": "heavy_adult"
     },
     "Poofy Chastity Diaper": {
-      "primaryColor": 1,
-      "secondaryColor": 0,
+      "color": [1, 0],
       "size": "moderate_adult"
     },
     "Plastic Covered Diaper": {
-      "primaryColor": 0,
+      "color": [0],
       "size": "light_adult"
     },
     "Satin Covered Diaper": {
-      "primaryColor": 0,
+      "color": [0],
       "size": "light_adult"
     },
     "Diaper": {
@@ -83,6 +79,16 @@
     },
     "Diaper Harness": {
       "size": "none"
+    },
+    "Untrainers Diaper": {
+      "size": "overnight",
+      "gradients": [1],
+      "indicator": [6]
+    },
+    "Cutest Diaper": {
+      "size": "light_adult",
+      "gradients": [4],
+      "indicator": [5]
     }
   }
 }
