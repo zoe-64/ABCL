@@ -1,4 +1,9 @@
-
 /node_modules
+/public
+.env
+/.vscode
+dist/abcl.js
+.qodo
+/versions/dev
 package-lock.json
 tsconfig.json
