@@ -1,0 +1,1 @@
+javascript:(function (){"use strict";if (typeof ABCL_Loaded !== "undefined") return; const src = `https://zoe-64.github.io/ABCL/beta/abcl.js?v=${Date.now()}`; const script = document.createElement("script"); script.src = src; script.type = "text/javascript"; script.crossOrigin = "anonymous"; document.head.appendChild(script)})()

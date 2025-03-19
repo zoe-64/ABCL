@@ -1,0 +1,85 @@
+{
+  "BabyItems": [
+    "Bows Dress",
+    "Babydoll Dress",
+    "Puffy Dress",
+    "Shiny dress",
+    "Summmer flower dress",
+    "Adult Baby Harness",
+    "Tutu",
+    "Frilled Bikni",
+    "Cosplay Girl Suit",
+    "Padded Mittens",
+    "Paw Mittens",
+    "Short Smooth Leather Mittens",
+    "Changing Table",
+    "Crib",
+    "Fox Plush",
+    "Bunny Plush",
+    "Shark Plush"
+  ],
+  "DiaperColors": {
+    "clean": "#8F8F8F",
+    "middlewet": "#ffe58b",
+    "maximumwet": "#ffd33e",
+    "middlemess": "#423019",
+    "maximummess": "#3C302C",
+    "selfwet": "#242103",
+    "selfmess": "#1f170d"
+  },
+  "DiaperSizeScale": {
+    "none": 0,
+    "small": 300,
+    "regular": 500,
+    "overnight": 800,
+    "light_adult": 900,
+    "moderate_adult": 1500,
+    "heavy_adult": 2500,
+    "specialized": 3500
+  },
+  "Diapers": {
+    "Patterned Diaper": {
+      "primaryColor": 1,
+      "size": "overnight"
+    },
+    "Bulky Diaper": {
+      "primaryColor": 1,
+      "secondaryColor": 0,
+      "size": "light_adult"
+    },
+    "Bulky Chastity Diaper": {
+      "primaryColor": 1,
+      "secondaryColor": 0,
+      "size": "moderate_adult"
+    },
+    "Poofy Diaper": {
+      "primaryColor": 1,
+      "secondaryColor": 0,
+      "size": "light_adult"
+    },
+    "Poofy Chastity Diaper 1": {
+      "primaryColor": 1,
+      "secondaryColor": 0,
+      "size": "heavy_adult"
+    },
+    "Poofy Chastity Diaper": {
+      "primaryColor": 1,
+      "secondaryColor": 0,
+      "size": "moderate_adult"
+    },
+    "Plastic Covered Diaper": {
+      "primaryColor": 0,
+      "size": "light_adult"
+    },
+    "Satin Covered Diaper": {
+      "primaryColor": 0,
+      "size": "light_adult"
+    },
+    "Diaper": {
+      "size": "regular"
+    },
+    "Diaper Harness": {
+      "size": "none"
+    }
+  }
+}

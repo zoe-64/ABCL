@@ -5,3 +5,5 @@
 dist/abcl.js
 .qodo
 /versions/dev
+package-lock.json
+tsconfig.json
