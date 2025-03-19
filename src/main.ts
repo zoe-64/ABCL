@@ -12,10 +12,10 @@ import { initActions } from "./core/actionLoader";
 import { loopInterval } from "./constants";
 import { initApi } from "./core/api";
 import { initCustomItems } from "./core/customItems";
+initCustomItems();
 
 const init = async () => {
   //  ServerPlayerSync();
-  initCustomItems();
 
   loadOrGenerateData();
   initSettingsScreen();
