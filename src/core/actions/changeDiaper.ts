@@ -1,6 +1,6 @@
 import { CombinedAction, DiaperSettingValues } from "../../types/types";
 import { sendDataToAction } from "../hooks";
-import { hasDiaper, updateDiaperColor } from "../player/diaper";
+import { hasDiaper, isDiaperLocked, updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { getCharacter, getCharacterName, isABCLPlayer, replace_template, SendAction, targetInputExtractor } from "../player/playerUtils";
 import { ABCLYesNoPrompt } from "../player/ui";
@@ -14,12 +14,12 @@ const changeDiaperRequest = (player: Character) => {
 export const changeDiaperFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfMessage = "%NAME% changes %INTENSIVE% diaper.";
-  const otherMessage = "%NAME% changes %OPP_NAME%'s diaper.";
+  const otherMessage = "%OPP_NAME% changes %NAME%'s diaper.";
   SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "changeDiaper", player);
 
-  updateDiaperColor();
   abclPlayer.stats.WetnessValue = 0;
   abclPlayer.stats.SoilinessValue = 0;
+  updateDiaperColor();
 };
 
 export type changeDiaperListeners = {
@@ -30,18 +30,19 @@ export type changeDiaperListeners = {
 
 export const changeDiaper: CombinedAction = {
   activity: {
-    ID: "diaper-change",
+    ID: "change-diaper",
     Name: "Change Diaper",
     Image: `${publicURL}/activity/changeDiaper.svg`,
     Target: ["ItemPelvis"],
     OnClick: (player: Character, group: AssetGroupItemName) => changeDiaperRequest(player),
-    Criteria: (player: Character) => hasDiaper(player) && isABCLPlayer(player),
+    Criteria: (player: Character) => hasDiaper(player) && isABCLPlayer(player) && !Player.IsRestrained() && !isDiaperLocked(),
   },
   command: {
-    Tag: "diaper-change",
+    Tag: "change-diaper",
     Action: (args, msg, parsed) => {
       const character = targetInputExtractor(parsed) ?? Player;
-      if (!changeDiaper.activity!.Criteria!(character)) return sendChatLocal("Is either not diapered or not an ABCL player.");
+      if (!changeDiaper.activity!.Criteria!(character))
+        return sendChatLocal("Is either not diapered or not an ABCL player or you are restrained or diaper is locked.");
 
       changeDiaperRequest(character);
     },

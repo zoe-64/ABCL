@@ -6,12 +6,12 @@ export const toPee: CombinedAction = {
     ID: "pee",
     Name: "Pee",
     Image: `${publicURL}/activity/wetDiaper.svg`,
-    OnClick: (player: Character, group: AssetGroupItemName) => abclPlayer.wet(),
+    OnClick: (player: Character, group: AssetGroupItemName) => abclPlayer.wet(true),
     TargetSelf: ["ItemPelvis"],
   },
   command: {
     Tag: "pee",
-    Action: (args, msg, parsed) => abclPlayer.wet(),
+    Action: (args, msg, parsed) => abclPlayer.wet(true),
     Description: ` Lets go of your bladder.`,
   },
 };

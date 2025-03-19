@@ -38,9 +38,7 @@ interface ModSettings {
   OnDiaperChange: DiaperChangePromptSetting;
   OpenRemoteSettings: boolean;
   LockedOutOfSettings: boolean;
-  DisableWettingLeaks: boolean;
-  DisableSoilingLeaks: boolean;
-  visibleMessages: {
+  VisibleMessages: {
     changeDiaper: boolean;
     checkDiaper: boolean;
     lickPuddle: boolean;
@@ -51,7 +49,14 @@ interface ModSettings {
     usePotty: boolean;
     useToilet: boolean;
     wipePuddle: boolean;
+    statusMessages: boolean;
   };
+  StatusMessages: Partial<Record<keyof ModStats, boolean>>;
+  DisableWettingLeaks: boolean;
+  DisableSoilingLeaks: boolean;
+  DisableClothingStains: boolean;
+  DisableDiaperStains: boolean;
+  AccidentsByActivities: boolean;
 }
 interface ModStats {
   PuddleSize: {

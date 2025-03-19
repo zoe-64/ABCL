@@ -7,6 +7,8 @@ import { bcModSDK, waitFor } from "./utils";
 import { overlay } from "./player/ui";
 import { ModIdentifier, ModVersion } from "../types/definitions";
 import { actions } from "./actionLoader";
+import { abclPlayer } from "./player/player";
+import { ACCIDENTS_ON_ACTIVITIES } from "../constants";
 export const sendDataToAction = (type: string, data?: any, target?: number) => {
   const ChatRoomMessage: PluginServerChatRoomMessage = {
     Type: "Hidden",
@@ -128,7 +130,21 @@ const initHooks = async () => {
     }
     return _result;
   });
-
+  bcModSDK.hookFunction("ActivityRun", 1, (args, next) => {
+    const result = next(args);
+    const [actor, acted, targetGroup, ItemActivity, ...rest] = args;
+    const activity = ItemActivity?.Activity;
+    if (abclPlayer.settings.AccidentsByActivities && acted.MemberNumber === Player.MemberNumber && activity.Name in ACCIDENTS_ON_ACTIVITIES) {
+      const chance = ACCIDENTS_ON_ACTIVITIES[activity.Name] as { wetting?: number; messing?: number };
+      if (abclPlayer.settings.PeeMetabolism !== "Disabled" && chance.wetting && Math.random() < chance.wetting * (1 + 2 * abclPlayer.stats.Incontinence)) {
+        abclPlayer.attemptWetting();
+      }
+      if (abclPlayer.settings.PoopMetabolism !== "Disabled" && chance.messing && Math.random() < chance.messing * (1 + 2 * abclPlayer.stats.Incontinence)) {
+        abclPlayer.attemptSoiling();
+      }
+    }
+    return result;
+  });
   bcModSDK.hookFunction("PreferenceSubscreenChatClick", 1, (args, next) => {
     if (MouseIn(1815, 75, 90, 90)) {
       const theme = Player.ChatSettings?.ColorTheme ?? "Light";

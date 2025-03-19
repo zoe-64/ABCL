@@ -11,7 +11,7 @@ export const defaultSettings: ModSettings = {
   DisableWettingLeaks: false,
   DisableSoilingLeaks: true,
   OnDiaperChange: DiaperSettingValues.Ask,
-  visibleMessages: {
+  VisibleMessages: {
     changeDiaper: true,
     checkDiaper: true,
     lickPuddle: true,
@@ -22,7 +22,20 @@ export const defaultSettings: ModSettings = {
     usePotty: true,
     useToilet: true,
     wipePuddle: true,
+    statusMessages: false,
   },
+  StatusMessages: {
+    Bladder: true,
+    Bowel: true,
+    Soiliness: true,
+    Wetness: true,
+    MentalRegression: true,
+    Incontinence: true,
+    PuddleSize: true,
+  },
+  DisableClothingStains: false,
+  DisableDiaperStains: false,
+  AccidentsByActivities: true,
 };
 
 export const defaultStats: ModStats = {

@@ -25,14 +25,14 @@ export const checkDiaper: CombinedAction = {
     Image: `${publicURL}/activity/diaperCheck.png`,
     OnClick: (player: Character, group: AssetGroupItemName) => diaperCheckFunction(player),
     Target: ["ItemPelvis"],
-    Criteria: (player: Character) => isABCLPlayer(player),
+    Criteria: (player: Character) => isABCLPlayer(player) && !Player.IsRestrained(),
   },
   command: {
     Tag: "check-diaper",
     Description: ` [MemberNumber|Name|Nickname]: Checks someone's diaper.`,
     Action: (args, msg, parsed) => {
       const character = targetInputExtractor(parsed) ?? Player;
-      if (!checkDiaper.activity!.Criteria!(character)) sendChatLocal("Is not an ABCL player.");
+      if (!checkDiaper.activity!.Criteria!(character)) return sendChatLocal("Is not an ABCL player or you are restrained.");
 
       diaperCheckFunction(character);
     },

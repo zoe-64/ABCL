@@ -6,12 +6,12 @@ export const toPoop: CombinedAction = {
     ID: "poop",
     Name: "Poop",
     Image: `${publicURL}/activity/soilDiaper.svg`,
-    OnClick: (player: Character, group) => abclPlayer.soil(),
+    OnClick: (player: Character, group) => abclPlayer.soil(true),
     TargetSelf: ["ItemPelvis"],
   },
   command: {
     Tag: "poop",
-    Action: () => abclPlayer.soil(),
+    Action: () => abclPlayer.soil(true),
     Description: ` Relaxes your bowels.`,
   },
 };

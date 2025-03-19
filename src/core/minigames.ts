@@ -168,7 +168,7 @@ export class MessMinigame extends AccidentMiniGame {
   End(victory: boolean) {
     super.End(victory);
     if (victory) {
-      abclPlayer.stats.Incontinence -= incontinenceOnAccident() / 2;
+      abclPlayer.stats.Incontinence -= incontinenceOnAccident(abclPlayer.stats.Incontinence) / 2;
       sendChatLocal("You managed to keep it together!");
       return;
     }
@@ -187,7 +187,7 @@ export class WetMinigame extends AccidentMiniGame {
   End(victory: boolean) {
     super.End(victory);
     if (victory) {
-      abclPlayer.stats.Incontinence -= incontinenceOnAccident() / 2;
+      abclPlayer.stats.Incontinence -= incontinenceOnAccident(abclPlayer.stats.Incontinence) / 2;
       sendChatLocal("You managed to hold it in!");
       return;
     }

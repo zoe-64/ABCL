@@ -1,6 +1,6 @@
+import { throttle } from "lodash-es";
 import { ABCLdata } from "../../constants";
 import { abclPlayer, updatePlayerClothes } from "./player";
-import { SendAction } from "./playerUtils";
 
 // Is/Has
 export const isLeaking = (type: "pee" | "poop" | "any" = "any") => {
@@ -27,7 +27,7 @@ export function hasDiaper(player: Character = Player): boolean {
   return Boolean((pelvisItem && isDiaper(pelvisItem)) || (panties && isDiaper(panties)));
 }
 export const isWearingBabyClothes = () => {
-  return Player.Appearance.some((clothing) => {
+  return Player.Appearance.some(clothing => {
     return ABCLdata.ItemDefinitions.BabyItems.includes(clothing.Asset.Description);
   });
 };
@@ -51,25 +51,36 @@ export function mixLevels(level: number, highLevel: string, midLevel: string, lo
   }
 }
 
-export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, secondaryColor: string, player: Character = Player) => {
+export const isDiaperLocked = (player: Character = Player): boolean => {
+  if (!hasDiaper()) return false;
+  const diaper = InventoryGet(player, "ItemPelvis");
+
+  return Boolean(
+    diaper &&
+      isDiaper(diaper) &&
+      (Player.MemberNumber === player.MemberNumber
+        ? diaper.Property?.LockedBy
+        : !(diaper.Property?.LockMemberNumber === player.MemberNumber || diaper.Property?.LockedBy === "ExclusivePadlock")),
+  );
+};
+export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, player: Character = Player) => {
+  if (abclPlayer.settings.DisableDiaperStains) return;
   const item = InventoryGet(player, slot);
   if (item && isDiaper(item)) {
-    const type = typeof item.Asset.DefaultColor;
+    const color = (item.Color ?? item.Asset.DefaultColor) as string[];
     const diaper = ABCLdata.Diapers[item.Asset.Description as keyof typeof ABCLdata.Diapers];
-
-    if (type !== typeof item.Color) {
-      item.Color = item.Asset.DefaultColor as ItemColor;
+    if ("color" in diaper) {
+      for (const index of diaper.color) {
+        /*   if (!color[index]) {
+          color[index] = item.Asset.DefaultColor[index];
+        }
+        if (color[index] === "Default") {
+          color[index] = "#FFFFFF";
+        } */
+        color[index] = primaryColor;
+      }
     }
-    if (type === "object" && JSON.stringify(item.Color).includes('"Default"')) {
-      item.Color = JSON.parse(JSON.stringify(item.Color).replaceAll(/"Default"/g, '"#FFFFFF"'));
-    }
-    const color: string[] = (item.Color ?? item.Asset.DefaultColor) as string[];
-    if ("primaryColor" in diaper) {
-      color[diaper.primaryColor] = primaryColor;
-    }
-    if ("secondaryColor" in diaper) {
-      color[diaper.secondaryColor] = secondaryColor;
-    }
+    console.log(color);
     item.Color = color;
   }
 };
@@ -80,11 +91,15 @@ export const updateDiaperColor = () => {
   const messColor = mixLevels(messLevel, ABCLdata.DiaperColors["maximummess"], ABCLdata.DiaperColors["middlemess"], ABCLdata.DiaperColors["clean"]);
   const wetColor = mixLevels(wetLevel, ABCLdata.DiaperColors["maximumwet"], ABCLdata.DiaperColors["middlewet"], ABCLdata.DiaperColors["clean"]);
 
-  const primaryColor = averageColor(messColor, wetColor, 0.7);
-  const secondaryColor = averageColor(messColor, wetColor, 0.9);
-
-  setDiaperColor("ItemPelvis", primaryColor, secondaryColor, Player);
-  setDiaperColor("Panties", primaryColor, secondaryColor, Player);
+  // lower is more mess higher is more wet
+  // when both are equal it should be 0.5
+  // if wet is 0 and mess is one then it should be 1
+  // if wet is 1 and mess is 0 then it should be 0
+  const mixedLevel = (messLevel + (1 - wetLevel)) / 2;
+  const primaryColor = averageColor(messColor, wetColor, mixedLevel);
+  console.log(mixedLevel, primaryColor);
+  setDiaperColor("ItemPelvis", primaryColor, Player);
+  setDiaperColor("Panties", primaryColor, Player);
   updatePlayerClothes();
 };
 
@@ -142,37 +157,51 @@ export function incontinenceChanceFormula(incontinence: number, fullness: number
 
 // mental regression
 export const mentalRegressionBonus = () => {
-  const assetDescriptions = Player.Appearance.map((clothing) => clothing.Asset.Description);
-  const matches = ABCLdata.ItemDefinitions.BabyItems.concat(["milk", "pacifier", "bib"]).filter((description) =>
-    assetDescriptions.some((assetDescription) => assetDescription.toLocaleLowerCase().includes(description))
+  const assetDescriptions = Player.Appearance.map(clothing => clothing.Asset.Description);
+  const matches = ABCLdata.ItemDefinitions.BabyItems.concat(["milk", "pacifier", "bib"]).filter(description =>
+    assetDescriptions.some(assetDescription => assetDescription.toLocaleLowerCase().includes(description)),
   );
   return Math.min(matches.length * 0.25, 1);
 };
-export const mentalRegressionOvertime = () => {
+export const mentalRegressionOvertime = throttle(() => {
   // if wearing baby clothes, mental regression goes up
   // if wet diaper, mental regression goes up
   // if leaking, mental regression goes up a lot
-  let modifier = 0 + mentalRegressionBonus();
+  let modifier = -0.5 + mentalRegressionBonus();
   if (isWearingBabyClothes()) modifier += 1;
   if (isDiaperDirty()) modifier += 0.25;
   if (isLeaking()) modifier += 0.5;
-  return modifier / (150 * 60); // 150 hours till 100%
-};
+  modifier = Math.max(-1, Math.min(modifier, 1));
 
-export function incontinenceOnAccident() {
+  const MR = abclPlayer.stats.MentalRegression;
+  let denominator;
+  if (modifier > 0) {
+    // Slow down progression as MR approaches 100%
+    denominator = 1 + Math.pow(15 * MR, 2);
+  } else if (modifier < 0) {
+    // Slow down regression as MR approaches 0%
+    denominator = 1 + Math.pow(15 * (1 - MR), 2);
+  } else {
+    return 0; // No change if modifier is 0
+  }
+
+  const scalingFactor = 0.1;
+  return (modifier * scalingFactor) / denominator;
+}, 1000 * 60 * 5);
+export const incontinenceOnAccident = (incontinence: number) => {
   const stages = [
-    { totalAccidents: 60, start: 0, end: 0.25 },
-    { totalAccidents: 120, start: 0.25, end: 0.5 },
-    { totalAccidents: 240, start: 0.5, end: 0.75 },
-    { totalAccidents: 480, start: 0.75, end: 1 },
+    { increase: 0.01, start: 0, end: 0.25 },
+    { increase: 0.005, start: 0.25, end: 0.5 },
+    { increase: 0.0025, start: 0.5, end: 0.75 },
+    { increase: 0.001, start: 0.75, end: 1 },
   ];
-  for (const { totalAccidents, start, end } of stages) {
-    if (abclPlayer.stats.Incontinence >= start && abclPlayer.stats.Incontinence < end) {
-      return 0.25 / totalAccidents;
+  for (const { increase, start, end } of stages) {
+    if (incontinence >= start && incontinence < end) {
+      return increase;
     }
   }
   return 0;
-}
+};
 
 export const mentalRegressionOnAccident = () => {
   const modifier = 1 + mentalRegressionBonus();
