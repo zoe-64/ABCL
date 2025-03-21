@@ -31,7 +31,6 @@ export const isWearingBabyClothes = () => {
     return ABCLdata.ItemDefinitions.BabyItems.includes(clothing.Asset.Description);
   });
 };
-
 // Color
 export function averageColor(color_1: HexColor, color_2: HexColor, ratio: number = 0.5): HexColor {
   let rgb_1 = DrawHexToRGB(color_1);
@@ -67,7 +66,7 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
   if (abclPlayer.settings.DisableDiaperStains) return;
   const item = InventoryGet(player, slot);
   if (item && isDiaper(item)) {
-    const color = (item.Color ?? item.Asset.DefaultColor) as string[];
+    const color = !item.Color || typeof item.Color === "string" ? (item.Asset.DefaultColor as string[]) : (item.Color as string[]);
     const diaper = ABCLdata.Diapers[item.Asset.Description as keyof typeof ABCLdata.Diapers];
     const dirtiness = Math.min(abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue / getPlayerDiaperSize(), 1);
     if ("indicator" in diaper) {
@@ -172,9 +171,6 @@ export const mentalRegressionBonus = () => {
   return Math.min(matches.length * 0.25, 1);
 };
 export const mentalRegressionOvertime = throttle(() => {
-  // if wearing baby clothes, mental regression goes up
-  // if wet diaper, mental regression goes up
-  // if leaking, mental regression goes up a lot
   let modifier = -0.5 + mentalRegressionBonus();
   if (isWearingBabyClothes()) modifier += 1;
   if (isDiaperDirty()) modifier += 0.25;

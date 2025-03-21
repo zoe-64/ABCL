@@ -57,7 +57,7 @@ export const defaultStats: ModStats = {
     value: 0, // in ml
   },
   WaterIntake: {
-    value: 300 / 20, // accident every 20 minutes
+    value: 300 / 20,
   },
   FoodIntake: {
     value: 200 / 60,

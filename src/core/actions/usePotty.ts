@@ -1,4 +1,4 @@
-import { INCONTINENCE_ON_POTTY_USE, INCONTINENCE_ON_TOILET_USE } from "../../constants";
+import { INCONTINENCE_ON_POTTY_USE } from "../../constants";
 import { CombinedAction } from "../../types/types";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";

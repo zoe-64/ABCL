@@ -229,7 +229,7 @@ export const initSettingsScreen = async () => {
   for (const key of Object.keys(StatusMessageElements) as (keyof ModSettings["StatusMessages"])[]) {
     if (StatusMessageElements.hasOwnProperty(key)) {
       StatusMessageElements[key]?.addEventListener("sl-change", (e: any) => {
-        abclPlayer.settings.setStatusMessageSetting(key, e.target.value);
+        abclPlayer.settings.setStatusMessageSetting(key, e.target.checked);
       });
     }
   }
@@ -303,7 +303,7 @@ export const initSettingsScreen = async () => {
       for (const key of Object.keys(StatusMessageElements) as (keyof ModSettings["StatusMessages"])[]) {
         if (StatusMessageElements.hasOwnProperty(key)) {
           const value = abclPlayer.settings.getStatusMessageSetting(key);
-          StatusMessageElements[key] && setCheckbox(StatusMessageElements[key], value ?? false);
+          setCheckbox(StatusMessageElements[key]!, value ?? false);
         }
       }
       for (const key of Object.keys(visibilityElements) as (keyof ModSettings["VisibleMessages"])[]) {
