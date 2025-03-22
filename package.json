@@ -21,7 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "@shoelace-style/shoelace": "^2.20.0",
-    "@sugarch/bc-asset-manager": "^0.2.16",
+    "@sugarch/bc-asset-manager": "^0.3.1",
     "@sugarch/bc-mod-hook-manager": "^0.2.11",
     "@types/lodash-es": "^4.17.12",
     "@types/react-dom": "^19.0.3",

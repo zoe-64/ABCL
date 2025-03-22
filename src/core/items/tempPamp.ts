@@ -1,20 +1,24 @@
 import { AssetManager, CustomAssetDefinition } from "@sugarch/bc-asset-manager";
 
 const assetDefintion: CustomAssetDefinition = {
-  // Asset name, must be unique in the body group
   Name: "Temp_Pamp",
-  // item appearing on random character
   Random: false,
   EditOpacity: true,
-  //  player canvas size is 500x1000
   Left: 160,
   Top: 411,
-  // the drawing order of the item, higher number means drawn later, and on top of other items
   Priority: 20,
   DefaultColor: ["#d6efff", "#7B7B7B", "#8197A7", "#4880B9", "#B5A95B", "#AAA44E"],
   // @ts-expect-error
   ParentGroup: {},
-  // Asset layers, picture resource names
+  Fetish: ["ABDL"],
+  HideItem: [
+    "ItemButtAnalBeads2",
+    "ItemVulvaVibratingDildo",
+    "ItemVulvaInflatableVibeDildo",
+    "ItemVulvaClitSuctionCup",
+    "ItemVulvaPiercingsVibeHeartClitPiercing",
+    "ItemVulvaPiercingsClitRing",
+  ],
   Layer: [
     {
       Name: "Back",

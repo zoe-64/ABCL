@@ -7,40 +7,43 @@ const assetDefintion: CustomAssetDefinition = {
   Top: 320,
   RemoveTime: 15,
   Priority: 40,
-  DefaultColor: ["#676285", "#848484", "#4a468d", "#4a468d", "#939394"],
+  DefaultColor: ["#676285", "#848484", "#4a468d", "#939394"],
   AllowLock: true,
   AllowTighten: true,
   Difficulty: 8,
   Fetish: ["ABDL"],
   Effect: [E.Freeze, E.MapImmobile],
-
+  AllowActivePose: [...PoseAllStanding],
+  Property: {
+    OverrideHeight: {
+      Height: 20,
+      Priority: 51,
+    },
+    Effect: [E.Lifted],
+  },
   // @ts-expect-error
   ParentGroup: {},
   Layer: [
     {
       Priority: 3,
       Name: "Chair",
-      AllowColorize: true,
     },
     {
       Priority: 50,
       Name: "Tray",
-      AllowColorize: true,
+    },
+    {
+      Priority: 3,
+      Name: "Seat",
     },
     {
       Priority: 45,
       Name: "Split",
-      AllowColorize: true,
-    },
-    {
-      Priority: 2,
-      Name: "Seat",
-      AllowColorize: true,
+      CopyLayerColor: "Seat",
     },
     {
       Priority: 1,
       Name: "Legs",
-      AllowColorize: true,
     },
   ],
 };
