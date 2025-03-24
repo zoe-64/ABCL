@@ -45,7 +45,7 @@ export const abclPlayer = {
     if (hasDiaper()) {
       SendAction("%NAME%'s diaper leaks and wet %INTENSIVE% clothes causing a puddle to form.", undefined, "wetClothing");
     } else {
-      SendAction("%NAME%'s wets %INTENSIVE% clothes leaks onto the floor.", undefined, "wetClothing");
+      SendAction("%NAME%'s wets %INTENSIVE% clothes and leaks onto the floor.", undefined, "wetClothing");
     }
     sendUpdateMyData();
     if (abclPlayer.settings.DisableClothingStains) return;
