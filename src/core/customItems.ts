@@ -4,6 +4,7 @@ import { bcModSDK } from "./utils";
 import { HookManager } from "@sugarch/bc-mod-hook-manager";
 import tempPamp from "./items/tempPamp";
 import highchair from "./items/highchair";
+import stroller from "./items/stroller";
 
 export const initCustomItems = () => {
   HookManager.initWithMod(bcModSDK);
@@ -11,5 +12,6 @@ export const initCustomItems = () => {
     pamps();
     tempPamp();
     highchair();
+    stroller();
   });
 };

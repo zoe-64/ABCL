@@ -1,3 +1,4 @@
+import { diaperRubFrontListeners } from "src/core/actions/diaperRubFront";
 import { changeDiaperListeners } from "../core/actions/changeDiaper";
 import { lickPuddleListeners } from "../core/actions/lickPuddle";
 import { onABCLMessageListeners } from "../core/actions/onABCLMessage";
@@ -5,6 +6,15 @@ import { syncListeners } from "../core/actions/sync";
 
 import { wipePuddleListeners } from "../core/actions/wipePuddle";
 import { ModVersion } from "./definitions";
+import { diaperRubBackListeners } from "src/core/actions/diaperRubBack";
+import { diaperPatBackListeners } from "src/core/actions/diaperPatBack";
+import { diaperPatFrontListeners } from "src/core/actions/diaperPatFront";
+import { diaperSquishBackListeners } from "src/core/actions/diaperSquishBack";
+import { diaperFaceSitListeners } from "src/core/actions/diaperFaceSit";
+import { diaperFaceRubListeners } from "src/core/actions/diaperFaceRub";
+import { diaperPourListeners } from "src/core/actions/diaperPour";
+import { diaperSquishFrontListeners } from "src/core/actions/diaperSquishFront";
+import { diaperPeeOthersDiaperListeners } from "src/core/actions/diaperPeeOthersDiaper";
 
 export type PartialDeep<T> = {
   [P in keyof T]?: PartialDeep<T[P]>;
@@ -101,7 +111,21 @@ export type ABCLActivity = {
 };
 
 export type HookListener<T> = (raw: PluginServerChatRoomMessage, data: T) => void;
-export type ListenerTypeMap = syncListeners & wipePuddleListeners & lickPuddleListeners & changeDiaperListeners & onABCLMessageListeners;
+export type ListenerTypeMap = syncListeners &
+  wipePuddleListeners &
+  lickPuddleListeners &
+  changeDiaperListeners &
+  onABCLMessageListeners &
+  diaperRubFrontListeners &
+  diaperRubBackListeners &
+  diaperPatBackListeners &
+  diaperPatFrontListeners &
+  diaperSquishBackListeners &
+  diaperFaceSitListeners &
+  diaperFaceRubListeners &
+  diaperPourListeners &
+  diaperPeeOthersDiaperListeners &
+  diaperSquishFrontListeners;
 
 export type CombinedAction = {
   activity?: ABCLActivity;

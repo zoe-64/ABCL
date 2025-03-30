@@ -1,6 +1,16 @@
 import { ABCLActivity, CombinedAction, HookListener } from "../types/types";
 import { changeDiaper } from "./actions/changeDiaper";
 import { checkDiaper } from "./actions/checkDiaper";
+import { diaperFaceRub } from "./actions/diaperFaceRub";
+import { diaperFaceSit } from "./actions/diaperFaceSit";
+import { diaperPatBack } from "./actions/diaperPatBack";
+import { diaperPatFront } from "./actions/diaperPatFront";
+import { diaperPeeOthersDiaper } from "./actions/diaperPeeOthersDiaper";
+import { diaperPour } from "./actions/diaperPour";
+import { diaperRubBack } from "./actions/diaperRubBack";
+import { diaperRubFront } from "./actions/diaperRubFront";
+import { diaperSquishBack } from "./actions/diaperSquishBack";
+import { diaperSquishFront } from "./actions/diaperSquishFront";
 import { lickPuddle } from "./actions/lickPuddle";
 import { onABCLMessage } from "./actions/onABCLMessage";
 import { sync, syncListeners } from "./actions/sync";
@@ -89,7 +99,28 @@ export const initActions = (): void => {
   });
   CommandCombine(commands);
 };
-export const actions: CombinedAction[] = [changeDiaper, checkDiaper, toPee, toPoop, usePotty, useToilet, sync, lickPuddle, wipePuddle, onABCLMessage];
+export const actions: CombinedAction[] = [
+  changeDiaper,
+  checkDiaper,
+  toPee,
+  toPoop,
+  usePotty,
+  useToilet,
+  sync,
+  lickPuddle,
+  wipePuddle,
+  onABCLMessage,
+  diaperFaceRub,
+  diaperFaceSit,
+  diaperPatBack,
+  diaperPatFront,
+  diaperPeeOthersDiaper,
+  diaperPour,
+  diaperRubFront,
+  diaperRubBack,
+  diaperSquishBack,
+  diaperSquishFront,
+];
 
 export const commands = actions.reduce((commands, { command }) => (command ? [...commands, command] : commands), [] as ICommand[]);
 export const activites = actions.reduce((activites, { activity }) => (activity ? [...activites, activity] : activites), [] as ABCLActivity[]);

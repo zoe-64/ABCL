@@ -1,15 +1,15 @@
-import { isColorable, Debouncer, getColor, Saver, sendChatLocal } from "../utils";
+import { isColorable, Throttler, getColor, Saver, sendChatLocal } from "../utils";
 import {
   incontinenceChanceFormula,
   getPlayerDiaperSize,
   mentalRegressionOnAccident,
-  mentalRegressionOvertime,
   updateDiaperColor,
   incontinenceLimitFormula,
   hasDiaper,
   averageColor,
   isDiaper,
   incontinenceOnAccident,
+  mentalRegressionOvertime,
 } from "./diaper";
 import { abclStatsWindow } from "./ui";
 import { ABCLdata } from "../../constants";
@@ -21,19 +21,28 @@ export const updatePlayerClothes = () => {
   CharacterRefresh(Player, true);
   ChatRoomCharacterUpdate(Player);
 };
-
+const bowelThrottler = new Throttler(120 * 60 * 1000);
+const bladderThrottler = new Throttler(120 * 60 * 1000);
+const regressionThrottler = new Throttler(5 * 60 * 1000);
 export const abclPlayer = {
   onAccident: () => {
     abclPlayer.stats.MentalRegression += mentalRegressionOnAccident() ?? 0;
   },
   update: () => {
+    bowelThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player[modIdentifier].Settings.PoopMetabolism]);
+    bladderThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism]);
     // once per minute
-    abclPlayer.stats.MentalRegression += mentalRegressionOvertime() ?? 0;
-    abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism];
-    abclPlayer.stats.BowelValue += abclPlayer.stats.FoodIntake * MetabolismSettingValues[Player[modIdentifier].Settings.PoopMetabolism];
-
-    Player[modIdentifier].Settings.PeeMetabolism !== "Disabled" && abclPlayer.attemptWetting();
-    Player[modIdentifier].Settings.PoopMetabolism !== "Disabled" && abclPlayer.attemptSoiling();
+    if (regressionThrottler.check()) {
+      abclPlayer.stats.MentalRegression += mentalRegressionOvertime() ?? 0;
+    }
+    if (bladderThrottler.check()) {
+      abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism];
+      Player[modIdentifier].Settings.PeeMetabolism !== "Disabled" && abclPlayer.attemptWetting();
+    }
+    if (bowelThrottler.check()) {
+      abclPlayer.stats.BowelValue += abclPlayer.stats.FoodIntake * MetabolismSettingValues[Player[modIdentifier].Settings.PoopMetabolism];
+      Player[modIdentifier].Settings.PoopMetabolism !== "Disabled" && abclPlayer.attemptSoiling();
+    }
     playerSaver.save();
   },
   wetClothing: () => {
@@ -342,6 +351,6 @@ export const abclPlayer = {
 
 const playerSaver = new Saver(2 * 60 * 1000);
 
-const incontinenceCheck = new Debouncer(2 * 60 * 1000);
+const incontinenceCheck = new Throttler(2 * 60 * 1000);
 
 (window as any).abclPlayer = abclPlayer;

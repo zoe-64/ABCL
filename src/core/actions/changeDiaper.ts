@@ -13,7 +13,7 @@ const changeDiaperRequest = (player: Character) => {
 };
 export const changeDiaperFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
-  const selfMessage = "%NAME% changes %INTENSIVE% diaper.";
+  const selfMessage = "%NAME% changes %POSSESSIVE% diaper.";
   const otherMessage = "%OPP_NAME% changes %NAME%'s diaper.";
   SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "changeDiaper", player);
 
