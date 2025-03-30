@@ -104,9 +104,9 @@ export const generateUniqueID = (identifier?: string) => {
   return `${identifier}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 };
 // similar to saver but limits how often a function can be called
-export class Debouncer {
+export class Throttler {
   private lastCallTime: number = 0;
-  private allowedCallInterval: number;
+  allowedCallInterval: number;
   constructor(allowedCallInterval: number) {
     this.allowedCallInterval = allowedCallInterval;
   }

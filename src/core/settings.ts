@@ -23,6 +23,7 @@ export const defaultSettings: ModSettings = {
     useToilet: true,
     wipePuddle: true,
     statusMessages: false,
+    playerActivity: true,
   },
   StatusMessages: {
     Bladder: true,

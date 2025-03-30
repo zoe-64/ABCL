@@ -1,7 +1,6 @@
 /node_modules
 /public
 .env
-/.vscode
 dist/abcl.js
 .qodo
 /versions/dev

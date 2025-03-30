@@ -90,8 +90,9 @@ export const SendStatusMessage = (type: keyof ModStats, delta: number, percent: 
   if (delta === 0) return;
   if (percent) delta = delta * 100;
   delta = Number(delta.toPrecision(2));
+  if (typeof Player[modIdentifier].Settings.StatusMessages[type] === "undefined") return;
   if (!Player[modIdentifier].Settings.StatusMessages[type]) return;
-  const isLocal = !Player[modIdentifier].Settings.StatusMessages[type];
+  const isLocal = Player[modIdentifier].Settings.StatusMessages[type];
   const wordConversion: Partial<Record<keyof ModStats, string>> = {
     Bladder: "PEE",
     Bowel: "POO",

@@ -31,6 +31,7 @@ interface ModSettings {
     useToilet: boolean;
     wipePuddle: boolean;
     statusMessages: boolean;
+    playerActivity: boolean;
   };
   StatusMessages: Partial<Record<keyof ModStats, boolean>>;
   DisableWettingLeaks: boolean;

@@ -1,4 +1,4 @@
-import { throttle } from "lodash-es";
+import { debounce, throttle } from "lodash-es";
 import { ABCLdata } from "../../constants";
 import { abclPlayer, updatePlayerClothes } from "./player";
 
@@ -170,7 +170,7 @@ export const mentalRegressionBonus = () => {
   );
   return Math.min(matches.length * 0.25, 1);
 };
-export const mentalRegressionOvertime = throttle(() => {
+export const mentalRegressionOvertime = () => {
   let modifier = -0.5 + mentalRegressionBonus();
   if (isWearingBabyClothes()) modifier += 1;
   if (isDiaperDirty()) modifier += 0.25;
@@ -190,8 +190,9 @@ export const mentalRegressionOvertime = throttle(() => {
   }
 
   const scalingFactor = 0.1;
-  return (modifier * scalingFactor) / denominator;
-}, 1000 * 60 * 5);
+  return (modifier * 5 * scalingFactor) / denominator;
+};
+
 export const incontinenceOnAccident = (incontinence: number) => {
   const stages = [
     { increase: 0.01, start: 0, end: 0.25 },

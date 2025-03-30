@@ -9,7 +9,7 @@ export default function SettingsPage(): h.JSX.Element {
   const [diaperChangePromptSetting, setDiaperChangePromptSetting] = useState<DiaperChangePromptSetting>(Player[modIdentifier].Settings.OnDiaperChange);
 
   return (
-    <div style={{ top: "20px", left: "100px", padding: "60px" }} id={`${modIdentifier}SettingsPage`} className={"ABCLHidden"}>
+    <div style={{ top: "20px", left: "100px", padding: "80px" }} id={`${modIdentifier}SettingsPage`} className={"ABCLHidden"}>
       <h1 style={{ textAlign: "center", width: "fit-content" }}> Settings </h1>
       {/* Wet and Soiling accidents prevention */}
       <div>
