@@ -6,6 +6,9 @@ const cleanup = require("rollup-plugin-cleanup");
 const copy = require("rollup-plugin-copy");
 const terser = require("@rollup/plugin-terser");
 const json = require("@rollup/plugin-json");
+const postcss = require("rollup-plugin-postcss");
+const alias = require("@rollup/plugin-alias");
+
 const path = require("path");
 const pkg = require("./package.json");
 const deployFileName = "abcl.js";
@@ -86,6 +89,7 @@ const plugins_debug = (deploySite, destDir) => [
     modIdentifier: modInfo.identifier,
     modScriptId: scriptId,
     preventAssignment: false,
+    "use client": "",
   }),
   commonjs(),
   resolve({ browser: true }),
@@ -96,6 +100,18 @@ const plugins_debug = (deploySite, destDir) => [
   }),
   cleanup(),
   json(),
+  postcss({
+    extract: true,
+    minimize: true,
+  }),
+  alias({
+    entries: [
+      { find: "react", replacement: "preact/compat" },
+      { find: "react-dom/test-utils", replacement: "preact/test-utils" },
+      { find: "react-dom", replacement: "preact/compat" },
+      { find: "react/jsx-runtime", replacement: "preact/jsx-runtime" },
+    ],
+  }),
 ];
 
 const plugins = (deploySite, destDir) => [...plugins_debug(deploySite, destDir), terser({ sourceMap: true })];

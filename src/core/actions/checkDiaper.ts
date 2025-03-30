@@ -1,8 +1,8 @@
 import { CombinedAction } from "../../types/types";
 import { hasDiaper } from "../player/diaper";
 import { isABCLPlayer, replace_template, SendAction, targetInputExtractor } from "../player/playerUtils";
-import { abclStatsWindow } from "../player/ui";
-import { sendChatLocal } from "../utils";
+import { resizeElements } from "../player/ui";
+import { getElement, sendChatLocal } from "../utils";
 
 const diaperCheckFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
@@ -11,7 +11,10 @@ const diaperCheckFunction = (player: Character) => {
   const selfClothesMessage = "%NAME% checks %INTENSIVE% clothes for any accidents.";
   const otherClothesMessage = "%NAME% checks %OPP_NAME%'s clothes for any accidents.";
 
-  abclStatsWindow.open(player.MemberNumber);
+  getElement(document.body, `#ABCLStatsPanel`).classList.remove("ABCLHidden");
+  setTimeout(() => {
+    resizeElements();
+  }, 2000);
   if (Math.random() < 0.75) return;
 
   if (hasDiaper(player)) return SendAction(replace_template(isSelf ? selfDiaperMessage : otherDiaperMessage, player), undefined, "checkDiaper", player);

@@ -20,9 +20,11 @@ const loop = () => {
   abclPlayer.update();
 };
 
+let loaded = false;
 const init = async () => {
-  //  ServerPlayerSync();
-
+  
+  if (loaded) return;
+  loaded = true;
   loadOrGenerateData();
   initSettingsScreen();
   initActions();

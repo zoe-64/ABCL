@@ -16,7 +16,6 @@ import { ABCLdata } from "../../constants";
 import { MetabolismSettingValues } from "../../types/types";
 import { SendAction, SendStatusMessage } from "./playerUtils";
 import { sendUpdateMyData } from "../hooks";
-import { throttle } from "lodash-es";
 
 export const updatePlayerClothes = () => {
   CharacterRefresh(Player, true);
@@ -30,11 +29,11 @@ export const abclPlayer = {
   update: () => {
     // once per minute
     abclPlayer.stats.MentalRegression += mentalRegressionOvertime() ?? 0;
-    abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[abclPlayer.settings.PeeMetabolism];
-    abclPlayer.stats.BowelValue += abclPlayer.stats.FoodIntake * MetabolismSettingValues[abclPlayer.settings.PoopMetabolism];
+    abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism];
+    abclPlayer.stats.BowelValue += abclPlayer.stats.FoodIntake * MetabolismSettingValues[Player[modIdentifier].Settings.PoopMetabolism];
 
-    abclPlayer.settings.PeeMetabolism !== "Disabled" && abclPlayer.attemptWetting();
-    abclPlayer.settings.PoopMetabolism !== "Disabled" && abclPlayer.attemptSoiling();
+    Player[modIdentifier].Settings.PeeMetabolism !== "Disabled" && abclPlayer.attemptWetting();
+    Player[modIdentifier].Settings.PoopMetabolism !== "Disabled" && abclPlayer.attemptSoiling();
     playerSaver.save();
   },
   wetClothing: () => {
@@ -48,7 +47,7 @@ export const abclPlayer = {
       SendAction("%NAME%'s wets %INTENSIVE% clothes leaks onto the floor.", undefined, "wetClothing");
     }
     sendUpdateMyData();
-    if (abclPlayer.settings.DisableClothingStains) return;
+    if (Player[modIdentifier].Settings.DisableClothingStains) return;
     const wetColor = "#96936C";
 
     const panties = InventoryGet(Player, "Panties");
@@ -82,7 +81,7 @@ export const abclPlayer = {
       SendAction("%NAME% soils %INTENSIVE% clothes.", undefined, "soilClothing");
     }
     sendUpdateMyData();
-    if (abclPlayer.settings.DisableClothingStains) return;
+    if (Player[modIdentifier].Settings.DisableClothingStains) return;
 
     const messColor = "#261a16";
 
@@ -337,67 +336,6 @@ export const abclPlayer = {
       if (value < 0) value = 0;
 
       this.WetnessValue = value * getPlayerDiaperSize();
-    },
-  },
-  settings: {
-    get AccidentsByActivities(): boolean {
-      return Player[modIdentifier].Settings.AccidentsByActivities;
-    },
-    set AccidentsByActivities(value: boolean) {
-      Player[modIdentifier].Settings.AccidentsByActivities = value;
-    },
-    set DisableClothingStains(value: boolean) {
-      Player[modIdentifier].Settings.DisableClothingStains = value;
-    },
-    set DisableDiaperStains(value: boolean) {
-      Player[modIdentifier].Settings.DisableDiaperStains = value;
-    },
-    get DisableClothingStains(): boolean {
-      return Player[modIdentifier].Settings.DisableClothingStains;
-    },
-    get DisableDiaperStains(): boolean {
-      return Player[modIdentifier].Settings.DisableDiaperStains;
-    },
-    getStatusMessageSetting(key: keyof ModStats) {
-      return Player[modIdentifier].Settings.StatusMessages[key];
-    },
-    setStatusMessageSetting(key: keyof ModStats, value: boolean) {
-      Player[modIdentifier].Settings.StatusMessages[key] = value;
-    },
-    setPublicMessage(key: keyof ModSettings["VisibleMessages"], value: boolean) {
-      Player[modIdentifier].Settings.VisibleMessages[key] = value;
-    },
-    getPublicMessage(key: keyof ModSettings["VisibleMessages"]): boolean {
-      return Player[modIdentifier].Settings.VisibleMessages[key];
-    },
-    set PeeMetabolism(value: MetabolismSetting) {
-      Player[modIdentifier].Settings.PeeMetabolism = value;
-    },
-    set PoopMetabolism(value: MetabolismSetting) {
-      Player[modIdentifier].Settings.PoopMetabolism = value;
-    },
-    get PeeMetabolism(): MetabolismSetting {
-      return Player[modIdentifier].Settings.PeeMetabolism;
-    },
-
-    get PoopMetabolism(): MetabolismSetting {
-      return Player[modIdentifier].Settings.PoopMetabolism;
-    },
-
-    get OnDiaperChange(): DiaperChangePromptSetting {
-      return Player[modIdentifier].Settings.OnDiaperChange;
-    },
-
-    set OnDiaperChange(value: DiaperChangePromptSetting) {
-      Player[modIdentifier].Settings.OnDiaperChange = value;
-    },
-
-    set OpenRemoteSettings(value: boolean) {
-      Player[modIdentifier].Settings.OpenRemoteSettings = value;
-    },
-
-    get OpenRemoteSettings(): boolean {
-      return Player[modIdentifier].Settings.OpenRemoteSettings;
     },
   },
 };

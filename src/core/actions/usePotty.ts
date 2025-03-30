@@ -5,7 +5,7 @@ import { abclPlayer } from "../player/player";
 import { SendAction } from "../player/playerUtils";
 import { sendChatLocal } from "../utils";
 
-const usePottyFunction = () => {
+export const usePottyFunction = () => {
   const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;
   const isGood = abclPlayer.stats.BladderFullness > 0.6 || abclPlayer.stats.BowelFullness > 0.6;
   const isTooEarly = abclPlayer.stats.BladderFullness < 0.3 - incontinenceOffset && abclPlayer.stats.BowelFullness < 0.3 - incontinenceOffset;
@@ -36,7 +36,7 @@ export const usePotty: CombinedAction = {
     ID: "potty",
     Name: "Sit and Use Potty",
     Image: `${publicURL}/activity/potty-temp.png`,
-    OnClick: (player: Character) => usePottyFunction(),
+    OnClick: (player: Character, group) => usePottyFunction(),
     TargetSelf: ["ItemButt"],
     Criteria: (player: Character) => !(hasDiaper(player) && isDiaperLocked()) && !Player.IsRestrained(),
   },

@@ -38,6 +38,9 @@ const assetDefintion: CustomAssetDefinition = {
       AllowColorize: true,
     },
     {
+      Opacity: 1,
+      MinOpacity: 0,
+      MaxOpacity: 1,
       Name: "Wet",
       AllowColorize: true,
     },

@@ -63,7 +63,7 @@ export const isDiaperLocked = (player: Character = Player): boolean => {
   );
 };
 export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, player: Character = Player) => {
-  if (abclPlayer.settings.DisableDiaperStains) return;
+  if (Player[modIdentifier].Settings.DisableDiaperStains) return;
   const item = InventoryGet(player, slot);
   if (item && isDiaper(item)) {
     const color = !item.Color || typeof item.Color === "string" ? (item.Asset.DefaultColor as string[]) : (item.Color as string[]);

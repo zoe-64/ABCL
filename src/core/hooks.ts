@@ -132,14 +132,22 @@ const initHooks = async () => {
   });
   bcModSDK.hookFunction("ActivityRun", 1, (args, next) => {
     const result = next(args);
-    const [actor, acted, targetGroup, ItemActivity, ...rest] = args;
+    const [_actor, acted, _targetGroup, ItemActivity, ..._rest] = args;
     const activity = ItemActivity?.Activity;
-    if (abclPlayer.settings.AccidentsByActivities && acted.MemberNumber === Player.MemberNumber && activity.Name in ACCIDENTS_ON_ACTIVITIES) {
+    if (Player[modIdentifier].Settings.AccidentsByActivities && acted.MemberNumber === Player.MemberNumber && activity.Name in ACCIDENTS_ON_ACTIVITIES) {
       const chance = ACCIDENTS_ON_ACTIVITIES[activity.Name] as { wetting?: number; messing?: number };
-      if (abclPlayer.settings.PeeMetabolism !== "Disabled" && chance.wetting && Math.random() < chance.wetting * (1 + 2 * abclPlayer.stats.Incontinence)) {
+      if (
+        Player[modIdentifier].Settings.PeeMetabolism !== "Disabled" &&
+        chance.wetting &&
+        Math.random() < chance.wetting * (1 + 2 * abclPlayer.stats.Incontinence)
+      ) {
         abclPlayer.attemptWetting();
       }
-      if (abclPlayer.settings.PoopMetabolism !== "Disabled" && chance.messing && Math.random() < chance.messing * (1 + 2 * abclPlayer.stats.Incontinence)) {
+      if (
+        Player[modIdentifier].Settings.PoopMetabolism !== "Disabled" &&
+        chance.messing &&
+        Math.random() < chance.messing * (1 + 2 * abclPlayer.stats.Incontinence)
+      ) {
         abclPlayer.attemptSoiling();
       }
     }

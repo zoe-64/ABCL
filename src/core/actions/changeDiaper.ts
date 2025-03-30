@@ -52,7 +52,7 @@ export const changeDiaper: CombinedAction = {
     "changeDiaper-accepted": ({ Sender }) => sendChatLocal(`${getCharacterName(Sender)} accepted your change diaper request.`),
     "changeDiaper-rejected": ({ Sender }) => sendChatLocal(`${getCharacterName(Sender)} rejected your change diaper request.`),
     "changeDiaper-pending": ({ Sender }) => {
-      switch (abclPlayer.settings.OnDiaperChange) {
+      switch (Player.ABCL.Settings.OnDiaperChange) {
         case DiaperSettingValues.Ask:
           new ABCLYesNoPrompt(
             `${getCharacterName(Sender)} wants to change your diaper.`,

@@ -1,6 +1,5 @@
 import { sendDataToAction } from "../hooks";
 import { sendChatLocal } from "../utils";
-import { abclPlayer } from "./player";
 
 // luv you zoi <3
 export const getCharacter = (identifier: string | number | Character): Character | undefined => {
@@ -91,8 +90,8 @@ export const SendStatusMessage = (type: keyof ModStats, delta: number, percent: 
   if (delta === 0) return;
   if (percent) delta = delta * 100;
   delta = Number(delta.toPrecision(2));
-  if (!abclPlayer.settings.getStatusMessageSetting(type)) return;
-  const isLocal = !abclPlayer.settings.getPublicMessage("statusMessages");
+  if (!Player[modIdentifier].Settings.StatusMessages[type]) return;
+  const isLocal = !Player[modIdentifier].Settings.StatusMessages[type];
   const wordConversion: Partial<Record<keyof ModStats, string>> = {
     Bladder: "PEE",
     Bowel: "POO",
@@ -130,7 +129,7 @@ export function SendAction(action: string, sender: Character | null = null, mess
     });
     return;
   }
-  const isLocal = !abclPlayer.settings.getPublicMessage(messageType);
+  const isLocal = !Player[modIdentifier].Settings.VisibleMessages[messageType];
   sendChatLocal(msg, ["ChatMessageAction", "ChatMessageNonDialogue"], "--label-color:#ff4949", isLocal);
 
   if (!isLocal) {

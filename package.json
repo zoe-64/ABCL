@@ -16,22 +16,21 @@
   "scripts": {
     "release": "node release.js",
     "generate released version": "node generate.js",
-    "watch": "nodemon --exec \"rollup -c rollup.config.js --configDebug --configDeploy http://localhost:3042 --configVersion dev && http-server ./versions/dev -p 3042 --cors\" -e js,ts --ignore ./versions"
+    "watch": "nodemon --exec \"rollup -c rollup.config.js --configDebug --configDeploy http://localhost:3042 --configVersion dev && http-server ./versions/dev -p 3042 --cors\" -e js,ts,tsx,css --ignore ./versions"
   },
   "license": "MIT",
   "dependencies": {
+    "@preact/signals": "^2.0.1",
+    "@rollup/plugin-alias": "^5.1.1",
     "@shoelace-style/shoelace": "^2.20.0",
     "@sugarch/bc-asset-manager": "^0.3.1",
     "@sugarch/bc-mod-hook-manager": "^0.2.11",
     "@types/lodash-es": "^4.17.12",
-    "@types/react-dom": "^19.0.3",
-    "abcl": "file:",
     "bc-stubs": "^111.0.0",
     "bondage-club-mod-sdk": "^1.2.0",
     "lit": "^3.2.1",
-    "react-dom": "^19.0.0",
-    "shoelace": "^0.1.1",
-    "tsx-dom": "^3.1.0"
+    "preact": "^10.26.4",
+    "rollup-plugin-postcss": "^4.0.2"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
@@ -43,7 +42,6 @@
     "@types/core-js": "^2.5.8",
     "@types/css": "^0.0.37",
     "@types/node": "^20.16.1",
-    "@types/react": "^19.0.8",
     "http-server": "^14.1.1",
     "lodash-es": "^4.17.21",
     "nodemon": "^3.1.4",

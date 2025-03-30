@@ -1,12 +1,8 @@
-import { changeDiaper, changeDiaperListeners } from "../core/actions/changeDiaper";
-import { checkDiaper } from "../core/actions/checkDiaper";
+import { changeDiaperListeners } from "../core/actions/changeDiaper";
 import { lickPuddleListeners } from "../core/actions/lickPuddle";
 import { onABCLMessageListeners } from "../core/actions/onABCLMessage";
-import { sync, syncListeners } from "../core/actions/sync";
-import { toPee } from "../core/actions/toPee";
-import { toPoop } from "../core/actions/toPoop";
-import { usePotty } from "../core/actions/usePotty";
-import { useToilet } from "../core/actions/useToilet";
+import { syncListeners } from "../core/actions/sync";
+
 import { wipePuddleListeners } from "../core/actions/wipePuddle";
 import { ModVersion } from "./definitions";
 

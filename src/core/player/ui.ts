@@ -1,102 +1,18 @@
 import { createCSS } from "../../screens/styles/css";
 import { generateUniqueID, waitForElement } from "../utils";
-import { getPlayerDiaperSize, hasDiaper } from "./diaper";
-import { getCharacter, getCharacterName } from "./playerUtils";
 
-export class ABCLStatsWindow {
-  statsDrawer: HTMLElement;
-  folded: boolean = false;
-  constructor() {
-    this.statsDrawer = document.createElement("sl-drawer");
-    this.statsDrawer.innerHTML = `
-    <p class="${modIdentifier}WindowHeaderTitle">Stats</p>
-    <sl-select id="${modIdentifier}CurrentPlayerSelect" value="${Player.MemberNumber}">
-    </sl-select>
+export const abclStatsWindow = {
+  update: () => {
+    StatsPanelVersion.setState(v => v + 1);
+  },
+};
 
-  
-		<div class="${modIdentifier}StatsWindowContent">
-      <label id="SoilinessPercentage">Soiliness</label>
-      <sl-progress-bar label="Soiliness" class="${modIdentifier}SoilinessPercentage"></sl-progress-bar>
-      <label id="WetnessPercentage">Wetness</label>
-      <sl-progress-bar label="Wetness" class="${modIdentifier}WetnessPercentage"></sl-progress-bar>
-      <label id="BowelFullness">Bowel</label>
-      <sl-progress-bar label="Bowel Fullness" class="${modIdentifier}BowelFullness"></sl-progress-bar>
-      <label id="BladderFullness">Bladder</label>
-      <sl-progress-bar label="Bladder Fullness" class="${modIdentifier}BladderFullness"></sl-progress-bar>
-      <label id="Incontinence">Incontinence</label>
-      <sl-progress-bar label="Incontinence" class="${modIdentifier}Incontinence"></sl-progress-bar>
-      <label id="MentalRegression">Mental Regression</label>
-      <sl-progress-bar label="Mental Regression" class="${modIdentifier}MentalRegression"></sl-progress-bar>
-		</div>
-   <sl-button class="${modIdentifier}RefreshButton">Refresh</sl-button>
-	`;
-
-    overlay.appendChild(this.statsDrawer);
-    this.statsDrawer.querySelector(`#${modIdentifier}CurrentPlayerSelect`)?.addEventListener("sl-change", () => this.update());
-    this.statsDrawer.querySelector(`.${modIdentifier}RefreshButton`)?.addEventListener("click", () => this.update());
-    this.update();
-  }
-  close() {
-    this.statsDrawer.removeAttribute("open");
-  }
-  open(selectedPlayerId?: number) {
-    this.statsDrawer.setAttribute("open", "true");
-    if (selectedPlayerId !== undefined) {
-      const currentPlayerSelect: HTMLSelectElement | null = this.statsDrawer.querySelector(`#${modIdentifier}CurrentPlayerSelect`);
-      if (currentPlayerSelect) {
-        currentPlayerSelect.value = selectedPlayerId.toString();
-      }
-    }
-    this.update();
-  }
-  async update() {
-    const currentPlayerSelect: HTMLSelectElement | null = this.statsDrawer.querySelector(`#${modIdentifier}CurrentPlayerSelect`);
-    if (!currentPlayerSelect) return;
-
-    let selectedCharacter: Character | undefined = getCharacter(currentPlayerSelect.value);
-    if (!selectedCharacter || !selectedCharacter?.ABCL) {
-      selectedCharacter = Player;
-    }
-    // fill select ChatRoomCharacter
-    currentPlayerSelect.innerHTML = "";
-    for (let character of ChatRoomCharacter) {
-      if (!character.ABCL) continue;
-      currentPlayerSelect.innerHTML += `<sl-option value="${character.MemberNumber}">${getCharacterName(character.MemberNumber)}</sl-option>`;
-    }
-
-    const updateInput = (className: string, value: number) => {
-      value = Math.round(value);
-      const input: HTMLInputElement | null = this.statsDrawer.querySelector(`.${modIdentifier}${className}`);
-      const label: HTMLLabelElement | null = this.statsDrawer.querySelector(`#${className}`);
-      if (!input || !label) return;
-      const valueRounded = Math.round((value + Number.EPSILON) * 10) / 10;
-      if (value > 100) {
-        input.value = "100";
-        input.innerText = `overflowing ${Math.round((value - 100) / (value / 100))}%`;
-        label.innerText = `${label.innerText.split(":")[0]}: overflowing ${valueRounded - 100}%`;
-      } else {
-        input.value = valueRounded.toString();
-        input.innerText = valueRounded.toString() + "%";
-        label.innerText = label.innerText.split(":")[0] + ": " + valueRounded.toString() + "%";
-      }
-    };
-    if (!selectedCharacter.ABCL) {
-      return;
-    }
-    if (hasDiaper(selectedCharacter)) {
-      updateInput("SoilinessPercentage", (selectedCharacter.ABCL.Stats.Soiliness.value / getPlayerDiaperSize(selectedCharacter)) * 100);
-      updateInput("WetnessPercentage", (selectedCharacter.ABCL.Stats.Wetness.value / getPlayerDiaperSize(selectedCharacter)) * 100);
-    } else {
-      updateInput("SoilinessPercentage", 0);
-      updateInput("WetnessPercentage", 0);
-    }
-
-    updateInput("BowelFullness", (selectedCharacter.ABCL.Stats.Bowel.value / selectedCharacter.ABCL.Stats.Bowel.size) * 100);
-    updateInput("BladderFullness", (selectedCharacter.ABCL.Stats.Bladder.value / selectedCharacter.ABCL.Stats.Bladder.size) * 100);
-    updateInput("Incontinence", selectedCharacter.ABCL.Stats.Incontinence.value * 100);
-    updateInput("MentalRegression", selectedCharacter.ABCL.Stats.MentalRegression.value * 100);
-  }
-}
+export const StatsPanelVersion = {
+  state: 0,
+  setState: (updater: (v: number) => number) => {
+    StatsPanelVersion.state = updater(StatsPanelVersion.state);
+  },
+};
 class MovableElement {
   newX: number = 0;
   newY: number = 0;
@@ -287,38 +203,78 @@ export class ABCLYesNoPrompt {
     });
   }
 }
-
+interface ABCLResizeElement {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fontSize: number;
+}
 export const overlay = document.createElement("div");
+overlay.id = `${modIdentifier}Overlay`;
+// get all the elements in overlay
 
-export let abclStatsWindow: ABCLStatsWindow;
+let indexedElements: ABCLResizeElement[] = [];
+const isElementVisible = (element: Element | null): boolean => {
+  if (!element || !element.isConnected) return false;
+
+  // Check if the element is rendered (not display: none or in a hidden subtree)
+  if ((element as HTMLElement).offsetParent === null) return false;
+
+  const style = getComputedStyle(element);
+  if (style.visibility === "hidden" || style.opacity === "0") return false;
+
+  // Check ancestors up to the document body
+  let parent = element.parentElement;
+  while (parent && parent !== document.body) {
+    const parentStyle = getComputedStyle(parent);
+    if (parentStyle.display === "none" || parentStyle.visibility === "hidden") {
+      return false;
+    }
+    parent = parent.parentElement;
+  }
+
+  return true;
+};
+
+export const resizeElements = () => {
+  if (document.readyState === "loading") return;
+  const elements = Array.from(overlay.querySelectorAll("*")).filter(element => element.getAttribute("indexed") !== "true" && isElementVisible(element));
+  const overlayRect = overlay.getBoundingClientRect();
+
+  indexedElements.push(
+    ...elements.map(element => {
+      const rect = element.getBoundingClientRect();
+      const id = element.id || generateUniqueID();
+      element.id = id;
+      element.setAttribute("indexed", "true");
+
+      return {
+        id: id,
+        y: rect.top - overlayRect.top,
+        x: rect.left - overlayRect.left,
+        width: rect.width,
+        height: rect.height,
+        fontSize: parseInt(getComputedStyle(element).fontSize, 10),
+      };
+    }),
+  );
+
+  indexedElements.forEach(element => {
+    ElementPositionFix(element.id, element.fontSize, element.x, element.y, element.width, element.height);
+  });
+};
+
+window.addEventListener("resize", resizeElements);
+
 overlay.classList.add(`${modIdentifier}Overlay`);
 
 export const initOverlay = () => {
-  const shoelaceCSSLight = document.createElement("link");
-  shoelaceCSSLight.rel = "stylesheet";
-  shoelaceCSSLight.href = "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/themes/light.css";
-  document.head.appendChild(shoelaceCSSLight);
-
-  // const shoelaceCSSDark = document.createElement("link");
-  // shoelaceCSSDark.rel = "stylesheet";
-  // shoelaceCSSDark.href = "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/themes/dark.css";
-  //  document.head.appendChild(shoelaceCSSDark);
-
-  const shoelaceScript = document.createElement("script");
-  shoelaceScript.src = "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/shoelace-autoloader.js";
-  shoelaceScript.type = "module";
-  shoelaceScript.async = true;
-  document.head.appendChild(shoelaceScript);
-
   const injectedStyles = document.createElement("style");
   injectedStyles.innerHTML = createCSS();
-
   document.head.appendChild(injectedStyles);
-  abclStatsWindow = new ABCLStatsWindow();
-  // overlay.classList.add((Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ? "sl-theme-light" : "sl-theme-dark");
-  // overlay.style.color = (Player.ChatSettings?.ColorTheme ?? "Light").startsWith("Light") ? "var(--tmd-text,black)" : "var(--tmd-text,white)";
   document.body.appendChild(overlay);
-
   waitForElement("#chat-room-div", { childCheck: true, timeout: 9999999999999999999999 }).then(() => {
     waitForElement(`.${modIdentifier}Overlay`, { timeout: 9999999999999999999999 }).then(() => {
       document.removeChild(overlay);
