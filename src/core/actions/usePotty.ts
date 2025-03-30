@@ -28,7 +28,7 @@ export const usePottyFunction = () => {
     abclPlayer.stats.Incontinence += INCONTINENCE_ON_POTTY_USE;
     abclPlayer.stats.MentalRegression -= 0.02;
   }
-  SendAction("%NAME% sits down uses the potty " + additionalText + ".", undefined, "usePotty");
+  SendAction("%NAME% sits down and uses the potty " + additionalText + ".", undefined, "usePotty");
 };
 
 export const usePotty: CombinedAction = {
