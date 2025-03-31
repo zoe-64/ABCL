@@ -13,7 +13,7 @@ import { diaperSquishBack } from "./actions/diaperSquishBack";
 import { diaperSquishFront } from "./actions/diaperSquishFront";
 import { lickPuddle } from "./actions/lickPuddle";
 import { onABCLMessage } from "./actions/onABCLMessage";
-import { sync, syncListeners } from "./actions/sync";
+import { sync } from "./actions/sync";
 import { toPee } from "./actions/toPee";
 import { toPoop } from "./actions/toPoop";
 import { usePotty } from "./actions/usePotty";

@@ -5,15 +5,18 @@ import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, SendAction } from "../player/playerUtils";
 
 const diaperPeeOthersDiaperRequest = (player: Character, volume: number) => {
-  if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-pee-others-diaper", undefined, player.MemberNumber);
+  if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-pee-others-diaper", { volume: volume }, player.MemberNumber);
   abclPlayer.stats.BladderValue = 0;
   diaperPeeOthersDiaperFunction(player, volume);
 };
 export const diaperPeeOthersDiaperFunction = (player: Character, volume: number) => {
   const otherMessage = "%OPP_NAME% tugs %NAME%'s diaper waistband and pees inside.";
   SendAction(replace_template(otherMessage, player), undefined, "playerActivity", player);
-  // whatever makes target wet and player losing bladder fullness
-  abclPlayer.stats.WetnessValue += volume;
+  CharacterSetFacialExpression(Player, "Blush", "Low", 8);
+  CharacterSetFacialExpression(Player, "Eyebrows", "Soft", 8);
+
+  CharacterSetFacialExpression(Player, "Eyes", "Surprised", 5);
+  abclPlayer.stats.WetnessValue += volume ?? 0;
 };
 export type diaperPeeOthersDiaperListeners = {
   "diaper-pee-others-diaper": { volume: number };
@@ -26,10 +29,10 @@ export const diaperPeeOthersDiaper: CombinedAction = {
     Image: `${publicURL}/activity/diaperPeeOthersDiaper.png`,
     Target: ["ItemPelvis"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperPeeOthersDiaperRequest(player, abclPlayer.stats.BladderValue),
-    Criteria: (player: Character) => isABCLPlayer(player) && hasDiaper(player) && player !== Player && !Player.IsRestrained(),
-    // Assume this is correct? target needs to have Diaper, ABCL and player can't do it while restrained?
+    Criteria: (player: Character) =>
+      isABCLPlayer(player) && hasDiaper(player) && abclPlayer.stats.BladderValue > 0 && player !== Player && !Player.IsRestrained(),
   },
   listeners: {
-    "diaper-pee-others-diaper": ({ Sender }, { volume }) => diaperPeeOthersDiaperRequest(getCharacter(Sender!) ?? Player, volume),
+    "diaper-pee-others-diaper": ({ Sender }, { volume }) => diaperPeeOthersDiaperFunction(getCharacter(Sender!) ?? Player, volume),
   },
 };

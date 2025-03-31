@@ -5,7 +5,7 @@ import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, SendAction } from "../player/playerUtils";
 
 const diaperPourRequest = (player: Character) => {
-  if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-pour-front", undefined, player.MemberNumber);
+  if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-pour", undefined, player.MemberNumber);
 
   diaperPourFunction(player);
 };
@@ -15,6 +15,12 @@ export const diaperPourFunction = (player: Character) => {
   const otherMessage = "%OPP_NAME% pours water in %NAME%'s diaper.";
   SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
   abclPlayer.stats.WetnessValue += 500;
+
+  CharacterSetFacialExpression(Player, "Blush", "Low", 8);
+  CharacterSetFacialExpression(Player, "Eyebrows", "Soft", 8);
+
+  CharacterSetFacialExpression(Player, "Eyes", "Surprised", 5);
+  CharacterSetFacialExpression(Player, "Eyes", "Daydream", 2);
 };
 
 export type diaperPourListeners = {
@@ -31,6 +37,6 @@ export const diaperPour: CombinedAction = {
     Criteria: (player: Character) => hasDiaper(player) && isABCLPlayer(player) && !Player.IsRestrained(), // Assume this is correct? target needs to have Diaper, ABCL and player can't do it while restrained?
   },
   listeners: {
-    "diaper-pour": ({ Sender }) => diaperPourRequest(getCharacter(Sender!) ?? Player),
+    "diaper-pour": ({ Sender }) => diaperPourFunction(getCharacter(Sender!) ?? Player),
   },
 };

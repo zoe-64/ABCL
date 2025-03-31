@@ -20,6 +20,7 @@ export const usePottyFunction = () => {
   let additionalText = "";
   if (isEmbarrassed) {
     additionalText = "and feels embarrased";
+    CharacterSetFacialExpression(Player, "Blush", "Low", 10);
     abclPlayer.stats.MentalRegression += 0.04;
   }
   if (isGood && !isTooFarGone) {
@@ -27,6 +28,7 @@ export const usePottyFunction = () => {
 
     abclPlayer.stats.Incontinence += INCONTINENCE_ON_POTTY_USE;
     abclPlayer.stats.MentalRegression -= 0.02;
+    CharacterSetFacialExpression(Player, "Mouth", "Happy", 8);
   }
   SendAction("%NAME% sits down uses the potty " + additionalText + ".", undefined, "usePotty");
 };

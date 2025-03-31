@@ -14,7 +14,7 @@ const LickPuddleFunction = (player: Character) => {
   const selfMessage = "%NAME% licks %INTENSIVE% puddle of pee.";
   const otherMessage = "%OPP_NAME% licks %NAME%'s puddle of pee.";
   SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "lickPuddle", player);
-
+  CharacterSetFacialExpression(Player, "Fluids", "DroolLow", 20);
   sendUpdateMyData();
   updatePlayerClothes();
   abclPlayer.stats.PuddleSize -= 50;

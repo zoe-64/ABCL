@@ -22,13 +22,13 @@ export type diaperSquishBackListeners = {
 export const diaperSquishBack: CombinedAction = {
   activity: {
     ID: "diaper-squish-back",
-    Name: "Diaper Squish",
+    Name: "Diaper Squish Bottom",
     Image: `${publicURL}/activity/diaperSquishBack.png`,
     Target: ["ItemButt"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperSquishBackRequest(player),
     Criteria: (player: Character) => isABCLPlayer(player) && hasDiaper(player) && !Player.IsRestrained(),
   },
   listeners: {
-    "diaper-squish-back": ({ Sender }) => diaperSquishBackRequest(getCharacter(Sender!) ?? Player),
+    "diaper-squish-back": ({ Sender }) => diaperSquishBackFunction(getCharacter(Sender!) ?? Player),
   },
 };

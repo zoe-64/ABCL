@@ -5,13 +5,13 @@ import { getCharacter, isABCLPlayer, replace_template, SendAction } from "../pla
 
 const diaperPatBackRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-pat-back", undefined, player.MemberNumber);
-
   diaperPatBackFunction(player);
 };
 export const diaperPatBackFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfMessage = "%NAME% pats %POSSESSIVE% diapered butt.";
   const otherMessage = "%OPP_NAME% pats %NAME%'s diapered butt.";
+  ActivityEffectFlat(Player, Player, 1, "ItemButt", 1);
   SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
 };
 
@@ -22,13 +22,13 @@ export type diaperPatBackListeners = {
 export const diaperPatBack: CombinedAction = {
   activity: {
     ID: "diaper-pat-back",
-    Name: "Diaper Pat",
+    Name: "Diaper Pat Bottom",
     Image: `${publicURL}/activity/diaperPatBack.png`,
     Target: ["ItemButt"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperPatBackRequest(player),
     Criteria: (player: Character) => isABCLPlayer(player) && hasDiaper(player) && !Player.IsRestrained(),
   },
   listeners: {
-    "diaper-pat-back": ({ Sender }) => diaperPatBackRequest(getCharacter(Sender!) ?? Player),
+    "diaper-pat-back": ({ Sender }) => diaperPatBackFunction(getCharacter(Sender!) ?? Player),
   },
 };

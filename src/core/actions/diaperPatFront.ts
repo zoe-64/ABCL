@@ -13,6 +13,7 @@ export const diaperPatFrontFunction = (player: Character) => {
   const selfMessage = "%NAME% pats %POSSESSIVE% diapered crotch.";
   const otherMessage = "%OPP_NAME% pats %NAME%'s diapered crotch.";
   SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
+  ActivityEffectFlat(Player, Player, 1, "ItemVulva", 1);
 };
 
 export type diaperPatFrontListeners = {
@@ -22,13 +23,13 @@ export type diaperPatFrontListeners = {
 export const diaperPatFront: CombinedAction = {
   activity: {
     ID: "diaper-pat-front",
-    Name: "Diaper Pat",
+    Name: "Diaper Pat Crotch",
     Image: `${publicURL}/activity/diaperPatFront.png`,
-    Target: ["ItemVulvaPiercings"],
+    Target: ["ItemVulva"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperPatFrontRequest(player),
     Criteria: (player: Character) => isABCLPlayer(player) && hasDiaper(player) && !Player.IsRestrained(),
   },
   listeners: {
-    "diaper-pat-front": ({ Sender }) => diaperPatFrontRequest(getCharacter(Sender!) ?? Player),
+    "diaper-pat-front": ({ Sender }) => diaperPatFrontFunction(getCharacter(Sender!) ?? Player),
   },
 };
