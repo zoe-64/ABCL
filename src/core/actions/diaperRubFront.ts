@@ -14,6 +14,7 @@ export const diaperRubFrontFunction = (player: Character) => {
   const selfMessage = "%NAME% rubs %POSSESSIVE% diapered crotch.";
   const otherMessage = "%OPP_NAME% rubs %NAME%'s diapered crotch.";
   SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
+  ActivityEffectFlat(Player, Player, 10, "ItemVulva", 1);
   if (abclPlayer.stats.Incontinence > Math.random()) {
     {
       abclPlayer.attemptWetting();
@@ -30,11 +31,11 @@ export const diaperRubFront: CombinedAction = {
     ID: "diaper-rub-front",
     Name: "Diaper Rub",
     Image: `${publicURL}/activity/diaperRubFront.png`,
-    Target: ["ItemVulvaPiercings"],
+    Target: ["ItemVulva"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperRubFrontRequest(player),
     Criteria: (player: Character) => isABCLPlayer(player) && hasDiaper(player) && !Player.IsRestrained(),
   },
   listeners: {
-    "diaper-rub-front": ({ Sender }) => diaperRubFrontRequest(getCharacter(Sender!) ?? Player),
+    "diaper-rub-front": ({ Sender }) => diaperRubFrontFunction(getCharacter(Sender!) ?? Player),
   },
 };

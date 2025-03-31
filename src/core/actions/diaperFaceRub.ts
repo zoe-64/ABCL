@@ -5,12 +5,19 @@ import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, SendAction } from "../player/playerUtils";
 
 const diaperFaceRubRequest = (player: Character) => {
-  if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-face-rub", undefined, player.MemberNumber);
+  if (player.MemberNumber !== Player.MemberNumber) {
+    ActivityEffectFlat(Player, Player, 12, "ItemVulva", 1);
+    return sendDataToAction("diaper-face-rub", undefined, player.MemberNumber);
+  }
   diaperFaceRubFunction(player);
 };
 export const diaperFaceRubFunction = (player: Character) => {
   const otherMessage = "%OPP_NAME% rubs %OPP_POSSESSIVE% diaper against %NAME%'s face.";
   SendAction(replace_template(otherMessage, player), undefined, "playerActivity", player);
+  ActivityEffectFlat(player, Player, 8, "ItemVulva", 1);
+  CharacterSetFacialExpression(Player, "Blush", "Medium", 5);
+  CharacterSetFacialExpression(Player, "Eyebrows", "Soft", 10);
+  CharacterSetFacialExpression(Player, "Eyes", "Dizzy", 10);
   abclPlayer.stats.MentalRegression += 0.02;
 };
 export type diaperFaceRubListeners = {
@@ -27,6 +34,6 @@ export const diaperFaceRub: CombinedAction = {
     Criteria: (player: Character) => hasDiaper(player) && isABCLPlayer(player) && !Player.IsRestrained() && player.MemberNumber !== Player.MemberNumber,
   },
   listeners: {
-    "diaper-face-rub": ({ Sender }) => diaperFaceRubRequest(getCharacter(Sender!) ?? Player),
+    "diaper-face-rub": ({ Sender }) => diaperFaceRubFunction(getCharacter(Sender!) ?? Player),
   },
 };

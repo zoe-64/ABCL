@@ -2,15 +2,16 @@ import { createCSS } from "../../screens/styles/css";
 import { generateUniqueID, waitForElement } from "../utils";
 
 export const abclStatsWindow = {
-  update: () => {
-    StatsPanelVersion.setState(v => v + 1);
-  },
-};
-
-export const StatsPanelVersion = {
   state: 0,
+  memberNumber: 0,
   setState: (updater: (v: number) => number) => {
-    StatsPanelVersion.state = updater(StatsPanelVersion.state);
+    abclStatsWindow.state = updater(abclStatsWindow.state);
+  },
+  setMemberNumber: (memberNumber: number) => {
+    abclStatsWindow.memberNumber = memberNumber;
+  },
+  update: () => {
+    abclStatsWindow.setState(v => v + 1);
   },
 };
 class MovableElement {
@@ -223,13 +224,13 @@ const isElementVisible = (element: Element | null): boolean => {
   if ((element as HTMLElement).offsetParent === null) return false;
 
   const style = getComputedStyle(element);
-  if (style.visibility === "hidden" || style.opacity === "0") return false;
+  if (style.visibility === "hidden" || style.opacity === "0" || element.classList.contains("no-resize")) return false;
 
   // Check ancestors up to the document body
   let parent = element.parentElement;
   while (parent && parent !== document.body) {
     const parentStyle = getComputedStyle(parent);
-    if (parentStyle.display === "none" || parentStyle.visibility === "hidden") {
+    if (parentStyle.display === "none" || parentStyle.visibility === "hidden" || parent.classList.contains("no-resize")) {
       return false;
     }
     parent = parent.parentElement;

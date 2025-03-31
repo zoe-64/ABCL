@@ -92,6 +92,12 @@ export abstract class AccidentMiniGame extends BaseMiniGame {
     this.AccidentPosition = this.AccidentMaxPosition;
 
     console.info("Accident minigame started: difficulty - " + this.AccidentChallenge + " time - " + this.AccidentGameDuration);
+    CharacterSetFacialExpression(Player, "Eyes", "Daydream", 10);
+    if (this.AccidentChallenge > 25) {
+      CharacterSetFacialExpression(Player, "Blush", "ShortBreath", 10);
+    } else {
+      CharacterSetFacialExpression(Player, "Blush", "Low", 10);
+    }
   }
   get IsGameActive() {
     return CommonTime() < MiniGameTimer && !MiniGameEnded && !this.GameFailed;
@@ -189,8 +195,11 @@ export class WetMinigame extends AccidentMiniGame {
     if (victory) {
       abclPlayer.stats.Incontinence -= incontinenceOnAccident(abclPlayer.stats.Incontinence) / 2;
       sendChatLocal("You managed to hold it in!");
+      CharacterSetFacialExpression(Player, "Mouth", "Happy", 20);
       return;
     }
+    CharacterSetFacialExpression(Player, "Blush", "Low", 10);
+    CharacterSetFacialExpression(Player, "Eyes", "Surprised", 9);
 
     abclPlayer.wet();
     abclPlayer.onAccident();

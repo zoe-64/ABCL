@@ -14,7 +14,7 @@ export function ValueBar({
   format?: (value: number) => string;
 }): h.JSX.Element {
   return (
-    <div class="value-bar">
+    <div class="value-bar no-resize">
       <div
         style={{
           background: foreground,
