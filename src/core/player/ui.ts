@@ -190,7 +190,7 @@ export class ABCLYesNoPrompt {
   }
 
   show() {
-    this.prompt.classList.add(`${modIdentifier}Prompt`);
+    this.prompt.classList.add(`${modIdentifier}Prompt`, `no-resize`);
     this.prompt.id = this.id;
     this.prompt.innerHTML = `<p>${this.message}</p><button class="${modIdentifier}PromptNo ${modIdentifier}Button">Deny</button><button class="${modIdentifier}PromptYes ${modIdentifier}Button">Accept</button>`;
     overlay.appendChild(this.prompt);

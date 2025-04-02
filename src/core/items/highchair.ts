@@ -14,13 +14,7 @@ const assetDefintion: CustomAssetDefinition = {
   Fetish: ["ABDL"],
   Effect: [E.Freeze, E.MapImmobile],
   AllowActivePose: [...PoseAllStanding],
-  Property: {
-    OverrideHeight: {
-      Height: 20,
-      Priority: 51,
-    },
-    Effect: [E.Lifted],
-  },
+  Height: 50,
   // @ts-expect-error
   ParentGroup: {},
   Layer: [

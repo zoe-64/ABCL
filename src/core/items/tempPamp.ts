@@ -10,7 +10,18 @@ const assetDefintion: CustomAssetDefinition = {
   DefaultColor: ["#d6efff", "#7B7B7B", "#8197A7", "#4880B9", "#B5A95B", "#AAA44E"],
   // @ts-expect-error
   ParentGroup: {},
+  Category: ["ABDL"],
   Fetish: ["ABDL"],
+  Attribute: ["GenitaliaCover"],
+  Value: 30,
+  Difficulty: 50,
+  Time: 5,
+  RemoveTime: 5,
+  AllowLock: true,
+  DrawLocks: false,
+  Effect: [E.Chaste],
+  Block: ["ItemVulva", "ItemButt", "ItemVulvaPiercings"],
+
   HideItem: [
     "ItemButtAnalBeads2",
     "ItemVulvaVibratingDildo",
@@ -18,6 +29,15 @@ const assetDefintion: CustomAssetDefinition = {
     "ItemVulvaClitSuctionCup",
     "ItemVulvaPiercingsVibeHeartClitPiercing",
     "ItemVulvaPiercingsClitRing",
+  ],
+  HideItemExclude: [
+    "ClothLowerHaremPants",
+    "ClothLowerPleatedSkirt",
+    "ClothLowerSkirt2",
+    "ClothLowerSkirt3",
+    "ClothLowerTennisSkirt1",
+    "ClothLowerLeggings1",
+    "ClothLowerLeggings2",
   ],
   Layer: [
     {
