@@ -85,6 +85,7 @@ export const createCSS = () => {
 	margin: auto;
 	position: relative;
 	top: 50%;
+  transform: translateY(-50%);
 	pointer-events: none;
   font-family: arial;
   color: ${fontColor};
