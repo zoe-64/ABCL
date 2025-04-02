@@ -84,7 +84,6 @@ export const createCSS = () => {
 	max-height: 100%;
 	margin: auto;
 	position: relative;
-	transform: translateY(-50%);
 	top: 50%;
 	pointer-events: none;
   font-family: arial;
