@@ -6,9 +6,9 @@ import { getElement, sendChatLocal } from "../utils";
 
 const diaperCheckFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
-  const selfDiaperMessage = "%NAME% checks %INTENSIVE% diaper.";
+  const selfDiaperMessage = "%NAME% checks %POSSESSIVE% diaper.";
   const otherDiaperMessage = "%NAME% checks %OPP_NAME%'s diaper.";
-  const selfClothesMessage = "%NAME% checks %INTENSIVE% clothes for any accidents.";
+  const selfClothesMessage = "%NAME% checks %POSSESSIVE% clothes for any accidents.";
   const otherClothesMessage = "%NAME% checks %OPP_NAME%'s clothes for any accidents.";
   abclStatsWindow.setMemberNumber(player.MemberNumber!);
   getElement(document.body, `#ABCLStatsPanel`).classList.remove("ABCLHidden");

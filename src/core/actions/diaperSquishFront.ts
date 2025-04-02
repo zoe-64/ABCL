@@ -10,8 +10,8 @@ const diaperSquishFrontRequest = (player: Character) => {
 };
 export const diaperSquishFrontFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
-  const selfMessage = "%NAME% squishes %POSSESSIVE% diapered butt.";
-  const otherMessage = "%OPP_NAME% squishes %NAME%'s diapered butt.";
+  const selfMessage = "%NAME% squishes %POSSESSIVE% diapered crotch.";
+  const otherMessage = "%OPP_NAME% squishes %NAME%'s diapered crotch.";
   SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
 };
 

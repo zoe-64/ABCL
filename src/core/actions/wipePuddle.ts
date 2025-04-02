@@ -14,7 +14,7 @@ const WipePuddleFunction = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber)
     return SendAction(replace_template("%OPP_NAME% wipes %NAME%'s puddle of pee.", player), undefined, "wipePuddle", player);
 
-  SendAction(replace_template("%NAME% wipes %INTENSIVE% puddle of pee.", player), undefined, "wipePuddle", player);
+  SendAction(replace_template("%NAME% wipes %POSSESSIVE% puddle of pee.", player), undefined, "wipePuddle", player);
 };
 export type wipePuddleListeners = {
   "wipe-puddle": undefined;

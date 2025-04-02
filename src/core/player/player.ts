@@ -51,9 +51,9 @@ export const abclPlayer = {
     abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
     abclPlayer.stats.BladderValue = 0;
     if (hasDiaper()) {
-      SendAction("%NAME%'s diaper leaks and wet %INTENSIVE% clothes causing a puddle to form.", undefined, "wetClothing");
+      SendAction("%NAME%'s diaper leaks and wet %POSSESSIVE% clothes causing a puddle to form.", undefined, "wetClothing");
     } else {
-      SendAction("%NAME%'s wets %INTENSIVE% clothes leaks onto the floor.", undefined, "wetClothing");
+      SendAction("%NAME%'s wets %POSSESSIVE% clothes and leaks onto the floor.", undefined, "wetClothing");
     }
     sendUpdateMyData();
     if (Player[modIdentifier].Settings.DisableClothingStains) return;
@@ -85,9 +85,9 @@ export const abclPlayer = {
   soilClothing: () => {
     abclPlayer.stats.BowelValue = 0;
     if (hasDiaper()) {
-      SendAction("%NAME%'s diaper leaks and soils %INTENSIVE% clothes.", undefined, "soilClothing");
+      SendAction("%NAME%'s diaper leaks and soils %POSSESSIVE% clothes.", undefined, "soilClothing");
     } else {
-      SendAction("%NAME% soils %INTENSIVE% clothes.", undefined, "soilClothing");
+      SendAction("%NAME% soils %POSSESSIVE% clothes.", undefined, "soilClothing");
     }
     sendUpdateMyData();
     if (Player[modIdentifier].Settings.DisableClothingStains) return;
@@ -119,7 +119,7 @@ export const abclPlayer = {
   wetDiaper: () => {
     const diaperSize = getPlayerDiaperSize();
     const absorbedVolume = Math.min(abclPlayer.stats.BladderValue, Math.max(0, diaperSize - abclPlayer.stats.WetnessValue));
-    SendAction("%NAME% wets %INTENSIVE% diaper.", undefined, "wetDiaper");
+    SendAction("%NAME% wets %POSSESSIVE% diaper.", undefined, "wetDiaper");
 
     abclPlayer.stats.BladderValue -= absorbedVolume;
     abclPlayer.stats.WetnessValue += absorbedVolume;
@@ -131,7 +131,7 @@ export const abclPlayer = {
   soilDiaper: () => {
     const diaperSize = getPlayerDiaperSize();
     const absorbedVolume = Math.min(abclPlayer.stats.BowelValue, Math.max(0, diaperSize - abclPlayer.stats.SoilinessValue));
-    SendAction("%NAME% soils %INTENSIVE% diaper.", undefined, "soilDiaper");
+    SendAction("%NAME% soils %POSSESSIVE% diaper.", undefined, "soilDiaper");
     abclPlayer.stats.BowelValue -= absorbedVolume;
     abclPlayer.stats.SoilinessValue += absorbedVolume;
 
