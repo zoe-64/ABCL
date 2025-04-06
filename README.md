@@ -24,8 +24,7 @@ We prefer you use TamperMonkey or ViolentMonkey.
 
 ### TamperMonkey or ViolentMonkey
 
-If you use [TamperMonkey](https://www.tampermonkey.net/) or [ViolentMonkey](https://violentmonkey.github.io): (available for several browsers: Chrome, Edge, Safari, Opera, Firefox) 1. Visit and click on install [loader.user.js](https://github.com/zoe-64/ABCL/raw/versions/latest/loader.user.js) or [versions/beta/loader.user.js](https://github.com/zoe-64/ABCL/blob/main/versions/beta/loader.user.js)
-
+If you use [TamperMonkey](https://www.tampermonkey.net/) or [ViolentMonkey](https://violentmonkey.github.io): (available for several browsers: Chrome, Edge, Safari, Opera, Firefox) 1. Visit and click on install [loader.user.js](https://github.com/zoe-64/ABCL/raw/main/versions/latest/loader.user.js) or [versions/beta/loader.user.js](https://github.com/zoe-64/ABCL/raw/main/versions/beta/loader.user.js)
 ### Bookmark
 
 1. Go to [bookmark.js](https://github.com/zoe-64/ABCL/blob/main/versions/latest/bookmark.js) or [beta/bookmark.js](https://github.com/zoe-64/ABCL/blob/main/versions/beta/bookmark.js)
