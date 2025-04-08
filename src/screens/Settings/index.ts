@@ -17,12 +17,12 @@ export const initSettingsScreen = async () => {
       if (MouseIn(1815, 75, 90, 90)) PreferenceSubscreenExtensionsExit();
     },
     exit: () => {
-      getElement(document.body, `#${modIdentifier}SettingsPage`).classList.add(`${modIdentifier}Hidden`);
+      getElement(document.body, "#ABCL-settings-page").classList.add(`ABCL-hidden`);
       syncData();
       return true;
     },
     load: () => {
-      getElement(document.body, `#${modIdentifier}SettingsPage`).classList.remove(`${modIdentifier}Hidden`);
+      getElement(document.body, "#ABCL-settings-page").classList.remove(`ABCL-hidden`);
       resizeElements();
     },
   });

@@ -1,0 +1,17 @@
+.ABCL-checkbox {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.7%;
+  white-space: nowrap;
+}
+
+.ABCL-checkbox input {
+  height: 100%;
+  aspect-ratio: 1/1;
+  width: auto;
+}
+
+.ABCL-checkbox p {
+  margin: 0.35%;
+}

@@ -29,11 +29,12 @@ export const abclPlayer = {
     abclPlayer.stats.MentalRegression += mentalRegressionOnAccident() ?? 0;
   },
   update: () => {
+    if (Player.ABCL.Settings.PauseStats) return;
     bowelThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player[modIdentifier].Settings.PoopMetabolism]);
     bladderThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism]);
     // once per minute
     if (regressionThrottler.check()) {
-      abclPlayer.stats.MentalRegression += mentalRegressionOvertime() ?? 0;
+      abclPlayer.stats.MentalRegression += (mentalRegressionOvertime() ?? 0) * 5;
     }
     if (bladderThrottler.check()) {
       abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism];
@@ -46,6 +47,7 @@ export const abclPlayer = {
     playerSaver.save();
   },
   wetClothing: () => {
+    if (Player.ABCL.Settings.DisableWettingLeaks) return;
     // panties -> pants -> floor
     sendChatLocal("You've had a wet accident in your clothes!");
     abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
@@ -83,6 +85,8 @@ export const abclPlayer = {
     updatePlayerClothes();
   },
   soilClothing: () => {
+    if (Player.ABCL.Settings.DisableSoilingLeaks) return;
+
     abclPlayer.stats.BowelValue = 0;
     if (hasDiaper()) {
       SendAction("%NAME%'s diaper leaks and soils %POSSESSIVE% clothes.", undefined, "soilClothing");
@@ -206,6 +210,9 @@ export const abclPlayer = {
     get PuddleSize() {
       return Player[modIdentifier].Stats.PuddleSize.value;
     },
+    get MentalRegressionModifier() {
+      return MetabolismSettingValues[Player[modIdentifier].Settings.MentalRegressionModifier];
+    },
     set MentalRegression(value: number) {
       if (value < 0) value = 0;
       if (value > 1) value = 1;
@@ -246,7 +253,6 @@ export const abclPlayer = {
     },
 
     // bladder
-
     set BladderValue(value: number) {
       if (value < 0) value = 0;
       const delta = value / this.BladderSize - this.BladderFullness;

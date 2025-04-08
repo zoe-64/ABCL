@@ -1,0 +1,15 @@
+.ABCL-hidden {
+  display: none !important;
+}
+.ABCL-overlay {
+  pointer-events: none;
+  z-index: 1;
+}
+.ABCL-overlay * {
+  pointer-events: fill;
+}
+/* sorry fusam */
+#fusam-addon-manager-container {
+  position: absolute;
+  top: 0;
+}

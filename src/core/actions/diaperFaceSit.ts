@@ -14,7 +14,7 @@ const diaperFaceSitRequest = (player: Character) => {
 export const diaperFaceSitFunction = (player: Character) => {
   const otherMessage = "%OPP_NAME% sits with her diapered butt on %NAME%'s face.";
   SendAction(replace_template(otherMessage, player), undefined, "playerActivity", player);
-  abclPlayer.stats.MentalRegression += 0.03;
+  abclPlayer.stats.MentalRegression += 0.03 * abclPlayer.stats.MentalRegressionModifier;
   ActivityEffectFlat(Player, Player, 8, "ItemNose", 1);
   CharacterSetFacialExpression(Player, "Blush", "ShortBreath", 30);
   CharacterSetFacialExpression(Player, "Eyebrows", "Soft", 30);

@@ -18,7 +18,7 @@ export const diaperFaceRubFunction = (player: Character) => {
   CharacterSetFacialExpression(Player, "Blush", "Medium", 5);
   CharacterSetFacialExpression(Player, "Eyebrows", "Soft", 10);
   CharacterSetFacialExpression(Player, "Eyes", "Dizzy", 10);
-  abclPlayer.stats.MentalRegression += 0.02;
+  abclPlayer.stats.MentalRegression += 0.02 * abclPlayer.stats.MentalRegressionModifier;
 };
 export type diaperFaceRubListeners = {
   "diaper-face-rub": void;

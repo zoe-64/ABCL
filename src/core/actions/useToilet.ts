@@ -13,7 +13,7 @@ const useToiletFunction = () => {
   let additionalText = "";
   if (isGood) {
     additionalText = "and feels releaved";
-    abclPlayer.stats.MentalRegression -= 0.02;
+    abclPlayer.stats.MentalRegression -= 0.02 * abclPlayer.stats.MentalRegressionModifier;
     abclPlayer.stats.Incontinence += INCONTINENCE_ON_TOILET_USE;
   }
   abclPlayer.stats.BladderFullness = 0;

@@ -1,4 +1,3 @@
-import { createCSS } from "../../screens/styles/css";
 import { generateUniqueID, waitForElement } from "../utils";
 
 export const abclStatsWindow = {
@@ -8,7 +7,7 @@ export const abclStatsWindow = {
     abclStatsWindow.state = updater(abclStatsWindow.state);
   },
   setMemberNumber: (memberNumber: number) => {
-    abclStatsWindow.memberNumber = memberNumber;
+    abclStatsWindow.setMemberNumber(memberNumber);
   },
   update: () => {
     abclStatsWindow.setState(v => v + 1);
@@ -204,80 +203,23 @@ export class ABCLYesNoPrompt {
     });
   }
 }
-interface ABCLResizeElement {
-  id: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  fontSize: number;
-}
+
 export const overlay = document.createElement("div");
-overlay.id = `${modIdentifier}Overlay`;
-// get all the elements in overlay
-
-let indexedElements: ABCLResizeElement[] = [];
-const isElementVisible = (element: Element | null): boolean => {
-  if (!element || !element.isConnected) return false;
-
-  // Check if the element is rendered (not display: none or in a hidden subtree)
-  if ((element as HTMLElement).offsetParent === null) return false;
-
-  const style = getComputedStyle(element);
-  if (style.visibility === "hidden" || style.opacity === "0" || element.classList.contains("no-resize")) return false;
-
-  // Check ancestors up to the document body
-  let parent = element.parentElement;
-  while (parent && parent !== document.body) {
-    const parentStyle = getComputedStyle(parent);
-    if (parentStyle.display === "none" || parentStyle.visibility === "hidden" || parent.classList.contains("no-resize")) {
-      return false;
-    }
-    parent = parent.parentElement;
-  }
-
-  return true;
-};
+overlay.id = `${modIdentifier}-overlay`;
 
 export const resizeElements = () => {
-  if (document.readyState === "loading") return;
-  const elements = Array.from(overlay.querySelectorAll("*")).filter(element => element.getAttribute("indexed") !== "true" && isElementVisible(element));
-  const overlayRect = overlay.getBoundingClientRect();
-
-  indexedElements.push(
-    ...elements.map(element => {
-      const rect = element.getBoundingClientRect();
-      const id = element.id || generateUniqueID();
-      element.id = id;
-      element.setAttribute("indexed", "true");
-
-      return {
-        id: id,
-        y: rect.top - overlayRect.top,
-        x: rect.left - overlayRect.left,
-        width: rect.width,
-        height: rect.height,
-        fontSize: parseInt(getComputedStyle(element).fontSize, 10),
-      };
-    }),
-  );
-
-  indexedElements.forEach(element => {
-    ElementPositionFix(element.id, element.fontSize, element.x, element.y, element.width, element.height);
-  });
+  ElementPositionFixed(overlay.id, 0, 0, 2000, 1000);
+  ElementPositionFixed("ABCL-stats-panel", 1700, 0, 300, 1000);
 };
 
 window.addEventListener("resize", resizeElements);
 
-overlay.classList.add(`${modIdentifier}Overlay`);
+overlay.classList.add(`ABCL-overlay`);
 
 export const initOverlay = () => {
-  const injectedStyles = document.createElement("style");
-  injectedStyles.innerHTML = createCSS();
-  document.head.appendChild(injectedStyles);
   document.body.appendChild(overlay);
   waitForElement("#chat-room-div", { childCheck: true, timeout: 9999999999999999999999 }).then(() => {
-    waitForElement(`.${modIdentifier}Overlay`, { timeout: 9999999999999999999999 }).then(() => {
+    waitForElement(`.ABCL-overlay`, { timeout: 9999999999999999999999 }).then(() => {
       document.removeChild(overlay);
       setTimeout(() => {
         document.appendChild(overlay);

@@ -2,7 +2,7 @@ import { h, render } from "preact";
 import SettingsPage from "./Settings/settingsPage";
 import { overlay } from "src/core/player/ui";
 import StatsPanel from "./components/statsPanel";
-
+import "./App.css";
 function App(): h.JSX.Element {
   return (
     <>

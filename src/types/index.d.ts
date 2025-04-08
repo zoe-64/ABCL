@@ -14,8 +14,10 @@ type MetabolismSetting = "Disabled" | "Normal" | "Slow" | "Fast" | "Faster" | "F
 type DiaperChangePromptSetting = "Deny" | "Ask" | "Allow";
 
 interface ModSettings {
+  PauseStats: boolean;
   PeeMetabolism: MetabolismSetting;
   PoopMetabolism: MetabolismSetting;
+  MentalRegressionModifier: MetabolismSetting;
   OnDiaperChange: DiaperChangePromptSetting;
   OpenRemoteSettings: boolean;
   LockedOutOfSettings: boolean;
@@ -32,6 +34,7 @@ interface ModSettings {
     wipePuddle: boolean;
     statusMessages: boolean;
     playerActivity: boolean;
+    pauseStats: boolean;
   };
   StatusMessages: Partial<Record<keyof ModStats, boolean>>;
   DisableWettingLeaks: boolean;

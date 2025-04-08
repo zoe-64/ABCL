@@ -1,0 +1,24 @@
+.ABCL-settings-page {
+  height: 79%;
+  margin: 5% 10dvw 0dvh 5dvw;
+  overflow-y: scroll;
+}
+.ABCL-settings-title {
+  text-align: center;
+  width: fit-content;
+  margin-top: 0;
+}
+.ABCL-divider {
+  margin: 1% 0;
+}
+.ABCL-checkbox-group {
+  flex-wrap: wrap;
+  gap: 1.5vw;
+  display: flex;
+  font-size: 0.8em;
+}
+
+.ABCL-settings-section {
+  margin-top: 2.1%;
+  margin-bottom: 0.7%;
+}

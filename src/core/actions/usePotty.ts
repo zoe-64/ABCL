@@ -21,13 +21,13 @@ export const usePottyFunction = () => {
   if (isEmbarrassed) {
     additionalText = "and feels embarrased";
     CharacterSetFacialExpression(Player, "Blush", "Low", 10);
-    abclPlayer.stats.MentalRegression += 0.04;
+    abclPlayer.stats.MentalRegression += 0.04 * abclPlayer.stats.MentalRegressionModifier;
   }
   if (isGood && !isTooFarGone) {
     additionalText += isEmbarrassed ? " but is releaved" : "and feels releaved";
 
     abclPlayer.stats.Incontinence += INCONTINENCE_ON_POTTY_USE;
-    abclPlayer.stats.MentalRegression -= 0.02;
+    abclPlayer.stats.MentalRegression -= 0.02 * abclPlayer.stats.MentalRegressionModifier;
     CharacterSetFacialExpression(Player, "Mouth", "Happy", 8);
   }
   SendAction("%NAME% sits down uses the potty " + additionalText + ".", undefined, "usePotty");

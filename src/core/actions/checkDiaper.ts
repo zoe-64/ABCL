@@ -11,7 +11,7 @@ const diaperCheckFunction = (player: Character) => {
   const selfClothesMessage = "%NAME% checks %POSSESSIVE% clothes for any accidents.";
   const otherClothesMessage = "%NAME% checks %OPP_NAME%'s clothes for any accidents.";
   abclStatsWindow.setMemberNumber(player.MemberNumber!);
-  getElement(document.body, `#ABCLStatsPanel`).classList.remove("ABCLHidden");
+  getElement(document.body, `#ABCL-stats`).classList.remove("ABCL-hidden");
   setTimeout(() => {
     resizeElements();
   }, 250);
