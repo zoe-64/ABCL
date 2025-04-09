@@ -1,7 +1,7 @@
 import { CombinedAction } from "../../types/types";
 import { sendDataToAction } from "../hooks";
 import { getDiaperVerb, hasDiaper } from "../player/diaper";
-import { getCharacter, isABCLPlayer, replace_template, SendAction } from "../player/playerUtils";
+import { getCharacter, isABCLPlayer, replace_template, SendABCLAction } from "../player/playerUtils";
 
 const diaperSquishBackRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-squish-back", undefined, player.MemberNumber);
@@ -13,7 +13,7 @@ export const diaperSquishBackFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfMessage = `%NAME% gives %POSSESSIVE% ${diaperVerb} diapered butt a squeeze, blushing a little as it squishes under %POSSESSIVE% hand.`;
   const otherMessage = `%OPP_NAME% gives %NAME%'s ${diaperVerb} diapered butt a teasing squeeze, smiling as %OPP_PRONOUN% squishes and kneads the ${diaperVerb} padding.`;
-  SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
+  SendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
 };
 
 export type diaperSquishBackListeners = {

@@ -210,6 +210,13 @@ overlay.id = `${modIdentifier}-overlay`;
 export const resizeElements = () => {
   ElementPositionFixed(overlay.id, 0, 0, 2000, 1000);
   ElementPositionFixed("ABCL-stats-panel", 1700, 0, 300, 1000);
+
+  const exitButtons = document.querySelectorAll(`.${modIdentifier}-exit-button`);
+  for (let i = 0; i < exitButtons.length; i++) {
+    const exitButton = exitButtons[i];
+    exitButton.id = exitButton.id || generateUniqueID();
+    ElementPositionFixed(exitButton.id, 1815, 75, 90, 90);
+  }
 };
 
 window.addEventListener("resize", resizeElements);

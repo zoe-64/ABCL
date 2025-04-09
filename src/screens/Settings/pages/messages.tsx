@@ -5,7 +5,7 @@ import Checkbox from "src/screens/components/checkbox";
 export default function MessagesPage({ setPage }: { setPage: (page: string) => void }): h.JSX.Element {
   return (
     <div>
-      <button onClick={() => setPage("menu")}>Back</button>
+      <button onClick={() => setPage("menu")} className="ABCL-exit-button"></button>
       <div>
         <h2>Visible Messages to Players</h2>
         <div className="ABCL-checkbox-group">

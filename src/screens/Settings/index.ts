@@ -11,10 +11,10 @@ export const initSettingsScreen = async () => {
     ButtonText: `${ModName} Settings`,
     Image: `${publicURL}/abcl.png`,
     run: () => {
-      DrawButton(1815, 75, 90, 90, "", "White", "Icons/Exit.png");
+      //DrawButton(1815, 75, 90, 90, "", "White", "Icons/Exit.png");
     },
     click: () => {
-      if (MouseIn(1815, 75, 90, 90)) PreferenceSubscreenExtensionsExit();
+      // if (MouseIn(1815, 75, 90, 90)) PreferenceSubscreenExtensionsExit();
     },
     exit: () => {
       getElement(document.body, "#ABCL-settings-page").classList.add(`ABCL-hidden`);

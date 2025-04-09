@@ -2,7 +2,7 @@ import { INCONTINENCE_ON_TOILET_USE } from "../../constants";
 import { CombinedAction } from "../../types/types";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { SendAction } from "../player/playerUtils";
+import { SendABCLAction } from "../player/playerUtils";
 import { sendChatLocal } from "../utils";
 
 const useToiletFunction = () => {
@@ -18,7 +18,7 @@ const useToiletFunction = () => {
   }
   abclPlayer.stats.BladderFullness = 0;
   abclPlayer.stats.BowelFullness = 0;
-  SendAction("%NAME% goes to the bathroom uses the toilet " + additionalText + ".", undefined, "useToilet");
+  SendABCLAction("%NAME% goes to the bathroom uses the toilet " + additionalText + ".", undefined, "useToilet");
 };
 
 export const useToilet: CombinedAction = {

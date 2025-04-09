@@ -13,7 +13,7 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
   return (
     <div className="ABCL-settings-section">
       <h2>Wet and Soiling</h2>
-      <button onClick={() => setPage("menu")}>Back</button>
+      <button onClick={() => setPage("menu")} className="ABCL-exit-button"></button>
       <div>
         <div className="ABCL-checkbox-group">
           <Checkbox

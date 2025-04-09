@@ -2,7 +2,7 @@ import { INCONTINENCE_ON_POTTY_USE } from "../../constants";
 import { CombinedAction } from "../../types/types";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { SendAction } from "../player/playerUtils";
+import { SendABCLAction } from "../player/playerUtils";
 import { sendChatLocal } from "../utils";
 
 export const usePottyFunction = () => {
@@ -12,7 +12,7 @@ export const usePottyFunction = () => {
   const isTooFarGone = abclPlayer.stats.MentalRegression > 0.9;
   const isEmbarrassed = abclPlayer.stats.MentalRegression < 0.3;
   if (isTooEarly) {
-    SendAction("%NAME% tries to use the potty but can't seem to get anything out.", undefined, "usePotty");
+    SendABCLAction("%NAME% tries to use the potty but can't seem to get anything out.", undefined, "usePotty");
     return;
   }
   abclPlayer.stats.BowelFullness = 0;
@@ -30,7 +30,7 @@ export const usePottyFunction = () => {
     abclPlayer.stats.MentalRegression -= 0.02 * abclPlayer.stats.MentalRegressionModifier;
     CharacterSetFacialExpression(Player, "Mouth", "Happy", 8);
   }
-  SendAction("%NAME% sits down uses the potty " + additionalText + ".", undefined, "usePotty");
+  SendABCLAction("%NAME% sits down uses the potty " + additionalText + ".", undefined, "usePotty");
 };
 
 export const usePotty: CombinedAction = {

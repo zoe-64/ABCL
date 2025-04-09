@@ -8,6 +8,18 @@
 .ABCL-overlay * {
   pointer-events: fill;
 }
+.ABCL-exit-button {
+  background-image: url("Icons/Exit.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  cursor: pointer;
+  background-color: #ffffff;
+  border: 1px solid #000000;
+  :hover {
+    background-color: cyan;
+  }
+}
 /* sorry fusam */
 #fusam-addon-manager-container {
   position: absolute;

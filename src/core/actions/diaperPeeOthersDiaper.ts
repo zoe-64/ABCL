@@ -2,7 +2,7 @@ import { CombinedAction } from "../../types/types";
 import { sendDataToAction } from "../hooks";
 import { hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, SendAction } from "../player/playerUtils";
+import { getCharacter, isABCLPlayer, replace_template, SendABCLAction } from "../player/playerUtils";
 
 const diaperPeeOthersDiaperRequest = (player: Character, volume: number) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-pee-others-diaper", { volume: volume }, player.MemberNumber);
@@ -11,7 +11,7 @@ const diaperPeeOthersDiaperRequest = (player: Character, volume: number) => {
 };
 export const diaperPeeOthersDiaperFunction = (player: Character, volume: number) => {
   const otherMessage = "%OPP_NAME% tugs %NAME%'s diaper waistband and pees inside.";
-  SendAction(replace_template(otherMessage, player), undefined, "playerActivity", player);
+  SendABCLAction(replace_template(otherMessage, player), undefined, "playerActivity", player);
   CharacterSetFacialExpression(Player, "Blush", "Low", 8);
   CharacterSetFacialExpression(Player, "Eyebrows", "Soft", 8);
 
