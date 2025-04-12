@@ -101,7 +101,7 @@ const plugins_debug = (deploySite, destDir) => [
   cleanup(),
   json(),
   postcss({
-    extract: true,
+    inject: true,
     minimize: true,
   }),
   alias({

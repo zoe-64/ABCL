@@ -1,0 +1,22 @@
+.ABCL-group-button {
+  background-color: var(--tmd-element, rgb(145, 145, 145));
+  color: var(--tmd-text, #fff);
+  border: 1px solid var(--tmd-element, #262626);
+  padding: 5px;
+  cursor: pointer;
+}
+
+.ABCL-group-button-selected {
+  background-color: var(--tmd-accent, rgb(0, 0, 0));
+}
+
+.ABCL-group {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  padding: 5px 0;
+}
+
+.ABCL-group p {
+  margin-right: 10px;
+}

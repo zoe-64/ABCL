@@ -4,8 +4,10 @@ import { sendUpdateMyData as sendUpdateMyData } from "./hooks";
 import { logger } from "./logger";
 
 export const defaultSettings: ModSettings = {
+  PauseStats: false,
   PeeMetabolism: MetabolismSettings.Normal,
   PoopMetabolism: MetabolismSettings.Normal,
+  MentalRegressionModifier: MetabolismSettings.Normal,
   OpenRemoteSettings: false,
   LockedOutOfSettings: false,
   DisableWettingLeaks: false,
@@ -24,6 +26,7 @@ export const defaultSettings: ModSettings = {
     wipePuddle: true,
     statusMessages: false,
     playerActivity: true,
+    pauseStats: false,
   },
   StatusMessages: {
     Bladder: true,

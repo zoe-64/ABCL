@@ -109,27 +109,8 @@ export const SendStatusMessage = (type: keyof ModStats, delta: number, percent: 
     sendDataToAction("onABCLMessage", { message: `${getCharacterName(Player.MemberNumber)}: ${message}`, local: isLocal });
   }
 };
-export function SendAction(action: string, sender: Character | null = null, messageType: keyof ModSettings["VisibleMessages"], target?: Character) {
+export function SendABCLAction(action: string, sender: Character | null = null, messageType: keyof ModSettings["VisibleMessages"], target?: Character) {
   let msg = replace_template(action, sender);
-  if (!messageType) {
-    ServerSend("ChatRoomChat", {
-      Content: "Beep",
-      Type: "Action",
-      Dictionary: [
-        // EN
-        { Tag: "Beep", Text: "msg" },
-        // CN
-        { Tag: "发送私聊", Text: "msg" },
-        // DE
-        { Tag: "Biep", Text: "msg" },
-        // FR
-        { Tag: "Sonner", Text: "msg" },
-        // Message itself
-        { Tag: "msg", Text: msg },
-      ],
-    });
-    return;
-  }
   const isLocal = !Player[modIdentifier].Settings.VisibleMessages[messageType];
   sendChatLocal(msg, ["ChatMessageAction", "ChatMessageNonDialogue"], "--label-color:#ff4949", isLocal);
 

@@ -2,10 +2,10 @@ import { INCONTINENCE_ON_TOILET_USE } from "../../constants";
 import { CombinedAction } from "../../types/types";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { SendAction } from "../player/playerUtils";
+import { SendABCLAction } from "../player/playerUtils";
 import { sendChatLocal } from "../utils";
 
-const useToiletFunction = () => {
+export const useToiletFunction = () => {
   const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;
   const isTooEarly = abclPlayer.stats.BladderFullness < 0.3 && abclPlayer.stats.BowelFullness < 0.3;
   const isGood = abclPlayer.stats.BladderFullness > 0.6 - incontinenceOffset || abclPlayer.stats.BowelFullness > 0.6 - incontinenceOffset;
@@ -13,12 +13,12 @@ const useToiletFunction = () => {
   let additionalText = "";
   if (isGood) {
     additionalText = "and feels releaved";
-    abclPlayer.stats.MentalRegression -= 0.02;
+    abclPlayer.stats.MentalRegression -= 0.02 * abclPlayer.stats.MentalRegressionModifier;
     abclPlayer.stats.Incontinence += INCONTINENCE_ON_TOILET_USE;
   }
   abclPlayer.stats.BladderFullness = 0;
   abclPlayer.stats.BowelFullness = 0;
-  SendAction("%NAME% goes to the bathroom and uses the toilet " + additionalText + ".", undefined, "useToilet");
+  SendABCLAction("%NAME% goes to the bathroom and uses the toilet " + additionalText + ".", undefined, "useToilet");
 };
 
 export const useToilet: CombinedAction = {
@@ -26,8 +26,8 @@ export const useToilet: CombinedAction = {
     ID: "toilet",
     Name: "Sit and Use Toilet",
     Image: `${publicURL}/activity/toilet-temp.png`,
-    OnClick: (player: Character) => useToiletFunction(),
-    Criteria: (player: Character) => abclPlayer.stats.MentalRegression < 0.3 && !(hasDiaper(player) && isDiaperLocked()) && !Player.IsRestrained(),
+    OnClick: (player, group) => useToiletFunction(),
+    Criteria: player => abclPlayer.stats.MentalRegression < 0.3 && !(hasDiaper(player) && isDiaperLocked()) && !Player.IsRestrained(),
     TargetSelf: ["ItemButt"],
   },
   command: {

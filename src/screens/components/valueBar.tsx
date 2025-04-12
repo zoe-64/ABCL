@@ -1,4 +1,5 @@
 import { h } from "preact";
+import "./valueBar.css";
 
 export function ValueBar({
   value,

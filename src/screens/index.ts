@@ -3,14 +3,14 @@ import { ModScreen } from "../types/types";
 
 export const initScreens = (screens: ModScreen[]) => {
   bcModSDK.hookFunction("TextLoad", 5, (args, next) => {
-    if (screens.some((screen) => screen.module === CurrentModule && screen.id === CurrentScreen)) {
+    if (screens.some(screen => screen.module === CurrentModule && screen.id === CurrentScreen)) {
       return;
     }
 
     return next(args);
   });
 
-  screens.forEach((screen) => {
+  screens.forEach(screen => {
     (<any>window)[`${screen.id}Background`] = "Sheet";
 
     const { KeyUp, Click, ...rest } = screen.functions;
@@ -25,9 +25,9 @@ export const initScreens = (screens: ModScreen[]) => {
         KeyUp?.(event);
       },
       Click: (event: MouseEvent) => {
-        if (MouseIn(1815, 75, 90, 90)) {
-          (<any>window)[`${screen.id}Exit`]();
-        }
+        //if (MouseIn(1815, 75, 90, 90)) {
+        //  (<any>window)[`${screen.id}Exit`]();
+        // }
         Click?.(event);
       },
     };

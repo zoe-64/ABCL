@@ -1,8 +1,9 @@
 import { h } from "preact";
+import "./checkbox.css";
 export default function Checkbox({ checked, setChecked, label }: { checked: boolean; setChecked: (checked: boolean) => void; label: string }): h.JSX.Element {
   return (
-    <div style={{ display: "flex", alignItems: "center", width: "fit-content", padding: "10px 10px", whiteSpace: "nowrap" }}>
-      <input style={{ width: "6vh", height: "6vh" }} type="checkbox" checked={checked} onChange={e => setChecked((e.target as HTMLInputElement).checked)} />
+    <div className="ABCL-checkbox">
+      <input type="checkbox" checked={checked} onChange={e => setChecked((e.target as HTMLInputElement).checked)} />
       <p style={{ marginLeft: "5px" }}>{label}</p>
     </div>
   );

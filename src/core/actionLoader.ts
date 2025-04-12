@@ -1,4 +1,4 @@
-import { ABCLActivity, CombinedAction, HookListener } from "../types/types";
+import { ABCLActivity, CombinedAction } from "../types/types";
 import { changeDiaper } from "./actions/changeDiaper";
 import { checkDiaper } from "./actions/checkDiaper";
 import { diaperFaceRub } from "./actions/diaperFaceRub";
@@ -13,6 +13,7 @@ import { diaperSquishBack } from "./actions/diaperSquishBack";
 import { diaperSquishFront } from "./actions/diaperSquishFront";
 import { lickPuddle } from "./actions/lickPuddle";
 import { onABCLMessage } from "./actions/onABCLMessage";
+import { pauseStats } from "./actions/pauseStats";
 import { sync } from "./actions/sync";
 import { toPee } from "./actions/toPee";
 import { toPoop } from "./actions/toPoop";
@@ -120,6 +121,7 @@ export const actions: CombinedAction[] = [
   diaperRubBack,
   diaperSquishBack,
   diaperSquishFront,
+  pauseStats,
 ];
 
 export const commands = actions.reduce((commands, { command }) => (command ? [...commands, command] : commands), [] as ICommand[]);

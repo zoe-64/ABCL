@@ -4,6 +4,7 @@ import { getCharacter, getCharacterName, isABCLPlayer } from "src/core/player/pl
 import { getPlayerDiaperSize } from "src/core/player/diaper";
 import { resizeElements, abclStatsWindow } from "src/core/player/ui";
 import { h } from "preact";
+import "./statsPanel.css";
 
 export default function StatsPanel(): h.JSX.Element {
   const [selectablePlayers, setSelectablePlayers] = useState<Character[]>(() => ChatRoomCharacter.filter(character => isABCLPlayer(character)));
@@ -32,37 +33,17 @@ export default function StatsPanel(): h.JSX.Element {
   const wetness = isABCL ? selectedCharacter.ABCL!.Stats.Wetness.value / getPlayerDiaperSize(selectedCharacter) : 0;
   const bowel = isABCL ? selectedCharacter.ABCL!.Stats.Bowel.value / selectedCharacter.ABCL!.Stats.Bowel.size : 0;
   const bladder = isABCL ? selectedCharacter.ABCL!.Stats.Bladder.value / selectedCharacter.ABCL!.Stats.Bladder.size : 0;
-
+  const pauseStats = isABCL ? selectedCharacter.ABCL!.Settings.PauseStats : false;
   useEffect(() => {
     resizeElements();
   }, [memberNumber]);
 
   return (
-    <div className={"ABCLHidden"} id="ABCLStatsPanel">
-      <div
-        style={{ width: "calc(2000px - 330px)", height: "1000px", top: 0, left: 0, position: "absolute" }}
-        onClick={() => document.getElementById("ABCLStatsPanel")?.classList.add("ABCLHidden")}
-      ></div>
-      <div
-        style={{
-          padding: "15px",
-          width: "300px",
-          height: "1000px",
-          position: "absolute",
-          top: "0px",
-          left: "calc(2000px - 330px)",
-          backgroundColor: "var(--tmd-element,rgb(255, 255, 255))",
-        }}
-      >
+    <div className="ABCL-hidden" id="ABCL-stats">
+      <div className="ABCL-stats-overlay" onClick={() => document.getElementById("ABCL-stats")?.classList.add("ABCL-hidden")}></div>
+      <div className="ABCL-stats-panel" id="ABCL-stats-panel">
         <select
-          style={{
-            padding: "10px",
-            borderRadius: "5px",
-            border: "1px solid #ccc",
-            backgroundColor: "#f9f9f9",
-            color: "#333",
-            width: "100%",
-          }}
+          class="ABCL-stats-select"
           onClick={() => {
             setSelectablePlayers(ChatRoomCharacter.filter(character => isABCLPlayer(character)));
           }}
@@ -78,13 +59,17 @@ export default function StatsPanel(): h.JSX.Element {
           ))}
         </select>
 
-        <div style={{ padding: "15px 0" }}>
-          <ValueBar value={incontinence} label={"Incontinence"} color={"#eeacacff"} foreground={"#cb5b5bff"} />
-          <ValueBar value={regression} label={"Mental Regression"} color={"#e6bff1ff"} foreground={"#ad74beff"} />
-          <ValueBar value={soiliness} label={"Soiliness"} color={"#d1aa98ff"} foreground={"#ab674aff"} />
-          <ValueBar value={wetness} label={"Wetness"} color={"#f3e1aeff"} foreground={"#e7c463ff"} />
-          <ValueBar value={bowel} label={"Bowel Fullness"} color={"#b7795cff"} foreground={"#7c4c36ff"} />
-          <ValueBar value={bladder} label={"Bladder Fullness"} color={"#eacd73ff"} foreground={"#cba01eff"} />
+        <div className="ABCL-stats-container">
+          <ValueBar value={incontinence} label="Incontinence" color="#cb5b5bff" foreground="#eeacacff" />
+          <ValueBar value={regression} label="Mental Regression" color="#ad74beff" foreground="#e6bff1ff" />
+          <ValueBar value={soiliness} label="Soiliness" color="#ab674aff" foreground="#d1aa98ff" />
+          <ValueBar value={wetness} label="Wetness" color="#e7c463ff" foreground="#f3e1aeff" />
+          <ValueBar value={bowel} label="Bowel Fullness" color="#7c4c36ff" foreground="#b7795cff" />
+          <ValueBar value={bladder} label="Bladder Fullness" color="#cba01eff" foreground="#eacd73ff" />
+          <p>
+            <span>Stats: </span>
+            <span>{pauseStats ? "Paused" : "Active"}</span>
+          </p>
           <button onClick={() => resizeElements()}>Refresh</button>
         </div>
       </div>

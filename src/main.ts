@@ -22,7 +22,6 @@ const loop = () => {
 
 let loaded = false;
 const init = async () => {
-  
   if (loaded) return;
   loaded = true;
   loadOrGenerateData();

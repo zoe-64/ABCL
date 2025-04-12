@@ -14,7 +14,7 @@ import {
 import { abclStatsWindow } from "./ui";
 import { ABCLdata } from "../../constants";
 import { MetabolismSettingValues } from "../../types/types";
-import { SendAction, SendStatusMessage } from "./playerUtils";
+import { SendABCLAction, SendStatusMessage } from "./playerUtils";
 import { sendUpdateMyData } from "../hooks";
 
 export const updatePlayerClothes = () => {
@@ -28,12 +28,14 @@ export const abclPlayer = {
   onAccident: () => {
     abclPlayer.stats.MentalRegression += mentalRegressionOnAccident() ?? 0;
   },
+  /** once per minute */
   update: () => {
+    if (Player.ABCL.Settings.PauseStats) return;
     bowelThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player[modIdentifier].Settings.PoopMetabolism]);
     bladderThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism]);
-    // once per minute
+
     if (regressionThrottler.check()) {
-      abclPlayer.stats.MentalRegression += mentalRegressionOvertime() ?? 0;
+      abclPlayer.stats.MentalRegression += (mentalRegressionOvertime() ?? 0) * 5;
     }
     if (bladderThrottler.check()) {
       abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism];
@@ -46,14 +48,15 @@ export const abclPlayer = {
     playerSaver.save();
   },
   wetClothing: () => {
+    if (Player.ABCL.Settings.DisableWettingLeaks) return;
     // panties -> pants -> floor
     sendChatLocal("You've had a wet accident in your clothes!");
     abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
     abclPlayer.stats.BladderValue = 0;
     if (hasDiaper()) {
-      SendAction("%NAME%'s diaper leaks and wet %POSSESSIVE% clothes causing a puddle to form.", undefined, "wetClothing");
+      SendABCLAction("%NAME%'s diaper leaks and wet %POSSESSIVE% clothes causing a puddle to form.", undefined, "wetClothing");
     } else {
-      SendAction("%NAME%'s wets %POSSESSIVE% clothes and leaks onto the floor.", undefined, "wetClothing");
+      SendABCLAction("%NAME%'s wets %POSSESSIVE% clothes and leaks onto the floor.", undefined, "wetClothing");
     }
     sendUpdateMyData();
     if (Player[modIdentifier].Settings.DisableClothingStains) return;
@@ -83,11 +86,13 @@ export const abclPlayer = {
     updatePlayerClothes();
   },
   soilClothing: () => {
+    if (Player.ABCL.Settings.DisableSoilingLeaks) return;
+
     abclPlayer.stats.BowelValue = 0;
     if (hasDiaper()) {
-      SendAction("%NAME%'s diaper leaks and soils %POSSESSIVE% clothes.", undefined, "soilClothing");
+      SendABCLAction("%NAME%'s diaper leaks and soils %POSSESSIVE% clothes.", undefined, "soilClothing");
     } else {
-      SendAction("%NAME% soils %POSSESSIVE% clothes.", undefined, "soilClothing");
+      SendABCLAction("%NAME% soils %POSSESSIVE% clothes.", undefined, "soilClothing");
     }
     sendUpdateMyData();
     if (Player[modIdentifier].Settings.DisableClothingStains) return;
@@ -119,7 +124,7 @@ export const abclPlayer = {
   wetDiaper: () => {
     const diaperSize = getPlayerDiaperSize();
     const absorbedVolume = Math.min(abclPlayer.stats.BladderValue, Math.max(0, diaperSize - abclPlayer.stats.WetnessValue));
-    SendAction("%NAME% wets %POSSESSIVE% diaper.", undefined, "wetDiaper");
+    SendABCLAction("%NAME% wets %POSSESSIVE% diaper.", undefined, "wetDiaper");
 
     abclPlayer.stats.BladderValue -= absorbedVolume;
     abclPlayer.stats.WetnessValue += absorbedVolume;
@@ -131,7 +136,7 @@ export const abclPlayer = {
   soilDiaper: () => {
     const diaperSize = getPlayerDiaperSize();
     const absorbedVolume = Math.min(abclPlayer.stats.BowelValue, Math.max(0, diaperSize - abclPlayer.stats.SoilinessValue));
-    SendAction("%NAME% soils %POSSESSIVE% diaper.", undefined, "soilDiaper");
+    SendABCLAction("%NAME% soils %POSSESSIVE% diaper.", undefined, "soilDiaper");
     abclPlayer.stats.BowelValue -= absorbedVolume;
     abclPlayer.stats.SoilinessValue += absorbedVolume;
 
@@ -206,6 +211,9 @@ export const abclPlayer = {
     get PuddleSize() {
       return Player[modIdentifier].Stats.PuddleSize.value;
     },
+    get MentalRegressionModifier() {
+      return MetabolismSettingValues[Player[modIdentifier].Settings.MentalRegressionModifier];
+    },
     set MentalRegression(value: number) {
       if (value < 0) value = 0;
       if (value > 1) value = 1;
@@ -246,7 +254,6 @@ export const abclPlayer = {
     },
 
     // bladder
-
     set BladderValue(value: number) {
       if (value < 0) value = 0;
       const delta = value / this.BladderSize - this.BladderFullness;

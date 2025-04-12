@@ -19,7 +19,6 @@ const assetDefintion: CustomAssetDefinition = {
   RemoveTime: 5,
   AllowLock: true,
   DrawLocks: false,
-  Effect: [E.Chaste],
   Block: ["ItemVulva", "ItemButt", "ItemVulvaPiercings"],
 
   HideItem: [

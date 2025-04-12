@@ -1,0 +1,4 @@
+.ABCL-thanks-list {
+  display: flex;
+  flex-direction: column;
+}

@@ -11,18 +11,18 @@ export const initSettingsScreen = async () => {
     ButtonText: `${ModName} Settings`,
     Image: `${publicURL}/abcl.png`,
     run: () => {
-      DrawButton(1815, 75, 90, 90, "", "White", "Icons/Exit.png");
+      //DrawButton(1815, 75, 90, 90, "", "White", "Icons/Exit.png");
     },
     click: () => {
-      if (MouseIn(1815, 75, 90, 90)) PreferenceSubscreenExtensionsExit();
+      // if (MouseIn(1815, 75, 90, 90)) PreferenceSubscreenExtensionsExit();
     },
     exit: () => {
-      getElement(document.body, `#${modIdentifier}SettingsPage`).classList.add(`${modIdentifier}Hidden`);
+      getElement(document.body, "#ABCL-settings-page").classList.add(`ABCL-hidden`);
       syncData();
       return true;
     },
     load: () => {
-      getElement(document.body, `#${modIdentifier}SettingsPage`).classList.remove(`${modIdentifier}Hidden`);
+      getElement(document.body, "#ABCL-settings-page").classList.remove(`ABCL-hidden`);
       resizeElements();
     },
   });

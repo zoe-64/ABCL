@@ -2,7 +2,7 @@ import { CombinedAction } from "../../types/types";
 import { sendDataToAction } from "../hooks";
 import { hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, SendAction } from "../player/playerUtils";
+import { getCharacter, isABCLPlayer, replace_template, SendABCLAction } from "../player/playerUtils";
 
 const diaperPourRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-pour", undefined, player.MemberNumber);
@@ -13,7 +13,7 @@ export const diaperPourFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfMessage = "%NAME% pours water in %POSSESSIVE% diaper.";
   const otherMessage = "%OPP_NAME% pours water in %NAME%'s diaper.";
-  SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
+  SendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
   abclPlayer.stats.WetnessValue += 500;
 
   CharacterSetFacialExpression(Player, "Blush", "Low", 8);

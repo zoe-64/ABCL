@@ -1,4 +1,3 @@
-import { debounce, throttle } from "lodash-es";
 import { ABCLdata } from "../../constants";
 import { abclPlayer, updatePlayerClothes } from "./player";
 
@@ -171,26 +170,16 @@ export const mentalRegressionBonus = () => {
   return Math.min(matches.length * 0.25, 1);
 };
 export const mentalRegressionOvertime = () => {
-  let modifier = -0.5 + mentalRegressionBonus();
+  let modifier = mentalRegressionBonus();
   if (isWearingBabyClothes()) modifier += 1;
-  if (isDiaperDirty()) modifier += 0.25;
-  if (isLeaking()) modifier += 0.5;
-  modifier = Math.max(-1, Math.min(modifier, 1));
+  if (isDiaperDirty()) modifier += 1;
+  if (isLeaking()) modifier += 1;
 
+  const mentalRegressionGoal = modifier / 4;
   const MR = abclPlayer.stats.MentalRegression;
-  let denominator;
-  if (modifier > 0) {
-    // Slow down progression as MR approaches 100%
-    denominator = 1 + Math.pow(15 * MR, 2);
-  } else if (modifier < 0) {
-    // Slow down regression as MR approaches 0%
-    denominator = 1 + Math.pow(15 * (1 - MR), 2);
-  } else {
-    return 0; // No change if modifier is 0
-  }
 
-  const scalingFactor = 0.1;
-  return (modifier * 5 * scalingFactor) / denominator;
+  const speed = 0.005 * abclPlayer.stats.MentalRegressionModifier;
+  return MR < mentalRegressionGoal ? speed : -speed;
 };
 
 export const incontinenceOnAccident = (incontinence: number) => {
@@ -209,10 +198,27 @@ export const incontinenceOnAccident = (incontinence: number) => {
 };
 
 export const mentalRegressionOnAccident = () => {
-  const modifier = 1 + mentalRegressionBonus();
+  const modifier = 1 + mentalRegressionBonus() * abclPlayer.stats.MentalRegressionModifier;
   if (abclPlayer.stats.MentalRegression < 0.25) return modifier / 500;
   if (0.25 > abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 0.5 && isDiaperDirty()) return modifier / 500;
   if (0.5 > abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 0.75 && isLeaking()) return modifier / 1000;
   if (0.75 > abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 1 && isLeaking()) return modifier / 1500;
   return 0;
+};
+
+export const getDiaperVerb = (player: Character) => {
+  if (!hasDiaper(player)) return "";
+  const size = getPlayerDiaperSize(player);
+
+  const messy = player.ABCL!.Stats.Soiliness.value / size > 0.5;
+  const wet = player.ABCL!.Stats.Wetness.value / size > 0.5;
+  const soggy = player.ABCL!.Stats.Wetness.value / size > 0.8;
+  const stinky = player.ABCL!.Stats.Soiliness.value / size > 0.8;
+
+  if (soggy && stinky) return "soggy and stinky";
+  if (stinky) return "stinky";
+  if (soggy) return "soggy";
+  if (wet) return "wet";
+  if (messy) return "messy";
+  return "dry";
 };

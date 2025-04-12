@@ -2,12 +2,12 @@ import { CombinedAction, DiaperSettingValues } from "../../types/types";
 import { sendDataToAction } from "../hooks";
 import { hasDiaper, isDiaperLocked, updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, getCharacterName, isABCLPlayer, replace_template, SendAction, targetInputExtractor } from "../player/playerUtils";
+import { getCharacter, getCharacterName, isABCLPlayer, replace_template, SendABCLAction, targetInputExtractor } from "../player/playerUtils";
 import { ABCLYesNoPrompt } from "../player/ui";
 import { sendChatLocal } from "../utils";
 
-const changeDiaperRequest = (player: Character) => {
-  if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("changeDiaper-pending", undefined, player.MemberNumber);
+export const changeDiaperRequest = (player: Character, force?: boolean) => {
+  if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("changeDiaper-pending", { force }, player.MemberNumber);
 
   changeDiaperFunction(player);
 };
@@ -15,7 +15,7 @@ export const changeDiaperFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfMessage = "%NAME% changes %POSSESSIVE% diaper.";
   const otherMessage = "%OPP_NAME% changes %NAME%'s diaper.";
-  SendAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "changeDiaper", player);
+  SendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "changeDiaper", player);
 
   abclPlayer.stats.WetnessValue = 0;
   abclPlayer.stats.SoilinessValue = 0;
@@ -25,7 +25,7 @@ export const changeDiaperFunction = (player: Character) => {
 export type changeDiaperListeners = {
   "changeDiaper-accepted": undefined;
   "changeDiaper-rejected": undefined;
-  "changeDiaper-pending": undefined;
+  "changeDiaper-pending": { force?: boolean };
 };
 
 export const changeDiaper: CombinedAction = {
@@ -51,7 +51,8 @@ export const changeDiaper: CombinedAction = {
   listeners: {
     "changeDiaper-accepted": ({ Sender }) => sendChatLocal(`${getCharacterName(Sender)} accepted your change diaper request.`),
     "changeDiaper-rejected": ({ Sender }) => sendChatLocal(`${getCharacterName(Sender)} rejected your change diaper request.`),
-    "changeDiaper-pending": ({ Sender }) => {
+    "changeDiaper-pending": ({ Sender }, { force }) => {
+      if (force) return changeDiaperFunction(getCharacter(Sender!) ?? Player);
       switch (Player.ABCL.Settings.OnDiaperChange) {
         case DiaperSettingValues.Ask:
           new ABCLYesNoPrompt(
