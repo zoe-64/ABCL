@@ -6,8 +6,8 @@ import { getCharacter, getCharacterName, isABCLPlayer, replace_template, SendABC
 import { ABCLYesNoPrompt } from "../player/ui";
 import { sendChatLocal } from "../utils";
 
-const changeDiaperRequest = (player: Character) => {
-  if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("changeDiaper-pending", undefined, player.MemberNumber);
+export const changeDiaperRequest = (player: Character, force?: boolean) => {
+  if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("changeDiaper-pending", { force }, player.MemberNumber);
 
   changeDiaperFunction(player);
 };
@@ -25,7 +25,7 @@ export const changeDiaperFunction = (player: Character) => {
 export type changeDiaperListeners = {
   "changeDiaper-accepted": undefined;
   "changeDiaper-rejected": undefined;
-  "changeDiaper-pending": undefined;
+  "changeDiaper-pending": { force?: boolean };
 };
 
 export const changeDiaper: CombinedAction = {
@@ -51,7 +51,8 @@ export const changeDiaper: CombinedAction = {
   listeners: {
     "changeDiaper-accepted": ({ Sender }) => sendChatLocal(`${getCharacterName(Sender)} accepted your change diaper request.`),
     "changeDiaper-rejected": ({ Sender }) => sendChatLocal(`${getCharacterName(Sender)} rejected your change diaper request.`),
-    "changeDiaper-pending": ({ Sender }) => {
+    "changeDiaper-pending": ({ Sender }, { force }) => {
+      if (force) return changeDiaperFunction(getCharacter(Sender!) ?? Player);
       switch (Player.ABCL.Settings.OnDiaperChange) {
         case DiaperSettingValues.Ask:
           new ABCLYesNoPrompt(

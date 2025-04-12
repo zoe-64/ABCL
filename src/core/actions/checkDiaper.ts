@@ -4,7 +4,7 @@ import { isABCLPlayer, replace_template, SendABCLAction, targetInputExtractor } 
 import { abclStatsWindow, resizeElements } from "../player/ui";
 import { getElement, sendChatLocal } from "../utils";
 
-const diaperCheckFunction = (player: Character) => {
+export const diaperCheckFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfDiaperMessage = "%NAME% checks %POSSESSIVE% diaper.";
   const otherDiaperMessage = "%NAME% checks %OPP_NAME%'s diaper.";

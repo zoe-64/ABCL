@@ -28,11 +28,12 @@ export const abclPlayer = {
   onAccident: () => {
     abclPlayer.stats.MentalRegression += mentalRegressionOnAccident() ?? 0;
   },
+  /** once per minute */
   update: () => {
     if (Player.ABCL.Settings.PauseStats) return;
     bowelThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player[modIdentifier].Settings.PoopMetabolism]);
     bladderThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism]);
-    // once per minute
+
     if (regressionThrottler.check()) {
       abclPlayer.stats.MentalRegression += (mentalRegressionOvertime() ?? 0) * 5;
     }

@@ -1,4 +1,4 @@
-import { ABCLActivity, CombinedAction, HookListener } from "../types/types";
+import { ABCLActivity, CombinedAction } from "../types/types";
 import { changeDiaper } from "./actions/changeDiaper";
 import { checkDiaper } from "./actions/checkDiaper";
 import { diaperFaceRub } from "./actions/diaperFaceRub";
