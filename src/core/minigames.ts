@@ -1,11 +1,12 @@
 // from LSCG - https://github.com/littlesera/LSCG/blob/8072c4d636a66bf12473823722afbc82fda8f98e/src/MiniGames/minigames.ts#L3C1-L3C87
 
+import { HookManager } from "@sugarch/bc-mod-hook-manager";
 import { incontinenceOnAccident } from "./player/diaper";
 import { abclPlayer } from "./player/player";
-import { bcModSDK, sendChatLocal } from "./utils";
+import { sendChatLocal } from "./utils";
 
 // for minigame text loading
-bcModSDK.hookFunction("TextLoad", 5, (args, next) => {
+HookManager.hookFunction("TextLoad", 5, (args, next) => {
   if (CurrentScreen === "WetMinigame" || CurrentScreen === "MessMinigame") return;
   else return next(args);
 });

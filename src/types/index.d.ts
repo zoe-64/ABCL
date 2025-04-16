@@ -88,3 +88,7 @@ interface PlayerCharacter {
 interface Character {
   [modIdentifier: string]: ModStorageModel | undefined;
 }
+
+declare interface ModuleScreens {
+  shushTs: "WetMinigame" | "MessMinigame";
+}
