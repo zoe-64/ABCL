@@ -23,7 +23,6 @@ const assetDefintion: CustomAssetDefinition = {
     Priority: 51,
     HeightRatioProportion: 0,
   },
-  // @ts-expect-error
   ParentGroup: {},
   Layer: [
     {

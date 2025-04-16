@@ -1,3 +1,4 @@
+import { HookManager } from "@sugarch/bc-mod-hook-manager";
 import { ABCLActivity, CombinedAction } from "../types/types";
 import { changeDiaper } from "./actions/changeDiaper";
 import { checkDiaper } from "./actions/checkDiaper";
@@ -20,7 +21,7 @@ import { toPoop } from "./actions/toPoop";
 import { usePotty } from "./actions/usePotty";
 import { useToilet } from "./actions/useToilet";
 import { wipePuddle } from "./actions/wipePuddle";
-import { bcModSDK, waitForElement } from "./utils";
+import { waitForElement } from "./utils";
 
 class Activity {
   constructor(
@@ -65,13 +66,13 @@ class Activity {
 }
 
 export const initActions = (): void => {
-  bcModSDK.hookFunction("DialogMenuMapping.activities.GetClickStatus", 1, (args, next) => {
+  HookManager.hookFunction("DialogMenuMapping.activities.GetClickStatus", 1, (args, next) => {
     const [_C, _clickedObj, _equippedItem] = args;
     if (!_clickedObj) return null;
     return next(args);
   });
 
-  bcModSDK.hookFunction("DialogChangeMode", 1, async (args, next) => {
+  HookManager.hookFunction("DialogChangeMode", 1, async (args, next) => {
     const [_mode] = args;
     next(args);
     if (_mode !== "activities") return;

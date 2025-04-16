@@ -1,14 +1,15 @@
-import bcModSdk from "bondage-club-mod-sdk";
 import { PluginServerChatRoomMessage, ListenerTypeMap, HookListener } from "../types/types";
 import { logger } from "./logger";
 import { isDiaper, updateDiaperColor } from "./player/diaper";
 import { isABCLPlayer } from "./player/playerUtils";
-import { bcModSDK, waitFor } from "./utils";
 import { overlay } from "./player/ui";
 import { ModIdentifier, ModVersion } from "../types/definitions";
 import { actions } from "./actionLoader";
 import { abclPlayer } from "./player/player";
 import { ACCIDENTS_ON_ACTIVITIES } from "../constants";
+import { HookManager } from "@sugarch/bc-mod-hook-manager";
+import { waitFor } from "./utils";
+import bcModSdk from "bondage-club-mod-sdk";
 export const sendDataToAction = (type: string, data?: any, target?: number) => {
   const ChatRoomMessage: PluginServerChatRoomMessage = {
     Type: "Hidden",
@@ -89,7 +90,7 @@ const receivePacket = (receivedMessage: PluginServerChatRoomMessage) => {
 
 const initHooks = async () => {
   await waitFor(() => ServerSocket && ServerIsConnected);
-  bcModSDK.hookFunction("DrawCharacter", 1, (args, next) => {
+  HookManager.hookFunction("DrawCharacter", 1, (args, next) => {
     const [C, CharX, CharY, Zoom] = args;
 
     if (isABCLPlayer(C) && C.ABCL!.Stats.PuddleSize.value > 0) {
@@ -107,12 +108,12 @@ const initHooks = async () => {
 
     return next(args);
   });
-  bcModSDK.hookFunction("ChatRoomSync", 1, (args, next) => {
+  HookManager.hookFunction("ChatRoomSync", 1, (args, next) => {
     sendUpdateMyData(); // Tell everyone else to update their copy of our data, when we join a room.
     return next(args);
   });
 
-  bcModSDK.hookFunction("ChatRoomMessage", 1, (args, next) => {
+  HookManager.hookFunction("ChatRoomMessage", 1, (args, next) => {
     if (args[0].Content === "ServerEnter" && args[0].Sender === Player.MemberNumber) {
       // Announce (via an init packet) that we're ready to receive data models.
       sendRequestOtherDataPacket();
@@ -122,7 +123,7 @@ const initHooks = async () => {
     receivePacket(args[0] as PluginServerChatRoomMessage);
     return next(args);
   });
-  bcModSDK.hookFunction("CharacterAppearanceSetItem", 1, (args, next) => {
+  HookManager.hookFunction("CharacterAppearanceSetItem", 1, (args, next) => {
     let [_character, _slot, _asset] = args;
     const _result = next(args);
     if (_slot === "ItemPelvis" && _asset) {
@@ -130,7 +131,7 @@ const initHooks = async () => {
     }
     return _result;
   });
-  bcModSDK.hookFunction("ActivityRun", 1, (args, next) => {
+  HookManager.hookFunction("ActivityRun", 1, (args, next) => {
     const result = next(args);
     const [_actor, acted, _targetGroup, ItemActivity, ..._rest] = args;
     const activity = ItemActivity?.Activity;
@@ -153,7 +154,7 @@ const initHooks = async () => {
     }
     return result;
   });
-  bcModSDK.hookFunction("PreferenceSubscreenChatClick", 1, (args, next) => {
+  HookManager.hookFunction("PreferenceSubscreenChatClick", 1, (args, next) => {
     if (MouseIn(1815, 75, 90, 90)) {
       const theme = Player.ChatSettings?.ColorTheme ?? "Light";
       if (theme.startsWith("Light") && !!overlay && !overlay.classList.contains("sl-theme-light")) {
@@ -177,10 +178,10 @@ export default initHooks;
 
 const reportWebhookURL = `https://discord.com/api/webhooks/1340000414506029162/aqt7qruFnzDMM5BN_kLtv9gCcallIF-JeRVYl9k23uSIlxrHRvcFMy5mtPUPGDpWZhHX`;
 const lastDetectedErrors: string[] = [];
-
+const ignoredIssues = ["Refusing to load mod"];
 window.addEventListener("error", async e => {
   console.error(e.filename);
-  if (!e.filename.toLowerCase().includes("abcl")) return;
+  if (!e.filename.toLowerCase().includes("abcl") || ignoredIssues.some(k => e.message.toLowerCase().includes(k.toLowerCase()))) return;
   const detectedError = `${e.message} at ${e.filename} ${e.lineno}`;
   if (lastDetectedErrors.includes(detectedError)) return;
   lastDetectedErrors.push(detectedError);
