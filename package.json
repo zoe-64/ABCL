@@ -21,9 +21,10 @@
   "license": "MIT",
   "dependencies": {
     "@preact/signals": "^2.0.1",
-    "@sugarch/bc-asset-manager": "^0.5.3",
-    "@sugarch/bc-event-handler": "^0.5.4",
-    "@sugarch/bc-mod-hook-manager": "^0.2.13",
+    "@sugarch/bc-activity-manager": "^0.4.4",
+    "@sugarch/bc-asset-manager": "^0.5.5",
+    "@sugarch/bc-event-handler": "^0.6.1",
+    "@sugarch/bc-mod-hook-manager": "^0.2.14",
     "@types/lodash-es": "^4.17.12",
     "bondage-club-mod-sdk": "^1.2.0",
     "eventemitter3": "^5.0.1",
