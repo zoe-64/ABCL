@@ -28,7 +28,7 @@ const bladderThrottler = new Throttler(120 * 60 * 1000);
 const regressionThrottler = new Throttler(5 * 60 * 1000);
 export const abclPlayer = {
   onAccident: () => {
-    abclPlayer.stats.MentalRegression += mentalRegressionOnAccident() ?? 0;
+    abclPlayer.stats.MentalRegression += mentalRegressionOnAccident();
   },
   /** once per minute */
   update: () => {
@@ -37,7 +37,7 @@ export const abclPlayer = {
     bladderThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism]);
 
     if (regressionThrottler.check()) {
-      abclPlayer.stats.MentalRegression += (mentalRegressionOvertime() ?? 0) * 5;
+      abclPlayer.stats.MentalRegression += mentalRegressionOvertime();
     }
     if (bladderThrottler.check() && Player[modIdentifier].Settings.PoopMetabolism !== "Disabled") {
       abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism];

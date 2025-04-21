@@ -176,13 +176,14 @@ export const mentalRegressionOvertime = () => {
   if (isLeaking()) modifier += 1;
 
   const mentalRegressionGoal = modifier / 4;
+  const minutes = 5;
+  const speed = 0.0025;
+  const regression = abclPlayer.stats.MentalRegression;
 
-  const speed = 0.005 * abclPlayer.stats.MentalRegressionModifier;
   return abclPlayer.stats.MentalRegression < mentalRegressionGoal
-    ? speed * modifier
-    : -speed * (((3 / Math.max(0.01, abclPlayer.stats.MentalRegressionModifier)) * 100) / 25);
+    ? Math.round(speed * modifier * (1 + regression / 3) * minutes * 1 * 100) / 100
+    : Math.round((-speed / Math.max(1, modifier) / (1 + regression)) * 3 * minutes * 1 * 100) / 100;
 };
-
 export const incontinenceOnAccident = (incontinence: number) => {
   const stages = [
     { increase: 0.01, start: 0, end: 0.25 },
