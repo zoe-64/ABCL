@@ -8,58 +8,70 @@ export function AboutPage({ setPage }: { setPage: (page: string) => void }): h.J
       <div>
         <h1>ABCL {modVersion}</h1>
         <p>
-          An addon for <a href="https://www.bondageprojects.com/club_game/">Bondage Club</a> that adds ABDL features to the game.
+          An addon for{" "}
+          <a target="_blank" href="https://www.bondageprojects.com/club_game/">
+            Bondage Club
+          </a>{" "}
+          that adds ABDL features to the game.
         </p>
         <p>
-          Made by <a href="https://github.com/zoe-64">Zoe</a> and <a href="https://github.com/kjbro">En (mama)</a>.
+          Made by{" "}
+          <a target="_blank" href="https://github.com/zoe-64">
+            Zoe
+          </a>{" "}
+          and{" "}
+          <a target="_blank" href="https://github.com/kjbro">
+            En (mama)
+          </a>
+          .
         </p>
         <p>
           Thanks to
           <div className="ABCL-thanks-list">
             <p>
-              <a>
+              <a target="_blank">
                 <span>Firefly</span>
               </a>{" "}
               - <span data-reason>for the original idea</span>
             </p>
             <p>
-              <a href="https://github.com/mochamaple">
+              <a target="_blank" href="https://github.com/mochamaple">
                 <span data-name></span>Maple
               </a>{" "}
               - <span data-reason>for the mod plugin template</span>
             </p>
             <p>
-              <a href="https://github.com/FurryZoi">
+              <a target="_blank" href="https://github.com/FurryZoi">
                 <span data-name></span>Zoi
               </a>{" "}
               - <span data-reason>for helping get themed to work</span>
             </p>
             <p>
-              <a href="https://github.com/minimar">
+              <a target="_blank" href="https://github.com/minimar">
                 <span data-name></span>minimar
               </a>{" "}
               - <span data-reason>for helping with typos</span>
             </p>
             <p>
-              <a href="https://github.com/dDeepLb">
+              <a target="_blank" href="https://github.com/dDeepLb">
                 <span data-name></span>Deep (papa)
               </a>{" "}
               - <span data-reason>for helping with code review and testing</span>
             </p>
             <p>
-              <a href="https://github.com/dynilath">
+              <a target="_blank" href="https://github.com/dynilath">
                 <span data-name></span>Da'Inihlus
               </a>{" "}
               - <span data-reason>for mod items architecture</span>
             </p>
             <p>
-              <a href="https://github.com/tetris245">
+              <a target="_blank" href="https://github.com/tetris245">
                 <span data-name></span>Nemesea
               </a>{" "}
               - <span data-reason>for getting me started with modding in bc</span>
             </p>
             <p>
-              <a href="https://github.com/littlesera">
+              <a target="_blank" href="https://github.com/littlesera">
                 <span data-name></span>Sera
               </a>{" "}
               - <span data-reason>for helping during the development process</span>
@@ -67,7 +79,11 @@ export function AboutPage({ setPage }: { setPage: (page: string) => void }): h.J
           </div>
         </p>
         <p>
-          Source code available on <a href="https://github.com/zoe-64/ABCL">GitHub</a>.
+          Source code available on{" "}
+          <a target="_blank" href="https://github.com/zoe-64/ABCL">
+            GitHub
+          </a>
+          .
         </p>
       </div>
     </div>
