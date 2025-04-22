@@ -4,7 +4,6 @@ import { loadOrGenerateData } from "./core/settings";
 import { initSettingsScreen } from "./screens/Settings";
 import { initMinigames } from "./core/minigames";
 import { abclPlayer } from "./core/player/player";
-import "./core/global";
 import { initOverlay } from "./core/player/ui";
 import { initActions } from "./core/actionLoader";
 import { loopInterval } from "./constants";

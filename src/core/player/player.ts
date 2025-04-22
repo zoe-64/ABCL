@@ -39,7 +39,7 @@ export const abclPlayer = {
     if (regressionThrottler.check()) {
       abclPlayer.stats.MentalRegression += mentalRegressionOvertime();
     }
-    if (bladderThrottler.check() && Player[modIdentifier].Settings.PoopMetabolism !== "Disabled") {
+    if (bladderThrottler.check() && Player[modIdentifier].Settings.PeeMetabolism !== "Disabled") {
       abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism];
       abclPlayer.attemptWetting();
     }
@@ -154,7 +154,7 @@ export const abclPlayer = {
 
     if (!incontinenceCheck.check()) return;
     if (window?.LITTLISH_CLUB && window.LITTLISH_CLUB.isRuleActive(Player, RuleId.PREVENT_RESISTING_URGES)) return new WetMinigame().End(false);
-    MiniGameStart("WetMinigame" as ModuleScreens["MiniGame"], 30 * chance, "noOp");
+    MiniGameStart("WetMinigame" as ModuleScreens["MiniGame"], 30 * chance, "CommonNoop");
   },
   attemptSoiling: () => {
     const limit = incontinenceLimitFormula(abclPlayer.stats.Incontinence);
@@ -164,7 +164,7 @@ export const abclPlayer = {
 
     if (!incontinenceCheck.check()) return;
     if (window?.LITTLISH_CLUB && window.LITTLISH_CLUB.isRuleActive(Player, RuleId.PREVENT_RESISTING_URGES)) return new MessMinigame().End(false);
-    MiniGameStart("MessMinigame" as ModuleScreens["MiniGame"], 30 * chance, "noOp");
+    MiniGameStart("MessMinigame" as ModuleScreens["MiniGame"], 30 * chance, "CommonNoop");
   },
   wet: (intentional: boolean = false) => {
     const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;

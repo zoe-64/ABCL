@@ -3,9 +3,28 @@ import { checkDiaper, diaperCheckFunction } from "./actions/checkDiaper";
 import { usePotty, usePottyFunction } from "./actions/usePotty";
 import { useToilet, useToiletFunction } from "./actions/useToilet";
 import { sendDataToAction, sendUpdateMyData } from "./hooks";
+import {
+  getDiaperVerb,
+  getPlayerDiaper,
+  getPlayerDiaperSize,
+  hasDiaper,
+  incontinenceChanceFormula,
+  incontinenceLimitFormula,
+  incontinenceOnAccident,
+  isDiaper,
+  isDiaperDirty,
+  isDiaperLocked,
+  isLeaking,
+  mentalRegressionBonus,
+  mentalRegressionOnAccident,
+  mentalRegressionOvertime,
+  setDiaperColor,
+  updateDiaperColor,
+} from "./player/diaper";
 import { abclPlayer } from "./player/player";
-import { isABCLPlayer } from "./player/playerUtils";
+import { getCharacter, isABCLPlayer } from "./player/playerUtils";
 import { overlay } from "./player/ui";
+import { clearData, updateData } from "./settings";
 
 export function initApi(): void {
   (<any>window)[`${modIdentifier}`] = {
@@ -60,6 +79,28 @@ export function initApi(): void {
     raw: {
       sendUpdateMyData,
       sendDataToAction,
+      mentalRegressionBonus,
+      mentalRegressionOvertime,
+      mentalRegressionOnAccident,
+      incontinenceOnAccident,
+      incontinenceChanceFormula,
+      incontinenceLimitFormula,
+      updateDiaperColor,
+      getPlayerDiaperSize,
+      getPlayerDiaper,
+      getDiaperVerb,
+      setDiaperColor,
+      isDiaperLocked,
+      isDiaperDirty,
+      isDiaper,
+      isABCLPlayer,
+      isLeaking,
+      hasDiaper,
+      utility: {
+        getCharacter,
+      },
+      clearData,
+      updateData,
     },
   };
 }
