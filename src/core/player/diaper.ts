@@ -181,8 +181,8 @@ export const mentalRegressionOvertime = () => {
   const regression = abclPlayer.stats.MentalRegression;
 
   return abclPlayer.stats.MentalRegression < mentalRegressionGoal
-    ? Math.round(speed * modifier * (1 + regression / 3) * minutes * 1 * 100) / 100
-    : Math.round((-speed / Math.max(1, modifier) / (1 + regression)) * 3 * minutes * 1 * 100) / 100;
+    ? Math.round(speed * modifier * (1 + regression / 3) * minutes * abclPlayer.stats.MentalRegressionModifier * 100) / 100
+    : Math.round((-speed / Math.max(1, modifier) / (1 + regression)) * 3 * minutes * abclPlayer.stats.MentalRegressionModifier * 100) / 100;
 };
 export const incontinenceOnAccident = (incontinence: number) => {
   const stages = [
