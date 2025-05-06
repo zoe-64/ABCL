@@ -9,7 +9,6 @@ const json = require("@rollup/plugin-json");
 const postcss = require("rollup-plugin-postcss");
 const alias = require("@rollup/plugin-alias");
 
-const path = require("path");
 const pkg = require("./package.json");
 const deployFileName = "abcl.js";
 
@@ -49,20 +48,19 @@ const default_config = (debug, destDir) => ({
   },
   treeshake: true,
 });
-
 const plugins_debug = (deploySite, destDir) => [
   copy({
     targets: [
-      {
-        src: `loader.user.js`,
+      /\d+.\d+.\d+/.test(loaderFileInfo.version) && {
+        src: `./build-files/loader.user.js`,
         dest: destDir,
         transform: contents =>
           contents
             .toString()
-            .replace("__DEPLOY_SITE__", `${deploySite}/${deployFileName}`)
-            .replace("__FAVICON__", `${deploySite}/assets/favicon.ico`)
-            .replace("__DESCRIPTION__", loaderFileInfo.description)
-            .replace(
+            .replaceAll("__DEPLOY_SITE__", `${deploySite}`)
+            .replaceAll("__VERSION__", loaderFileInfo.version)
+            .replaceAll("__DESCRIPTION__", loaderFileInfo.description)
+            .replaceAll(
               "__NAME__",
               deploySite.indexOf("localhost") > -1
                 ? loaderFileInfo.name + " (Local)"
@@ -70,9 +68,9 @@ const plugins_debug = (deploySite, destDir) => [
                 ? loaderFileInfo.name + " (Dev)"
                 : loaderFileInfo.name,
             )
-            .replace("__AUTHOR__", loaderFileInfo.author)
-            .replace("__LOAD_FLAG__", loadFlag)
-            .replace("__SCRIPT_ID__", scriptId),
+            .replaceAll("__AUTHOR__", loaderFileInfo.author)
+            .replaceAll("__LOAD_FLAG__", loadFlag)
+            .replaceAll("__SCRIPT_ID__", scriptId),
       },
       {
         src: `src/assets/*`,
@@ -118,6 +116,7 @@ const plugins = (deploySite, destDir) => [...plugins_debug(deploySite, destDir),
 
 module.exports = cliArgs => {
   const version = cliArgs.configVersion;
+  loaderFileInfo.version = version;
   const destDir = `${process.env.INIT_CWD}/versions/${version}`;
   console.log(`Version ${version} is set to be published`);
   if (!version) throw new Error("No version specified");

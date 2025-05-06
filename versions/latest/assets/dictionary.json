@@ -9,7 +9,6 @@
       "Adult Baby Harness",
       "Tutu",
       "Frilled Bikni",
-      "Cosplay Girl Suit",
       "Padded Mittens",
       "Paw Mittens",
       "Short Smooth Leather Mittens",
@@ -17,7 +16,8 @@
       "Crib",
       "Fox Plush",
       "Bunny Plush",
-      "Shark Plush"
+      "Shark Plush",
+      "Little's Highchair"
     ],
     "Pants": ["Long Leggings", "Short Leggings", "Business Trousers", "Latex Pants", "Long Latex Pants", "Ripped Jeans", "Jeans", "Pajama"]
   },
@@ -85,7 +85,7 @@
       "gradients": [1],
       "indicator": [6]
     },
-    "Cutest Diaper": {
+    "Crinkly Diaper": {
       "size": "light_adult",
       "gradients": [4],
       "indicator": [5]
