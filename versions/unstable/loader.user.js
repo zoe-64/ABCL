@@ -8,7 +8,7 @@
 // @match https://*.bondage-europe.com/R*/*
 // @match https://*.bondageprojects.com/R*/*
 // @match http://localhost:*/*
-// @icon  https://zoe-64.github.io/ABCL/versions/beta/assets/favicon.ico
+// @icon  https://zoe-64.github.io/ABCL/versions/unstable/assets/favicon.ico
 // @grant none
 // @run-at document-end
 // ==/UserScript==
