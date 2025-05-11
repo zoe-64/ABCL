@@ -21,7 +21,7 @@ import { RuleId } from "src/types/definitions";
 
 export const updatePlayerClothes = () => {
   CharacterRefresh(Player, true);
-  ChatRoomCharacterUpdate(Player);
+  //ChatRoomCharacterUpdate(Player);
 };
 const bowelThrottler = new Throttler(120 * 60 * 1000);
 const bladderThrottler = new Throttler(120 * 60 * 1000);
