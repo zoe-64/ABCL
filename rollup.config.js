@@ -51,7 +51,12 @@ const default_config = (debug, destDir) => ({
 const plugins_debug = (deploySite, destDir) => [
   copy({
     targets: [
-      /\d+.\d+.\d+/.test(loaderFileInfo.version) && {
+      {
+        src: `src/assets/*`,
+        dest: `${destDir}/assets`,
+      },
+    ].push(
+      (/\d+.\d+.\d+/.test(loaderFileInfo.version) && {
         src: `./build-files/loader.user.js`,
         dest: destDir,
         transform: contents =>
@@ -71,12 +76,9 @@ const plugins_debug = (deploySite, destDir) => [
             .replaceAll("__AUTHOR__", loaderFileInfo.author)
             .replaceAll("__LOAD_FLAG__", loadFlag)
             .replaceAll("__SCRIPT_ID__", scriptId),
-      },
-      {
-        src: `src/assets/*`,
-        dest: `${destDir}/assets`,
-      },
-    ],
+      }) ||
+        undefined,
+    ),
   }),
   replace({
     modName: modInfo.name,

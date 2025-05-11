@@ -65,7 +65,7 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
   if (Player[modIdentifier].Settings.DisableDiaperStains) return;
   const item = InventoryGet(player, slot);
   if (item && isDiaper(item)) {
-    const color = !item.Color || typeof item.Color === "string" ? (item.Asset.DefaultColor as string[]) : (item.Color as string[]);
+    const color = !item.Color || typeof item.Color === "string" ? [...item.Asset.DefaultColor] : [...item.Color];
     const diaper = ABCLdata.Diapers[item.Asset.Description as keyof typeof ABCLdata.Diapers];
     const dirtiness = Math.min(abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue / getPlayerDiaperSize(), 1);
     if ("indicator" in diaper) {
@@ -86,7 +86,6 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
         color[index] = primaryColor;
       }
     }
-    console.log(color);
     item.Color = color;
   }
 };
@@ -103,7 +102,7 @@ export const updateDiaperColor = () => {
   // if wet is 1 and mess is 0 then it should be 0
   const mixedLevel = Math.max(Math.min((messLevel + (1 - wetLevel)) / 2, 2), 0);
   const primaryColor = averageColor(messColor, wetColor, mixedLevel);
-  console.log(mixedLevel, primaryColor);
+
   setDiaperColor("ItemPelvis", primaryColor, Player);
   setDiaperColor("Panties", primaryColor, Player);
   updatePlayerClothes();
