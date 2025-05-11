@@ -55,7 +55,6 @@ const plugins_debug = (deploySite, destDir) => [
         src: `src/assets/*`,
         dest: `${destDir}/assets`,
       },
-    ].push(
       (/\d+.\d+.\d+/.test(loaderFileInfo.version) && {
         src: `./build-files/loader.user.js`,
         dest: destDir,
@@ -76,10 +75,10 @@ const plugins_debug = (deploySite, destDir) => [
             .replaceAll("__AUTHOR__", loaderFileInfo.author)
             .replaceAll("__LOAD_FLAG__", loadFlag)
             .replaceAll("__SCRIPT_ID__", scriptId),
-      }) ||
-        undefined,
-    ),
+      }) || { src: `./directory-does-not-exist`, dest: destDir },
+    ],
   }),
+
   replace({
     modName: modInfo.name,
     modVersion: modInfo.version,
