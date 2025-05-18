@@ -89,6 +89,14 @@
       "size": "light_adult",
       "gradients": [4],
       "indicator": [5]
+    },
+    "Latex Chastity Diaper": {
+      "color": [0],
+      "size": "moderate_adult"
+    },
+    "Latex Diaper": {
+      "color": [0],
+      "size": "moderate_adult"
     }
   }
 }
