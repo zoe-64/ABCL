@@ -17,17 +17,20 @@ export const isDiaperDirty = () => {
   return abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue >= diaperSize / 2;
 };
 export const isDiaper = (item: Item): boolean => {
-  return item.Asset.Description.toLowerCase().includes("diaper") && item.Asset.Description in ABCLdata.Diapers;
+  return item.Asset.DynamicGroupName + item.Asset.Name in ABCLdata.Diapers;
 };
 export function hasDiaper(player: Character = Player): boolean {
   if (!player) return false;
   const pelvisItem = InventoryGet(player, "ItemPelvis");
   const panties = InventoryGet(player, "Panties");
-  return Boolean((pelvisItem && isDiaper(pelvisItem)) || (panties && isDiaper(panties)));
+  // @ts-expect-error Echo slot
+  const panties2 = InventoryGet(player, "Panties_笨笨蛋Luzi");
+
+  return Boolean((pelvisItem && isDiaper(pelvisItem)) || (panties && isDiaper(panties)) || (panties2 && isDiaper(panties2)));
 }
 export const isWearingBabyClothes = () => {
   return Player.Appearance.some(clothing => {
-    return ABCLdata.ItemDefinitions.BabyItems.includes(clothing.Asset.Description);
+    return ABCLdata.ItemDefinitions.BabyItems.includes(clothing.Asset.DynamicGroupName + clothing.Asset.Name);
   });
 };
 // Color
@@ -66,7 +69,7 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
   const item = InventoryGet(player, slot);
   if (item && isDiaper(item)) {
     const color = !item.Color || typeof item.Color === "string" ? [...item.Asset.DefaultColor] : [...item.Color];
-    const diaper = ABCLdata.Diapers[item.Asset.Description as keyof typeof ABCLdata.Diapers];
+    const diaper = ABCLdata.Diapers[(item.Asset.DynamicGroupName + item.Asset.Name) as keyof typeof ABCLdata.Diapers];
     const dirtiness = Math.min(abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue / getPlayerDiaperSize(), 1);
     if ("indicator" in diaper) {
       for (const index of diaper.indicator) {
@@ -81,11 +84,11 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
         }
       }
     }
-    if ("color" in diaper) {
-      for (const index of diaper.color) {
-        color[index] = primaryColor;
-      }
-    }
+    //if ("color" in diaper) {
+    //  for (const index of diaper.color) {
+    //    color[index] = primaryColor;
+    //  }
+    //} no longer used
     item.Color = color;
   }
 };
@@ -105,6 +108,8 @@ export const updateDiaperColor = () => {
 
   setDiaperColor("ItemPelvis", primaryColor, Player);
   setDiaperColor("Panties", primaryColor, Player);
+  // @ts-expect-error Echo slot
+  setDiaperColor("Panties_笨笨蛋Luzi", primaryColor, Player);
   updatePlayerClothes();
 };
 
@@ -112,6 +117,9 @@ export const updateDiaperColor = () => {
 export function getPlayerDiaperSize(player: Character = Player): number {
   const pelvisItem = InventoryGet(player, "ItemPelvis");
   const panties = InventoryGet(player, "Panties");
+  // @ts-expect-error Echo slot
+  const panties2 = InventoryGet(player, "Panties_笨笨蛋Luzi");
+
   let size = 50;
   if (pelvisItem && isDiaper(pelvisItem)) {
     size += getDiaperSize(pelvisItem);
@@ -119,13 +127,18 @@ export function getPlayerDiaperSize(player: Character = Player): number {
   if (panties && isDiaper(panties)) {
     size += getDiaperSize(panties);
   }
+  if (panties2 && isDiaper(panties2)) {
+    size += getDiaperSize(panties2);
+  }
   return size;
 }
 export function getDiaperSize(diaper: Item): number {
-  if (diaper.Asset.Description === "Poofy Chastity Diaper" && diaper.Property?.TypeRecord?.typed === 1) {
+  if (diaper.Asset.Name === "PoofyDiaper" && diaper.Property?.TypeRecord?.typed === 1) {
     return ABCLdata.DiaperSizeScale.heavy_adult;
   }
-  return ABCLdata.DiaperSizeScale[ABCLdata.Diapers[diaper.Asset.Description as keyof typeof ABCLdata.Diapers].size as keyof typeof ABCLdata.DiaperSizeScale];
+  return ABCLdata.DiaperSizeScale[
+    ABCLdata.Diapers[(diaper.Asset.DynamicGroupName + diaper.Asset.Name) as keyof typeof ABCLdata.Diapers].size as keyof typeof ABCLdata.DiaperSizeScale
+  ];
 }
 
 export const getPlayerDiaper = (): {
@@ -134,15 +147,21 @@ export const getPlayerDiaper = (): {
 } => {
   const pelvisItem = InventoryGet(Player, "ItemPelvis");
   const panties = InventoryGet(Player, "Panties");
-  let diapers: { ItemPelvis: Item | null; Panties: Item | null } = {
+  // @ts-expect-error Echo slot
+  const panties2 = InventoryGet(player, "Panties_笨笨蛋Luzi");
+  let diapers: { ItemPelvis: Item | null; Panties: Item | null; Panties_笨笨蛋Luzi: Item | null } = {
     ItemPelvis: null,
     Panties: null,
+    Panties_笨笨蛋Luzi: null,
   };
   if (pelvisItem && isDiaper(pelvisItem)) {
     diapers["ItemPelvis"] = pelvisItem;
   }
   if (panties && isDiaper(panties)) {
     diapers["Panties"] = panties;
+  }
+  if (panties2 && isDiaper(panties2)) {
+    diapers["Panties_笨笨蛋Luzi"] = panties2;
   }
   return diapers;
 };
@@ -162,10 +181,7 @@ export function incontinenceChanceFormula(incontinence: number, fullness: number
 
 // mental regression
 export const mentalRegressionBonus = () => {
-  const assetDescriptions = Player.Appearance.map(clothing => clothing.Asset.Description);
-  const matches = ABCLdata.ItemDefinitions.BabyItems.concat(["milk", "pacifier", "bib"]).filter(description =>
-    assetDescriptions.some(assetDescription => assetDescription.toLocaleLowerCase().includes(description)),
-  );
+  const matches = Player.Appearance.filter(clothing => clothing.Asset.DynamicGroupName + clothing.Asset.Name in ABCLdata.ItemDefinitions.BabyItems);
   return Math.min(matches.length * 0.25, 1);
 };
 export const mentalRegressionOvertime = () => {

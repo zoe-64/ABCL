@@ -15,6 +15,7 @@ import {
   isDiaperDirty,
   isDiaperLocked,
   isLeaking,
+  isWearingBabyClothes,
   mentalRegressionBonus,
   mentalRegressionOnAccident,
   mentalRegressionOvertime,
@@ -95,6 +96,7 @@ export function initApi(): void {
       isDiaper,
       isABCLPlayer,
       isLeaking,
+      isWearingBabyClothes,
       hasDiaper,
       utility: {
         getCharacter,
