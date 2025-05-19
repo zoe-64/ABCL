@@ -5,7 +5,7 @@ const replace = require("@rollup/plugin-replace");
 const cleanup = require("rollup-plugin-cleanup");
 const copy = require("rollup-plugin-copy");
 const terser = require("@rollup/plugin-terser");
-const json = require("@rollup/plugin-json");
+const jsonlint = require("rollup-plugin-jsonlint");
 const postcss = require("rollup-plugin-postcss");
 const alias = require("@rollup/plugin-alias");
 
@@ -98,7 +98,7 @@ const plugins_debug = (deploySite, destDir) => [
     inlineSources: true,
   }),
   cleanup(),
-  json(),
+  jsonlint({ mode: "cjson" }),
   postcss({
     inject: true,
     minimize: true,

@@ -75,7 +75,7 @@ export const abclPlayer = {
     }
 
     for (const item of Player.Appearance) {
-      if (ABCLdata.ItemDefinitions.Pants.some(pants => pants === item.Asset.Description)) {
+      if (ABCLdata.ItemDefinitions.Pants.some(pants => pants === item.Asset.DynamicGroupName + item.Asset.Name)) {
         const colors = getColor(item.Color || (item.Asset.DefaultColor as ItemColor), item.Asset);
         for (let i = 0; i < colors.length; i++) {
           if (!isColorable(colors[i])) continue;
@@ -112,7 +112,7 @@ export const abclPlayer = {
     }
 
     for (const item of Player.Appearance) {
-      if (ABCLdata.ItemDefinitions.Pants.some(pants => pants === item.Asset.Description)) {
+      if (ABCLdata.ItemDefinitions.Pants.some(pants => pants === item.Asset.DynamicGroupName + item.Asset.Name)) {
         const colors = getColor(item.Color || (item.Asset.DefaultColor as ItemColor), item.Asset);
         for (let i = 0; i < colors.length; i++) {
           if (!isColorable(colors[i])) continue;
