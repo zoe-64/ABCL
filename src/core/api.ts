@@ -22,7 +22,7 @@ import {
   setDiaperColor,
   updateDiaperColor,
 } from "./player/diaper";
-import { abclPlayer } from "./player/player";
+import { abclPlayer, updatePlayerClothes } from "./player/player";
 import { getCharacter, isABCLPlayer } from "./player/playerUtils";
 import { overlay } from "./player/ui";
 import { clearData, updateData } from "./settings";
@@ -78,6 +78,7 @@ export function initApi(): void {
       },
     },
     raw: {
+      updatePlayerClothes,
       sendUpdateMyData,
       sendDataToAction,
       mentalRegressionBonus,
