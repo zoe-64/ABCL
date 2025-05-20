@@ -64,6 +64,11 @@ export const isDiaperLocked = (player: Character = Player): boolean => {
         : !(diaper.Property?.LockMemberNumber === player.MemberNumber || diaper.Property?.LockedBy === "ExclusivePadlock")),
   );
 };
+
+export const getLayerIndexFromColorIndex = (colorIndex: number, asset: Asset) => {
+  return (asset.Layer as AssetLayer[]).findIndex(layer => layer.ColorIndex === colorIndex);
+};
+
 export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, player: Character = Player) => {
   if (Player[modIdentifier].Settings.DisableDiaperStains) return;
   const item = InventoryGet(player, slot);
@@ -78,10 +83,14 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
     }
     if ("gradients" in diaper) {
       for (const index of diaper.gradients) {
-        if (item.Property?.Opacity && typeof item.Property.Opacity === "object") {
-          item.Property.Opacity[index] = dirtiness;
-          color[index] = primaryColor;
+        item.Property ??= {};
+        if (typeof item.Property.Opacity === "number") {
+          item.Property.Opacity = undefined;
         }
+        const layerIndex = getLayerIndexFromColorIndex(index, item.Asset);
+        item.Property.Opacity ??= item.Asset.Layer.map(layer => layer.Opacity);
+        item.Property.Opacity[layerIndex] = dirtiness;
+        color[index] = primaryColor;
       }
     }
     //if ("color" in diaper) {

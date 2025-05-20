@@ -1,5 +1,6 @@
 import { AssetManager, CustomAssetDefinition } from "@sugarch/bc-asset-manager";
 import { HookManager } from "@sugarch/bc-mod-hook-manager";
+import echoOverwirte from "./echoOverwirte";
 const defaultLayer: AssetLayer = {
   AllowColorize: true,
   AllowTypes: null,
@@ -93,7 +94,6 @@ HookManager.afterPlayerLogin(() => {
 });
 export default function () {
   const echo = Boolean((<any>globalThis)?.__BC_LUZI_GLOBALS__?.["OnceFlag.服装拓展"]);
-
   AssetManager.addImageMapping({
     "Assets/Female3DCG/Panties/Diapers1_Small_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}/small.png`,
     "Assets/Female3DCG/Panties/Diapers1_Normal_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//normal.png`,
@@ -327,4 +327,7 @@ export default function () {
       Asset: AssetGet("Female3DCG", "ItemPelvis", "PoofyDiaper")!,
     });
   });
+  if (echo) {
+    echoOverwirte();
+  }
 }

@@ -57,7 +57,58 @@
     "specialized": 3500
   },
   "Diapers": {
-    "PantiesDiaper": {
+    // echo compat
+
+    "Panties_笨笨蛋LuziDiapers1": {
+      // Diaper
+      "size": "regular",
+      "gradients": [1]
+    },
+    "Panties_笨笨蛋LuziDiapers2": {
+      // Plastic Covered Diaper
+      //"color": [0],
+      "gradients": [2],
+      "size": "light_adult"
+    },
+    "Panties_笨笨蛋LuziDiapers3": {
+      // Satin Covered Diaper
+      //"color": [0],
+      "gradients": [1],
+      "size": "light_adult"
+    },
+    "Panties_笨笨蛋LuziDiapers4": {
+      // Patterned Diaper
+      //"color": [0],
+      "gradients": [3],
+      "size": "overnight"
+    },
+    "Panties_笨笨蛋LuziBulkyDiaper": {
+      // Bulky Diaper
+      //"color": [0, 1],
+      "gradients": [4],
+
+      "size": "light_adult"
+    },
+    "Panties_笨笨蛋LuziPoofyDiaper": {
+      // Poofy Diaper
+      //"color": [1, 0],
+      "gradients": [4],
+      "size": "light_adult"
+    },
+    "Panties_笨笨蛋LuziUntrainersThin": {
+      // Crinkly Diaper
+      "size": "light_adult",
+      "gradients": [4],
+      "indicator": [5]
+    },
+    "Panties_笨笨蛋LuziLatexDiaper": {
+      // Latex Diaper
+      //"color": [0],
+      "gradients": [2],
+      "size": "moderate_adult"
+    },
+
+    "PantiesDiapers1": {
       // Diaper
       "size": "regular",
       "gradients": [1]
