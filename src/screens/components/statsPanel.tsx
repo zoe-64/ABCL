@@ -3,9 +3,36 @@ import { ValueBar } from "./valueBar";
 import { getCharacter, getCharacterName, isABCLPlayer } from "src/core/player/playerUtils";
 import { getPlayerDiaperSize } from "src/core/player/diaper";
 import { resizeElements, abclStatsWindow } from "src/core/player/ui";
-import { h } from "preact";
-import "./statsPanel.css";
-
+import { h, JSX } from "preact";
+import styled from "styled-components";
+const StatsPanelComponent = styled.div<JSX.IntrinsicElements["div"]>`
+  .ABCL-stats-overlay {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
+  }
+  .ABCL-stats-panel {
+    background-color: var(--tmd-element, rgb(255, 255, 255));
+  }
+  .ABCL-stats-select {
+    padding: 0.7%;
+    border-radius: 0.35%;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    color: #333;
+    width: calc(100% - 16%);
+    margin: 8%;
+  }
+  .ABCL-stats-container {
+    padding: 8%;
+    font-size: 0.5em;
+    gap: 1em;
+    display: flex;
+    flex-direction: column;
+  }
+`;
 export default function StatsPanel(): h.JSX.Element {
   const [selectablePlayers, setSelectablePlayers] = useState<Character[]>(() => ChatRoomCharacter.filter(character => isABCLPlayer(character)));
   const [memberNumber, setMemberNumber] = useState(0);
@@ -39,7 +66,7 @@ export default function StatsPanel(): h.JSX.Element {
   }, [memberNumber]);
 
   return (
-    <div className="ABCL-hidden" id="ABCL-stats">
+    <StatsPanelComponent className="ABCL-hidden" id="ABCL-stats">
       <div className="ABCL-stats-overlay" onClick={() => document.getElementById("ABCL-stats")?.classList.add("ABCL-hidden")}></div>
       <div className="ABCL-stats-panel" id="ABCL-stats-panel">
         <select
@@ -73,6 +100,6 @@ export default function StatsPanel(): h.JSX.Element {
           <button onClick={() => resizeElements()}>Refresh</button>
         </div>
       </div>
-    </div>
+    </StatsPanelComponent>
   );
 }

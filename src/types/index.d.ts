@@ -1,6 +1,14 @@
 interface Window {
   modLoadFlag?: boolean;
   LITTLISH_CLUB: LITTLISH_CLUB_API;
+  LSCG_REMOTE_WINDOW_OPEN?: boolean;
+  bcx?: {
+    inBcxSubscreen: () => boolean;
+  };
+  MPA?: {
+    version: string;
+    menuLoaded: boolean;
+  };
 }
 
 declare const modVersion: string;

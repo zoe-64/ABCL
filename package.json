@@ -29,7 +29,8 @@
     "bondage-club-mod-sdk": "^1.2.0",
     "eventemitter3": "^5.0.1",
     "preact": "^10.26.4",
-    "rollup-plugin-jsonlint": "^2.1.0"
+    "rollup-plugin-jsonlint": "^2.1.0",
+    "styled-components": "^6.1.19"
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^5.1.1",

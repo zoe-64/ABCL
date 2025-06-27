@@ -31,7 +31,7 @@ export const diaperFaceRub: CombinedAction = {
     Image: `${publicURL}/activity/diaperFaceRub.png`,
     Target: ["ItemNose"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperFaceRubRequest(player),
-    Criteria: (player: Character) => hasDiaper(player) && isABCLPlayer(player) && !Player.IsRestrained() && player.MemberNumber !== Player.MemberNumber,
+    Criteria: (player: Character) => hasDiaper(Player) && isABCLPlayer(player) && !Player.IsRestrained() && player.MemberNumber !== Player.MemberNumber,
   },
   listeners: {
     "diaper-face-rub": ({ Sender }) => diaperFaceRubFunction(getCharacter(Sender!) ?? Player),

@@ -2,13 +2,13 @@ import { PluginServerChatRoomMessage, ListenerTypeMap, HookListener } from "../t
 import { logger } from "./logger";
 import { isDiaper, updateDiaperColor } from "./player/diaper";
 import { isABCLPlayer } from "./player/playerUtils";
-import { overlay } from "./player/ui";
+import { overlay, resizeElements } from "./player/ui";
 import { ModIdentifier, ModVersion } from "../types/definitions";
 import { actions } from "./actionLoader";
 import { abclPlayer } from "./player/player";
 import { ACCIDENTS_ON_ACTIVITIES } from "../constants";
 import { HookManager } from "@sugarch/bc-mod-hook-manager";
-import { waitFor } from "./utils";
+import { getElement, HookPriority, waitFor } from "./utils";
 import bcModSdk from "bondage-club-mod-sdk";
 export const sendDataToAction = (type: string, data?: any, target?: number) => {
   const ChatRoomMessage: PluginServerChatRoomMessage = {
@@ -171,6 +171,44 @@ const initHooks = async () => {
       }
     }
     return next(args);
+  });
+
+  HookManager.hookFunction("InformationSheetRun", HookPriority.TOP, (args, next) => {
+    if (
+      (InformationSheetSelection?.IsPlayer() || InformationSheetSelection?.ABCL) &&
+      !(window.bcx?.inBcxSubscreen && window.bcx.inBcxSubscreen()) &&
+      !window?.LSCG_REMOTE_WINDOW_OPEN &&
+      !(window.LITTLISH_CLUB?.inModSubscreen && window.LITTLISH_CLUB.inModSubscreen()) &&
+      !window.MPA?.menuLoaded
+    ) {
+      DrawButton(1700 - 90 - 20, 700 - 15, 90, 90, "", "White", `${publicURL}/icon-small.png`, modName);
+    }
+    next(args);
+  });
+
+  HookManager.hookFunction("InformationSheetClick", HookPriority.OBSERVE, (args, next) => {
+    if (
+      (InformationSheetSelection?.IsPlayer() || InformationSheetSelection?.ABCL) &&
+      !(window.bcx?.inBcxSubscreen && window.bcx.inBcxSubscreen()) &&
+      !(window.LSCG_REMOTE_WINDOW_OPEN && window.LITTLISH_CLUB.inModSubscreen()) &&
+      !window.MPA?.menuLoaded &&
+      MouseIn(1700 - 90 - 10, 800 - 100, 90, 90)
+    ) {
+      getElement(document.body, "#ABCL-settings-page").classList.remove(`ABCL-hidden`);
+      resizeElements();
+      CommonSetScreen("Character", "Preference");
+      PreferenceSubscreen = PreferenceSubscreens.find(s => s.name === "Extensions") ?? null;
+      const mod = PreferenceExtensionsDisplay.find(e => e.Button === "ABCL Settings");
+      if (mod) {
+        mod.click();
+      }
+      getElement<HTMLButtonElement>(document.body, "#ABCL-shared-settings-button").click();
+    }
+    next(args);
+  });
+
+  HookManager.hookFunction("InformationSheetExit", HookPriority.OBSERVE, (args, next) => {
+    next(args);
   });
 };
 

@@ -12,7 +12,7 @@ export const diaperSquishFrontFunction = (player: Character) => {
   const diaperVerb = getDiaperVerb(Player);
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfMessage = `%NAME% presses into the front of %POSSESSIVE% ${diaperVerb} diaper, blushing as %PRONOUN% squishes %POSSESSIVE% ${diaperVerb} padding.`;
-  const otherMessage = `%OPP_NAME% presses her hand into %NAME%'s ${diaperVerb} diaper, giggling as %OPP_PRONOUN% squishes the ${diaperVerb} padding between %POSSESSIVE% legs.`;
+  const otherMessage = `%OPP_NAME% presses %OPP_POSSESSIVE% hand into %NAME%'s ${diaperVerb} diaper, giggling as %OPP_PRONOUN% squishes the ${diaperVerb} padding between %POSSESSIVE% legs.`;
   SendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
 };
 

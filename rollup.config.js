@@ -89,6 +89,8 @@ const plugins_debug = (deploySite, destDir) => [
     modScriptId: scriptId,
     preventAssignment: false,
     "use client": "",
+    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+    'Object.defineProperty(exports, "__esModule", { value: true });': "",
   }),
   commonjs(),
   resolve({ browser: true }),

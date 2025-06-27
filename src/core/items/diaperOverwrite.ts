@@ -1,4 +1,4 @@
-import { AssetManager, CustomAssetDefinition } from "@sugarch/bc-asset-manager";
+import { AssetManager } from "@sugarch/bc-asset-manager";
 import { HookManager } from "@sugarch/bc-mod-hook-manager";
 import echoOverwirte from "./echoOverwirte";
 const defaultLayer: AssetLayer = {

@@ -144,8 +144,8 @@ export const getColor = (color: ItemColor | null | "Default" | string[] | ItemCo
 
   return [color];
 };
-export const getElement = (parent: Element, selector: string): Element => {
-  const element = parent.querySelector(selector);
+export const getElement = <T extends Element>(parent: Element, selector: string): T => {
+  const element = parent.querySelector<T>(selector);
   if (element) return element;
   throw new Error(`Element with selector "${selector}" not found`);
 };

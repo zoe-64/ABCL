@@ -16,7 +16,8 @@ export const isDiaperDirty = () => {
   const diaperSize = getPlayerDiaperSize();
   return abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue >= diaperSize / 2;
 };
-export const isDiaper = (item: Item): boolean => {
+export const isDiaper = (item: Item | null): boolean => {
+  if (!item) return false;
   return item.Asset.DynamicGroupName + item.Asset.Name in ABCLdata.Diapers;
 };
 export function hasDiaper(player: Character = Player): boolean {
@@ -53,16 +54,11 @@ export function mixLevels(level: number, highLevel: string, midLevel: string, lo
 }
 
 export const isDiaperLocked = (player: Character = Player): boolean => {
-  if (!hasDiaper()) return false;
   const diaper = InventoryGet(player, "ItemPelvis");
-
-  return Boolean(
-    diaper &&
-      isDiaper(diaper) &&
-      (Player.MemberNumber === player.MemberNumber
-        ? diaper.Property?.LockedBy
-        : !(diaper.Property?.LockMemberNumber === player.MemberNumber || diaper.Property?.LockedBy === "ExclusivePadlock")),
-  );
+  if (!diaper || !isDiaper(diaper)) return false;
+  const lock = diaper.Property?.LockedBy;
+  if (!lock) return false;
+  return !DialogCanUnlock(player, diaper);
 };
 
 export const getLayerIndexFromColorIndex = (colorIndex: number, asset: Asset) => {
