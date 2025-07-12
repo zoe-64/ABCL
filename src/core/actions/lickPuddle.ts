@@ -1,7 +1,7 @@
 import { CombinedAction } from "../../types/types";
 import { sendDataToAction, sendUpdateMyData } from "../hooks";
 import { abclPlayer, updatePlayerClothes } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, SendABCLAction, targetInputExtractor } from "../player/playerUtils";
+import { getCharacter, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
 import { sendChatLocal } from "../utils";
 
 const lickPuddleRequest = (player: Character) => {
@@ -13,7 +13,7 @@ const LickPuddleFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfMessage = "%NAME% licks %POSSESSIVE% puddle of pee.";
   const otherMessage = "%OPP_NAME% licks %NAME%'s puddle of pee.";
-  SendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "lickPuddle", player);
+  sendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "lickPuddle", player);
   CharacterSetFacialExpression(Player, "Fluids", "DroolLow", 20);
   sendUpdateMyData();
   updatePlayerClothes();

@@ -4,6 +4,7 @@ import { usePotty, usePottyFunction } from "./actions/usePotty";
 import { useToilet, useToiletFunction } from "./actions/useToilet";
 import { sendDataToAction, sendUpdateMyData } from "./hooks";
 import {
+  averageColor,
   getDiaperVerb,
   getPlayerDiaper,
   getPlayerDiaperSize,
@@ -19,13 +20,15 @@ import {
   mentalRegressionBonus,
   mentalRegressionOnAccident,
   mentalRegressionOvertime,
+  mixLevels,
   setDiaperColor,
   updateDiaperColor,
 } from "./player/diaper";
 import { abclPlayer, updatePlayerClothes } from "./player/player";
-import { getCharacter, isABCLPlayer } from "./player/playerUtils";
+import { getCharacter, getCharacterName, isABCLPlayer, replace_template, sendABCLAction, sendStatusMessage } from "./player/playerUtils";
 import { overlay } from "./player/ui";
 import { clearData, updateData } from "./settings";
+import { getColor, isColorable } from "./utils";
 
 export function initApi(): void {
   (<any>window)[`${modIdentifier}`] = {
@@ -78,6 +81,8 @@ export function initApi(): void {
       },
     },
     raw: {
+      sendStatusMessage,
+      sendABCLAction,
       updatePlayerClothes,
       sendUpdateMyData,
       sendDataToAction,
@@ -101,6 +106,12 @@ export function initApi(): void {
       hasDiaper,
       utility: {
         getCharacter,
+        mixLevels,
+        averageColor,
+        getCharacterName,
+        replace_template,
+        isColorable,
+        getColor,
       },
       clearData,
       updateData,

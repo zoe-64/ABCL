@@ -2,7 +2,7 @@ import { CombinedAction } from "../../types/types";
 import { sendDataToAction } from "../hooks";
 import { hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, SendABCLAction } from "../player/playerUtils";
+import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
 
 const diaperFaceRubRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) {
@@ -13,7 +13,7 @@ const diaperFaceRubRequest = (player: Character) => {
 };
 export const diaperFaceRubFunction = (player: Character) => {
   const otherMessage = "%OPP_NAME% rubs %OPP_POSSESSIVE% diaper against %NAME%'s face.";
-  SendABCLAction(replace_template(otherMessage, player), undefined, "playerActivity", player);
+  sendABCLAction(replace_template(otherMessage, player), undefined, "playerActivity", player);
   ActivityEffectFlat(player, Player, 8, "ItemVulva", 1);
   CharacterSetFacialExpression(Player, "Blush", "Medium", 5);
   CharacterSetFacialExpression(Player, "Eyebrows", "Soft", 10);

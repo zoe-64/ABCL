@@ -1,9 +1,9 @@
 import { CombinedAction } from "../../types/types";
-import { SendABCLAction } from "../player/playerUtils";
+import { sendABCLAction } from "../player/playerUtils";
 
 export const pauseStatsFunction = () => {
   const isPaused = Player.ABCL.Settings.PauseStats;
-  SendABCLAction(isPaused ? "%NAME% resumed their ABCL stats." : "%NAME% paused their ABCL stats.", Player, "pauseStats");
+  sendABCLAction(isPaused ? "%NAME% resumed their ABCL stats." : "%NAME% paused their ABCL stats.", Player, "pauseStats");
   Player.ABCL.Settings.PauseStats = !isPaused;
 };
 

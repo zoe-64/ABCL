@@ -1,7 +1,7 @@
 import { CombinedAction } from "../../types/types";
 import { sendDataToAction, sendUpdateMyData } from "../hooks";
 import { abclPlayer, updatePlayerClothes } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, SendABCLAction } from "../player/playerUtils";
+import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
 import { sendChatLocal } from "../utils";
 const WipePuddleRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("wipe-puddle", undefined, player.MemberNumber);
@@ -12,9 +12,9 @@ const WipePuddleFunction = (player: Character) => {
   sendUpdateMyData();
   updatePlayerClothes();
   if (player.MemberNumber !== Player.MemberNumber)
-    return SendABCLAction(replace_template("%OPP_NAME% wipes %NAME%'s puddle of pee.", player), undefined, "wipePuddle", player);
+    return sendABCLAction(replace_template("%OPP_NAME% wipes %NAME%'s puddle of pee.", player), undefined, "wipePuddle", player);
 
-  SendABCLAction(replace_template("%NAME% wipes %POSSESSIVE% puddle of pee.", player), undefined, "wipePuddle", player);
+  sendABCLAction(replace_template("%NAME% wipes %POSSESSIVE% puddle of pee.", player), undefined, "wipePuddle", player);
 };
 export type wipePuddleListeners = {
   "wipe-puddle": undefined;

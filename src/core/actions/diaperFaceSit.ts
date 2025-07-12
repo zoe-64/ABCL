@@ -2,7 +2,7 @@ import { CombinedAction } from "../../types/types";
 import { sendDataToAction } from "../hooks";
 import { hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, SendABCLAction } from "../player/playerUtils";
+import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
 
 const diaperFaceSitRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) {
@@ -13,7 +13,7 @@ const diaperFaceSitRequest = (player: Character) => {
 };
 export const diaperFaceSitFunction = (player: Character) => {
   const otherMessage = "%OPP_NAME% sits with %OPP_POSSESSIVE% diapered butt on %NAME%'s face.";
-  SendABCLAction(replace_template(otherMessage, player), undefined, "playerActivity", player);
+  sendABCLAction(replace_template(otherMessage, player), undefined, "playerActivity", player);
   abclPlayer.stats.MentalRegression += 0.03 * abclPlayer.stats.MentalRegressionModifier;
   ActivityEffectFlat(Player, Player, 8, "ItemNose", 1);
   CharacterSetFacialExpression(Player, "Blush", "ShortBreath", 30);

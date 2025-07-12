@@ -1,7 +1,7 @@
 import { CombinedAction } from "../../types/types";
 import { sendDataToAction } from "../hooks";
 import { getDiaperVerb, hasDiaper } from "../player/diaper";
-import { getCharacter, isABCLPlayer, replace_template, SendABCLAction } from "../player/playerUtils";
+import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
 
 const diaperPatBackRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-pat-back", undefined, player.MemberNumber);
@@ -15,7 +15,7 @@ export const diaperPatBackFunction = (player: Character) => {
   const selfMessage = `%NAME% playfully pats %POSSESSIVE% ${diaperVerb} diapered butt, enjoying the soft ${diaperSound} it makes.`;
   const otherMessage = `%OPP_NAME% gives %NAME%'s diapered butt a playful pat, as the ${diaperVerb} diaper ${diaperSoundSingular} softly.`;
   ActivityEffectFlat(Player, Player, 1, "ItemButt", 1);
-  SendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
+  sendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
 };
 
 export type diaperPatBackListeners = {

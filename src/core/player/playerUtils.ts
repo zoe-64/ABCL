@@ -86,7 +86,7 @@ export function replace_template(text: string, source: Character | null = null, 
     .replaceAll("%CAP_OPP_INTENSIVE%", oppIntensive);
 }
 
-export const SendStatusMessage = (type: keyof ModStats, delta: number, percent: boolean = false) => {
+export const sendStatusMessage = (type: keyof ModStats, delta: number, percent: boolean = false) => {
   if (delta === 0) return;
   if (percent) delta = delta * 100;
   delta = Number(delta.toPrecision(2));
@@ -109,7 +109,7 @@ export const SendStatusMessage = (type: keyof ModStats, delta: number, percent: 
     sendDataToAction("onABCLMessage", { message: `${getCharacterName(Player.MemberNumber)}: ${message}`, local: isLocal });
   }
 };
-export function SendABCLAction(action: string, sender: Character | null = null, messageType: keyof ModSettings["VisibleMessages"], target?: Character) {
+export function sendABCLAction(action: string, sender: Character | null = null, messageType: keyof ModSettings["VisibleMessages"], target?: Character) {
   let msg = replace_template(action, sender);
   const isLocal = !Player[modIdentifier].Settings.VisibleMessages[messageType];
   sendChatLocal(msg, ["ChatMessageAction", "ChatMessageNonDialogue"], "--label-color:#ff4949", isLocal);

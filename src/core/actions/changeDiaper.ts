@@ -2,7 +2,7 @@ import { CombinedAction, DiaperSettingValues } from "../../types/types";
 import { sendDataToAction } from "../hooks";
 import { hasDiaper, isDiaperLocked, updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, getCharacterName, isABCLPlayer, replace_template, SendABCLAction, targetInputExtractor } from "../player/playerUtils";
+import { getCharacter, getCharacterName, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
 import { ABCLYesNoPrompt } from "../player/ui";
 import { sendChatLocal } from "../utils";
 
@@ -15,7 +15,7 @@ export const changeDiaperFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfMessage = "%NAME% changes %POSSESSIVE% diaper.";
   const otherMessage = "%OPP_NAME% changes %NAME%'s diaper.";
-  SendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "changeDiaper", player);
+  sendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "changeDiaper", player);
 
   abclPlayer.stats.WetnessValue = 0;
   abclPlayer.stats.SoilinessValue = 0;

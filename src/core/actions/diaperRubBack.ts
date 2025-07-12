@@ -2,7 +2,7 @@ import { CombinedAction } from "../../types/types";
 import { sendDataToAction } from "../hooks";
 import { getDiaperVerb, hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, SendABCLAction } from "../player/playerUtils";
+import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
 
 const diaperRubBackRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-rub-back", undefined, player.MemberNumber);
@@ -15,7 +15,7 @@ export const diaperRubBackFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfMessage = `%NAME% blushes as %PRONOUN% rubs %POSSESSIVE% ${diaperVerb} diapered butt with both hands, breath hitching at the soft ${diaperSound} under %POSSESSIVE% hands.`;
   const otherMessage = `%OPP_NAME% runs %OPP_POSSESSIVE% hand over %NAME%'s ${diaperVerb} diapered butt, rubbing affectionate circles into the ${diaperVerb} padding.`;
-  SendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
+  sendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
   ActivityEffectFlat(Player, Player, 5, "ItemButt", 1);
   if (abclPlayer.stats.Incontinence > Math.random()) {
     {
