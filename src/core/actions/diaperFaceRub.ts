@@ -15,9 +15,11 @@ export const diaperFaceRubFunction = (player: Character) => {
   const otherMessage = "%OPP_NAME% rubs %OPP_POSSESSIVE% diaper against %NAME%'s face.";
   sendABCLAction(replace_template(otherMessage, player), undefined, "playerActivity", player);
   ActivityEffectFlat(player, Player, 8, "ItemVulva", 1);
-  CharacterSetFacialExpression(Player, "Blush", "Medium", 5);
-  CharacterSetFacialExpression(Player, "Eyebrows", "Soft", 10);
-  CharacterSetFacialExpression(Player, "Eyes", "Dizzy", 10);
+  if (Player.ABCL.Settings.ExpressionsByActivities) {
+    CharacterSetFacialExpression(Player, "Blush", "Medium", 5);
+    CharacterSetFacialExpression(Player, "Eyebrows", "Soft", 10);
+    CharacterSetFacialExpression(Player, "Eyes", "Dizzy", 10);
+  }
   abclPlayer.stats.MentalRegression += 0.02 * abclPlayer.stats.MentalRegressionModifier;
 };
 export type diaperFaceRubListeners = {

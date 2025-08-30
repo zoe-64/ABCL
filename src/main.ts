@@ -20,7 +20,6 @@ const loop = () => {
 };
 
 HookManager.afterPlayerLogin(async () => {
-  console.log("init");
   loadOrGenerateData();
   initSettingsScreen();
   initActions();

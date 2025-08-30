@@ -27,6 +27,7 @@ export function ValueBar({
             background: color,
             width: `${value * 100}%`,
             height: "100%",
+            maxWidth: "100%",
           }}
         />
       </div>

@@ -29,6 +29,7 @@ interface ModSettings {
   OnDiaperChange: DiaperChangePromptSetting;
   OpenRemoteSettings: boolean;
   LockedOutOfSettings: boolean;
+  ExpressionsByActivities: boolean;
   VisibleMessages: {
     changeDiaper: boolean;
     checkDiaper: boolean;
@@ -83,18 +84,20 @@ interface ModStats {
   };
 }
 
+type SettingKeys = Exclude<keyof ModSettings, "VisibleMessages"> | keyof ModSettings["VisibleMessages"];
 interface ModStorageModel {
   Version?: string;
   Settings: ModSettings;
+  SettingPermissions: Record<SettingKeys, boolean>;
   Stats: ModStats;
 }
 
 interface PlayerCharacter {
-  [modIdentifier: string]: ModStorageModel;
+  ABCL: ModStorageModel;
 }
 
 interface Character {
-  [modIdentifier: string]: ModStorageModel | undefined;
+  ABCL?: ModStorageModel | undefined;
 }
 
 declare interface ModuleScreens {

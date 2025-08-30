@@ -1,6 +1,32 @@
 import { h } from "preact";
 import "./about.css";
+import { Stack } from "src/screens/components/positionComponents";
+import styled from "@emotion/styled";
 
+const CreditItemComponent = styled.p`
+  margin: 0;
+  > a {
+    text-decoration: none;
+    color: inherit;
+  }
+  > span {
+    color: inherit;
+  }
+`;
+function CreditItem({ name, reason, link }: { name: string; reason: string; link?: string }): h.JSX.Element {
+  return (
+    <CreditItemComponent>
+      {link ? (
+        <a target="_blank" href={link}>
+          <span>{name}</span>
+        </a>
+      ) : (
+        <span>{name}</span>
+      )}
+      - <span>{reason}</span>
+    </CreditItemComponent>
+  );
+}
 export function AboutPage({ setPage }: { setPage: (page: string) => void }): h.JSX.Element {
   return (
     <div>
@@ -27,56 +53,16 @@ export function AboutPage({ setPage }: { setPage: (page: string) => void }): h.J
         </p>
         <p>
           Thanks to
-          <div className="ABCL-thanks-list">
-            <p>
-              <a target="_blank">
-                <span>Firefly</span>
-              </a>{" "}
-              - <span data-reason>for the original idea</span>
-            </p>
-            <p>
-              <a target="_blank" href="https://github.com/mochamaple">
-                <span data-name></span>Maple
-              </a>{" "}
-              - <span data-reason>for the mod plugin template</span>
-            </p>
-            <p>
-              <a target="_blank" href="https://github.com/FurryZoi">
-                <span data-name></span>Zoi
-              </a>{" "}
-              - <span data-reason>for helping get themed to work</span>
-            </p>
-            <p>
-              <a target="_blank" href="https://github.com/minimar">
-                <span data-name></span>minimar
-              </a>{" "}
-              - <span data-reason>for helping with typos</span>
-            </p>
-            <p>
-              <a target="_blank" href="https://github.com/dDeepLb">
-                <span data-name></span>Deep (papa)
-              </a>{" "}
-              - <span data-reason>for helping with code review and testing</span>
-            </p>
-            <p>
-              <a target="_blank" href="https://github.com/dynilath">
-                <span data-name></span>Da'Inihlus
-              </a>{" "}
-              - <span data-reason>for mod items architecture</span>
-            </p>
-            <p>
-              <a target="_blank" href="https://github.com/tetris245">
-                <span data-name></span>Nemesea
-              </a>{" "}
-              - <span data-reason>for getting me started with modding in bc</span>
-            </p>
-            <p>
-              <a target="_blank" href="https://github.com/littlesera">
-                <span data-name></span>Sera
-              </a>{" "}
-              - <span data-reason>for helping during the development process</span>
-            </p>
-          </div>
+          <Stack className="ABCL-thanks-list">
+            <CreditItem name="Firefly" reason="for the original idea" />
+            <CreditItem name="Maple" reason="for the mod plugin template" link="https://github.com/mochamaple" />
+            <CreditItem name="Zoi" reason="for helping get themed to work" link="https://github.com/FurryZoi" />
+            <CreditItem name="minimar" reason="for helping with typos" link="https://github.com/minimar" />
+            <CreditItem name="Deep" reason="for helping with code review and testing" link="https://github.com/dDeepLb" />
+            <CreditItem name="Da'Inihlus" reason="for providing great library mods" link="https://github.com/dynilath" />
+            <CreditItem name="Nemesea" reason="for getting me started with modding in bc" link="https://github.com/tetris245" />
+            <CreditItem name="Sera" reason="for helping during the development process" link="https://github.com/littlesera" />
+          </Stack>
         </p>
         <p>
           Source code available on{" "}

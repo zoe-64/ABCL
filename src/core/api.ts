@@ -1,3 +1,4 @@
+import { inModSubscreen } from "src/screens/Settings";
 import { changeDiaper, changeDiaperRequest } from "./actions/changeDiaper";
 import { checkDiaper, diaperCheckFunction } from "./actions/checkDiaper";
 import { usePotty, usePottyFunction } from "./actions/usePotty";
@@ -26,14 +27,13 @@ import {
 } from "./player/diaper";
 import { abclPlayer, updatePlayerClothes } from "./player/player";
 import { getCharacter, getCharacterName, isABCLPlayer, replace_template, sendABCLAction, sendStatusMessage } from "./player/playerUtils";
-import { overlay } from "./player/ui";
 import { clearData, updateData } from "./settings";
-import { getColor, isColorable } from "./utils";
+import { getColor, getElement, isColorable } from "./utils";
 
 export function initApi(): void {
   (<any>window)[`${modIdentifier}`] = {
     version: modVersion,
-    inModSubscreen: () => Boolean(overlay.querySelector(`.${modIdentifier}SettingPage`)?.classList.contains("ABCL-hidden")),
+    inModSubscreen: inModSubscreen,
     isABCLPlayer,
 
     wet: abclPlayer.wet,
@@ -112,6 +112,7 @@ export function initApi(): void {
         replace_template,
         isColorable,
         getColor,
+        getElement,
       },
       clearData,
       updateData,

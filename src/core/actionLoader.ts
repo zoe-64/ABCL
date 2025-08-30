@@ -15,14 +15,12 @@ import { diaperSquishFront } from "./actions/diaperSquishFront";
 import { lickPuddle } from "./actions/lickPuddle";
 import { onABCLMessage } from "./actions/onABCLMessage";
 import { pauseStats } from "./actions/pauseStats";
-import { sync } from "./actions/sync";
 import { toPee } from "./actions/toPee";
 import { toPoop } from "./actions/toPoop";
 import { usePotty } from "./actions/usePotty";
 import { useToilet } from "./actions/useToilet";
 import { wipePuddle } from "./actions/wipePuddle";
 import { waitForElement } from "./utils";
-
 class Activity {
   constructor(
     public id: string,
@@ -108,7 +106,6 @@ export const actions: CombinedAction[] = [
   toPoop,
   usePotty,
   useToilet,
-  sync,
   lickPuddle,
   wipePuddle,
   onABCLMessage,

@@ -3,7 +3,6 @@ import { sendDataToAction } from "../hooks";
 import { hasDiaper, isDiaperLocked, updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { getCharacter, getCharacterName, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
-import { ABCLYesNoPrompt } from "../player/ui";
 import { sendChatLocal } from "../utils";
 
 export const changeDiaperRequest = (player: Character, force?: boolean) => {
@@ -35,7 +34,7 @@ export const changeDiaper: CombinedAction = {
     Image: `${publicURL}/activity/changeDiaper.svg`,
     Target: ["ItemPelvis"],
     OnClick: (player: Character, group: AssetGroupItemName) => changeDiaperRequest(player),
-    Criteria: (player: Character) => hasDiaper(player) && isABCLPlayer(player) && !Player.IsRestrained() && !isDiaperLocked(),
+    Criteria: (player: Character) => hasDiaper(player) && isABCLPlayer(player) && !Player.IsRestrained() && !isDiaperLocked(player),
   },
   command: {
     Tag: "change-diaper",
@@ -49,21 +48,36 @@ export const changeDiaper: CombinedAction = {
     Description: ` [MemberNumber|Name|Nickname]: Changes someone's diaper.`,
   },
   listeners: {
-    "changeDiaper-accepted": ({ Sender }) => sendChatLocal(`${getCharacterName(Sender)} accepted your change diaper request.`),
-    "changeDiaper-rejected": ({ Sender }) => sendChatLocal(`${getCharacterName(Sender)} rejected your change diaper request.`),
+    "changeDiaper-accepted": ({ Sender }) => ToastManager.info(`${getCharacterName(Sender)} accepted your change diaper request.`),
+    "changeDiaper-rejected": ({ Sender }) => ToastManager.info(`${getCharacterName(Sender)} rejected your change diaper request.`),
     "changeDiaper-pending": ({ Sender }, { force }) => {
       if (force) return changeDiaperFunction(getCharacter(Sender!) ?? Player);
       switch (Player.ABCL.Settings.OnDiaperChange) {
         case DiaperSettingValues.Ask:
-          new ABCLYesNoPrompt(
-            `${getCharacterName(Sender)} wants to change your diaper.`,
-            () => {
-              changeDiaperFunction(getCharacter(Sender!) ?? Player);
-              sendDataToAction("changeDiaper-accepted", undefined, Sender);
+          ToastManager.custom(`${getCharacterName(Sender)} wants to change your diaper.`, "info", {
+            duration: 10 * 1000,
+            onClose: (toast, reason) => {
+              if (reason === "click") toast.setAttribute("aria-checked", "true");
+              if (toast.getAttribute("aria-checked") !== "true") sendDataToAction("changeDiaper-rejected", undefined, Sender);
             },
-            () => sendDataToAction("changeDiaper-rejected", undefined, Sender),
-            10 * 1000,
-          );
+            buttons: [
+              {
+                label: "Yes",
+                onClick: (_, toast) => {
+                  changeDiaperFunction(getCharacter(Sender!) ?? Player);
+                  sendDataToAction("changeDiaper-accepted", undefined, Sender);
+                  toast?._dismiss?.("click");
+                },
+              },
+              {
+                label: "No",
+                onClick: (_, toast) => {
+                  sendDataToAction("changeDiaper-rejected", undefined, Sender);
+                  toast?._dismiss?.("click");
+                },
+              },
+            ],
+          });
           break;
         case DiaperSettingValues.Allow:
           changeDiaperFunction(getCharacter(Sender!) ?? Player);

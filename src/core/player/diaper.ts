@@ -66,7 +66,7 @@ export const getLayerIndexFromColorIndex = (colorIndex: number, asset: Asset) =>
 };
 
 export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, player: Character = Player) => {
-  if (Player[modIdentifier].Settings.DisableDiaperStains) return;
+  if (Player.ABCL.Settings.DisableDiaperStains) return;
   const item = InventoryGet(player, slot);
   if (item && isDiaper(item)) {
     const color = !item.Color || typeof item.Color === "string" ? [...item.Asset.DefaultColor] : [...item.Color];

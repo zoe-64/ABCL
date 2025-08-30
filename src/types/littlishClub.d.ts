@@ -17,11 +17,11 @@ declare interface LITTLISH_CLUB_API {
   /**
    * Finds out if character "C1" is caregiver of character "C2"
    */
-  isCaregiverOf(C1: Character, C2: Character): boolean;
+  isCaregiverOf(C1: Character, C2?: Character): boolean;
   /**
    * Finds out if character "C1" is mommy of character "C2"
    */
-  isMommyOf(C1: Character, C2: Character): boolean;
+  isMommyOf(C1: Character, C2?: Character): boolean;
   /**
    * Finds out if character "C1" has certain access right for character "C2"
    */

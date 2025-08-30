@@ -33,18 +33,18 @@ export const abclPlayer = {
   /** once per minute */
   update: () => {
     if (Player.ABCL.Settings.PauseStats) return;
-    bowelThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player[modIdentifier].Settings.PoopMetabolism]);
-    bladderThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism]);
+    bowelThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player.ABCL.Settings.PoopMetabolism]);
+    bladderThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player.ABCL.Settings.PeeMetabolism]);
 
     if (regressionThrottler.check()) {
       abclPlayer.stats.MentalRegression += mentalRegressionOvertime();
     }
-    if (bladderThrottler.check() && Player[modIdentifier].Settings.PeeMetabolism !== "Disabled") {
-      abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[Player[modIdentifier].Settings.PeeMetabolism];
+    if (bladderThrottler.check() && Player.ABCL.Settings.PeeMetabolism !== "Disabled") {
+      abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[Player.ABCL.Settings.PeeMetabolism];
       abclPlayer.attemptWetting();
     }
-    if (bowelThrottler.check() && Player[modIdentifier].Settings.PoopMetabolism !== "Disabled") {
-      abclPlayer.stats.BowelValue += abclPlayer.stats.FoodIntake * MetabolismSettingValues[Player[modIdentifier].Settings.PoopMetabolism];
+    if (bowelThrottler.check() && Player.ABCL.Settings.PoopMetabolism !== "Disabled") {
+      abclPlayer.stats.BowelValue += abclPlayer.stats.FoodIntake * MetabolismSettingValues[Player.ABCL.Settings.PoopMetabolism];
       abclPlayer.attemptSoiling();
     }
     playerSaver.save();
@@ -61,7 +61,7 @@ export const abclPlayer = {
       sendABCLAction("%NAME%'s wets %POSSESSIVE% clothes and leaks onto the floor.", undefined, "wetClothing");
     }
     sendUpdateMyData();
-    if (Player[modIdentifier].Settings.DisableClothingStains) return;
+    if (Player.ABCL.Settings.DisableClothingStains) return;
     const wetColor = "#96936C";
 
     const panties = InventoryGet(Player, "Panties");
@@ -97,7 +97,7 @@ export const abclPlayer = {
       sendABCLAction("%NAME% soils %POSSESSIVE% clothes.", undefined, "soilClothing");
     }
     sendUpdateMyData();
-    if (Player[modIdentifier].Settings.DisableClothingStains) return;
+    if (Player.ABCL.Settings.DisableClothingStains) return;
 
     const messColor = "#261a16";
 
@@ -206,53 +206,53 @@ export const abclPlayer = {
     set PuddleSize(value: number) {
       if (value < 0) value = 0;
       if (value > 250) value = 250;
-      const delta = value - Player[modIdentifier].Stats.PuddleSize.value;
+      const delta = value - Player.ABCL.Stats.PuddleSize.value;
       sendStatusMessage("PuddleSize", delta);
-      Player[modIdentifier].Stats.PuddleSize.value = value;
+      Player.ABCL.Stats.PuddleSize.value = value;
     },
     get PuddleSize() {
-      return Player[modIdentifier].Stats.PuddleSize.value;
+      return Player.ABCL.Stats.PuddleSize.value;
     },
     get MentalRegressionModifier() {
-      return MetabolismSettingValues[Player[modIdentifier].Settings.MentalRegressionModifier];
+      return MetabolismSettingValues[Player.ABCL.Settings.MentalRegressionModifier];
     },
     set MentalRegression(value: number) {
       if (value < 0) value = 0;
       if (value > 1) value = 1;
-      const delta = value - Player[modIdentifier].Stats.MentalRegression.value;
+      const delta = value - Player.ABCL.Stats.MentalRegression.value;
       sendStatusMessage("MentalRegression", delta, true);
-      Player[modIdentifier].Stats.MentalRegression.value = value;
+      Player.ABCL.Stats.MentalRegression.value = value;
       abclStatsWindow.update();
     },
     get MentalRegression() {
-      return Player[modIdentifier].Stats.MentalRegression.value;
+      return Player.ABCL.Stats.MentalRegression.value;
     },
     set Incontinence(value: number) {
       if (value < 0) value = 0;
       if (value > 1) value = 1;
-      const delta = value - Player[modIdentifier].Stats.Incontinence.value;
+      const delta = value - Player.ABCL.Stats.Incontinence.value;
       sendStatusMessage("Incontinence", delta, true);
-      Player[modIdentifier].Stats.Incontinence.value = value;
+      Player.ABCL.Stats.Incontinence.value = value;
       abclStatsWindow.update();
     },
     get Incontinence() {
-      return Player[modIdentifier].Stats.Incontinence.value;
+      return Player.ABCL.Stats.Incontinence.value;
     },
 
     // intake
     set WaterIntake(value: number) {
       if (value < 0) value = 0;
-      Player[modIdentifier].Stats.WaterIntake.value = value;
+      Player.ABCL.Stats.WaterIntake.value = value;
     },
     get WaterIntake() {
-      return Player[modIdentifier].Stats.WaterIntake.value;
+      return Player.ABCL.Stats.WaterIntake.value;
     },
     set FoodIntake(value: number) {
       if (value < 0) value = 0;
-      Player[modIdentifier].Stats.FoodIntake.value = value;
+      Player.ABCL.Stats.FoodIntake.value = value;
     },
     get FoodIntake() {
-      return Player[modIdentifier].Stats.FoodIntake.value;
+      return Player.ABCL.Stats.FoodIntake.value;
     },
 
     // bladder
@@ -260,30 +260,30 @@ export const abclPlayer = {
       if (value < 0) value = 0;
       const delta = value / this.BladderSize - this.BladderFullness;
       sendStatusMessage("Bladder", delta, true);
-      Player[modIdentifier].Stats.Bladder.value = value;
+      Player.ABCL.Stats.Bladder.value = value;
       abclStatsWindow.update();
     },
     get BladderValue() {
-      return Player[modIdentifier].Stats.Bladder.value;
+      return Player.ABCL.Stats.Bladder.value;
     },
     set BladderSize(value: number) {
       if (value < 0) value = 0;
-      Player[modIdentifier].Stats.Bladder.size = value;
+      Player.ABCL.Stats.Bladder.size = value;
       abclStatsWindow.update();
     },
     get BladderSize(): number {
-      return Player[modIdentifier].Stats.Bladder.size;
+      return Player.ABCL.Stats.Bladder.size;
     },
     set WetnessValue(value: number) {
       if (value < 0) value = 0;
       const delta = value / getPlayerDiaperSize() - this.WetnessPercentage;
       sendStatusMessage("Wetness", delta, true);
-      Player[modIdentifier].Stats.Wetness.value = value;
+      Player.ABCL.Stats.Wetness.value = value;
       updateDiaperColor();
       abclStatsWindow.update();
     },
     get WetnessValue() {
-      return Player[modIdentifier].Stats.Wetness.value;
+      return Player.ABCL.Stats.Wetness.value;
     },
     // computed
     set BladderFullness(value: number) {
@@ -301,31 +301,31 @@ export const abclPlayer = {
       if (value < 0) value = 0;
       const delta = value / this.BowelSize - this.BowelFullness;
       sendStatusMessage("Bowel", delta, true);
-      Player[modIdentifier].Stats.Bowel.value = value;
+      Player.ABCL.Stats.Bowel.value = value;
       abclStatsWindow.update();
     },
     get BowelValue() {
-      return Player[modIdentifier].Stats.Bowel.value;
+      return Player.ABCL.Stats.Bowel.value;
     },
 
     set BowelSize(value: number) {
       if (value < 0) value = 0;
-      Player[modIdentifier].Stats.Bowel.size = value;
+      Player.ABCL.Stats.Bowel.size = value;
       abclStatsWindow.update();
     },
     get BowelSize(): number {
-      return Player[modIdentifier].Stats.Bowel.size;
+      return Player.ABCL.Stats.Bowel.size;
     },
     set SoilinessValue(value: number) {
       if (value < 0) value = 0;
       const delta = value / getPlayerDiaperSize() - this.SoilinessPercentage;
       sendStatusMessage("Soiliness", delta, true);
-      Player[modIdentifier].Stats.Soiliness.value = value;
+      Player.ABCL.Stats.Soiliness.value = value;
       updateDiaperColor();
       abclStatsWindow.update();
     },
     get SoilinessValue() {
-      return Player[modIdentifier].Stats.Soiliness.value;
+      return Player.ABCL.Stats.Soiliness.value;
     },
     // computed
     set BowelFullness(value: number) {

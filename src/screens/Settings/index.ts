@@ -2,7 +2,7 @@ import { syncData } from "../../core/settings";
 import { ModName } from "../../types/definitions";
 import { getElement } from "src/core/utils";
 import renderApp from "../App";
-import { resizeElements } from "src/core/player/ui";
+import { overlay, resizeElements } from "src/core/player/ui";
 
 export const initSettingsScreen = async () => {
   renderApp();
@@ -26,4 +26,10 @@ export const initSettingsScreen = async () => {
       resizeElements();
     },
   });
+};
+
+export const inModSubscreen = () => {
+  if (!document.getElementById(`ABCL-settings-page`)) return false;
+  if (!document.getElementById(`ABCL-settings-page`)?.classList.contains("ABCL-hidden")) return true;
+  return false;
 };

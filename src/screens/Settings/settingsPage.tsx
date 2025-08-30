@@ -8,21 +8,32 @@ import styled from "styled-components";
 import SharedSettingsPage from "./pages/shared-settings";
 
 const SettingsPageComponent = styled.div<JSX.IntrinsicElements["div"]>`
-  height: 79%;
-  margin: 5% 10dvw 0dvh 5dvw;
+  height: 77%;
+  margin: 2em 5em 1em 5em;
   overflow-y: auto;
+  padding: 1em;
+  color: var(--abcl-text);
   > header > h1 {
     text-align: center;
-    width: fit-content;
+    margin-bottom: 0.1em;
     margin-top: 0;
   }
+  > h2 {
+    margin: 0;
+    margin-bottom: 0.25em;
+  }
 `;
-
+export const SettingsH2 = styled.h2`
+  margin: 0;
+  font-size: 6vmin;
+  color: var(--abcl-text);
+`;
 const MenuPage = styled.div<JSX.IntrinsicElements["div"]>`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   width: 56%;
+  color: var(--abcl-text);
   > section {
     gap: 0.2em;
     display: flex;
@@ -53,18 +64,20 @@ const MenuPage = styled.div<JSX.IntrinsicElements["div"]>`
       flex: 1 1 auto;
       text-align: left;
       padding: 10px;
-      border: 1px black solid;
+      border: var(--abcl-border);
+      color: inherit;
     }
   }
   .ABCL-button {
     width: fit-content;
     padding: 0.3em;
-    border: 1px black solid;
-    background-color: white;
+    border: var(--abcl-border);
+    background-color: var(--abcl-element);
     cursor: pointer;
     white-space: nowrap;
+    color: inherit;
     &:hover {
-      background-color: cyan;
+      background-color: var(--abcl-hover-color);
     }
   }
 `;
@@ -80,6 +93,7 @@ export default function SettingsPage(): h.JSX.Element {
         <button onClick={() => PreferenceSubscreenExtensionsExit()} className="ABCL-exit-button"></button>
         <header>
           <h1> ABCL Settings </h1>
+          <hr />
         </header>
         {
           {
@@ -126,8 +140,6 @@ export default function SettingsPage(): h.JSX.Element {
       </SettingsPageComponent>
       <button
         onClick={() => {
-          (window as any).CurrentScreen = "Preference";
-          (window as any).PreferenceSubscreen = PreferenceSubscreens.find(screen => screen.name === "Extensions");
           setPage("sharedSettings");
           setSelectedCharacter(InformationSheetSelection ?? undefined);
         }}

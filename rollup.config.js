@@ -91,6 +91,7 @@ const plugins_debug = (deploySite, destDir) => [
     "use client": "",
     "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
     'Object.defineProperty(exports, "__esModule", { value: true });': "",
+    "styled-components": "styled-components/dist/styled-components.browser.esm.js",
   }),
   commonjs(),
   resolve({ browser: true }),

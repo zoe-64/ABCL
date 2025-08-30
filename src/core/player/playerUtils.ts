@@ -19,8 +19,9 @@ export const getCharacter = (identifier: string | number | Character): Character
       nickname?.startsWith(identifierString)
     );
   });
-
-  return characters[0];
+  if (characters.length === 0) return undefined;
+  else if (characters.length > 1) return characters[0]; //throw new Error(`More than one character matches ${identifier}!`);
+  else return characters[0];
 };
 
 export const targetInputExtractor = (parsed: string[]): Character | undefined => {
@@ -90,9 +91,9 @@ export const sendStatusMessage = (type: keyof ModStats, delta: number, percent: 
   if (delta === 0) return;
   if (percent) delta = delta * 100;
   delta = Number(delta.toPrecision(2));
-  if (typeof Player[modIdentifier].Settings.StatusMessages[type] === "undefined") return;
-  if (!Player[modIdentifier].Settings.StatusMessages[type]) return;
-  const isLocal = Player[modIdentifier].Settings.StatusMessages[type];
+  if (typeof Player.ABCL.Settings.StatusMessages[type] === "undefined") return;
+  if (!Player.ABCL.Settings.StatusMessages[type]) return;
+  const isLocal = Player.ABCL.Settings.StatusMessages[type];
   const wordConversion: Partial<Record<keyof ModStats, string>> = {
     Bladder: "PEE",
     Bowel: "POO",
@@ -111,7 +112,7 @@ export const sendStatusMessage = (type: keyof ModStats, delta: number, percent: 
 };
 export function sendABCLAction(action: string, sender: Character | null = null, messageType: keyof ModSettings["VisibleMessages"], target?: Character) {
   let msg = replace_template(action, sender);
-  const isLocal = !Player[modIdentifier].Settings.VisibleMessages[messageType];
+  const isLocal = !Player.ABCL.Settings.VisibleMessages[messageType];
   sendChatLocal(msg, ["ChatMessageAction", "ChatMessageNonDialogue"], "--label-color:#ff4949", isLocal);
 
   if (!isLocal) {

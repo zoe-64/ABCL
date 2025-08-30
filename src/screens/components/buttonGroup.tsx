@@ -1,45 +1,51 @@
-import { h, JSX } from "preact";
+import { JSX } from "preact";
+import { forwardRef } from "preact/compat";
 import styled from "styled-components";
-const ButtonGroupComponent = styled.div<JSX.IntrinsicElements["div"]>`
+import { LockWidget } from "./lockWidget";
+const ButtonGroupComponent = styled.div<JSX.IntrinsicElements["div"] & { locked?: boolean }>`
   display: flex;
   align-items: center;
   width: fit-content;
-  padding: 5px 0;
   button {
-    background-color: var(--tmd-element, rgb(145, 145, 145));
-    color: var(--tmd-text, #fff);
-    border: 1px solid var(--tmd-element, #262626);
-    padding: 5px;
-    cursor: pointer;
+    background-color: var(--abcl-element);
+    color: var(--abcl-text);
+    border: None;
+    border-top: var(--abcl-border);
+    border-bottom: var(--abcl-border);
+    height: 100%;
+    padding: 0 0.5em;
+    cursor: ${props => (props.locked ? "not-allowed" : "pointer")};
   }
-
+  button:first-child {
+    border-left: var(--abcl-border);
+  }
+  button:last-child {
+    border-right: var(--abcl-border);
+  }
   button[data-selected="true"] {
-    background-color: var(--tmd-accent, rgb(0, 0, 0));
-  }
-
-  p {
-    margin-right: 10px;
+    background-color: var(--abcl-selected-background);
+    color: var(--abcl-selected-text);
+    cursor: ${props => (props.locked ? "not-allowed" : "default")};
   }
 `;
-export default function ButtonGroup({
-  options,
-  value,
-  setValue,
-  label,
-}: {
+export type ButtonGroupProps = {
   options: string[];
   value: string;
   setValue: (value: string) => void;
-  label: string;
-}): h.JSX.Element {
-  return (
-    <ButtonGroupComponent>
-      <p>{label}</p>
+  locked?: boolean;
+  opaqueLock?: boolean;
+  setLocked?: (locked: boolean) => void;
+} & JSX.IntrinsicElements["div"];
+
+export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(({ options, value, setValue, locked, opaqueLock, setLocked, ...props }, ref) => (
+  <>
+    <ButtonGroupComponent {...props} ref={ref} locked={locked && opaqueLock}>
       {options.map((option, i) => (
-        <button key={i} data-selected={option === value} onClick={() => setValue(option)}>
+        <button key={i} data-selected={option === value} onClick={() => (locked && opaqueLock ? null : setValue(option))} disabled={locked}>
           {option}
         </button>
       ))}
     </ButtonGroupComponent>
-  );
-}
+    <LockWidget locked={locked} opaque={opaqueLock} setLocked={setLocked} size={2} noBorderLeft />
+  </>
+));

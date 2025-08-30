@@ -14,14 +14,15 @@ const StatsPanelComponent = styled.div<JSX.IntrinsicElements["div"]>`
     position: absolute;
   }
   .ABCL-stats-panel {
-    background-color: var(--tmd-element, rgb(255, 255, 255));
+    background-color: var(--abcl-element);
+    color: var(--abcl-text);
   }
   .ABCL-stats-select {
     padding: 0.7%;
     border-radius: 0.35%;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
-    color: #333;
+    border: var(--abcl-border);
+    background-color: var(--abcl-element);
+    color: var(--abcl-text);
     width: calc(100% - 16%);
     margin: 8%;
   }

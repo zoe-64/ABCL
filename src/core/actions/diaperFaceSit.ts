@@ -16,10 +16,12 @@ export const diaperFaceSitFunction = (player: Character) => {
   sendABCLAction(replace_template(otherMessage, player), undefined, "playerActivity", player);
   abclPlayer.stats.MentalRegression += 0.03 * abclPlayer.stats.MentalRegressionModifier;
   ActivityEffectFlat(Player, Player, 8, "ItemNose", 1);
-  CharacterSetFacialExpression(Player, "Blush", "ShortBreath", 30);
-  CharacterSetFacialExpression(Player, "Eyebrows", "Soft", 30);
+  if (Player.ABCL.Settings.ExpressionsByActivities) {
+    CharacterSetFacialExpression(Player, "Blush", "ShortBreath", 30);
+    CharacterSetFacialExpression(Player, "Eyebrows", "Soft", 30);
 
-  CharacterSetFacialExpression(Player, "Eyes", "Dizzy", 30);
+    CharacterSetFacialExpression(Player, "Eyes", "Dizzy", 30);
+  }
 };
 export type diaperFaceSitListeners = {
   "diaper-face-sit": void;

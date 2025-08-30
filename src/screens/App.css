@@ -1,3 +1,19 @@
+:root {
+  --abcl-text: var(--tmd-text, #000);
+
+  --abcl-element: var(--tmd-element, #fff);
+  --abcl-element-indentation: var(--tmd-main, #d9d9d9);
+  --abcl-metabolism-multiplier-text: var(--tmd-text, #b3b3b3);
+
+  --abcl-selected-text: var(--tmd-text, #fff);
+  --abcl-selected-background: var(--tmd-accent, #000);
+
+  --abcl-border-color: var(--tmd-accent, #ababab);
+  --abcl-border: 0.1em solid var(--abcl-border-color);
+
+  --abcl-hover-color: var(--tmd-accent, cyan);
+}
+
 .ABCL-hidden {
   display: none !important;
 }
@@ -14,14 +30,13 @@
   background-repeat: no-repeat;
   background-size: contain;
   cursor: pointer;
-  background-color: #ffffff;
-  border: 1px solid #000000;
+  background-color: var(--abcl-element);
+  border: var(--abcl-border);
   :hover {
-    background-color: cyan;
+    background-color: var(--abcl-hover-color);
   }
 }
-/* sorry fusam */
-#fusam-addon-manager-container {
-  position: absolute;
-  top: 0;
+
+.value-bar-label {
+  color: var(--abcl-text);
 }

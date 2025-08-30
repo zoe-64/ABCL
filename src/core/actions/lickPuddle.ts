@@ -14,7 +14,9 @@ const LickPuddleFunction = (player: Character) => {
   const selfMessage = "%NAME% licks %POSSESSIVE% puddle of pee.";
   const otherMessage = "%OPP_NAME% licks %NAME%'s puddle of pee.";
   sendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "lickPuddle", player);
-  CharacterSetFacialExpression(Player, "Fluids", "DroolLow", 20);
+  if (Player.ABCL.Settings.ExpressionsByActivities) {
+    CharacterSetFacialExpression(Player, "Fluids", "DroolLow", 20);
+  }
   sendUpdateMyData();
   updatePlayerClothes();
   abclPlayer.stats.PuddleSize -= 50;

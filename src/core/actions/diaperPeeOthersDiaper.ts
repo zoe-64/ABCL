@@ -12,10 +12,12 @@ const diaperPeeOthersDiaperRequest = (player: Character, volume: number) => {
 export const diaperPeeOthersDiaperFunction = (player: Character, volume: number) => {
   const otherMessage = "%OPP_NAME% tugs %NAME%'s diaper waistband and pees inside.";
   sendABCLAction(replace_template(otherMessage, player), undefined, "playerActivity", player);
-  CharacterSetFacialExpression(Player, "Blush", "Low", 8);
-  CharacterSetFacialExpression(Player, "Eyebrows", "Soft", 8);
+  if (Player.ABCL.Settings.ExpressionsByActivities) {
+    CharacterSetFacialExpression(Player, "Blush", "Low", 8);
+    CharacterSetFacialExpression(Player, "Eyebrows", "Soft", 8);
 
-  CharacterSetFacialExpression(Player, "Eyes", "Surprised", 5);
+    CharacterSetFacialExpression(Player, "Eyes", "Surprised", 5);
+  }
   abclPlayer.stats.WetnessValue += volume ?? 0;
 };
 export type diaperPeeOthersDiaperListeners = {

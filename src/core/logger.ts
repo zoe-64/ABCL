@@ -1,4 +1,8 @@
 class Logger {
+  private silent: boolean;
+  constructor(silent = true) {
+    this.silent = silent;
+  }
   private logsArray: Array<{
     level: string;
     timestamp: string;
@@ -22,6 +26,8 @@ class Logger {
     if (this.logsArray.length > this.maxLogSize) {
       this.logsArray.shift();
     }
+    if (this.silent) return;
+    console.log(logEntry);
   }
 
   info(message: any) {
@@ -45,4 +51,4 @@ class Logger {
   }
 }
 
-export const logger = new Logger();
+export const logger = new Logger(false);

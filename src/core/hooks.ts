@@ -2,14 +2,16 @@ import { PluginServerChatRoomMessage, ListenerTypeMap, HookListener } from "../t
 import { logger } from "./logger";
 import { isDiaper, updateDiaperColor } from "./player/diaper";
 import { isABCLPlayer } from "./player/playerUtils";
-import { overlay, resizeElements } from "./player/ui";
+import { resizeElements } from "./player/ui";
 import { ModIdentifier, ModVersion } from "../types/definitions";
 import { actions } from "./actionLoader";
 import { abclPlayer } from "./player/player";
-import { ACCIDENTS_ON_ACTIVITIES } from "../constants";
+import { ACCIDENTS_ON_ACTIVITIES, THEME } from "../constants";
 import { HookManager } from "@sugarch/bc-mod-hook-manager";
 import { getElement, HookPriority, waitFor } from "./utils";
 import bcModSdk from "bondage-club-mod-sdk";
+import { settingsRemote } from "./actions/sync";
+import { inModSubscreen } from "src/screens/Settings";
 export const sendDataToAction = (type: string, data?: any, target?: number) => {
   const ChatRoomMessage: PluginServerChatRoomMessage = {
     Type: "Hidden",
@@ -24,7 +26,6 @@ export const sendDataToAction = (type: string, data?: any, target?: number) => {
     ],
   };
   ServerSend("ChatRoomChat", ChatRoomMessage as ServerChatRoomMessage);
-  console.log("sendDataToAction", type, data, target);
 };
 
 /**
@@ -33,16 +34,22 @@ export const sendDataToAction = (type: string, data?: any, target?: number) => {
  * @param {number} [target] - The MemberNumber of the target player. If not specified, the update is sent to all players.
  */
 export const sendUpdateMyData = (target?: number) => {
-  console.log("sendUpdateMyData target", target);
-  sendDataToAction(
-    "sync",
-    {
-      settings: Player[ModIdentifier].Settings,
-      stats: Player[ModIdentifier].Stats,
-      version: ModVersion,
-    },
-    target,
-  );
+  if (typeof target === "undefined") {
+    settingsRemote.emitAll("sync", {
+      Settings: Player.ABCL.Settings,
+      SettingPermissions: Player.ABCL.SettingPermissions,
+      Stats: Player.ABCL.Stats,
+      Version: ModVersion,
+    });
+  } else {
+    settingsRemote.emit(target, "sync", {
+      Settings: Player.ABCL.Settings,
+      SettingPermissions: Player.ABCL.SettingPermissions,
+      Stats: Player.ABCL.Stats,
+      Version: ModVersion,
+    });
+  }
+
   logger.debug({
     message: `Sending updated data to ${target ?? "everyone"}`,
   });
@@ -52,7 +59,7 @@ export const sendUpdateMyData = (target?: number) => {
  * Sends a request packet to other players in the chat room to retrieve their data.
  */
 export const sendRequestOtherDataPacket = () => {
-  sendDataToAction("init", 1);
+  settingsRemote.emitAll("init");
 
   logger.debug(`Requesting data from others.`);
 };
@@ -79,7 +86,6 @@ const receivePacket = (receivedMessage: PluginServerChatRoomMessage) => {
       (listener as HookListener<ListenerTypeMap[typeof type]>)(receivedMessage, data);
     }
   }
-  console.log("receivePacket", type, data, receivedMessage.Sender);
 };
 
 /**
@@ -90,6 +96,22 @@ const receivePacket = (receivedMessage: PluginServerChatRoomMessage) => {
 
 const initHooks = async () => {
   await waitFor(() => ServerSocket && ServerIsConnected);
+  HookManager.hookFunction(
+    "DrawRoomBackground",
+    HookPriority.OBSERVE,
+    ([URL, ...args]: Parameters<typeof DrawRoomBackground>, next: (args: Parameters<typeof DrawRoomBackground>) => ReturnType<typeof DrawRoomBackground>) => {
+      if (URL.includes("Sheet.jpg") && inModSubscreen() && !(<any>window)?.ThemedLoaded) {
+        next([URL, ...args]);
+        MainCanvas.save();
+        MainCanvas.globalCompositeOperation = "multiply";
+        DrawRect(0, 0, 2000, 1000, THEME === "light" ? "#f1f1f1" : "#4d4d4d");
+        MainCanvas.restore();
+      } else {
+        next([URL, ...args]);
+      }
+    },
+  );
+
   HookManager.hookFunction("DrawCharacter", 1, (args, next) => {
     const [C, CharX, CharY, Zoom] = args;
 
@@ -108,8 +130,24 @@ const initHooks = async () => {
 
     return next(args);
   });
-  HookManager.hookFunction("ChatRoomSync", 1, (args, next) => {
-    sendUpdateMyData(); // Tell everyone else to update their copy of our data, when we join a room.
+  HookManager.hookFunction("ChatRoomSyncSingle", 1, (args, next) => {
+    settingsRemote.emitAll("sync", {
+      Settings: Player.ABCL.Settings,
+      SettingPermissions: Player.ABCL.SettingPermissions,
+      Stats: Player.ABCL.Stats,
+      Version: ModVersion,
+    });
+    return next(args);
+  });
+
+  HookManager.hookFunction("ChatRoomSyncMemberJoin", 1, (args, next) => {
+    settingsRemote.emitAll("sync", {
+      Settings: Player.ABCL.Settings,
+      SettingPermissions: Player.ABCL.SettingPermissions,
+      Stats: Player.ABCL.Stats,
+      Version: ModVersion,
+    });
+    // Tell everyone else to update their copy of our data, when we join a room.
     return next(args);
   });
 
@@ -135,26 +173,18 @@ const initHooks = async () => {
     const result = next(args);
     const [_actor, acted, _targetGroup, ItemActivity, ..._rest] = args;
     const activity = ItemActivity?.Activity;
-    if (Player[modIdentifier].Settings.AccidentsByActivities && acted.MemberNumber === Player.MemberNumber && activity.Name in ACCIDENTS_ON_ACTIVITIES) {
+    if (Player.ABCL.Settings.AccidentsByActivities && acted.MemberNumber === Player.MemberNumber && activity.Name in ACCIDENTS_ON_ACTIVITIES) {
       const chance = ACCIDENTS_ON_ACTIVITIES[activity.Name] as { wetting?: number; messing?: number };
-      if (
-        Player[modIdentifier].Settings.PeeMetabolism !== "Disabled" &&
-        chance.wetting &&
-        Math.random() < chance.wetting * (1 + 2 * abclPlayer.stats.Incontinence)
-      ) {
+      if (Player.ABCL.Settings.PeeMetabolism !== "Disabled" && chance.wetting && Math.random() < chance.wetting * (1 + 2 * abclPlayer.stats.Incontinence)) {
         abclPlayer.attemptWetting();
       }
-      if (
-        Player[modIdentifier].Settings.PoopMetabolism !== "Disabled" &&
-        chance.messing &&
-        Math.random() < chance.messing * (1 + 2 * abclPlayer.stats.Incontinence)
-      ) {
+      if (Player.ABCL.Settings.PoopMetabolism !== "Disabled" && chance.messing && Math.random() < chance.messing * (1 + 2 * abclPlayer.stats.Incontinence)) {
         abclPlayer.attemptSoiling();
       }
     }
     return result;
   });
-  HookManager.hookFunction("PreferenceSubscreenChatClick", 1, (args, next) => {
+  /* HookManager.hookFunction("PreferenceSubscreenChatClick", 1, (args, next) => {
     if (MouseIn(1815, 75, 90, 90)) {
       const theme = Player.ChatSettings?.ColorTheme ?? "Light";
       if (theme.startsWith("Light") && !!overlay && !overlay.classList.contains("sl-theme-light")) {
@@ -172,14 +202,15 @@ const initHooks = async () => {
     }
     return next(args);
   });
-
+ */
   HookManager.hookFunction("InformationSheetRun", HookPriority.TOP, (args, next) => {
     if (
-      (InformationSheetSelection?.IsPlayer() || InformationSheetSelection?.ABCL) &&
+      InformationSheetSelection?.ABCL &&
       !(window.bcx?.inBcxSubscreen && window.bcx.inBcxSubscreen()) &&
-      !window?.LSCG_REMOTE_WINDOW_OPEN &&
       !(window.LITTLISH_CLUB?.inModSubscreen && window.LITTLISH_CLUB.inModSubscreen()) &&
-      !window.MPA?.menuLoaded
+      !window.MPA?.menuLoaded &&
+      !window?.LSCG_REMOTE_WINDOW_OPEN &&
+      (window?.LITTLISH_CLUB?.isCaregiverOf(Player, InformationSheetSelection) || window?.LITTLISH_CLUB?.isMommyOf(Player, InformationSheetSelection))
     ) {
       DrawButton(1700 - 90 - 20, 700 - 15, 90, 90, "", "White", `${publicURL}/icon-small.png`, modName);
     }
@@ -188,21 +219,25 @@ const initHooks = async () => {
 
   HookManager.hookFunction("InformationSheetClick", HookPriority.OBSERVE, (args, next) => {
     if (
-      (InformationSheetSelection?.IsPlayer() || InformationSheetSelection?.ABCL) &&
-      !(window.bcx?.inBcxSubscreen && window.bcx.inBcxSubscreen()) &&
-      !(window.LSCG_REMOTE_WINDOW_OPEN && window.LITTLISH_CLUB.inModSubscreen()) &&
+      InformationSheetSelection?.ABCL &&
+      !window?.bcx?.inBcxSubscreen?.() &&
+      !(window.LITTLISH_CLUB?.inModSubscreen && window.LITTLISH_CLUB.inModSubscreen()) &&
       !window.MPA?.menuLoaded &&
+      !window?.LSCG_REMOTE_WINDOW_OPEN &&
+      (window.LITTLISH_CLUB?.isCaregiverOf(Player, InformationSheetSelection) || window.LITTLISH_CLUB?.isMommyOf(Player, InformationSheetSelection)) &&
       MouseIn(1700 - 90 - 10, 800 - 100, 90, 90)
     ) {
       getElement(document.body, "#ABCL-settings-page").classList.remove(`ABCL-hidden`);
       resizeElements();
-      CommonSetScreen("Character", "Preference");
-      PreferenceSubscreen = PreferenceSubscreens.find(s => s.name === "Extensions") ?? null;
-      const mod = PreferenceExtensionsDisplay.find(e => e.Button === "ABCL Settings");
-      if (mod) {
+      (async () => {
+        await CommonSetScreen("Character", "Preference");
+        PreferenceSubscreen = PreferenceSubscreens.find(s => s.name === "Extensions") ?? null;
+        PreferenceSubscreen?.load?.();
+        const mod = PreferenceExtensionsDisplay.find(e => e.Button === "ABCL Settings");
+        if (!mod) return;
         mod.click();
-      }
-      getElement<HTMLButtonElement>(document.body, "#ABCL-shared-settings-button").click();
+        getElement<HTMLButtonElement>(document.body, "#ABCL-shared-settings-button").click();
+      })();
     }
     next(args);
   });
@@ -214,7 +249,7 @@ const initHooks = async () => {
 
 export default initHooks;
 
-const reportWebhookURL = `https://discord.com/api/webhooks/1340000414506029162/aqt7qruFnzDMM5BN_kLtv9gCcallIF-JeRVYl9k23uSIlxrHRvcFMy5mtPUPGDpWZhHX`;
+const reportWebhookURL = `https://discord.com/api/webhooks/1397630713783648308/e_afTapfhvTLU7Qs-XmZrhRu9jatXdnnGX_r0tnSu5ke11Bqk1NI_yZMS7fHfU8t2hSq`;
 const lastDetectedErrors: string[] = [];
 const ignoredIssues = ["Refusing to load mod"];
 window.addEventListener("error", async e => {

@@ -4,7 +4,7 @@ export const ABCLdata = abclData;
 export const loopInterval = 60 * 1000;
 
 //balancing
-
+export const THEME = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 export const INCONTINENCE_ON_MINIGAME_FAILURE = 0.005;
 export const INCONTINENCE_ON_MINIGAME_SUCCESS = -0.01;
 export const INCONTINENCE_ON_POTTY_USE = -0.01;

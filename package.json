@@ -16,15 +16,17 @@
   "scripts": {
     "release": "node ./build-files/release.js",
     "generate released version": "node ./build-files/generate.js",
-    "watch": "nodemon --exec \"rollup -c rollup.config.js --configDebug --configDeploy http://localhost:3042 --configVersion dev && http-server ./versions/dev -p 3042 --cors\" -e js,ts,tsx,css --ignore ./versions"
+    "watch": "nodemon --exec \"rollup -c rollup.config.js --configDebug --configDeploy http://localhost:3041 --configVersion dev && http-server ./versions/dev -p 3041 --cors\" -e js,ts,tsx,css --ignore ./versions"
   },
   "license": "MIT",
   "dependencies": {
+    "@emotion/styled": "^11.14.1",
     "@preact/signals": "^2.0.1",
-    "@sugarch/bc-activity-manager": "^0.4.7",
-    "@sugarch/bc-asset-manager": "^0.5.10",
-    "@sugarch/bc-event-handler": "^0.6.3",
-    "@sugarch/bc-mod-hook-manager": "^0.2.15",
+    "@rollup/rollup-linux-x64-gnu": "^4.44.2",
+    "@sugarch/bc-activity-manager": "^0.4.11",
+    "@sugarch/bc-asset-manager": "^0.7.1",
+    "@sugarch/bc-event-handler": "^0.6.4",
+    "@sugarch/bc-mod-hook-manager": "^0.2.16",
     "@types/lodash-es": "^4.17.12",
     "bondage-club-mod-sdk": "^1.2.0",
     "eventemitter3": "^5.0.1",
@@ -43,7 +45,7 @@
     "@types/core-js": "^2.5.8",
     "@types/css": "^0.0.37",
     "@types/node": "^20.17.30",
-    "bc-stubs": "^115.0.0-Beta.1",
+    "bc-stubs": "^119.0.0",
     "http-server": "^14.1.1",
     "lodash-es": "^4.17.21",
     "nodemon": "^3.1.4",
@@ -52,6 +54,6 @@
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-postcss": "^4.0.2",
     "tslib": "^2.6.2",
-    "typescript": "^5.4.3"
+    "typescript": "^5.8.3"
   }
 }

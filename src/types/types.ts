@@ -2,7 +2,6 @@ import { diaperRubFrontListeners } from "src/core/actions/diaperRubFront";
 import { changeDiaperListeners } from "../core/actions/changeDiaper";
 import { lickPuddleListeners } from "../core/actions/lickPuddle";
 import { onABCLMessageListeners } from "../core/actions/onABCLMessage";
-import { syncListeners } from "../core/actions/sync";
 
 import { wipePuddleListeners } from "../core/actions/wipePuddle";
 import { ModVersion } from "./definitions";
@@ -111,8 +110,7 @@ export type ABCLActivity = {
 };
 
 export type HookListener<T> = (raw: PluginServerChatRoomMessage, data: T) => void;
-export type ListenerTypeMap = syncListeners &
-  wipePuddleListeners &
+export type ListenerTypeMap = wipePuddleListeners &
   lickPuddleListeners &
   changeDiaperListeners &
   onABCLMessageListeners &

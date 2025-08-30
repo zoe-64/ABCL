@@ -40,6 +40,7 @@ export const defaultSettings: ModSettings = {
   DisableClothingStains: false,
   DisableDiaperStains: false,
   AccidentsByActivities: true,
+  ExpressionsByActivities: false,
 };
 
 export const defaultStats: ModStats = {
@@ -73,31 +74,65 @@ export const defaultStats: ModStats = {
     value: 0,
   },
 };
+
+export const defaultSettingPermissions: ModStorageModel["SettingPermissions"] = {
+  PeeMetabolism: false,
+  PoopMetabolism: false,
+  MentalRegressionModifier: false,
+  OnDiaperChange: false,
+  PauseStats: false,
+  DisableWettingLeaks: false,
+  DisableSoilingLeaks: false,
+  DisableClothingStains: false,
+  DisableDiaperStains: false,
+  AccidentsByActivities: false,
+  ExpressionsByActivities: false, // Experimental / buggy
+
+  changeDiaper: false,
+  checkDiaper: false,
+  lickPuddle: false,
+  wetDiaper: false,
+  wetClothing: false,
+  soilDiaper: false,
+  soilClothing: false,
+  usePotty: false,
+  useToilet: false,
+  wipePuddle: false,
+  statusMessages: false,
+  playerActivity: false,
+
+  pauseStats: false,
+  OpenRemoteSettings: false,
+  LockedOutOfSettings: false,
+  StatusMessages: false,
+};
 const defaultData: ModStorageModel = {
   Settings: defaultSettings,
   Stats: defaultStats,
+  SettingPermissions: defaultSettingPermissions,
 };
 
 export const updateData = (newData: PartialDeep<ModStorageModel>) => {
-  Player[modIdentifier] = merge(Player[modIdentifier] || defaultData, newData);
+  Player.ABCL = merge(Player.ABCL || defaultData, newData);
   syncData();
 };
 
 export const syncData = debounce(() => {
-  const compressed = LZString.compressToBase64(JSON.stringify(Player[modIdentifier]));
-  Player.ExtensionSettings[modIdentifier] = compressed;
+  const compressed = LZString.compressToBase64(JSON.stringify(Player.ABCL));
+  Player.ExtensionSettings.ABCL = compressed;
   ServerPlayerExtensionSettingsSync(modIdentifier);
   sendUpdateMyData();
 }, 1000);
 
 //const devMode = false; use clearData() // Manually toggle during local development if needed to clear settings
 export const loadOrGenerateData = async () => {
-  const dataString = LZString.decompressFromBase64(Player.ExtensionSettings[modIdentifier]);
+  const dataString = LZString.decompressFromBase64(Player.ExtensionSettings.ABCL);
   const data = dataString
     ? JSON.parse(dataString)
     : {
         Settings: {},
         Stats: {},
+        SettingPermissions: {},
       };
 
   // migrations
@@ -121,16 +156,17 @@ export const loadOrGenerateData = async () => {
     {
       Settings: defaultSettings,
       Stats: defaultStats,
+      SettingPermissions: defaultSettingPermissions,
       Version: modVersion,
     },
     data,
   );
   logger.debug({ message: "Merged settings object", modStorageObject });
-  Player[modIdentifier] = modStorageObject;
+  Player.ABCL = modStorageObject;
 };
 
 export const clearData = () => {
-  Player.ExtensionSettings[modIdentifier] = "N4XyA==="; // Empty object compressed
+  Player.ExtensionSettings.ABCL = "N4XyA==="; // Empty object compressed
   ServerPlayerExtensionSettingsSync(modIdentifier);
   logger.warn("cleared data");
 };

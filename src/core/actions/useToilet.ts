@@ -34,7 +34,9 @@ export const useToilet: CombinedAction = {
     Tag: "use-toilet",
     Action: () => {
       if (abclPlayer.stats.MentalRegression < 0.3) {
-        CharacterSetFacialExpression(Player, "Eyes", "Dizzy", 8);
+        if (Player.ABCL.Settings.ExpressionsByActivities) {
+          CharacterSetFacialExpression(Player, "Eyes", "Dizzy", 8);
+        }
         return sendChatLocal("You feel uncomfortable, the toilet is cold and hard almost like ice. You can't use it.");
       }
       if (hasDiaper() && (Player.IsRestrained() || isDiaperLocked())) return sendChatLocal("You can't use the toilet while your diaper is locked.");

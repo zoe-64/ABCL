@@ -1,37 +1,59 @@
-import { CombinedAction } from "../../types/types";
 import { sendUpdateMyData } from "../hooks";
 import { logger } from "../logger";
-import { getCharacter } from "../player/playerUtils";
 
-export type syncListeners = {
-  init: never;
-  sync: { settings: ModSettings; stats: ModStats; version: typeof modVersion; target?: number };
+import { ChatRoomEvents, ChatRoomRemoteEventEmitter } from "@sugarch/bc-event-handler";
+import { updateData } from "../settings";
+import { ModVersion } from "src/types/definitions";
+import { PartialDeep } from "src/types/types";
+import { sendChatLocal } from "../utils";
+
+type EventMap = {
+  updateSettings: [{ settings: PartialDeep<ModSettings>; settingPermissions: PartialDeep<ModStorageModel["SettingPermissions"]> }];
+  init: [];
+  sync: [{ Settings: ModSettings; Stats: ModStats; Version: string; SettingPermissions: ModStorageModel["SettingPermissions"] }];
 };
 
-export const sync: CombinedAction = {
-  listeners: {
-    sync: ({ Sender }, data) => {
-      if (!Sender) return;
-      console.log("sync:" + modIdentifier);
+export const settingsRemote = new ChatRoomRemoteEventEmitter<EventMap>(modIdentifier);
+settingsRemote.on("updateSettings", (info, { settings, settingPermissions }) => {
+  const character = ChatRoomCharacter.find(character => character.MemberNumber === info.sender);
+  if (!character) return;
+  if (window.LITTLISH_CLUB.isMommyOf(character, Player) || window.LITTLISH_CLUB.isCaregiverOf(character, Player)) {
+    ToastManager.info(`${character.Name} updated your settings.`);
+    sendChatLocal(`${character.Name} updated your settings.`);
+    updateData({
+      Settings: settings,
+      SettingPermissions: settingPermissions,
+    });
+  }
+  return;
+});
+settingsRemote.on("init", info => {
+  logger.debug(`Received request for data`);
+  sendUpdateMyData(info.sender);
+});
 
-      logger.debug({
-        message: `Received updated data`,
-        data,
-      });
+ChatRoomEvents.on("PlayerJoin", player => {
+  if (player.MemberNumber === Player.MemberNumber) return;
+  settingsRemote.emitAll("sync", {
+    Settings: Player.ABCL.Settings,
+    SettingPermissions: Player.ABCL.SettingPermissions,
+    Stats: Player.ABCL.Stats,
+    Version: ModVersion,
+  });
+});
+settingsRemote.on("sync", (info, { Settings, Stats, Version, SettingPermissions }) => {
+  if (info.sender === Player.MemberNumber) return;
 
-      const otherCharacter = getCharacter(Sender);
-      if (!otherCharacter) return;
+  const index = ChatRoomCharacter.findIndex(character => character.MemberNumber === info.sender);
+  if (index === -1) return logger.warn(`Could not find character with member number ${info.sender}`);
 
-      otherCharacter[modIdentifier] = {
-        Stats: data.stats,
-        Version: data.version,
-        Settings: data.settings,
-      };
-    },
-    init: ({ Sender }) => {
-      console.log("init");
-      logger.debug(`Received request for data`);
-      sendUpdateMyData(Sender);
-    },
-  },
-};
+  logger.debug(`Updating data for ${info.sender}`);
+  ChatRoomCharacter[index].ABCL = {
+    Stats,
+    Version,
+    SettingPermissions,
+    Settings,
+  };
+
+  return;
+});
