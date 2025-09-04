@@ -7,7 +7,17 @@ import { SettingPanel } from "src/screens/components/settingPanel";
 import { MetabolismBar } from "src/screens/components/metabolismDropDown";
 import { Group, Stack } from "src/screens/components/positionComponents";
 import { SettingsH2 } from "../settingsPage";
+import { clearData } from "src/core/settings";
+import styled from "@emotion/styled";
 
+const ResetButton = styled.button`
+  background-color: #5e1a1a;
+  color: var(--abcl-text);
+  border: var(--abcl-border);
+  padding: 1em;
+  cursor: pointer;
+  margin-top: 1em;
+`;
 export default function StatsPage({ setPage }: { setPage: (page: string) => void }): h.JSX.Element {
   const [peeMetabolism, setPeeMetabolism] = useState<MetabolismSetting>(Player.ABCL.Settings.PeeMetabolism);
   const [peeMetabolismLocked, _setPeeMetabolismLocked] = useState<boolean>(Player.ABCL.SettingPermissions.PeeMetabolism);
@@ -100,6 +110,33 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
           />
         </SettingPanel>
       </Group>
+      <ResetButton
+        onClick={() => {
+          ToastManager.warning("Warning: This will reset all settings to their default values and reload the page. Are you sure you want to do this?", {
+            duration: 10 * 1000,
+            buttons: [
+              {
+                label: "Reset",
+                onClick: (ev, toast) => {
+                  clearData();
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 2000);
+                  toast?._dismiss?.("click");
+                },
+              },
+              {
+                label: "Cancel",
+                onClick: (ev, toast) => {
+                  toast?._dismiss?.("click");
+                },
+              },
+            ],
+          });
+        }}
+      >
+        Reset Settings
+      </ResetButton>
       <div style={{ height: "10em" }}></div>
     </Stack>
   );
