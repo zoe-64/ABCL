@@ -5,6 +5,7 @@ import { Checkbox } from "src/screens/components/checkbox";
 import { Group } from "src/screens/components/positionComponents";
 import { SettingPanel } from "src/screens/components/settingPanel";
 import { SettingsH2 } from "../settingsPage";
+import { isOwned } from "src/core/player/diaper";
 
 export default function MessagesPage({ setPage }: { setPage: (page: string) => void }): h.JSX.Element {
   const [wetDiaper, setWetDiaper] = useState<boolean>(Player.ABCL.Settings.VisibleMessages.wetDiaper);
@@ -82,37 +83,37 @@ export default function MessagesPage({ setPage }: { setPage: (page: string) => v
         <SettingsH2>Visible Messages to Players</SettingsH2>
         <Group>
           <SettingPanel title="Wetting Diapers">
-            <Checkbox checked={wetDiaper} setChecked={setWetDiaper} locked={wetDiaperLocked} opaqueLock={true} />
+            <Checkbox checked={wetDiaper} setChecked={setWetDiaper} locked={wetDiaperLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
           <SettingPanel title="Wetting Clothes">
-            <Checkbox checked={wetClothing} setChecked={setWetClothing} locked={wetClothingLocked} opaqueLock={true} />
+            <Checkbox checked={wetClothing} setChecked={setWetClothing} locked={wetClothingLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
           <SettingPanel title="Soiling Diapers">
-            <Checkbox checked={soilDiaper} setChecked={setSoilDiaper} locked={soilDiaperLocked} opaqueLock={true} />
+            <Checkbox checked={soilDiaper} setChecked={setSoilDiaper} locked={soilDiaperLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
           <SettingPanel title="Soiling Clothes">
-            <Checkbox checked={soilClothing} setChecked={setSoilClothing} locked={soilClothingLocked} opaqueLock={true} />
+            <Checkbox checked={soilClothing} setChecked={setSoilClothing} locked={soilClothingLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
           <SettingPanel title="Changing Diapers">
-            <Checkbox checked={changeDiaper} setChecked={setChangeDiaper} locked={changeDiaperLocked} opaqueLock={true} />
+            <Checkbox checked={changeDiaper} setChecked={setChangeDiaper} locked={changeDiaperLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
           <SettingPanel title="Checking Diapers">
-            <Checkbox checked={checkDiaper} setChecked={setCheckDiaper} locked={checkDiaperLocked} opaqueLock={true} />
+            <Checkbox checked={checkDiaper} setChecked={setCheckDiaper} locked={checkDiaperLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
           <SettingPanel title="Licking Puddles">
-            <Checkbox checked={lickPuddle} setChecked={setLickPuddle} locked={lickPuddleLocked} opaqueLock={true} />
+            <Checkbox checked={lickPuddle} setChecked={setLickPuddle} locked={lickPuddleLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
           <SettingPanel title="Wiping Puddle">
-            <Checkbox checked={wipePuddle} setChecked={setWipePuddle} locked={wipePuddleLocked} opaqueLock={true} />
+            <Checkbox checked={wipePuddle} setChecked={setWipePuddle} locked={wipePuddleLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
           <SettingPanel title="Using Potty">
-            <Checkbox checked={usePotty} setChecked={setUsePotty} locked={usePottyLocked} opaqueLock={true} />
+            <Checkbox checked={usePotty} setChecked={setUsePotty} locked={usePottyLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
           <SettingPanel title="Using Toilet">
-            <Checkbox checked={useToilet} setChecked={setUseToilet} locked={useToiletLocked} opaqueLock={true} />
+            <Checkbox checked={useToilet} setChecked={setUseToilet} locked={useToiletLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
           <SettingPanel title="Show Status Messages">
-            <Checkbox checked={statusMessages} setChecked={setStatusMessages} locked={statusMessagesLocked} opaqueLock={true} />
+            <Checkbox checked={statusMessages} setChecked={setStatusMessages} locked={statusMessagesLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
         </Group>
       </div>

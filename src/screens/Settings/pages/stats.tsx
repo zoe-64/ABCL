@@ -2,21 +2,25 @@ import { h } from "preact";
 
 import { ButtonGroup } from "../../components/buttonGroup";
 import { Checkbox } from "../../components/checkbox";
-import { useState } from "preact/hooks";
+import { useCallback, useEffect, useReducer, useState } from "preact/hooks";
 import { SettingPanel } from "src/screens/components/settingPanel";
 import { MetabolismBar } from "src/screens/components/metabolismDropDown";
 import { Group, Stack } from "src/screens/components/positionComponents";
 import { SettingsH2 } from "../settingsPage";
 import { clearData } from "src/core/settings";
 import styled from "@emotion/styled";
+import { isOwned } from "src/core/player/diaper";
+import { RuleId } from "src/types/definitions";
 
 const ResetButton = styled.button`
-  background-color: #5e1a1a;
-  color: var(--abcl-text);
+  background-color: rgb(255, 125, 125);
+  color: #fff;
   border: var(--abcl-border);
-  padding: 1em;
+  padding: 0.5em;
   cursor: pointer;
   margin-top: 1em;
+  font-weight: bold;
+  font-size: 2em;
 `;
 export default function StatsPage({ setPage }: { setPage: (page: string) => void }): h.JSX.Element {
   const [peeMetabolism, setPeeMetabolism] = useState<MetabolismSetting>(Player.ABCL.Settings.PeeMetabolism);
@@ -43,6 +47,7 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
 
   const [expressionsByActivities, setExpressionsByActivities] = useState<boolean>(Player.ABCL.Settings.ExpressionsByActivities);
   const [expressionsByActivitiesLocked, _setExpressionsByActivitiesLocked] = useState<boolean>(Player.ABCL.SettingPermissions.ExpressionsByActivities);
+
   return (
     <Stack className="ABCL-settings-section">
       <SettingsH2>Wet and Soiling</SettingsH2>
@@ -67,36 +72,41 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
       ></button>
       <Group>
         <SettingPanel title="Pause Stats">
-          <Checkbox checked={pauseStats} setChecked={setPauseStats} locked={pauseStatsLocked} opaqueLock={true} />
+          <Checkbox checked={pauseStats} setChecked={setPauseStats} locked={pauseStatsLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Wetting Leaks / Puddles">
-          <Checkbox checked={disableWettingLeaks} setChecked={setDisableWettingLeaks} locked={disableWettingLeaksLocked} opaqueLock={true} />
+          <Checkbox checked={disableWettingLeaks} setChecked={setDisableWettingLeaks} locked={disableWettingLeaksLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Messy Leaks">
-          <Checkbox checked={disableSoilingLeaks} setChecked={setDisableSoilingLeaks} locked={disableSoilingLeaksLocked} opaqueLock={true} />
+          <Checkbox checked={disableSoilingLeaks} setChecked={setDisableSoilingLeaks} locked={disableSoilingLeaksLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Clothing Stains">
-          <Checkbox checked={disableClothingStains} setChecked={setDisableClothingStains} locked={disableClothingStainsLocked} opaqueLock={true} />
+          <Checkbox checked={disableClothingStains} setChecked={setDisableClothingStains} locked={disableClothingStainsLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Diaper Stains">
-          <Checkbox checked={disableDiaperStains} setChecked={setDisableDiaperStains} locked={disableDiaperStainsLocked} opaqueLock={true} />
+          <Checkbox checked={disableDiaperStains} setChecked={setDisableDiaperStains} locked={disableDiaperStainsLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Accidents by Activities">
-          <Checkbox checked={accidentsByActivities} setChecked={setAccidentsByActivities} locked={accidentsByActivitiesLocked} opaqueLock={true} />
+          <Checkbox checked={accidentsByActivities} setChecked={setAccidentsByActivities} locked={accidentsByActivitiesLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Expressions by Activities (Experimental)">
-          <Checkbox checked={expressionsByActivities} setChecked={setExpressionsByActivities} locked={expressionsByActivitiesLocked} opaqueLock={true} />
+          <Checkbox
+            checked={expressionsByActivities}
+            setChecked={setExpressionsByActivities}
+            locked={expressionsByActivitiesLocked && isOwned()}
+            opaqueLock={true}
+          />
         </SettingPanel>
       </Group>
       <Group>
         <SettingPanel title="Pee Metabolism">
-          <MetabolismBar value={peeMetabolism} setValue={setPeeMetabolism} locked={peeMetabolismLocked} opaqueLock={true}></MetabolismBar>
+          <MetabolismBar value={peeMetabolism} setValue={setPeeMetabolism} locked={peeMetabolismLocked && isOwned()} opaqueLock={true}></MetabolismBar>
         </SettingPanel>
         <SettingPanel title="Bowel Metabolism">
-          <MetabolismBar value={poopMetabolism} setValue={setPoopMetabolism} locked={poopMetabolismLocked} opaqueLock={true}></MetabolismBar>
+          <MetabolismBar value={poopMetabolism} setValue={setPoopMetabolism} locked={poopMetabolismLocked && isOwned()} opaqueLock={true}></MetabolismBar>
         </SettingPanel>
         <SettingPanel title="Mental Regression">
-          <MetabolismBar value={mentalMetabolism} setValue={setMentalMetabolism} locked={mentalMetabolismLocked} opaqueLock={true}></MetabolismBar>
+          <MetabolismBar value={mentalMetabolism} setValue={setMentalMetabolism} locked={mentalMetabolismLocked && isOwned()} opaqueLock={true}></MetabolismBar>
         </SettingPanel>
         <SettingPanel title="On Diaper Change Prompt">
           <ButtonGroup
@@ -112,7 +122,8 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
       </Group>
       <ResetButton
         onClick={() => {
-          ToastManager.warning("Warning: This will reset all settings to their default values and reload the page. Are you sure you want to do this?", {
+          if (isOwned() && window.LITTLISH_CLUB.isRuleActive(Player, RuleId.DISABLE_RESET_SETTINGS_BUTTON)) return;
+          ToastManager.warning("This will reset abcl and reload the page. Do you want to reset?", {
             duration: 10 * 1000,
             buttons: [
               {
@@ -134,6 +145,7 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
             ],
           });
         }}
+        disabled={!isOwned() && window.LITTLISH_CLUB.isRuleActive(Player, RuleId.DISABLE_RESET_SETTINGS_BUTTON)}
       >
         Reset Settings
       </ResetButton>

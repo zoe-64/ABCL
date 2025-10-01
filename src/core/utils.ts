@@ -2,13 +2,16 @@ import { PermissionLevels } from "../types/types";
 import { syncData } from "./settings";
 import { logger } from "./logger";
 import { HookManager } from "@sugarch/bc-mod-hook-manager";
+import bcModSdk from "bondage-club-mod-sdk";
 
-HookManager.init({
+export const registeredMod = bcModSdk.registerMod({
   name: modName,
   fullName: modName,
   version: modVersion,
   repository: modRepo,
 });
+
+HookManager.initWithMod(registeredMod);
 
 export enum HookPriority {
   OBSERVE = 0,

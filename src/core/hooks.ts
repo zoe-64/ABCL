@@ -206,11 +206,12 @@ const initHooks = async () => {
   HookManager.hookFunction("InformationSheetRun", HookPriority.TOP, (args, next) => {
     if (
       InformationSheetSelection?.ABCL &&
-      !(window.bcx?.inBcxSubscreen && window.bcx.inBcxSubscreen()) &&
-      !(window.LITTLISH_CLUB?.inModSubscreen && window.LITTLISH_CLUB.inModSubscreen()) &&
+      !window?.bcx?.inBcxSubscreen?.() &&
       !window.MPA?.menuLoaded &&
-      !window?.LSCG_REMOTE_WINDOW_OPEN &&
-      (window?.LITTLISH_CLUB?.isCaregiverOf(Player, InformationSheetSelection) || window?.LITTLISH_CLUB?.isMommyOf(Player, InformationSheetSelection))
+      window.LITTLISH_CLUB &&
+      !window.LITTLISH_CLUB.inModSubscreen() &&
+      (window.LITTLISH_CLUB.isCaregiverOf(Player, InformationSheetSelection) || window.LITTLISH_CLUB.isMommyOf(Player, InformationSheetSelection)) &&
+      window.LITTLISH_CLUB.hasAccessRightTo(Player, InformationSheetSelection, "MANAGE_ABCL_SETTINGS")
     ) {
       DrawButton(1700 - 90 - 20, 700 - 15, 90, 90, "", "White", `${publicURL}/icon-small.png`, modName);
     }
@@ -221,10 +222,12 @@ const initHooks = async () => {
     if (
       InformationSheetSelection?.ABCL &&
       !window?.bcx?.inBcxSubscreen?.() &&
-      !(window.LITTLISH_CLUB?.inModSubscreen && window.LITTLISH_CLUB.inModSubscreen()) &&
       !window.MPA?.menuLoaded &&
       !window?.LSCG_REMOTE_WINDOW_OPEN &&
-      (window.LITTLISH_CLUB?.isCaregiverOf(Player, InformationSheetSelection) || window.LITTLISH_CLUB?.isMommyOf(Player, InformationSheetSelection)) &&
+      window.LITTLISH_CLUB &&
+      !window.LITTLISH_CLUB.inModSubscreen() &&
+      (window.LITTLISH_CLUB.isCaregiverOf(Player, InformationSheetSelection) || window.LITTLISH_CLUB.isMommyOf(Player, InformationSheetSelection)) &&
+      window.LITTLISH_CLUB.hasAccessRightTo(Player, InformationSheetSelection, "MANAGE_ABCL_SETTINGS") &&
       MouseIn(1700 - 90 - 10, 800 - 100, 90, 90)
     ) {
       getElement(document.body, "#ABCL-settings-page").classList.remove(`ABCL-hidden`);

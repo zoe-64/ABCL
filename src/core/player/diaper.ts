@@ -2,6 +2,9 @@ import { ABCLdata } from "../../constants";
 import { abclPlayer, updatePlayerClothes } from "./player";
 
 // Is/Has
+export const isOwned = (player: Character = Player): boolean => {
+  return !window.LITTLISH_CLUB || window.LITTLISH_CLUB.getMommyOf(player) !== null || window.LITTLISH_CLUB.getCaregiversOf(player).length > 0;
+};
 export const isLeaking = (type: "pee" | "poop" | "any" = "any") => {
   const diaperSize = getPlayerDiaperSize();
   if (type === "pee") {

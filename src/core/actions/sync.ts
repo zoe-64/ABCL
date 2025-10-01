@@ -18,8 +18,8 @@ settingsRemote.on("updateSettings", (info, { settings, settingPermissions }) => 
   const character = ChatRoomCharacter.find(character => character.MemberNumber === info.sender);
   if (!character) return;
   if (window.LITTLISH_CLUB.isMommyOf(character, Player) || window.LITTLISH_CLUB.isCaregiverOf(character, Player)) {
-    ToastManager.info(`${character.Name} updated your settings.`);
-    sendChatLocal(`${character.Name} updated your settings.`);
+    ToastManager.info(`${character.Nickname ?? character.Name} (${character.MemberNumber}) updated your settings.`);
+    sendChatLocal(`${character.Nickname ?? character.Name} (${character.MemberNumber}) updated your settings.`);
     updateData({
       Settings: settings,
       SettingPermissions: settingPermissions,

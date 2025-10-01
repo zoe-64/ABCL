@@ -2,7 +2,7 @@ import { syncData } from "../../core/settings";
 import { ModName } from "../../types/definitions";
 import { getElement } from "src/core/utils";
 import renderApp from "../App";
-import { overlay, resizeElements } from "src/core/player/ui";
+import { resizeElements } from "src/core/player/ui";
 
 export const initSettingsScreen = async () => {
   renderApp();

@@ -1,5 +1,5 @@
 import { h, JSX } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useReducer, useState } from "preact/hooks";
 import StatsPage from "./pages/stats";
 import MessagesPage from "./pages/messages";
 import { resizeElements } from "src/core/player/ui";
