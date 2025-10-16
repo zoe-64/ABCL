@@ -34,8 +34,8 @@ export const targetInputExtractor = (parsed: string[]): Character | undefined =>
   return character;
 };
 
-export const isABCLPlayer = (character: Character, strict?: boolean, version = Player.ABCL.Version): boolean => {
-  return Boolean(character?.ABCL && (!strict || character.ABCL.Version === version));
+export const isABCLPlayer = (character: Character, strict?: boolean, version = Player?.ABCL?.Version): boolean => {
+  return Boolean(character?.ABCL && (!strict || character?.ABCL?.Version === version));
 };
 
 export function getCharacterName(memberNumber: number | undefined): string {
