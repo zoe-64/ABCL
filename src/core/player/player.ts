@@ -14,7 +14,7 @@ import {
 import { abclStatsWindow } from "./ui";
 import { ABCLdata } from "../../constants";
 import { MetabolismSettingValues } from "../../types/types";
-import { sendABCLAction, sendStatusMessage } from "./playerUtils";
+import { getAccidentAutopilotOutcome, isAccidentsAutopiloted, sendABCLAction, sendStatusMessage } from "./playerUtils";
 import { sendUpdateMyData } from "../hooks";
 import { MessMinigame, WetMinigame } from "../minigames";
 import { RuleId } from "src/types/definitions";
@@ -153,7 +153,8 @@ export const abclPlayer = {
     if (!(Math.random() < chance || abclPlayer.stats.BladderFullness > limit)) return;
 
     if (!incontinenceCheck.check()) return;
-    if (window?.LITTLISH_CLUB && window.LITTLISH_CLUB.isRuleActive(Player, RuleId.PREVENT_RESISTING_URGES)) return new WetMinigame().End(false);
+    if (window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.PREVENT_RESISTING_URGES)) return new WetMinigame().End(false);
+    if (isAccidentsAutopiloted()) return new WetMinigame().End(getAccidentAutopilotOutcome("Wet"));
     MiniGameStart("WetMinigame" as ModuleScreens["MiniGame"], 30 * chance, "CommonNoop");
   },
   attemptSoiling: () => {
@@ -163,7 +164,8 @@ export const abclPlayer = {
     if (!(Math.random() < chance || abclPlayer.stats.BowelFullness > limit)) return;
 
     if (!incontinenceCheck.check()) return;
-    if (window?.LITTLISH_CLUB && window.LITTLISH_CLUB.isRuleActive(Player, RuleId.PREVENT_RESISTING_URGES)) return new MessMinigame().End(false);
+    if (window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.PREVENT_RESISTING_URGES)) return new MessMinigame().End(false);
+    if (isAccidentsAutopiloted()) return new MessMinigame().End(getAccidentAutopilotOutcome("Mess"));
     MiniGameStart("MessMinigame" as ModuleScreens["MiniGame"], 30 * chance, "CommonNoop");
   },
   wet: (intentional: boolean = false) => {

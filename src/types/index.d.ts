@@ -51,6 +51,7 @@ interface ModSettings {
   DisableClothingStains: boolean;
   DisableDiaperStains: boolean;
   AccidentsByActivities: boolean;
+  AccidentAutopilot: boolean;
 }
 interface ModStats {
   PuddleSize: {
@@ -81,6 +82,16 @@ interface ModStats {
   };
   Incontinence: {
     value: number;
+  };
+  MinigameStatistics: {
+    Wet: {
+      Total: number;
+      Success: number;
+    };
+    Mess: {
+      Total: number;
+      Success: number;
+    };
   };
 }
 

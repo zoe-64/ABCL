@@ -35,12 +35,7 @@ export async function waitFor(func: { (): any; (): boolean; (): any }, cancelFun
 export const sendChatLocal = (message: string, classes: string[] = [], style?: string, local: boolean = true): void => {
   if (!ServerPlayerIsInChatRoom()) return;
   const msgElement = document.createElement("div");
-  msgElement.innerHTML =
-    ((local && "(local) ") || "") +
-    message
-      .split("\n")
-      .map(line => line.trim())
-      .join("<br/>");
+  msgElement.innerText = ((local && "(local) ") || "") + message;
   msgElement.classList.add(`${modIdentifier}LocalMessage`, "ChatMessage", ...classes);
   if (style) {
     msgElement.style.cssText = style;
@@ -152,3 +147,7 @@ export const getElement = <T extends Element>(parent: Element, selector: string)
   if (element) return element;
   throw new Error(`Element with selector "${selector}" not found`);
 };
+
+export function getRandomInt(max: number): number {
+  return Math.floor(Math.random() * max);
+}

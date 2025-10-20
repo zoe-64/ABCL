@@ -33,122 +33,63 @@ const defaultLayer: AssetLayer = {
   DrawingTop: { "": 0 },
   ColorIndex: 0,
 };
+const generateItemEntry = (itemName: string, itemGroup: string, echo = false) => {
+  const obj: Record<string, string> = {};
+  obj[`Assets/Female3DCG/${itemGroup}/${itemName}_Small_Gradient.png`] = `${publicURL}/items/diaper/${itemName}${echo ? "_echo" : ""}/small.png`;
+  obj[`Assets/Female3DCG/${itemGroup}/${itemName}_Normal_Gradient.png`] = `${publicURL}/items/diaper/${itemName}${echo ? "_echo" : ""}/normal.png`;
+  obj[`Assets/Female3DCG/${itemGroup}/${itemName}_Large_Gradient.png`] = `${publicURL}/items/diaper/${itemName}${echo ? "_echo" : ""}/large.png`;
+  obj[`Assets/Female3DCG/${itemGroup}/${itemName}_XLarge_Gradient.png`] = `${publicURL}/items/diaper/${itemName}${echo ? "_echo" : ""}/xlarge.png`;
+  return obj;
+};
 HookManager.afterPlayerLogin(() => {
   const echo = Boolean((<any>globalThis)?.__BC_LUZI_GLOBALS__?.["OnceFlag.服装拓展"]);
+
   AssetManager.addImageMapping({
-    "Assets/Female3DCG/Panties/Diapers1_Small_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}/small.png`,
-    "Assets/Female3DCG/Panties/Diapers1_Normal_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//normal.png`,
-    "Assets/Female3DCG/Panties/Diapers1_Large_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//large.png`,
-    "Assets/Female3DCG/Panties/Diapers1_XLarge_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//xlarge.png`,
+    ...generateItemEntry("Diapers1", "Override/EchoV2/Panties", true),
+    ...generateItemEntry("Diapers2", "Override/EchoV2/Panties", true),
+    ...generateItemEntry("Diapers3", "Override/EchoV2/Panties", true),
+    ...generateItemEntry("Diapers4", "Override/EchoV2/Panties", true),
 
-    "Assets/Female3DCG/Panties/Diapers2_Small_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//small.png`,
-    "Assets/Female3DCG/Panties/Diapers2_Normal_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//normal.png`,
-    "Assets/Female3DCG/Panties/Diapers2_Large_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//large.png`,
-    "Assets/Female3DCG/Panties/Diapers2_XLarge_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//xlarge.png`,
+    ...generateItemEntry("Diapers1", "Panties", echo),
+    ...generateItemEntry("Diapers2", "Panties", echo),
+    ...generateItemEntry("Diapers3", "Panties", echo),
+    ...generateItemEntry("Diapers4", "Panties", echo),
 
-    "Assets/Female3DCG/Panties/Diapers3_Small_Gradient.png": `${publicURL}/items/diaper/Diapers3${echo ? "_echo" : ""}//small.png`,
-    "Assets/Female3DCG/Panties/Diapers3_Normal_Gradient.png": `${publicURL}/items/diaper/Diapers3${echo ? "_echo" : ""}//normal.png`,
-    "Assets/Female3DCG/Panties/Diapers3_Large_Gradient.png": `${publicURL}/items/diaper/Diapers3${echo ? "_echo" : ""}//large.png`,
-    "Assets/Female3DCG/Panties/Diapers3_XLarge_Gradient.png": `${publicURL}/items/diaper/Diapers3${echo ? "_echo" : ""}//xlarge.png`,
+    ...generateItemEntry("LatexDiaper", "Panties", echo),
+    "Assets/Female3DCG/Panties/BulkyDiaper_Back_Gradient.png": `${publicURL}/BulkyDiaper/back.png`,
+    ...generateItemEntry("BulkyDiaper", "Panties", echo),
+    ...generateItemEntry("PoofyDiaper", "Panties", echo),
 
-    "Assets/Female3DCG/Panties/Diapers4_Small_Gradient.png": `${publicURL}/items/diaper/Diapers4${echo ? "_echo" : ""}//small.png`,
-    "Assets/Female3DCG/Panties/Diapers4_Normal_Gradient.png": `${publicURL}/items/diaper/Diapers4${echo ? "_echo" : ""}//normal.png`,
-    "Assets/Female3DCG/Panties/Diapers4_Large_Gradient.png": `${publicURL}/items/diaper/Diapers4${echo ? "_echo" : ""}//large.png`,
-    "Assets/Female3DCG/Panties/Diapers4_XLarge_Gradient.png": `${publicURL}/items/diaper/Diapers4${echo ? "_echo" : ""}//xlarge.png`,
-
-    "Assets/Female3DCG/Panties/LatexDiaper_Small_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/small.png`,
-    "Assets/Female3DCG/Panties/LatexDiaper_Normal_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/normal.png`,
-    "Assets/Female3DCG/Panties/LatexDiaper_Large_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/large.png`,
-    "Assets/Female3DCG/Panties/LatexDiaper_XLarge_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/xlarge.png`,
-
-    "Assets/Female3DCG/Panties/BulkyDiaper_Back_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/back.png`,
-    "Assets/Female3DCG/Panties/BulkyDiaper_Small_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/small.png`,
-    "Assets/Female3DCG/Panties/BulkyDiaper_Normal_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/normal.png`,
-    "Assets/Female3DCG/Panties/BulkyDiaper_Large_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/large.png`,
-    "Assets/Female3DCG/Panties/BulkyDiaper_XLarge_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/xlarge.png`,
-
-    "Assets/Female3DCG/Panties/PoofyDiaper_Back_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/back.png`,
-    "Assets/Female3DCG/Panties/PoofyDiaper_Small_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/small.png`,
-    "Assets/Female3DCG/Panties/PoofyDiaper_Normal_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/normal.png`,
-    "Assets/Female3DCG/Panties/PoofyDiaper_Large_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/large.png`,
-    "Assets/Female3DCG/Panties/PoofyDiaper_XLarge_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/xlarge.png`,
-
-    // ItemPelvis
-    "Assets/Female3DCG/ItemPelvis/LatexDiaper_Small_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/small.png`,
-    "Assets/Female3DCG/ItemPelvis/LatexDiaper_Normal_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/normal.png`,
-    "Assets/Female3DCG/ItemPelvis/LatexDiaper_Large_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/large.png`,
-    "Assets/Female3DCG/ItemPelvis/LatexDiaper_XLarge_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/xlarge.png`,
-
-    "Assets/Female3DCG/ItemPelvis/BulkyDiaper_Back_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/back.png`,
-    "Assets/Female3DCG/ItemPelvis/BulkyDiaper_Small_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/small.png`,
-    "Assets/Female3DCG/ItemPelvis/BulkyDiaper_Normal_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/normal.png`,
-    "Assets/Female3DCG/ItemPelvis/BulkyDiaper_Large_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/large.png`,
-    "Assets/Female3DCG/ItemPelvis/BulkyDiaper_XLarge_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/xlarge.png`,
-
-    "Assets/Female3DCG/ItemPelvis/PoofyDiaper_Back_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/back.png`,
-    "Assets/Female3DCG/ItemPelvis/PoofyDiaper_Small_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/small.png`,
-    "Assets/Female3DCG/ItemPelvis/PoofyDiaper_Normal_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/normal.png`,
-    "Assets/Female3DCG/ItemPelvis/PoofyDiaper_Large_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/large.png`,
-    "Assets/Female3DCG/ItemPelvis/PoofyDiaper_XLarge_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/xlarge.png`,
+    ...generateItemEntry("LatexDiaper", "ItemPelvis", echo),
+    "Assets/Female3DCG/ItemPelvis/BulkyDiaper_Back_Gradient.png": `${publicURL}/BulkyDiaper/back.png`,
+    ...generateItemEntry("BulkyDiaper", "ItemPelvis", echo),
+    "Assets/Female3DCG/ItemPelvis/PoofyDiaper_Back_Gradient.png": `${publicURL}/PoofyDiaper/back.png`,
+    ...generateItemEntry("PoofyDiaper", "ItemPelvis", echo),
   });
 });
 export default function () {
   const echo = Boolean((<any>globalThis)?.__BC_LUZI_GLOBALS__?.["OnceFlag.服装拓展"]);
   AssetManager.addImageMapping({
-    "Assets/Female3DCG/Panties/Diapers1_Small_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}/small.png`,
-    "Assets/Female3DCG/Panties/Diapers1_Normal_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//normal.png`,
-    "Assets/Female3DCG/Panties/Diapers1_Large_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//large.png`,
-    "Assets/Female3DCG/Panties/Diapers1_XLarge_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//xlarge.png`,
+    ...generateItemEntry("Diapers1", "Override/EchoV2/Panties", true),
+    ...generateItemEntry("Diapers2", "Override/EchoV2/Panties", true),
+    ...generateItemEntry("Diapers3", "Override/EchoV2/Panties", true),
+    ...generateItemEntry("Diapers4", "Override/EchoV2/Panties", true),
 
-    "Assets/Female3DCG/Panties/Diapers2_Small_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//small.png`,
-    "Assets/Female3DCG/Panties/Diapers2_Normal_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//normal.png`,
-    "Assets/Female3DCG/Panties/Diapers2_Large_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//large.png`,
-    "Assets/Female3DCG/Panties/Diapers2_XLarge_Gradient.png": `${publicURL}/items/diaper/Diapers1${echo ? "_echo" : ""}//xlarge.png`,
+    ...generateItemEntry("Diapers1", "Panties", echo),
+    ...generateItemEntry("Diapers2", "Panties", echo),
+    ...generateItemEntry("Diapers3", "Panties", echo),
+    ...generateItemEntry("Diapers4", "Panties", echo),
 
-    "Assets/Female3DCG/Panties/Diapers3_Small_Gradient.png": `${publicURL}/items/diaper/Diapers3${echo ? "_echo" : ""}//small.png`,
-    "Assets/Female3DCG/Panties/Diapers3_Normal_Gradient.png": `${publicURL}/items/diaper/Diapers3${echo ? "_echo" : ""}//normal.png`,
-    "Assets/Female3DCG/Panties/Diapers3_Large_Gradient.png": `${publicURL}/items/diaper/Diapers3${echo ? "_echo" : ""}//large.png`,
-    "Assets/Female3DCG/Panties/Diapers3_XLarge_Gradient.png": `${publicURL}/items/diaper/Diapers3${echo ? "_echo" : ""}//xlarge.png`,
+    ...generateItemEntry("LatexDiaper", "Panties", echo),
+    "Assets/Female3DCG/Panties/BulkyDiaper_Back_Gradient.png": `${publicURL}/BulkyDiaper/back.png`,
+    ...generateItemEntry("BulkyDiaper", "Panties", echo),
+    ...generateItemEntry("PoofyDiaper", "Panties", echo),
 
-    "Assets/Female3DCG/Panties/Diapers4_Small_Gradient.png": `${publicURL}/items/diaper/Diapers4${echo ? "_echo" : ""}//small.png`,
-    "Assets/Female3DCG/Panties/Diapers4_Normal_Gradient.png": `${publicURL}/items/diaper/Diapers4${echo ? "_echo" : ""}//normal.png`,
-    "Assets/Female3DCG/Panties/Diapers4_Large_Gradient.png": `${publicURL}/items/diaper/Diapers4${echo ? "_echo" : ""}//large.png`,
-    "Assets/Female3DCG/Panties/Diapers4_XLarge_Gradient.png": `${publicURL}/items/diaper/Diapers4${echo ? "_echo" : ""}//xlarge.png`,
-
-    "Assets/Female3DCG/Panties/LatexDiaper_Small_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/small.png`,
-    "Assets/Female3DCG/Panties/LatexDiaper_Normal_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/normal.png`,
-    "Assets/Female3DCG/Panties/LatexDiaper_Large_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/large.png`,
-    "Assets/Female3DCG/Panties/LatexDiaper_XLarge_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/xlarge.png`,
-
-    "Assets/Female3DCG/Panties/BulkyDiaper_Back_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/back.png`,
-    "Assets/Female3DCG/Panties/BulkyDiaper_Small_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/small.png`,
-    "Assets/Female3DCG/Panties/BulkyDiaper_Normal_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/normal.png`,
-    "Assets/Female3DCG/Panties/BulkyDiaper_Large_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/large.png`,
-    "Assets/Female3DCG/Panties/BulkyDiaper_XLarge_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/xlarge.png`,
-
-    "Assets/Female3DCG/Panties/PoofyDiaper_Back_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/back.png`,
-    "Assets/Female3DCG/Panties/PoofyDiaper_Small_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/small.png`,
-    "Assets/Female3DCG/Panties/PoofyDiaper_Normal_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/normal.png`,
-    "Assets/Female3DCG/Panties/PoofyDiaper_Large_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/large.png`,
-    "Assets/Female3DCG/Panties/PoofyDiaper_XLarge_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/xlarge.png`,
-
-    // ItemPelvis
-    "Assets/Female3DCG/ItemPelvis/LatexDiaper_Small_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/small.png`,
-    "Assets/Female3DCG/ItemPelvis/LatexDiaper_Normal_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/normal.png`,
-    "Assets/Female3DCG/ItemPelvis/LatexDiaper_Large_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/large.png`,
-    "Assets/Female3DCG/ItemPelvis/LatexDiaper_XLarge_Gradient.png": `${publicURL}/items/diaper/LatexDiaper/xlarge.png`,
-
-    "Assets/Female3DCG/ItemPelvis/BulkyDiaper_Back_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/back.png`,
-    "Assets/Female3DCG/ItemPelvis/BulkyDiaper_Small_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/small.png`,
-    "Assets/Female3DCG/ItemPelvis/BulkyDiaper_Normal_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/normal.png`,
-    "Assets/Female3DCG/ItemPelvis/BulkyDiaper_Large_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/large.png`,
-    "Assets/Female3DCG/ItemPelvis/BulkyDiaper_XLarge_Gradient.png": `${publicURL}/items/diaper/BulkyDiaper/xlarge.png`,
-
-    "Assets/Female3DCG/ItemPelvis/PoofyDiaper_Back_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/back.png`,
-    "Assets/Female3DCG/ItemPelvis/PoofyDiaper_Small_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/small.png`,
-    "Assets/Female3DCG/ItemPelvis/PoofyDiaper_Normal_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/normal.png`,
-    "Assets/Female3DCG/ItemPelvis/PoofyDiaper_Large_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/large.png`,
-    "Assets/Female3DCG/ItemPelvis/PoofyDiaper_XLarge_Gradient.png": `${publicURL}/items/diaper/PoofyDiaper/xlarge.png`,
+    ...generateItemEntry("LatexDiaper", "ItemPelvis", echo),
+    "Assets/Female3DCG/ItemPelvis/BulkyDiaper_Back_Gradient.png": `${publicURL}/BulkyDiaper/back.png`,
+    ...generateItemEntry("BulkyDiaper", "ItemPelvis", echo),
+    "Assets/Female3DCG/ItemPelvis/PoofyDiaper_Back_Gradient.png": `${publicURL}/PoofyDiaper/back.png`,
+    ...generateItemEntry("PoofyDiaper", "ItemPelvis", echo),
   });
   AssetManager.addLayerNamesRaw("Panties", "Diapers1", { EN: { "": "Diaper", Gradient: "Wet stains" } });
   AssetManager.addLayerNamesRaw("Panties", "Diapers3", { EN: { "": "Diaper", Gradient: "Wet stains" } });
@@ -163,6 +104,22 @@ export default function () {
   AssetManager.addLayerNamesRaw("ItemPelvis", "BulkyDiaper", { EN: { Gradient: "Wet stains" } });
   AssetManager.addLayerNamesRaw("ItemPelvis", "PoofyDiaper", { EN: { Gradient: "Wet stains" } });
 
+  AssetManager.modifyAsset("Panties", "Diapers1", (assetGroup, asset) => {
+    asset.DefaultColor = ["#817884", "#a88800"];
+    asset.ColorableLayerCount = 2;
+    asset.EditOpacity = true;
+    (asset.Layer as Mutable<AssetLayer[]>).push({
+      ...defaultLayer,
+      ParentGroup: { "": "BodyLower" },
+      Priority: 24,
+      Opacity: 0,
+      Name: "Gradient",
+      ColorIndex: 1,
+      DrawingLeft: { "": 150 },
+      DrawingTop: { "": 395 },
+      Asset: AssetGet("Female3DCG", "Panties", "Diapers1")!,
+    });
+  });
   AssetManager.modifyAsset("Panties", "Diapers1", (assetGroup, asset) => {
     asset.DefaultColor = ["#817884", "#a88800"];
     asset.ColorableLayerCount = 2;

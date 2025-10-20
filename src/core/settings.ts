@@ -41,6 +41,7 @@ export const defaultSettings: ModSettings = {
   DisableDiaperStains: false,
   AccidentsByActivities: true,
   ExpressionsByActivities: false,
+  AccidentAutopilot: false,
 };
 
 export const defaultStats: ModStats = {
@@ -72,6 +73,16 @@ export const defaultStats: ModStats = {
   },
   MentalRegression: {
     value: 0,
+  },
+  MinigameStatistics: {
+    Wet: {
+      Total: 0,
+      Success: 0,
+    },
+    Mess: {
+      Total: 0,
+      Success: 0,
+    },
   },
 };
 
@@ -105,6 +116,7 @@ export const defaultSettingPermissions: ModStorageModel["SettingPermissions"] = 
   OpenRemoteSettings: false,
   LockedOutOfSettings: false,
   StatusMessages: false,
+  AccidentAutopilot: false,
 };
 const defaultData: ModStorageModel = {
   Settings: defaultSettings,

@@ -50,6 +50,22 @@ export function getCharacterName(memberNumber: number | undefined): string {
   return character.Nickname ? character.Nickname : character.Name;
 }
 
+export const isAccidentsAutopiloted = () => {
+  return ["Afk", "Brb", "Sleep"].includes(InventoryGet(Player, "Emoticon")?.Property?.Expression ?? "") || Player.ABCL.Settings.AccidentAutopilot;
+};
+
+export const getAccidentAutopilotSuccess = (type: keyof typeof Player.ABCL.Stats.MinigameStatistics) => {
+  if (Player.ABCL.Stats.MinigameStatistics[type].Total < 10) return 0.7;
+  return (Player.ABCL.Stats.MinigameStatistics[type].Success / (Player.ABCL.Stats.MinigameStatistics[type].Total ?? 1)) * 0.9;
+};
+
+export const getAccidentAutopilotOutcome = (type: keyof typeof Player.ABCL.Stats.MinigameStatistics) => {
+  const chance = getAccidentAutopilotSuccess(type);
+  const roll = Math.random();
+  if (roll < chance) return true;
+  return false;
+};
+
 // luv you sera <3
 export function replace_template(text: string, source: Character | null = null, fallbackSourceName: string = "") {
   let result = text;

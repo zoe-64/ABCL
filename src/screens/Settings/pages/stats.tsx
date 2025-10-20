@@ -2,7 +2,7 @@ import { h } from "preact";
 
 import { ButtonGroup } from "../../components/buttonGroup";
 import { Checkbox } from "../../components/checkbox";
-import { useCallback, useEffect, useReducer, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
 import { SettingPanel } from "src/screens/components/settingPanel";
 import { MetabolismBar } from "src/screens/components/metabolismDropDown";
 import { Group, Stack } from "src/screens/components/positionComponents";
@@ -122,7 +122,7 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
       </Group>
       <ResetButton
         onClick={() => {
-          if (isOwned() && window.LITTLISH_CLUB.isRuleActive(Player, RuleId.DISABLE_RESET_SETTINGS_BUTTON)) return;
+          if (isOwned() && window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.DISABLE_RESET_SETTINGS_BUTTON)) return;
           ToastManager.warning("This will reset abcl and reload the page. Do you want to reset?", {
             duration: 10 * 1000,
             buttons: [
@@ -145,7 +145,7 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
             ],
           });
         }}
-        disabled={!isOwned() && window.LITTLISH_CLUB.isRuleActive(Player, RuleId.DISABLE_RESET_SETTINGS_BUTTON)}
+        disabled={!isOwned() && window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.DISABLE_RESET_SETTINGS_BUTTON)}
       >
         Reset Settings
       </ResetButton>
