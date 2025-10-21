@@ -75,16 +75,21 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
           <Checkbox checked={pauseStats} setChecked={setPauseStats} locked={pauseStatsLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Wetting Leaks / Puddles">
-          <Checkbox checked={disableWettingLeaks} setChecked={setDisableWettingLeaks} locked={disableWettingLeaksLocked && isOwned()} opaqueLock={true} />
+          <Checkbox checked={!disableWettingLeaks} setChecked={setDisableWettingLeaks} locked={disableWettingLeaksLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Messy Leaks">
-          <Checkbox checked={disableSoilingLeaks} setChecked={setDisableSoilingLeaks} locked={disableSoilingLeaksLocked && isOwned()} opaqueLock={true} />
+          <Checkbox checked={!disableSoilingLeaks} setChecked={setDisableSoilingLeaks} locked={disableSoilingLeaksLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Clothing Stains">
-          <Checkbox checked={disableClothingStains} setChecked={setDisableClothingStains} locked={disableClothingStainsLocked && isOwned()} opaqueLock={true} />
+          <Checkbox
+            checked={!disableClothingStains}
+            setChecked={setDisableClothingStains}
+            locked={disableClothingStainsLocked && isOwned()}
+            opaqueLock={true}
+          />
         </SettingPanel>
         <SettingPanel title="Diaper Stains">
-          <Checkbox checked={disableDiaperStains} setChecked={setDisableDiaperStains} locked={disableDiaperStainsLocked && isOwned()} opaqueLock={true} />
+          <Checkbox checked={!disableDiaperStains} setChecked={setDisableDiaperStains} locked={disableDiaperStainsLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Accidents by Activities">
           <Checkbox checked={accidentsByActivities} setChecked={setAccidentsByActivities} locked={accidentsByActivitiesLocked && isOwned()} opaqueLock={true} />

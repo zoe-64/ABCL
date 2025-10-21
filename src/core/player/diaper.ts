@@ -1,20 +1,22 @@
 import { ABCLdata } from "../../constants";
 import { abclPlayer, updatePlayerClothes } from "./player";
+import { isABCLPlayer } from "./playerUtils";
 
 // Is/Has
 export const isOwned = (player: Character = Player): boolean => {
   return !window?.LITTLISH_CLUB || window.LITTLISH_CLUB.getMommyOf(player) !== null || window.LITTLISH_CLUB.getCaregiversOf(player).length > 0;
 };
 
-export const isLeaking = (type: "pee" | "poop" | "any" = "any") => {
-  const diaperSize = getPlayerDiaperSize();
+export const isLeaking = (type: "pee" | "poop" | "any" = "any", player: Character = Player) => {
+  if (!isABCLPlayer(player)) return false;
+  const diaperSize = getPlayerDiaperSize(player);
   if (type === "pee") {
-    return abclPlayer.stats.PuddleSize > 0;
+    return player.ABCL!.Stats.PuddleSize.value > 0;
   }
   if (type === "poop") {
-    return abclPlayer.stats.SoilinessValue >= diaperSize;
+    return player.ABCL!.Stats.Soiliness.value >= diaperSize;
   }
-  return abclPlayer.stats.SoilinessValue >= diaperSize || abclPlayer.stats.WetnessValue >= diaperSize;
+  return player.ABCL!.Stats.Soiliness.value >= diaperSize || player.ABCL!.Stats.PuddleSize.value >= diaperSize;
 };
 
 export const isDiaperDirty = () => {

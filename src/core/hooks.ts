@@ -1,6 +1,6 @@
 import { PluginServerChatRoomMessage, ListenerTypeMap, HookListener } from "../types/types";
 import { logger } from "./logger";
-import { isDiaper, updateDiaperColor } from "./player/diaper";
+import { isDiaper, isLeaking, updateDiaperColor } from "./player/diaper";
 import { isABCLPlayer } from "./player/playerUtils";
 import { resizeElements } from "./player/ui";
 import { ModIdentifier, ModVersion } from "../types/definitions";
@@ -216,6 +216,22 @@ const initHooks = async () => {
       DrawButton(1700 - 90 - 20, 700 - 15, 90, 90, "", "White", `${publicURL}/icon-small.png`, modName);
     }
     next(args);
+  });
+
+  HookManager.hookFunction("CharacterNickname", 1, (args, next) => {
+    const [_C] = args;
+    let nickname = next(args);
+    if (isABCLPlayer(_C) && isLeaking("any", _C)) {
+      nickname = "🍼 " + nickname;
+    }
+    if (_C.MemberNumber === 54811) {
+      nickname = "❀ " + nickname;
+    }
+    if (_C.MemberNumber === 164988) {
+      nickname = "ᐢ. ₓ .ᐢ " + nickname;
+    }
+
+    return nickname;
   });
 
   HookManager.hookFunction("InformationSheetClick", HookPriority.OBSERVE, (args, next) => {
