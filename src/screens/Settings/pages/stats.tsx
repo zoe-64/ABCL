@@ -13,7 +13,7 @@ import { isOwned } from "src/core/player/diaper";
 import { RuleId } from "src/types/definitions";
 
 const ResetButton = styled.button`
-  background-color: rgb(255, 125, 125);
+  background-color: var(--abcl-warning-color);
   color: #fff;
   border: var(--abcl-border);
   padding: 0.5em;
@@ -75,21 +75,22 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
           <Checkbox checked={pauseStats} setChecked={setPauseStats} locked={pauseStatsLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Wetting Leaks / Puddles">
-          <Checkbox checked={!disableWettingLeaks} setChecked={setDisableWettingLeaks} locked={disableWettingLeaksLocked && isOwned()} opaqueLock={true} />
+          <Checkbox checked={disableWettingLeaks} setChecked={setDisableWettingLeaks} locked={disableWettingLeaksLocked && isOwned()} opaqueLock inverted />
         </SettingPanel>
         <SettingPanel title="Messy Leaks">
-          <Checkbox checked={!disableSoilingLeaks} setChecked={setDisableSoilingLeaks} locked={disableSoilingLeaksLocked && isOwned()} opaqueLock={true} />
+          <Checkbox checked={disableSoilingLeaks} setChecked={setDisableSoilingLeaks} locked={disableSoilingLeaksLocked && isOwned()} opaqueLock inverted />
         </SettingPanel>
         <SettingPanel title="Clothing Stains">
           <Checkbox
-            checked={!disableClothingStains}
+            checked={disableClothingStains}
             setChecked={setDisableClothingStains}
             locked={disableClothingStainsLocked && isOwned()}
-            opaqueLock={true}
+            opaqueLock
+            inverted
           />
         </SettingPanel>
         <SettingPanel title="Diaper Stains">
-          <Checkbox checked={!disableDiaperStains} setChecked={setDisableDiaperStains} locked={disableDiaperStainsLocked && isOwned()} opaqueLock={true} />
+          <Checkbox checked={disableDiaperStains} setChecked={setDisableDiaperStains} locked={disableDiaperStainsLocked && isOwned()} opaqueLock inverted />
         </SettingPanel>
         <SettingPanel title="Accidents by Activities">
           <Checkbox checked={accidentsByActivities} setChecked={setAccidentsByActivities} locked={accidentsByActivitiesLocked && isOwned()} opaqueLock={true} />

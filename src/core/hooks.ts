@@ -116,8 +116,8 @@ const initHooks = async () => {
     const [C, CharX, CharY, Zoom] = args;
 
     if (isABCLPlayer(C) && C.ABCL!.Stats.PuddleSize.value > 0) {
-      const puddleSizeFactor = C.ABCL!.Stats.PuddleSize.value / 300;
-
+      let puddleSizeFactor = C.ABCL!.Stats.PuddleSize.value / 300;
+      if (puddleSizeFactor > 1.5) puddleSizeFactor = 1.5;
       const width = 512 * puddleSizeFactor;
       const height = 235 * puddleSizeFactor;
 
@@ -224,7 +224,7 @@ const initHooks = async () => {
     if (isABCLPlayer(_C) && isLeaking("any", _C)) {
       nickname = "🍼 " + nickname;
     }
-    if (_C.MemberNumber === 54811) {
+    if ([155633, 54811, 126467, 178496, 33367].includes(_C.MemberNumber ?? -1)) {
       nickname = "❀ " + nickname;
     }
     if (_C.MemberNumber === 164988) {

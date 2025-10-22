@@ -1,10 +1,11 @@
 import { useEffect, useState } from "preact/hooks";
 import { ValueBar } from "./valueBar";
 import { getCharacter, getCharacterName, isABCLPlayer } from "src/core/player/playerUtils";
-import { getPlayerDiaperSize } from "src/core/player/diaper";
+import { getPlayerDiaperSize, incontinenceLimitFormula } from "src/core/player/diaper";
 import { resizeElements, abclStatsWindow } from "src/core/player/ui";
 import { h, JSX } from "preact";
 import styled from "styled-components";
+import { abclPlayer } from "src/core/player/player";
 const StatsPanelComponent = styled.div<JSX.IntrinsicElements["div"]>`
   .ABCL-stats-overlay {
     width: 100%;
@@ -14,7 +15,7 @@ const StatsPanelComponent = styled.div<JSX.IntrinsicElements["div"]>`
     position: absolute;
   }
   .ABCL-stats-panel {
-    background-color: var(--abcl-element);
+    background-color: var(--abcl-element-indentation);
     color: var(--abcl-text);
   }
   .ABCL-stats-select {
@@ -67,7 +68,11 @@ export default function StatsPanel(): h.JSX.Element {
   }, [memberNumber]);
 
   return (
-    <StatsPanelComponent className="ABCL-hidden" id="ABCL-stats">
+    <StatsPanelComponent
+      className="ABCL-hidden"
+      id="ABCL-stats"
+      onMouseEnter={() => setSelectablePlayers(ChatRoomCharacter.filter(character => isABCLPlayer(character)))}
+    >
       <div className="ABCL-stats-overlay" onClick={() => document.getElementById("ABCL-stats")?.classList.add("ABCL-hidden")}></div>
       <div className="ABCL-stats-panel" id="ABCL-stats-panel">
         <select
@@ -81,19 +86,19 @@ export default function StatsPanel(): h.JSX.Element {
           }}
         >
           {selectablePlayers.map(character => (
-            <option key={character.MemberNumber} value={character.MemberNumber}>
+            <option key={character.MemberNumber} value={character.MemberNumber} selected={character.MemberNumber === memberNumber}>
               {getCharacterName(character.MemberNumber)}
             </option>
           ))}
         </select>
 
         <div className="ABCL-stats-container">
-          <ValueBar value={incontinence} label="Incontinence" color="#cb5b5bff" foreground="#eeacacff" />
-          <ValueBar value={regression} label="Mental Regression" color="#ad74beff" foreground="#e6bff1ff" />
-          <ValueBar value={soiliness} label="Soiliness" color="#ab674aff" foreground="#d1aa98ff" />
-          <ValueBar value={wetness} label="Wetness" color="#e7c463ff" foreground="#f3e1aeff" />
-          <ValueBar value={bowel} label="Bowel Fullness" color="#7c4c36ff" foreground="#b7795cff" />
-          <ValueBar value={bladder} label="Bladder Fullness" color="#cba01eff" foreground="#eacd73ff" />
+          <ValueBar value={incontinence} label="Incontinence" color="#e26c6cff" />
+          <ValueBar value={regression} label="Mental Regression" color="#cf6ce2ff" />
+          <ValueBar value={soiliness} label="Soiliness" color="#e2aa6cff" />
+          <ValueBar value={wetness} label="Wetness" color="#e2d06cff" />
+          <ValueBar value={bowel} label="Bowel Fullness" color="#e2aa6cff" stripedSection={1 - incontinenceLimitFormula(incontinence)} />
+          <ValueBar value={bladder} label="Bladder Fullness" color="#e2d06cff" stripedSection={1 - incontinenceLimitFormula(incontinence)} />
           <p>
             <span>Stats: </span>
             <span>{pauseStats ? "Paused" : "Active"}</span>

@@ -2,7 +2,7 @@
   --abcl-text: var(--tmd-text, #000);
 
   --abcl-element: var(--tmd-element, #fff);
-  --abcl-element-indentation: var(--tmd-main, #d9d9d9);
+  --abcl-element-indentation: var(--tmd-main, #f0f0f0);
   --abcl-metabolism-multiplier-text: var(--tmd-text, #b3b3b3);
 
   --abcl-selected-text: var(--tmd-text, #fff);
@@ -12,6 +12,23 @@
   --abcl-border: 0.1em solid var(--abcl-border-color);
 
   --abcl-hover-color: var(--tmd-accent, cyan);
+
+  --abcl-warning-color: #ff4646;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --abcl-text: var(--tmd-text, #c8c8c8);
+    --abcl-element: var(--tmd-element, #424242);
+    --abcl-element-indentation: var(--tmd-main, #262626);
+    --abcl-metabolism-multiplier-text: var(--tmd-text, #c1c1c1);
+    --abcl-selected-text: var(--tmd-text, #fff);
+    --abcl-selected-background: var(--tmd-accent, #000);
+    --abcl-border-color: var(--tmd-accent, #2b2b2b);
+    --abcl-border: 0.1em solid var(--abcl-border-color);
+    --abcl-hover-color: var(--tmd-accent, #005968);
+    --abcl-warning-color: #a80000;
+  }
 }
 
 .ABCL-hidden {

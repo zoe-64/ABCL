@@ -8,15 +8,13 @@ export const isOwned = (player: Character = Player): boolean => {
 };
 
 export const isLeaking = (type: "pee" | "poop" | "any" = "any", player: Character = Player) => {
-  if (!isABCLPlayer(player)) return false;
+  if (!isABCLPlayer(player) || !hasDiaper(player)) return false;
   const diaperSize = getPlayerDiaperSize(player);
-  if (type === "pee") {
-    return player.ABCL!.Stats.PuddleSize.value > 0;
-  }
-  if (type === "poop") {
-    return player.ABCL!.Stats.Soiliness.value >= diaperSize;
-  }
-  return player.ABCL!.Stats.Soiliness.value >= diaperSize || player.ABCL!.Stats.PuddleSize.value >= diaperSize;
+  const leakingPee = player.ABCL!.Stats.PuddleSize.value > 0 || player.ABCL!.Stats.Wetness.value >= diaperSize;
+  const leakingPoop = player.ABCL!.Stats.Soiliness.value >= diaperSize;
+  if (type === "pee") return leakingPee;
+  if (type === "poop") return leakingPoop;
+  return leakingPee || leakingPoop;
 };
 
 export const isDiaperDirty = () => {
@@ -103,6 +101,7 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
     //} no longer used
     item.Color = color;
   }
+  updatePlayerClothes(slot);
 };
 export const updateDiaperColor = () => {
   const messLevel = abclPlayer.stats.SoilinessValue / getPlayerDiaperSize();
@@ -122,7 +121,6 @@ export const updateDiaperColor = () => {
   setDiaperColor("Panties", primaryColor, Player);
   // @ts-expect-error Echo slot
   setDiaperColor("Panties_笨笨蛋Luzi", primaryColor, Player);
-  updatePlayerClothes();
 };
 
 // Size

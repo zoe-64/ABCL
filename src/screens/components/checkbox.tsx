@@ -25,17 +25,20 @@ export type CheckboxProps = {
   opaqueLock?: boolean;
   setLocked?: Dispatch<boolean>;
   showLock?: boolean;
+  inverted?: boolean;
 } & JSX.IntrinsicElements["div"];
 
-export const Checkbox = forwardRef<HTMLDivElement, CheckboxProps>(({ checked, setChecked, locked, opaqueLock, setLocked, showLock = true, ...props }, ref) => (
-  <>
-    <CheckboxComponent {...props} ref={ref} onClick={() => (locked && opaqueLock ? null : setChecked(!checked))} locked={locked && opaqueLock}>
-      {checked ? (
-        <img src={publicURL + `/icons/checkmark-${THEME}.svg`} alt="checkmark" />
-      ) : (
-        <img src={publicURL + `/icons/crossmark-${THEME}.svg`} alt="crossmark" />
-      )}
-    </CheckboxComponent>
-    {showLock && <LockWidget locked={locked} opaque={opaqueLock} setLocked={setLocked} />}
-  </>
-));
+export const Checkbox = forwardRef<HTMLDivElement, CheckboxProps>(
+  ({ checked, setChecked, locked, opaqueLock, setLocked, showLock = true, inverted = false, ...props }, ref) => (
+    <>
+      <CheckboxComponent {...props} ref={ref} onClick={() => (locked && opaqueLock ? null : setChecked(!checked))} locked={locked && opaqueLock}>
+        {(checked && !inverted) || (!checked && inverted) ? (
+          <img src={publicURL + `/icons/checkmark-${THEME}.svg`} alt="checkmark" />
+        ) : (
+          <img src={publicURL + `/icons/crossmark-${THEME}.svg`} alt="crossmark" />
+        )}
+      </CheckboxComponent>
+      {showLock && <LockWidget locked={locked} opaque={opaqueLock} setLocked={setLocked} />}
+    </>
+  ),
+);

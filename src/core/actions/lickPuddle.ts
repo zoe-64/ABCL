@@ -18,7 +18,6 @@ const LickPuddleFunction = (player: Character) => {
     CharacterSetFacialExpression(Player, "Fluids", "DroolLow", 20);
   }
   sendUpdateMyData();
-  updatePlayerClothes();
   abclPlayer.stats.PuddleSize -= 50;
 };
 export type lickPuddleListeners = {

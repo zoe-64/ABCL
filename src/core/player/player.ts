@@ -19,10 +19,12 @@ import { sendUpdateMyData } from "../hooks";
 import { MessMinigame, WetMinigame } from "../minigames";
 import { RuleId } from "src/types/definitions";
 
-export const updatePlayerClothes = () => {
+export const updatePlayerClothes = (itemGroup?: AssetGroupName) => {
   CharacterRefresh(Player, true);
-  //ChatRoomCharacterUpdate(Player);
+  if (!itemGroup) return ChatRoomCharacterUpdate(Player);
+  ChatRoomCharacterItemUpdate(Player, itemGroup);
 };
+
 const bowelThrottler = new Throttler(120 * 60 * 1000);
 const bladderThrottler = new Throttler(120 * 60 * 1000);
 const regressionThrottler = new Throttler(5 * 60 * 1000);
@@ -278,6 +280,11 @@ export const abclPlayer = {
     },
     set WetnessValue(value: number) {
       if (value < 0) value = 0;
+      if (value > getPlayerDiaperSize()) {
+        const overflow = value - getPlayerDiaperSize();
+        value -= overflow;
+        this.PuddleSize += overflow;
+      }
       const delta = value / getPlayerDiaperSize() - this.WetnessPercentage;
       sendStatusMessage("Wetness", delta, true);
       Player.ABCL.Stats.Wetness.value = value;

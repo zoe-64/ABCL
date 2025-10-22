@@ -10,7 +10,6 @@ const WipePuddleRequest = (player: Character) => {
 const WipePuddleFunction = (player: Character) => {
   abclPlayer.stats.PuddleSize = 0;
   sendUpdateMyData();
-  updatePlayerClothes();
   if (player.MemberNumber !== Player.MemberNumber)
     return sendABCLAction(replace_template("%OPP_NAME% wipes %NAME%'s puddle of pee.", player), undefined, "wipePuddle", player);
 

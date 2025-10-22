@@ -1,0 +1,195 @@
+{
+  "ItemDefinitions": {
+    "BabyItems": [
+      "ClothBabydollDress1", // Babydoll Dress
+      "ClothAdultBabyDress1", // Puffy Dress
+      "ClothAdultBabyDress2", // Bows Dress
+      "ClothAdultBabyDress3", // Summer Flower Dress
+      "ClothAdultBabyDress4", // Shiny Dress
+      "ItemTorsoAdultBabyHarness", // Adult Baby Harness
+      "ClothLowerTutu", // Tutu
+      "PantiesBikini1", // Frilled Bikini
+      "ItemHandsPaddedMittens", // Padded Mittens
+      "ItemHandsPawMittens", // Paw Mittens
+      "ItemHandsSmoothLeatherMittens1", // Short Smooth Leather Mittens
+      "ItemDevicesChangingTable", // Changing Table
+      "ItemDevicesCrib", // Crib
+      "ItemMiscFoxPlush", // Fox Plush
+      "ItemMiscBunPlush", // Bunny Plush
+      "ItemHandheldShark", // Shark Plush
+      "ItemDevicesHighchair", // Highchair
+      "ClothAccessoryBib", // Bib
+      "ItemMouthMilkBottle", // Milk Bottle
+      "ItemMouthRegressedMilk", // Nursery Milk Bottle
+      "ItemMouthHarnessPacifierGag", // Harness Pacifier
+      "ItemMouthPacifierGag", // Pacifier
+      "ItemMouthPaciGag" // Pacifier Gag
+    ],
+    "Pants": [
+      "ClothLowerLeggings2", // Long Leggings
+      "ClothLowerLeggings1", // Short Leggings
+      "ClothLowerBusinessTrousers", // Business Trousers
+      "ClothLowerLatexPants1", // Latex Pants
+      "ClothLowerPantBoots", // Long Latex Pants
+      "ClothLowerJeans1", // Jeans
+      "ClothLowerJeans2", // Ripped Jeans
+      "ClothLowerPajama1" // Pajama
+    ]
+  },
+  "DiaperColors": {
+    "clean": "#8F8F8F",
+    "middlewet": "#ffe58b",
+    "maximumwet": "#ffd33e",
+    "middlemess": "#423019",
+    "maximummess": "#3C302C",
+    "selfwet": "#242103",
+    "selfmess": "#1f170d",
+    "indicatorAccident": "#1e47a6"
+  },
+  "DiaperSizeScale": {
+    "none": 0,
+    "small": 300,
+    "regular": 500,
+    "overnight": 800,
+    "light_adult": 900,
+    "moderate_adult": 1500,
+    "heavy_adult": 2500,
+    "specialized": 3500
+  },
+  "Diapers": {
+    // echo compat
+
+    "Panties_笨笨蛋LuziDiapers1": {
+      // Diaper
+      "size": "regular",
+      "gradients": [1]
+    },
+    "Panties_笨笨蛋LuziDiapers2": {
+      // Plastic Covered Diaper
+      //"color": [0],
+      "gradients": [2],
+      "size": "light_adult"
+    },
+    "Panties_笨笨蛋LuziDiapers3": {
+      // Satin Covered Diaper
+      //"color": [0],
+      "gradients": [1],
+      "size": "light_adult"
+    },
+    "Panties_笨笨蛋LuziDiapers4": {
+      // Patterned Diaper
+      //"color": [0],
+      "gradients": [3],
+      "size": "overnight"
+    },
+    "Panties_笨笨蛋LuziBulkyDiaper": {
+      // Bulky Diaper
+      //"color": [0, 1],
+      "gradients": [4],
+
+      "size": "light_adult"
+    },
+    "Panties_笨笨蛋LuziPoofyDiaper": {
+      // Poofy Diaper
+      //"color": [1, 0],
+      "gradients": [4],
+      "size": "light_adult"
+    },
+    "Panties_笨笨蛋LuziUntrainersThin": {
+      // Crinkly Diaper
+      "size": "light_adult",
+      "gradients": [4],
+      "indicator": [5]
+    },
+    "Panties_笨笨蛋LuziLatexDiaper": {
+      // Latex Diaper
+      //"color": [0],
+      "gradients": [2],
+      "size": "moderate_adult"
+    },
+
+    "PantiesDiapers1": {
+      // Diaper
+      "size": "regular",
+      "gradients": [1]
+    },
+    "PantiesDiapers2": {
+      // Plastic Covered Diaper
+      //"color": [0],
+      "gradients": [2],
+      "size": "light_adult"
+    },
+    "PantiesDiapers3": {
+      // Satin Covered Diaper
+      //"color": [0],
+      "gradients": [1],
+      "size": "light_adult"
+    },
+    "PantiesDiapers4": {
+      // Patterned Diaper
+      //"color": [0],
+      "gradients": [3],
+      "size": "overnight"
+    },
+    "PantiesBulkyDiaper": {
+      // Bulky Diaper
+      //"color": [0, 1],
+      "gradients": [4],
+
+      "size": "light_adult"
+    },
+    "ItemPelvisBulkyDiaper": {
+      // Bulky Chastity Diaper
+      //"color": [1, 0],
+      "gradients": [4],
+
+      "size": "moderate_adult"
+    },
+    "PantiesPoofyDiaper": {
+      // Poofy Diaper
+      //"color": [1, 0],
+      "gradients": [4],
+      "size": "light_adult"
+    },
+    "ItemPelvisPoofyDiaper 1": {
+      // Poofy Chastity Diaper + property
+      //"color": [1, 0],
+      "gradients": [4],
+      "size": "heavy_adult"
+    },
+    "ItemPelvisPoofyDiaper": {
+      // Poofy Chastity Diaper
+      //"color": [1, 0],
+      "gradients": [4],
+      "size": "moderate_adult"
+    },
+    "ItemPelvisDiaperHarness": {
+      // Diaper Harness
+      "size": "none"
+    },
+    "ItemPelvisUntrainersThin": {
+      // Crinkly Diaper
+      "size": "light_adult",
+      "gradients": [4],
+      "indicator": [5]
+    },
+    "PantiesUntrainersThin": {
+      // Crinkly Diaper
+      "size": "light_adult",
+      "gradients": [4],
+      "indicator": [5]
+    },
+    "ItemPelvisLatexDiaper": {
+      // Latex Chastity Diaper
+      "gradients": [2],
+      //"color": [0],
+      "size": "moderate_adult"
+    },
+    "PantiesLatexDiaper": {
+      // Latex Diaper
+      //"color": [0],
+      "gradients": [2],
+      "size": "moderate_adult"
+    }
+  }
+}
