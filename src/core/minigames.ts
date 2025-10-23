@@ -1,18 +1,24 @@
-// from LSCG - https://github.com/littlesera/LSCG/blob/8072c4d636a66bf12473823722afbc82fda8f98e/src/MiniGames/minigames.ts#L3C1-L3C87
-
 import { HookManager } from "@sugarch/bc-mod-hook-manager";
-import { incontinenceOnAccident } from "./player/diaper";
-import { abclPlayer } from "./player/player";
-import { getRandomInt, sendChatLocal } from "./utils";
+import { getRandomInt } from "./utils";
+import { DistractionRushGame } from "./minigames/distractionRush";
+import { BaseMiniGame, MessMinigameResult, WetMinigameResult } from "./minigames/baseMinigame";
 
 // for minigame text loading
 HookManager.hookFunction("TextLoad", 5, (args, next) => {
-  if (CurrentScreen === "WetMinigame" || CurrentScreen === "MessMinigame") return;
+  if (
+    CurrentScreen === "WetMinigame" ||
+    CurrentScreen === "MessMinigame" ||
+    CurrentScreen === "DistractionRush-Wetting" ||
+    CurrentScreen === "DistractionRush-Messes"
+  )
+    return;
   else return next(args);
 });
 export const initMinigames = () => {
   registerMiniGame(new MessMinigame());
   registerMiniGame(new WetMinigame());
+  registerMiniGame(new DistractionRushGame("Wetting"));
+  registerMiniGame(new DistractionRushGame("Messes"));
 };
 export function registerMiniGame<T extends BaseMiniGame>(miniGame: T) {
   var name = miniGame.name;
@@ -24,110 +30,6 @@ export function registerMiniGame<T extends BaseMiniGame>(miniGame: T) {
   (<any>window)[name + "KeyDown"] = () => miniGame.KeyDown();
   (<any>window)[name + "Exit"] = () => miniGame.Exit();
   (<any>window)[name + "End"] = (victory: boolean) => miniGame.End(victory);
-}
-
-export abstract class BaseMiniGame {
-  name: string = "";
-
-  Run() {
-    ChatRoomRun(CommonTime());
-  }
-  Click() {}
-  Load() {}
-  Unload() {}
-  Resize() {}
-  KeyDown() {}
-  Exit() {}
-  End(victory: boolean) {
-    CommonSetScreen("Online", "ChatRoom");
-    MiniGameVictory = victory;
-    MiniGameEnded = true;
-    MiniGameTimer = CommonTime();
-  }
-}
-
-export abstract class ClickTheRightThingMinigame extends BaseMiniGame {
-  /**
-   * @param {Record<string, number>} imageArray - An array of images src's with good / bad score paired to them
-   */
-  correctAnswers: number = 0;
-  timerLength: number = 30;
-  timeLeft: number = 0;
-  rounds: number = 5;
-  options: Record<string, number> = {
-    "Maybe I should just let go..": -1,
-    "I'm not sure..": 0,
-    "I'm not a baby": 1,
-    "I can hold it": 1,
-    "The pressure is too much": -1,
-    "It's too hard": -1,
-    "I'm an adult now": 1,
-  };
-  constructor() {
-    super();
-    this.name = "ClickTheRightThing";
-  }
-  Load() {
-    const updateRounds = () => {
-      this.timeLeft = this.timerLength;
-      this.rounds--;
-      const container = document.getElementById("abcl-minigame-container");
-      if (!container) return;
-      container.innerHTML = "";
-      // pick 5 random options with one postive
-      for (let i = 0; i < 5; i++) {
-        const option = Object.keys(this.options).filter(key => this.options[key] === 1)[Math.floor(Math.random() * Object.keys(this.options).length)];
-        container.appendChild(
-          ElementCreate({
-            tag: "div",
-            attributes: {
-              class: "abcl-minigame-option",
-            },
-            dataAttributes: {
-              option: option,
-              good: this.options[option],
-            },
-            children: [option],
-          }),
-        );
-      }
-      const updateTimer = () => {
-        const timer = document.getElementById("abcl-minigame-timer");
-        if (!timer) return;
-        const time = this.timeLeft;
-        timer.innerHTML = time < 10 ? "0" + time : time.toString();
-      };
-
-      ElementCreate({
-        tag: "div",
-        attributes: {
-          id: "abcl-minigame",
-        },
-        children: [
-          ElementCreate({
-            tag: "div",
-            attributes: {
-              id: "abcl-minigame-timer",
-            },
-            children: ["00"],
-          }),
-          ElementCreate({
-            tag: "div",
-            attributes: {
-              id: "abcl-minigame-container",
-            },
-            children: [],
-          }),
-        ],
-        parent: document.body,
-      });
-    };
-  }
-
-  End(victory: boolean): void {
-    super.End(victory);
-    ElementRemove("#abcl-minigame");
-  }
 }
 
 export abstract class AccidentMiniGame extends BaseMiniGame {
@@ -257,14 +159,7 @@ export class MessMinigame extends AccidentMiniGame {
   name = "MessMinigame";
   End(victory: boolean) {
     super.End(victory);
-    if (victory) {
-      abclPlayer.stats.Incontinence -= incontinenceOnAccident(abclPlayer.stats.Incontinence) / 2;
-      sendChatLocal("You managed to keep it together!");
-      return;
-    }
-
-    abclPlayer.soil();
-    abclPlayer.onAccident();
+    MessMinigameResult();
   }
 }
 
@@ -276,21 +171,6 @@ export class WetMinigame extends AccidentMiniGame {
   name = "WetMinigame";
   End(victory: boolean) {
     super.End(victory);
-    Player.ABCL.Stats.MinigameStatistics.Wet.Total++;
-    if (victory) {
-      abclPlayer.stats.Incontinence -= incontinenceOnAccident(abclPlayer.stats.Incontinence) / 2;
-      sendChatLocal("You managed to hold it in!");
-      if (Player.ABCL.Settings.ExpressionsByActivities) {
-        CharacterSetFacialExpression(Player, "Mouth", "Happy", 20);
-      }
-      Player.ABCL.Stats.MinigameStatistics.Wet.Success++;
-      return;
-    }
-    if (Player.ABCL.Settings.ExpressionsByActivities) {
-      CharacterSetFacialExpression(Player, "Blush", "Low", 10);
-      CharacterSetFacialExpression(Player, "Eyes", "Surprised", 9);
-    }
-    abclPlayer.wet();
-    abclPlayer.onAccident();
+    WetMinigameResult();
   }
 }

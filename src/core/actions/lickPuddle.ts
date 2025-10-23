@@ -1,6 +1,6 @@
 import { CombinedAction } from "../../types/types";
 import { sendDataToAction, sendUpdateMyData } from "../hooks";
-import { abclPlayer, updatePlayerClothes } from "../player/player";
+import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
 import { sendChatLocal } from "../utils";
 

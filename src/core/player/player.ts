@@ -1,4 +1,4 @@
-import { isColorable, Throttler, getColor, Saver, sendChatLocal } from "../utils";
+import { isColorable, Throttler, getColor, Saver, sendChatLocal, createRateLimiter } from "../utils";
 import {
   incontinenceChanceFormula,
   getPlayerDiaperSize,
@@ -14,16 +14,19 @@ import {
 import { abclStatsWindow } from "./ui";
 import { ABCLdata } from "../../constants";
 import { MetabolismSettingValues } from "../../types/types";
-import { getAccidentAutopilotOutcome, isAccidentsAutopiloted, sendABCLAction, sendStatusMessage } from "./playerUtils";
+import { getAccidentAutopilotOutcome, isAccidentsAutopiloted as isAccidentsAutoPiloted, sendABCLAction, sendStatusMessage } from "./playerUtils";
 import { sendUpdateMyData } from "../hooks";
-import { MessMinigame, WetMinigame } from "../minigames";
+import { MessMinigame, WetMinigame as WetMiniGame } from "../minigames";
 import { RuleId } from "src/types/definitions";
+import { MessMinigameResult, WetMinigameResult } from "../minigames/baseMinigame";
 
-export const updatePlayerClothes = (itemGroup?: AssetGroupName) => {
+export const updatePlayerClothes = async (itemGroup?: AssetGroupName) => {
   CharacterRefresh(Player, true);
   if (!itemGroup) return ChatRoomCharacterUpdate(Player);
   ChatRoomCharacterItemUpdate(Player, itemGroup);
 };
+
+export const queueUpdatePlayerClothes = createRateLimiter<typeof updatePlayerClothes>(updatePlayerClothes, 1 * 1000);
 
 const bowelThrottler = new Throttler(120 * 60 * 1000);
 const bladderThrottler = new Throttler(120 * 60 * 1000);
@@ -52,7 +55,10 @@ export const abclPlayer = {
     playerSaver.save();
   },
   wetClothing: () => {
-    if (Player.ABCL.Settings.DisableWettingLeaks) return;
+    if (Player.ABCL.Settings.DisableWettingLeaks) {
+      abclPlayer.stats.BladderValue = 0;
+      return;
+    }
     // panties -> pants -> floor
     sendChatLocal("You've had a wet accident in your clothes!");
     abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
@@ -87,12 +93,12 @@ export const abclPlayer = {
       }
     }
 
-    updatePlayerClothes();
+    queueUpdatePlayerClothes();
   },
   soilClothing: () => {
+    abclPlayer.stats.BowelValue = 0;
     if (Player.ABCL.Settings.DisableSoilingLeaks) return;
 
-    abclPlayer.stats.BowelValue = 0;
     if (hasDiaper()) {
       sendABCLAction("%NAME%'s diaper leaks and soils %POSSESSIVE% clothes.", undefined, "soilClothing");
     } else {
@@ -123,7 +129,7 @@ export const abclPlayer = {
         item.Color = colors;
       }
     }
-    updatePlayerClothes();
+    queueUpdatePlayerClothes();
   },
   wetDiaper: () => {
     const diaperSize = getPlayerDiaperSize();
@@ -155,9 +161,9 @@ export const abclPlayer = {
     if (!(Math.random() < chance || abclPlayer.stats.BladderFullness > limit)) return;
 
     if (!incontinenceCheck.check()) return;
-    if (window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.PREVENT_RESISTING_URGES)) return new WetMinigame().End(false);
-    if (isAccidentsAutopiloted()) return new WetMinigame().End(getAccidentAutopilotOutcome("Wet"));
-    MiniGameStart("WetMinigame" as ModuleScreens["MiniGame"], 30 * chance, "CommonNoop");
+    if (window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.PREVENT_RESISTING_URGES)) return new WetMiniGame().End(false);
+    if (isAccidentsAutoPiloted()) return WetMinigameResult(false);
+    MiniGameStart("DistractionRush-Wetting" as ModuleScreens["MiniGame"], 1 + chance, "WetMinigameResult");
   },
   attemptSoiling: () => {
     const limit = incontinenceLimitFormula(abclPlayer.stats.Incontinence);
@@ -167,8 +173,8 @@ export const abclPlayer = {
 
     if (!incontinenceCheck.check()) return;
     if (window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.PREVENT_RESISTING_URGES)) return new MessMinigame().End(false);
-    if (isAccidentsAutopiloted()) return new MessMinigame().End(getAccidentAutopilotOutcome("Mess"));
-    MiniGameStart("MessMinigame" as ModuleScreens["MiniGame"], 30 * chance, "CommonNoop");
+    if (isAccidentsAutoPiloted()) return MessMinigameResult(false);
+    MiniGameStart("DistractionRush-Messes" as ModuleScreens["MiniGame"], 1 + chance, "MessMinigameResult");
   },
   wet: (intentional: boolean = false) => {
     const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;
@@ -308,6 +314,7 @@ export const abclPlayer = {
     // bowel
     set BowelValue(value: number) {
       if (value < 0) value = 0;
+      if (value > this.BowelSize) value = this.BowelSize;
       const delta = value / this.BowelSize - this.BowelFullness;
       sendStatusMessage("Bowel", delta, true);
       Player.ABCL.Stats.Bowel.value = value;
@@ -369,6 +376,6 @@ export const abclPlayer = {
 
 const playerSaver = new Saver(2 * 60 * 1000);
 
-const incontinenceCheck = new Throttler(2 * 60 * 1000);
+export const incontinenceCheck = new Throttler(2 * 60 * 1000);
 
 (window as any).abclPlayer = abclPlayer;

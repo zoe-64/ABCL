@@ -1,5 +1,5 @@
 import { ABCLdata } from "../../constants";
-import { abclPlayer, updatePlayerClothes } from "./player";
+import { abclPlayer, queueUpdatePlayerClothes } from "./player";
 import { isABCLPlayer } from "./playerUtils";
 
 // Is/Has
@@ -8,10 +8,10 @@ export const isOwned = (player: Character = Player): boolean => {
 };
 
 export const isLeaking = (type: "pee" | "poop" | "any" = "any", player: Character = Player) => {
-  if (!isABCLPlayer(player) || !hasDiaper(player)) return false;
+  if (!isABCLPlayer(player)) return false;
   const diaperSize = getPlayerDiaperSize(player);
-  const leakingPee = player.ABCL!.Stats.PuddleSize.value > 0 || player.ABCL!.Stats.Wetness.value >= diaperSize;
-  const leakingPoop = player.ABCL!.Stats.Soiliness.value >= diaperSize;
+  const leakingPee = player.ABCL!.Stats.PuddleSize.value > 0 || (hasDiaper(player) && player.ABCL!.Stats.Wetness.value >= diaperSize);
+  const leakingPoop = hasDiaper(player) && player.ABCL!.Stats.Soiliness.value >= diaperSize;
   if (type === "pee") return leakingPee;
   if (type === "poop") return leakingPoop;
   return leakingPee || leakingPoop;
@@ -101,7 +101,7 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
     //} no longer used
     item.Color = color;
   }
-  updatePlayerClothes(slot);
+  queueUpdatePlayerClothes(slot);
 };
 export const updateDiaperColor = () => {
   const messLevel = abclPlayer.stats.SoilinessValue / getPlayerDiaperSize();

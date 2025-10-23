@@ -26,7 +26,7 @@ import {
   setDiaperColor,
   updateDiaperColor,
 } from "./player/diaper";
-import { abclPlayer, updatePlayerClothes } from "./player/player";
+import { abclPlayer, incontinenceCheck, queueUpdatePlayerClothes, updatePlayerClothes } from "./player/player";
 import { getCharacter, getCharacterName, isABCLPlayer, replace_template, sendABCLAction, sendStatusMessage } from "./player/playerUtils";
 import { clearData, updateData } from "./settings";
 import { getColor, getElement, isColorable } from "./utils";
@@ -85,6 +85,7 @@ export function initApi(): void {
       sendStatusMessage,
       sendABCLAction,
       updatePlayerClothes,
+      queueUpdatePlayerClothes,
       sendUpdateMyData,
       sendDataToAction,
       mentalRegressionBonus,
@@ -118,6 +119,7 @@ export function initApi(): void {
       },
       clearData,
       updateData,
+      incontinenceCheckThrottle: incontinenceCheck,
     },
   };
 }

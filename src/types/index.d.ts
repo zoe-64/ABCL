@@ -112,5 +112,5 @@ interface Character {
 }
 
 declare interface ModuleScreens {
-  shushTs: "WetMinigame" | "MessMinigame";
+  shushTs: "WetMinigame" | "MessMinigame" | "DistractionRush-Wetting" | "DistractionRush-Messes";
 }

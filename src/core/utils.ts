@@ -104,10 +104,23 @@ export const generateUniqueID = (identifier?: string) => {
 export class Throttler {
   private lastCallTime: number = 0;
   allowedCallInterval: number;
+  pausedTime: number | null = null;
+  pausedOffset: number = 0;
   constructor(allowedCallInterval: number) {
     this.allowedCallInterval = allowedCallInterval;
   }
+  pause() {
+    this.pausedTime = Date.now();
+    this.pausedOffset = this.lastCallTime - this.pausedTime;
+  }
+  resume() {
+    this.pausedTime = null;
+    this.lastCallTime = Date.now() - this.pausedOffset;
+  }
   check(): boolean {
+    if (this.pausedTime) {
+      return false;
+    }
     if (Date.now() - this.lastCallTime > this.allowedCallInterval) {
       this.lastCallTime = Date.now();
       return true;
@@ -116,6 +129,11 @@ export class Throttler {
   }
   reset() {
     this.lastCallTime = 0;
+    this.pausedTime = null;
+  }
+  resetAllowedCallInterval() {
+    this.lastCallTime = Date.now();
+    this.pausedTime = null;
   }
   isReady() {
     return Date.now() - this.lastCallTime > this.allowedCallInterval;
@@ -150,4 +168,30 @@ export const getElement = <T extends Element>(parent: Element, selector: string)
 
 export function getRandomInt(max: number): number {
   return Math.floor(Math.random() * max);
+}
+
+export function createRateLimiter<T extends (...args: any[]) => Promise<any>>(func: T, delay: number): (...funcArgs: Parameters<T>) => void {
+  const queue: Parameters<T>[] = [];
+  let isProcessing: boolean = false;
+
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  async function worker(): Promise<void> {
+    if (isProcessing) return;
+    isProcessing = true;
+
+    while (queue.length > 0) {
+      const args = queue.shift()!; // '!' is non-null assertion as we checked queue.length
+
+      await func(...args);
+
+      await sleep(delay);
+    }
+    isProcessing = false;
+  }
+
+  return function (...args: Parameters<T>): void {
+    queue.push(args);
+    worker();
+  };
 }
