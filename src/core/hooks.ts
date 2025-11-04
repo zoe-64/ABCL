@@ -1,6 +1,6 @@
 import { PluginServerChatRoomMessage, ListenerTypeMap, HookListener } from "../types/types";
 import { logger } from "./logger";
-import { isDiaper, isLeaking, updateDiaperColor } from "./player/diaper";
+import { getDiaperSize, isDiaper, isLeaking, updateDiaperColor } from "./player/diaper";
 import { isABCLPlayer } from "./player/playerUtils";
 import { resizeElements } from "./player/ui";
 import { ModIdentifier, ModVersion } from "../types/definitions";
@@ -165,7 +165,11 @@ const initHooks = async () => {
     let [_character, _slot, _asset] = args;
     const _result = next(args);
     if (_slot === "ItemPelvis" && _asset) {
-      if (isDiaper({ Asset: _asset })) updateDiaperColor();
+      if (isDiaper({ Asset: _asset })) {
+        abclPlayer.stats.BladderValue = Math.min(abclPlayer.stats.BladderValue, getDiaperSize({ Asset: _asset }));
+        abclPlayer.stats.BowelValue = Math.min(abclPlayer.stats.BowelValue, getDiaperSize({ Asset: _asset }));
+        updateDiaperColor();
+      }
     }
     return _result;
   });
@@ -224,7 +228,8 @@ const initHooks = async () => {
     if (isABCLPlayer(_C) && isLeaking("any", _C)) {
       nickname = "🍼 " + nickname;
     }
-    if ([155633, 54811, 126467, 178496, 33367].includes(_C.MemberNumber ?? -1)) {
+    //   En,     Maria, Arelia, Lorenzi, Mai,  Loona,  Amy,    Ivy
+    if ([155633, 54811, 126467, 178496, 33367, 198473, 194267, 213616].includes(_C.MemberNumber ?? -1)) {
       nickname = "❀ " + nickname;
     }
     if (_C.MemberNumber === 164988) {
