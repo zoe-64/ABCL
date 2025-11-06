@@ -52,6 +52,7 @@ interface ModSettings {
   DisableDiaperStains: boolean;
   AccidentsByActivities: boolean;
   AccidentAutopilot: boolean;
+  ShowOwnBadges: boolean;
 }
 interface ModStats {
   PuddleSize: {

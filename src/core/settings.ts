@@ -42,6 +42,7 @@ export const defaultSettings: ModSettings = {
   AccidentsByActivities: true,
   ExpressionsByActivities: false,
   AccidentAutopilot: false,
+  ShowOwnBadges: true,
 };
 
 export const defaultStats: ModStats = {
@@ -117,6 +118,7 @@ export const defaultSettingPermissions: ModStorageModel["SettingPermissions"] = 
   LockedOutOfSettings: false,
   StatusMessages: false,
   AccidentAutopilot: false,
+  ShowOwnBadges: false,
 };
 const defaultData: ModStorageModel = {
   Settings: defaultSettings,

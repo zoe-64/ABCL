@@ -225,11 +225,14 @@ const initHooks = async () => {
   HookManager.hookFunction("CharacterNickname", 1, (args, next) => {
     const [_C] = args;
     let nickname = next(args);
+    if (isABCLPlayer(_C) && !_C.ABCL!.Settings.ShowOwnBadges) {
+      return nickname;
+    }
     if (isABCLPlayer(_C) && isLeaking("any", _C)) {
       nickname = "🍼 " + nickname;
     }
     //   En,     Maria, Arelia, Lorenzi, Mai,  Loona,  Amy,    Ivy
-    if ([155633, 54811, 126467, 178496, 33367, 198473, 194267, 213616].includes(_C.MemberNumber ?? -1)) {
+    if ([155633, 54811, 126467, 178496, 33367, 198473, 149267, 213616].includes(_C.MemberNumber ?? -1)) {
       nickname = "❀ " + nickname;
     }
     if (_C.MemberNumber === 164988) {

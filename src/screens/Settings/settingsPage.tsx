@@ -1,7 +1,7 @@
 import { h, JSX } from "preact";
 import { useEffect, useReducer, useState } from "preact/hooks";
 import StatsPage from "./pages/stats";
-import MessagesPage from "./pages/messages";
+import MiscPage from "./pages/misc";
 import { resizeElements } from "src/core/player/ui";
 import { AboutPage } from "./pages/about";
 import styled from "styled-components";
@@ -102,8 +102,8 @@ export default function SettingsPage(): h.JSX.Element {
                 <section>
                   <h2>Menu</h2>
                   <div id="ABCL-page-list">
-                    <button onClick={() => setPage("messages")} className="ABCL-button">
-                      Messages
+                    <button onClick={() => setPage("misc")} className="ABCL-button">
+                      Misc
                     </button>
                     <button onClick={() => setPage("stats")} className="ABCL-button">
                       Stats
@@ -131,7 +131,7 @@ export default function SettingsPage(): h.JSX.Element {
                 </section>
               </MenuPage>
             ),
-            messages: <MessagesPage setPage={setPage} />,
+            misc: <MiscPage setPage={setPage} />,
             stats: <StatsPage setPage={setPage} />,
             about: <AboutPage setPage={setPage} />,
             sharedSettings: <SharedSettingsPage setPage={setPage} selectedCharacter={selectedCharacter} />,

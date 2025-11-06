@@ -7,7 +7,7 @@ import { SettingPanel } from "src/screens/components/settingPanel";
 import { SettingsH2 } from "../settingsPage";
 import { isOwned } from "src/core/player/diaper";
 
-export default function MessagesPage({ setPage }: { setPage: (page: string) => void }): h.JSX.Element {
+export default function MiscPage({ setPage }: { setPage: (page: string) => void }): h.JSX.Element {
   const [wetDiaper, setWetDiaper] = useState<boolean>(Player.ABCL.Settings.VisibleMessages.wetDiaper);
   const [wetClothing, setWetClothing] = useState<boolean>(Player.ABCL.Settings.VisibleMessages.wetClothing);
   const [soilDiaper, setSoilDiaper] = useState<boolean>(Player.ABCL.Settings.VisibleMessages.soilDiaper);
@@ -40,6 +40,8 @@ export default function MessagesPage({ setPage }: { setPage: (page: string) => v
   const [mentalRegression, setMentalRegression] = useState<boolean>(Player.ABCL.Settings.StatusMessages["MentalRegression"] ?? false);
   const [puddleSize, setPuddleSize] = useState<boolean>(Player.ABCL.Settings.StatusMessages["PuddleSize"] ?? false);
 
+  const [showOwnBadges, setShowOwnBadges] = useState<boolean>(Player.ABCL.Settings.ShowOwnBadges);
+
   return (
     <div>
       <button
@@ -65,6 +67,8 @@ export default function MessagesPage({ setPage }: { setPage: (page: string) => v
           Player.ABCL.Settings.StatusMessages["MentalRegression"] = mentalRegression;
           Player.ABCL.Settings.StatusMessages["PuddleSize"] = puddleSize;
 
+          Player.ABCL.Settings.ShowOwnBadges = showOwnBadges;
+
           Player.ABCL.SettingPermissions.wetDiaper = wetDiaperLocked;
           Player.ABCL.SettingPermissions.wetClothing = wetClothingLocked;
           Player.ABCL.SettingPermissions.soilDiaper = soilDiaperLocked;
@@ -79,6 +83,14 @@ export default function MessagesPage({ setPage }: { setPage: (page: string) => v
         }}
         className="ABCL-exit-button"
       ></button>
+      <div>
+        <SettingsH2>Miscellaneous</SettingsH2>
+        <Group>
+          <SettingPanel title="Show own badges / bottle icon">
+            <Checkbox checked={showOwnBadges} setChecked={setShowOwnBadges} opaqueLock={true} />
+          </SettingPanel>
+        </Group>
+      </div>
       <div>
         <SettingsH2>Visible Messages to Players</SettingsH2>
         <Group>
