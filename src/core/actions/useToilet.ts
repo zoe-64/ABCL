@@ -27,13 +27,15 @@ export const useToilet: CombinedAction = {
     Name: "Sit and Use Toilet",
     Image: `${publicURL}/activity/toilet-temp.png`,
     OnClick: (player, group) => useToiletFunction(),
+    // if the regression is too high, deny toilet usage
     Criteria: player => abclPlayer.stats.MentalRegression < 0.3 && !(hasDiaper(player) && isDiaperLocked()) && !Player.IsRestrained(),
     TargetSelf: ["ItemButt"],
   },
   command: {
     Tag: "use-toilet",
     Action: () => {
-      if (abclPlayer.stats.MentalRegression < 0.3) {
+      // if the regression is too high, deny toilet usage
+      if (abclPlayer.stats.MentalRegression >= 0.3) {
         if (Player.ABCL.Settings.ExpressionsByActivities) {
           CharacterSetFacialExpression(Player, "Eyes", "Dizzy", 8);
         }
