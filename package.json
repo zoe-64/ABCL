@@ -45,7 +45,7 @@
     "@types/core-js": "^2.5.8",
     "@types/css": "^0.0.37",
     "@types/node": "^20.17.30",
-    "bc-stubs": "^121.0.0",
+    "bc-stubs": "^126.0.0",
     "http-server": "^14.1.1",
     "lodash-es": "^4.17.21",
     "nodemon": "^3.1.4",

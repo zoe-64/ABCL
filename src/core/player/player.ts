@@ -14,7 +14,7 @@ import {
 import { abclStatsWindow } from "./ui";
 import { ABCLdata } from "../../constants";
 import { MetabolismSettingValues } from "../../types/types";
-import { getAccidentAutopilotOutcome, isAccidentsAutopiloted as isAccidentsAutoPiloted, sendABCLAction, sendStatusMessage } from "./playerUtils";
+import { isAccidentsAutopiloted as isAccidentsAutoPiloted, sendABCLAction, sendStatusMessage } from "./playerUtils";
 import { sendUpdateMyData } from "../hooks";
 import { MessMinigame, WetMinigame as WetMiniGame } from "../minigames";
 import { RuleId } from "src/types/definitions";

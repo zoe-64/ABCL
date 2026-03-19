@@ -40,7 +40,7 @@ export const isWearingBabyClothes = () => {
   });
 };
 // Color
-export function averageColor(color_1: HexColor, color_2: HexColor, ratio: number = 0.5): HexColor {
+export function averageColor(color_1: string, color_2: string, ratio: number = 0.5): BCColor {
   let rgb_1 = DrawHexToRGB(color_1);
   let rgb_2 = DrawHexToRGB(color_2);
   let avgRgb: RGBColor = {
@@ -79,7 +79,7 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
     const dirtiness = Math.min(abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue / getPlayerDiaperSize(), 1);
     if ("indicator" in diaper) {
       for (const index of diaper.indicator) {
-        color[index] = averageColor(ABCLdata.DiaperColors.indicatorAccident, item.Asset.DefaultColor[index], dirtiness);
+        color[index] = averageColor(ABCLdata.DiaperColors.indicatorAccident, item.Asset.DefaultColor[index], dirtiness) as BCColor;
       }
     }
     if ("gradients" in diaper) {
@@ -91,7 +91,7 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
         const layerIndex = getLayerIndexFromColorIndex(index, item.Asset);
         item.Property.Opacity ??= item.Asset.Layer.map(layer => layer.Opacity);
         item.Property.Opacity[layerIndex] = dirtiness;
-        color[index] = primaryColor;
+        color[index] = primaryColor as BCColor;
       }
     }
     //if ("color" in diaper) {

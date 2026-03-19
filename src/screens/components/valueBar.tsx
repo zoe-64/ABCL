@@ -11,6 +11,7 @@ const ValueBarContainer = styled.div<JSX.IntrinsicElements["div"]>`
     color: #000000;
     font-weight: bold;
     font-size: 1.2em;
+    margin: 0;
   }
   > div {
     position: relative;
@@ -28,6 +29,7 @@ const ValueBarContainer = styled.div<JSX.IntrinsicElements["div"]>`
     padding-left: 0.2em;
     > p {
       color: #fff;
+      margin: 0;
     }
     min-width: 2.5em;
   }

@@ -4,6 +4,7 @@ import { DistractionRushGame } from "./minigames/distractionRush";
 import { BaseMiniGame, MessMinigameResult, WetMinigameResult } from "./minigames/baseMinigame";
 
 // for minigame text loading
+// @ts-expect-error ts(2345)
 HookManager.hookFunction("TextLoad", 5, (args, next) => {
   if (
     CurrentScreen === "WetMinigame" ||

@@ -106,7 +106,7 @@ export class DistractionRushGame extends BaseMiniGame {
   options: (typeof options)[typeof this.type];
   static timerLength: number = 120;
   timeLeft: number = 0;
-  timer: NodeJS.Timeout | null = null;
+  timer: number | null = null;
   constructor(type: "Wetting" | "Messes") {
     super();
     this.type = type;

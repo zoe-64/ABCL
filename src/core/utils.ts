@@ -145,7 +145,7 @@ export class Throttler {
 // return a hex color
 export const isColorable = (color: string) => color !== "Default" && typeof color === "string";
 
-export const getColor = (color: ItemColor | null | "Default" | string[] | ItemColor, asset: Asset): string[] => {
+export const getColor = (color: ItemColor | null | "Default" | string[] | ItemColor, asset: Asset): BCColor[] => {
   if (typeof color === "string" && color !== "Default") logger.warn(`Unknown color: ${color}`);
   if (!color || color === "Default") return [...asset.DefaultColor.map(color => (color === "Default" ? "#FFFFFF" : color))];
 
@@ -155,7 +155,7 @@ export const getColor = (color: ItemColor | null | "Default" | string[] | ItemCo
         return "#FFFFFF";
       }
       return mappedColor;
-    });
+    }) as BCColor[];
   }
 
   return [color];

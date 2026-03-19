@@ -5,7 +5,6 @@ import { getPlayerDiaperSize, incontinenceLimitFormula } from "src/core/player/d
 import { resizeElements, abclStatsWindow } from "src/core/player/ui";
 import { h, JSX } from "preact";
 import styled from "styled-components";
-import { abclPlayer } from "src/core/player/player";
 const StatsPanelComponent = styled.div<JSX.IntrinsicElements["div"]>`
   .ABCL-stats-overlay {
     width: 100%;
@@ -13,6 +12,9 @@ const StatsPanelComponent = styled.div<JSX.IntrinsicElements["div"]>`
     top: 0;
     left: 0;
     position: absolute;
+  }
+  .ABCL-stats-overlay p {
+    margin: 0;
   }
   .ABCL-stats-panel {
     background-color: var(--abcl-element-indentation);
