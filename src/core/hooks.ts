@@ -96,6 +96,17 @@ const receivePacket = (receivedMessage: PluginServerChatRoomMessage) => {
 
 const initHooks = async () => {
   await waitFor(() => ServerSocket && ServerIsConnected);
+  HookManager.hookFunction("TextPrefetchFile", 1, (args, next) => {
+    if (args[0] !== "Screens/Room/Crafting/Text_Crafting.csv") {
+      return next(args);
+    }
+    const cache = next(args);
+    cache.cache["PropertyLaxative"] = "Laxative-laced";
+    cache.cache["PropertyDiuretic"] = "Diuretic-laced";
+    cache.cache["DescriptionLaxative"] = "Relaxes the wearers bowels";
+    cache.cache["DescriptionDiuretic"] = "Numbs the wearers bladder";
+    return cache;
+  });
   HookManager.hookFunction(
     "DrawRoomBackground",
     HookPriority.OBSERVE,
@@ -180,10 +191,10 @@ const initHooks = async () => {
     if (Player.ABCL.Settings.AccidentsByActivities && acted.MemberNumber === Player.MemberNumber && activity.Name in ACCIDENTS_ON_ACTIVITIES) {
       const chance = ACCIDENTS_ON_ACTIVITIES[activity.Name] as { wetting?: number; messing?: number };
       if (Player.ABCL.Settings.PeeMetabolism !== "Disabled" && chance.wetting && Math.random() < chance.wetting * (1 + 2 * abclPlayer.stats.Incontinence)) {
-        abclPlayer.attemptWetting();
+        abclPlayer.attemptWetting(true);
       }
       if (Player.ABCL.Settings.PoopMetabolism !== "Disabled" && chance.messing && Math.random() < chance.messing * (1 + 2 * abclPlayer.stats.Incontinence)) {
-        abclPlayer.attemptSoiling();
+        abclPlayer.attemptSoiling(true);
       }
     }
     return result;

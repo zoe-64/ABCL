@@ -61,18 +61,12 @@ export const DropDown = forwardRef<HTMLDivElement, DropDownProps>(
     const listRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
-        if (listRef.current && !listRef.current.contains(event.target as Node)) {
-          setOpen(false);
-        }
+        if (listRef.current && !listRef.current.contains(event.target as Node)) setOpen(false);   
       };
 
-      if (open) {
-        document.addEventListener("mousedown", handleClickOutside);
-      }
+      if (open) document.addEventListener("mousedown", handleClickOutside);
 
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
+      return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [open]);
 
     return (

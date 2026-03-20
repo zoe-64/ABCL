@@ -41,12 +41,13 @@ export const initOverlay = () => {
   waitForElement("#chat-room-div", { childCheck: true, timeout: TIMEOUT })
     .then(() => waitForElement(`.ABCL-overlay`, { timeout: TIMEOUT }))
     .then(() => {
-      document.removeChild(overlay);
-      setTimeout(() => {
-        document.body.appendChild(overlay);
-      }, 1000);
-    })
-    .catch(error => {
-      console.error("Failed to initialize overlay:", error);
+      try {
+        document.removeChild(overlay);
+        setTimeout(() => {
+          document.body.appendChild(overlay);
+        }, 1000);
+      } catch (err) {
+        // this is not an error worth caring about
+      }
     });
 };

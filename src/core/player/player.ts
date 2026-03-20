@@ -35,6 +35,23 @@ export const abclPlayer = {
   onAccident: () => {
     abclPlayer.stats.MentalRegression += mentalRegressionOnAccident();
   },
+  tick: () => {
+    if (Player.ABCL.Settings.PeeMetabolism !== "Disabled") {
+      const diureticCount = CommonClamp(InventoryCraftCount(Player, "Diuretic" as CraftingPropertyType, true), 0, 5);
+
+      abclPlayer.stats.BladderValue +=
+        abclPlayer.stats.WaterIntake * MetabolismSettingValues[Player.ABCL.Settings.PeeMetabolism] * Math.max(1 + diureticCount / 2, 1);
+      abclPlayer.attemptWetting();
+    }
+    if (Player.ABCL.Settings.PoopMetabolism !== "Disabled") {
+      const laxativeCount = CommonClamp(InventoryCraftCount(Player, "Laxative" as CraftingPropertyType, true), 0, 5);
+
+      abclPlayer.stats.BowelValue +=
+        abclPlayer.stats.FoodIntake * MetabolismSettingValues[Player.ABCL.Settings.PoopMetabolism] * Math.max(1 + laxativeCount / 2, 1);
+      abclPlayer.attemptSoiling();
+    }
+    playerSaver.save();
+  },
   /** once per minute */
   update: () => {
     if (Player.ABCL.Settings.PauseStats) return;
@@ -45,11 +62,17 @@ export const abclPlayer = {
       abclPlayer.stats.MentalRegression += mentalRegressionOvertime();
     }
     if (bladderThrottler.check() && Player.ABCL.Settings.PeeMetabolism !== "Disabled") {
-      abclPlayer.stats.BladderValue += abclPlayer.stats.WaterIntake * MetabolismSettingValues[Player.ABCL.Settings.PeeMetabolism];
+      const diureticCount = CommonClamp(InventoryCraftCount(Player, "Diuretic" as CraftingPropertyType, true), 0, 5);
+
+      abclPlayer.stats.BladderValue +=
+        abclPlayer.stats.WaterIntake * MetabolismSettingValues[Player.ABCL.Settings.PeeMetabolism] * Math.max(1 + diureticCount / 1.25, 1);
       abclPlayer.attemptWetting();
     }
     if (bowelThrottler.check() && Player.ABCL.Settings.PoopMetabolism !== "Disabled") {
-      abclPlayer.stats.BowelValue += abclPlayer.stats.FoodIntake * MetabolismSettingValues[Player.ABCL.Settings.PoopMetabolism];
+      const laxativeCount = CommonClamp(InventoryCraftCount(Player, "Laxative" as CraftingPropertyType, true), 0, 5);
+
+      abclPlayer.stats.BowelValue +=
+        abclPlayer.stats.FoodIntake * MetabolismSettingValues[Player.ABCL.Settings.PoopMetabolism] * Math.max(1 + laxativeCount, 1);
       abclPlayer.attemptSoiling();
     }
     playerSaver.save();
@@ -154,24 +177,24 @@ export const abclPlayer = {
       abclPlayer.soilClothing();
     }
   },
-  attemptWetting: () => {
+  attemptWetting: (force?: boolean) => {
     const limit = incontinenceLimitFormula(abclPlayer.stats.Incontinence);
     const chance = incontinenceChanceFormula(abclPlayer.stats.Incontinence, abclPlayer.stats.BladderFullness);
 
     if (!(Math.random() < chance || abclPlayer.stats.BladderFullness > limit)) return;
 
-    if (!incontinenceCheck.check()) return;
+    if (!force && !incontinenceCheck.check()) return;
     if (window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.PREVENT_RESISTING_URGES)) return new WetMiniGame().End(false);
     if (isAccidentsAutoPiloted()) return WetMinigameResult(false);
     MiniGameStart("DistractionRush-Wetting" as ModuleScreens["MiniGame"], 1 + chance, "WetMinigameResult");
   },
-  attemptSoiling: () => {
+  attemptSoiling: (force?: boolean) => {
     const limit = incontinenceLimitFormula(abclPlayer.stats.Incontinence);
     const chance = incontinenceChanceFormula(abclPlayer.stats.Incontinence, abclPlayer.stats.BowelFullness);
 
     if (!(Math.random() < chance || abclPlayer.stats.BowelFullness > limit)) return;
 
-    if (!incontinenceCheck.check()) return;
+    if (!force && !incontinenceCheck.check()) return;
     if (window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.PREVENT_RESISTING_URGES)) return new MessMinigame().End(false);
     if (isAccidentsAutoPiloted()) return MessMinigameResult(false);
     MiniGameStart("DistractionRush-Messes" as ModuleScreens["MiniGame"], 1 + chance, "MessMinigameResult");

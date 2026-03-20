@@ -22,7 +22,7 @@ export const isDiaperDirty = () => {
   return abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue >= diaperSize / 2;
 };
 export const isDiaper = (item: Item | null): boolean => {
-  if (!item) return false;
+  if (!item || !item.Asset) return false;
   return item.Asset.DynamicGroupName + item.Asset.Name in ABCLdata.Diapers;
 };
 export function hasDiaper(player: Character = Player): boolean {
@@ -73,7 +73,7 @@ export const getLayerIndexFromColorIndex = (colorIndex: number, asset: Asset) =>
 export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, player: Character = Player) => {
   if (Player.ABCL.Settings.DisableDiaperStains) return;
   const item = InventoryGet(player, slot);
-  if (item && isDiaper(item)) {
+  if (item && item.Asset && isDiaper(item)) {
     const color = !item.Color || typeof item.Color === "string" ? [...item.Asset.DefaultColor] : [...item.Color];
     const diaper = ABCLdata.Diapers[(item.Asset.DynamicGroupName + item.Asset.Name) as keyof typeof ABCLdata.Diapers];
     const dirtiness = Math.min(abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue / getPlayerDiaperSize(), 1);

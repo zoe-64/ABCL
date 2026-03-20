@@ -10,6 +10,7 @@ import { loopInterval } from "./constants";
 import { initApi } from "./core/api";
 import { initCustomItems } from "./core/customItems";
 import { HookManager } from "@sugarch/bc-mod-hook-manager";
+import { initProperties } from "./core/properties";
 initCustomItems();
 
 const loop = () => {
@@ -18,12 +19,21 @@ const loop = () => {
   }
   abclPlayer.update();
 };
-
+HookManager.afterInit(() => {
+  CraftingValidationRecord.Effects.Validate = function (c, a) {
+    if (!CommonIsObject(c.Effects)) {
+      return false;
+    }
+    if (c.Effects?.Normal) return false;
+    return true;
+  };
+});
 HookManager.afterPlayerLogin(async () => {
   loadOrGenerateData();
   initSettingsScreen();
   initActions();
   initHooks();
+  initProperties();
   initMinigames();
   initOverlay();
   initApi();
