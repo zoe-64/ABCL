@@ -1,0 +1,19 @@
+# Ignore build artifacts
+dist/
+build/
+coverage/
+
+# Ignore specific folders
+node_modules/
+.next/
+.vercel/
+
+# Ignore environment files
+*.log
+.env*
+
+# Ignore all HTML files
+**/*.html
+
+# Ignore specific files
+versions/

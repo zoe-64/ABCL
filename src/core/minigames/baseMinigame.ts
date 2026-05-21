@@ -14,11 +14,12 @@ export abstract class BaseMiniGame {
   Resize() {}
   KeyDown() {}
   Exit() {}
-  End(victory: boolean) {
+  End(victory: boolean) {2
     CommonSetScreen("Online", "ChatRoom");
     MiniGameVictory = victory;
     MiniGameEnded = true;
     MiniGameTimer = CommonTime();
+    // @ts-expect-error
     CommonCallFunctionByName(MiniGameReturnFunction);
   }
 }

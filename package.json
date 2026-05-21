@@ -1,7 +1,7 @@
 {
   "name": "abcl",
   "displayName": "ABCL",
-  "version": "2.3.5",
+  "version": "2.3.9",
   "description": "An addon for [Bondage Club](https://www.bondageprojects.com/club_game/). Stands for \"Adult baby club lover\"~",
   "repository": {
     "type": "git",
@@ -14,6 +14,7 @@
     "input": "main.ts"
   },
   "scripts": {
+    "check": "tsc --noEmit",
     "release": "node ./build-files/release.js",
     "generate released version": "node ./build-files/generate.js",
     "watch": "nodemon --exec \"rollup -c rollup.config.js --configDebug --configDeploy http://localhost:3041 --configVersion dev && http-server ./versions/dev -p 3041 --cors\" -e js,ts,tsx,css --ignore ./versions"
@@ -30,11 +31,6 @@
     "styled-components": "^6.1.19"
   },
   "devDependencies": {
-    "@sugarch/bc-activity-manager": "^1.0.2",
-    "@sugarch/bc-asset-manager": "^1.0.2",
-    "@sugarch/bc-event-handler": "^1.0.1",
-    "@sugarch/bc-mod-hook-manager": "^0.3.1",
-    "bondage-club-mod-sdk": "^1.2.0",
     "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.0.0",
@@ -42,13 +38,22 @@
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
+    "@sugarch/bc-activity-manager": "^1.0.2",
+    "@sugarch/bc-asset-manager": "^1.0.2",
+    "@sugarch/bc-event-handler": "^1.0.1",
+    "@sugarch/bc-mod-hook-manager": "^0.3.1",
     "@types/core-js": "^2.5.8",
     "@types/css": "^0.0.37",
     "@types/node": "^20.17.30",
-    "bc-stubs": "^126.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.4",
+    "@typescript-eslint/parser": "^8.59.4",
+    "bc-stubs": "^128.0.0",
+    "bondage-club-mod-sdk": "^1.2.0",
+    "eslint": "^10.4.0",
     "http-server": "^14.1.1",
     "lodash-es": "^4.17.21",
     "nodemon": "^3.1.4",
+    "prettier": "^3.8.3",
     "rollup": "^4.13.2",
     "rollup-plugin-cleanup": "^3.2.1",
     "rollup-plugin-copy": "^3.5.0",

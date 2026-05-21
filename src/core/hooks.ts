@@ -111,7 +111,7 @@ const initHooks = async () => {
     "DrawRoomBackground",
     HookPriority.OBSERVE,
     ([URL, ...args]: Parameters<typeof DrawRoomBackground>, next: (args: Parameters<typeof DrawRoomBackground>) => ReturnType<typeof DrawRoomBackground>) => {
-      if (URL.includes("Sheet.jpg") && inModSubscreen() && !(<any>window)?.ThemedLoaded) {
+      if (URL != null && URL.includes("Sheet.jpg") && inModSubscreen() && !(<any>window)?.ThemedLoaded) {
         next([URL, ...args]);
         MainCanvas.save();
         MainCanvas.globalCompositeOperation = "multiply";

@@ -3,7 +3,7 @@
     "target": "ES2021",
     "lib": ["ESNext", "dom", "DOM.Iterable"],
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "sourceMap": true,
     "removeComments": false,
     "outDir": "./versons/dev",
@@ -19,12 +19,12 @@
     "jsxImportSource": "preact",
     "types": ["preact"],
     "checkJs": true,
-    "baseUrl": "./",
     "paths": {
       "react": ["./node_modules/preact/compat/"],
       "react/jsx-runtime": ["./node_modules/preact/jsx-runtime"],
       "react-dom": ["./node_modules/preact/compat/"],
-      "react-dom/*": ["./node_modules/preact/compat/*"]
+      "react-dom/*": ["./node_modules/preact/compat/*"],
+      "*": ["./*"]
     }
   },
   "include": ["node_modules/bc-stubs/bc/**/*.d.ts", "./src/**/*", "./bc-modding-utilities/src/Typedef.d.ts", "./bc-modding-utilities/src/**/*"]

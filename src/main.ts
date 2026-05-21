@@ -20,6 +20,7 @@ const loop = () => {
   abclPlayer.update();
 };
 HookManager.afterInit(() => {
+  if (CraftingValidationRecord?.Effects == null) return
   CraftingValidationRecord.Effects.Validate = function (c, a) {
     if (!CommonIsObject(c.Effects)) {
       return false;
