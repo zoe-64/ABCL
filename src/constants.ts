@@ -1,4 +1,4 @@
-import abclData from "./assets/dictionary.json" assert { type: "json" };
+import abclData from "./assets/dictionary.json" with { type: "json" };
 export const ABCLdata = abclData;
 
 export const loopInterval = 60 * 1000;

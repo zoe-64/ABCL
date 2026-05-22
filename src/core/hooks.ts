@@ -110,16 +110,22 @@ const initHooks = async () => {
   HookManager.hookFunction(
     "DrawRoomBackground",
     HookPriority.OBSERVE,
-    ([URL, ...args]: Parameters<typeof DrawRoomBackground>, next: (args: Parameters<typeof DrawRoomBackground>) => ReturnType<typeof DrawRoomBackground>) => {
-      if (URL != null && URL.includes("Sheet.jpg") && inModSubscreen() && !(<any>window)?.ThemedLoaded) {
-        next([URL, ...args]);
+    (args: Parameters<typeof DrawRoomBackground>, next: (args: Parameters<typeof DrawRoomBackground>) => ReturnType<typeof DrawRoomBackground>) => {
+     const [URL, _bounds, _opts] = args;
+
+      if (!URL) {
+        return next(args);
+      }
+      
+      if (typeof URL === "string" && URL.includes("Sheet.jpg") && inModSubscreen() && !(<any>window)?.ThemedLoaded) {
+        let result = next(args);
         MainCanvas.save();
         MainCanvas.globalCompositeOperation = "multiply";
         DrawRect(0, 0, 2000, 1000, THEME === "light" ? "#f1f1f1" : "#4d4d4d");
         MainCanvas.restore();
-      } else {
-        next([URL, ...args]);
-      }
+        return result;
+      } 
+      return next(args);
     },
   );
 
