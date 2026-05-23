@@ -134,7 +134,7 @@ export abstract class AccidentMiniGame extends BaseMiniGame {
   }
 
   Run() {
-    ChatRoomRun(CommonTime());
+    super.Run();
 
     if (this.IsStartDelay) {
       DrawText(this.startText, 500, 500, "white", "black");

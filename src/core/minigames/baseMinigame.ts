@@ -5,7 +5,23 @@ import { sendChatLocal } from "../utils";
 export abstract class BaseMiniGame {
   name: string = "";
 
+  private _GetBackground() {
+    if (!ChatRoomData) {
+      return "";
+    } else if (ChatRoomIsCustomized() && ChatRoomData?.Custom?.ImageURL) {
+      return ChatRoomData?.Custom.ImageURL;
+    } else {
+      return `Backgrounds/${ChatRoomData.Background}.jpg`;
+    }  
+  }
+
   Run() {
+    /**
+     * TODO: R129
+     * Remove & replace `this._GetBackground()` in favor of `ChatRoomGetBackgroundURL()` in R129
+     * xref: https://gitgud.io/BondageProjects/Bondage-College/-/merge_requests/6336/diffs#c4a4ecaa7eeeddf307bdcb1c254d8aca9d2bbfac_6870_6879
+     */
+    (<any>window)[this.name + "Background"] = this._GetBackground();
     ChatRoomRun(CommonTime());
   }
   Click() {}
