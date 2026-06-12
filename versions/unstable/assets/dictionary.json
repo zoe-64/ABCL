@@ -101,6 +101,12 @@
       "gradients": [4],
       "indicator": [5]
     },
+    "Panties_笨笨蛋RoyalDiaper": {
+      // Royal Diaper
+      "size": "light_adult",
+      "gradients": [3],
+      "indicator": [4]
+    },
     "Panties_笨笨蛋LuziLatexDiaper": {
       // Latex Diaper
       //"color": [0],
@@ -178,6 +184,12 @@
       "size": "light_adult",
       "gradients": [4],
       "indicator": [5]
+    },
+    "PantiesRoyalDiaper": {
+      // Royal Diaper
+      "size": "light_adult",
+      "gradients": [3],
+      "indicator": [4]
     },
     "ItemPelvisLatexDiaper": {
       // Latex Chastity Diaper
