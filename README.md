@@ -37,3 +37,8 @@ If you use [TamperMonkey](https://www.tampermonkey.net/) or [ViolentMonkey](http
 Special thanks to tetris245 for helping me get into modding!<br>
 Thanks to Zoi, Sera, En and Maple for helping.<br>
 Thanks to Firefly for creating the BC-Diaper-Wetter script.
+
+You can support this project through:
+`82jGPwtHRGPgTx6dsGpn21CxYKiFzQYyJTCHL1RrjU54L8aDL4iPQ5SHk7y7Mn4w9Y7AG62PNWanMYgMGcvbWa4mBGxJ5FN`<br>
+<img width="200" height="200" alt="qr-xmr8" src="https://github.com/user-attachments/assets/6a894718-c13c-4720-bdc0-ac88688340d0" />
+
