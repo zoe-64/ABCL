@@ -1,0 +1,9 @@
+Added rules for allowing baby to:
+change themselves
+use the potty without removing the diaper
+check diaper state when in restraints
+use potty
+use toilet
+change other babies
+
+Adjusted incontinence balancing
