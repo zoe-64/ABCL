@@ -11,12 +11,12 @@ export const INCONTINENCE_ON_POTTY_USE = -0.02;
 export const INCONTINENCE_ON_TOILET_USE = -0.02;
 
 export const ACCIDENTS_ON_ACTIVITIES: Partial<Record<Activity["Name"], { wetting?: number; messing?: number }>> = {
-  Tickle: { wetting: 0.05, messing: 0.01 },
-  TickleItem: { wetting: 0.08, messing: 0.01 },
-  Spank: { wetting: 0.12, messing: 0.15 },
-  ShockItem: { wetting: 0.15, messing: 0.2 },
-  Kick: { wetting: 0.05, messing: 0.05 },
-  Rub: { wetting: 0.01 },
+  Tickle: { wetting: 0.1, messing: 0.01 },
+  TickleItem: { wetting: 0.18, messing: 0.01 },
+  Spank: { wetting: 0.25, messing: 0.25 },
+  ShockItem: { wetting: 0.25, messing: 0.3 },
+  Kick: { wetting: 0.75, messing: 0.75 },
+  Rub: { wetting: 0.05 },
   SpankItem: { wetting: 0.15, messing: 0.2 },
   Slap: { wetting: 0.03, messing: 0.04 },
   Grope: { wetting: 0.06, messing: 0.05 },
