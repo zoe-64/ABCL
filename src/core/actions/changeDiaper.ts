@@ -34,22 +34,33 @@ export const changeDiaper: CombinedAction = {
     Image: `${publicURL}/activity/changeDiaper.svg`,
     Target: ["ItemPelvis"],
     OnClick: (player: Character, group: AssetGroupItemName) => changeDiaperRequest(player),
-    Criteria: (player: Character) => hasDiaper(player) && isABCLPlayer(player) && !Player.IsRestrained() && !isDiaperLocked(player),
+    Criteria: (player: Character, silent?: boolean) => {
+      if (!abclPlayer.settings.CanChangeSelf) {
+        if (!silent) {
+          sendABCLAction("%NAME% tries to tug on %POSSESSIVE% diaper tabs, pulling on the waistband and shaking the diaper but nothing works.", undefined, "changeDiaper", player);
+        }
+        return false
+      }
+      if (!abclPlayer.settings.CanChangeDiapers && player.MemberNumber !== Player.MemberNumber) {
+        if (!silent) {
+          sendABCLAction("%NAME% tries to change %OPP_NAME%'s diaper, but finds the task difficult.", undefined, "changeDiaper", player);
+        }
+        return false
+      }
+      if (hasDiaper(player) && isABCLPlayer(player) && !Player.IsRestrained() && !isDiaperLocked(player)) {
+        return true
+      }
+      if (!silent) {
+        sendABCLAction("%NAME% tries to tug on %POSSESSIVE% diaper tabs, but nothing works.", undefined, "changeDiaper", player);
+      }
+      return false
+    }
   },
   command: {
     Tag: "change-diaper",
     Action: (args, msg, parsed) => {
       const character = targetInputExtractor(parsed) ?? Player;
-      if (!changeDiaper.activity!.Criteria!(character))
-        return sendChatLocal("Is either not diapered or not an ABCL player or you are restrained or diaper is locked.");
-      if (!abclPlayer.settings.CanChangeSelf) {
-        sendABCLAction("%NAME% tries to tug on %POSSESSIVE% diaper tabs, pulling on the waistband and shaking the diaper but nothing works.", undefined, "changeDiaper", character);
-        return
-      }
-      if (!abclPlayer.settings.CanChangeDiapers && character.MemberNumber !== Player.MemberNumber) {
-        sendABCLAction("%NAME% tries to change %OPP_NAME%'s diaper, but finds the task difficult.", undefined, "changeDiaper", character);
-        return
-      }
+      if (!changeDiaper.activity!.Criteria!(character)) return;
       changeDiaperRequest(character);
     },
     Description: ` [MemberNumber|Name|Nickname]: Changes someone's diaper.`,
