@@ -8,14 +8,14 @@
 // @match https://*.bondage-europe.com/R*/*
 // @match https://*.bondageprojects.com/R*/*
 // @match http://localhost:*/*
-// @icon  https://zoe-64.github.io/ABCL/versions/beta/versions/2.3.13/assets/favicon.ico
+// @icon  https://zoe-64.github.io/ABCL/versions/2.3.13/assets/favicon.ico
 // @grant none
 // @run-at document-end
 // ==/UserScript==
 
 (function () {
   "use strict";
-  const src = `https://zoe-64.github.io/ABCL/versions/beta/versions/2.3.13/abcl.js?v=${Date.now()}`;
+  const src = `https://zoe-64.github.io/ABCL/versions/2.3.13/abcl.js?v=${Date.now()}`;
   // @ts-ignore
   if (typeof ABCL_Loaded === "undefined") {
     const script = document.createElement("script");

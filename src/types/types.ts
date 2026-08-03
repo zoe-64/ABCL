@@ -106,7 +106,7 @@ export type ABCLActivity = {
   OnClick?: (player: Character, group: AssetGroupItemName) => void;
   Target?: AssetGroupItemName[];
   TargetSelf?: AssetGroupItemName[];
-  Criteria?: (player: Character) => boolean;
+  Criteria?: (player: Character, silent?: boolean) => boolean;
 };
 
 export type HookListener<T> = (raw: PluginServerChatRoomMessage, data: T) => void;
