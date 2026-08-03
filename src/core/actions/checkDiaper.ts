@@ -1,5 +1,6 @@
 import { CombinedAction } from "../../types/types";
 import { hasDiaper } from "../player/diaper";
+import { abclPlayer } from "../player/player";
 import { isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
 import { abclStatsWindow, resizeElements } from "../player/ui";
 import { getElement, sendChatLocal } from "../utils";
@@ -34,7 +35,9 @@ export const checkDiaper: CombinedAction = {
     Description: ` [MemberNumber|Name|Nickname]: Checks someone's diaper.`,
     Action: (args, msg, parsed) => {
       const character = targetInputExtractor(parsed) ?? Player;
-      if (!checkDiaper.activity!.Criteria!(character)) return sendChatLocal("Is not an ABCL player or you are restrained.");
+      if (character.MemberNumber !== Player.MemberNumber || !abclPlayer.settings.CanCheckDiaperWithRestraints) {
+        if (!checkDiaper.activity!.Criteria!(character)) return sendChatLocal("Is not an ABCL player or you are restrained.");
+      }
 
       diaperCheckFunction(character);
     },

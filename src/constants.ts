@@ -5,10 +5,10 @@ export const loopInterval = 60 * 1000;
 
 //balancing
 export const THEME = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-export const INCONTINENCE_ON_MINIGAME_FAILURE = 0.005;
+export const INCONTINENCE_ON_MINIGAME_FAILURE = 0.002;
 export const INCONTINENCE_ON_MINIGAME_SUCCESS = -0.01;
-export const INCONTINENCE_ON_POTTY_USE = -0.01;
-export const INCONTINENCE_ON_TOILET_USE = -0.01;
+export const INCONTINENCE_ON_POTTY_USE = -0.02;
+export const INCONTINENCE_ON_TOILET_USE = -0.02;
 
 export const ACCIDENTS_ON_ACTIVITIES: Partial<Record<Activity["Name"], { wetting?: number; messing?: number }>> = {
   Tickle: { wetting: 0.05, messing: 0.01 },

@@ -20,6 +20,13 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
   const [useToilet, setUseToilet] = useState<boolean>(Player.ABCL.Settings.VisibleMessages.useToilet);
   const [statusMessages, setStatusMessages] = useState<boolean>(Player.ABCL.Settings.VisibleMessages.statusMessages);
 
+  const [canChangeDiapers, setCanChangeDiapers] = useState<boolean>(Player.ABCL.Settings.CanChangeDiapers);
+  const [canChangeSelf, _setCanChangeSelf] = useState<boolean>(Player.ABCL.Settings.CanChangeSelf);
+  const [canUseBathroomWithDiaper, _setCanUseBathroomWithDiaper] = useState<boolean>(Player.ABCL.Settings.CanUseBathroomWithDiaper);
+  const [canCheckDiaperWithRestraints, _setCanCheckDiaperWithRestraints] = useState<boolean>(Player.ABCL.Settings.CanCheckDiaperWithRestraints);
+  const [canUseToilet, _setCanUseToilet] = useState<boolean>(Player.ABCL.Settings.CanUseToilet);
+  const [canUsePotty, _setCanUsePotty] = useState<boolean>(Player.ABCL.Settings.CanUsePotty);
+
   const [wetDiaperLocked, _setWetDiaperLocked] = useState<boolean>(Player.ABCL.SettingPermissions.wetDiaper);
   const [wetClothingLocked, _setWetClothingLocked] = useState<boolean>(Player.ABCL.SettingPermissions.wetClothing);
   const [soilDiaperLocked, _setSoilDiaperLocked] = useState<boolean>(Player.ABCL.SettingPermissions.soilDiaper);
@@ -31,6 +38,15 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
   const [usePottyLocked, _setUsePottyLocked] = useState<boolean>(Player.ABCL.SettingPermissions.usePotty);
   const [useToiletLocked, _setUseToiletLocked] = useState<boolean>(Player.ABCL.SettingPermissions.useToilet);
   const [statusMessagesLocked, _setStatusMessagesLocked] = useState<boolean>(Player.ABCL.SettingPermissions.statusMessages);
+
+  const [canChangeDiapersLocked, _setCanChangeDiapersLocked] = useState<boolean>(Player.ABCL.SettingPermissions.CanChangeDiapers);
+  const [canChangeSelfLocked, _setCanChangeSelfLocked] = useState<boolean>(Player.ABCL.SettingPermissions.CanChangeSelf);
+  const [canUseBathroomWithDiaperLocked, _setCanUseBathroomWithDiaperLocked] = useState<boolean>(Player.ABCL.SettingPermissions.CanUseBathroomWithDiaper);
+  const [canCheckDiaperWithRestraintsLocked, _setCanCheckDiaperWithRestraintsLocked] = useState<boolean>(
+    Player.ABCL.SettingPermissions.CanCheckDiaperWithRestraints,
+  );
+  const [canUseToiletLocked, _setCanUseToiletLocked] = useState<boolean>(Player.ABCL.SettingPermissions.CanUseToilet);
+  const [canUsePottyLocked, _setCanUsePottyLocked] = useState<boolean>(Player.ABCL.SettingPermissions.CanUsePotty);
 
   const [wetness, setWetness] = useState<boolean>(Player.ABCL.Settings.StatusMessages["Wetness"] ?? false);
   const [soiliness, setSoiliness] = useState<boolean>(Player.ABCL.Settings.StatusMessages["Soiliness"] ?? false);
@@ -59,6 +75,13 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
           Player.ABCL.Settings.VisibleMessages.useToilet = useToilet;
           Player.ABCL.Settings.VisibleMessages.statusMessages = statusMessages;
 
+          Player.ABCL.Settings.CanChangeDiapers = canChangeDiapers;
+          Player.ABCL.Settings.CanChangeSelf = canChangeSelf;
+          Player.ABCL.Settings.CanUseBathroomWithDiaper = canUseBathroomWithDiaper;
+          Player.ABCL.Settings.CanCheckDiaperWithRestraints = canCheckDiaperWithRestraints;
+          Player.ABCL.Settings.CanUseToilet = canUseToilet;
+          Player.ABCL.Settings.CanUsePotty = canUsePotty;
+
           Player.ABCL.Settings.StatusMessages["Wetness"] = wetness;
           Player.ABCL.Settings.StatusMessages["Soiliness"] = soiliness;
           Player.ABCL.Settings.StatusMessages["Bladder"] = bladder;
@@ -80,6 +103,13 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
           Player.ABCL.SettingPermissions.usePotty = usePottyLocked;
           Player.ABCL.SettingPermissions.useToilet = useToiletLocked;
           Player.ABCL.SettingPermissions.statusMessages = statusMessagesLocked;
+
+          Player.ABCL.SettingPermissions.CanChangeDiapers = canChangeDiapersLocked;
+          Player.ABCL.SettingPermissions.CanChangeSelf = canChangeSelfLocked;
+          Player.ABCL.SettingPermissions.CanUseBathroomWithDiaper = canUseBathroomWithDiaperLocked;
+          Player.ABCL.SettingPermissions.CanCheckDiaperWithRestraints = canCheckDiaperWithRestraintsLocked;
+          Player.ABCL.SettingPermissions.CanUseToilet = canUseToiletLocked;
+          Player.ABCL.SettingPermissions.CanUsePotty = canUsePottyLocked;
         }}
         className="ABCL-exit-button"
       ></button>
@@ -88,6 +118,39 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
         <Group>
           <SettingPanel title="Show own badges / bottle icon">
             <Checkbox checked={showOwnBadges} setChecked={setShowOwnBadges} opaqueLock={true} />
+          </SettingPanel>
+        </Group>
+      </div>
+      <div>
+        <SettingsH2>Permissions</SettingsH2>
+        <Group>
+          <SettingPanel title="Change Self">
+            <Checkbox checked={canChangeSelf} setChecked={_setCanChangeSelf} locked={canChangeSelfLocked && isOwned()} opaqueLock={true} />
+          </SettingPanel>
+          <SettingPanel title="Change Diapers">
+            <Checkbox checked={canChangeDiapers} setChecked={setCanChangeDiapers} locked={canChangeDiapersLocked && isOwned()} opaqueLock={true} />
+          </SettingPanel>
+          <SettingPanel title="Using Toilet/Potty with Diaper">
+            <Checkbox
+              checked={canUseBathroomWithDiaper}
+              setChecked={_setCanUseBathroomWithDiaper}
+              locked={canUseBathroomWithDiaperLocked && isOwned()}
+              opaqueLock={true}
+            />
+          </SettingPanel>
+          <SettingPanel title="Checking Diaper with Restraints">
+            <Checkbox
+              checked={canCheckDiaperWithRestraints}
+              setChecked={_setCanCheckDiaperWithRestraints}
+              locked={canCheckDiaperWithRestraintsLocked && isOwned()}
+              opaqueLock={true}
+            />
+          </SettingPanel>
+          <SettingPanel title="Using Toilet">
+            <Checkbox checked={canUseToilet} setChecked={_setCanUseToilet} locked={canUseToiletLocked && isOwned()} opaqueLock={true} />
+          </SettingPanel>
+          <SettingPanel title="Using Potty">
+            <Checkbox checked={canUsePotty} setChecked={_setCanUsePotty} locked={canUsePottyLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
         </Group>
       </div>

@@ -1,0 +1,4 @@
+Added new crafting properties (laxative and diuretics)
+Updated name badges are now optional (🍼)
+Fixed some bugs that came from the last BC updates
+Fixed toilet logic which was flipped

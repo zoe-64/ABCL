@@ -32,6 +32,9 @@ const bowelThrottler = new Throttler(120 * 60 * 1000);
 const bladderThrottler = new Throttler(120 * 60 * 1000);
 const regressionThrottler = new Throttler(5 * 60 * 1000);
 export const abclPlayer = {
+  get settings() {
+    return Player.ABCL.Settings
+  },
   onAccident: () => {
     abclPlayer.stats.MentalRegression += mentalRegressionOnAccident();
   },
@@ -77,20 +80,32 @@ export const abclPlayer = {
     }
     playerSaver.save();
   },
-  wetClothing: () => {
+  wetClothing: (sittingOn?: "toilet" | "potty") => {
     if (Player.ABCL.Settings.DisableWettingLeaks) {
-      abclPlayer.stats.BladderValue = 0;
-      return;
+        abclPlayer.stats.BladderValue = 0;
+        return;
     }
-    // panties -> pants -> floor
-    sendChatLocal("You've had a wet accident in your clothes!");
+    
+    let actionMessage = "wets %POSSESSIVE% clothes";
+    if (sittingOn === "toilet") {
+        actionMessage = `forgets to lift up the lid and ${actionMessage}`;
+    }
+    if (hasDiaper()) {
+        actionMessage = `%POSSESSIVE%'s diaper leaks and ${actionMessage}`;
+    }
+    
+    if (sittingOn === "toilet") {
+        actionMessage = `${actionMessage} while sitting on the toilet`;
+    } else if (sittingOn === "potty") {
+        actionMessage = `${actionMessage} while sitting on the potty`;
+    }
+    actionMessage = `${actionMessage}, causing a puddle to form on the floor.`;
+    actionMessage = `%NAME% ${actionMessage}.`;
+    
     abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
     abclPlayer.stats.BladderValue = 0;
-    if (hasDiaper()) {
-      sendABCLAction("%NAME%'s diaper leaks and wet %POSSESSIVE% clothes causing a puddle to form.", undefined, "wetClothing");
-    } else {
-      sendABCLAction("%NAME%'s wets %POSSESSIVE% clothes and leaks onto the floor.", undefined, "wetClothing");
-    }
+    
+    sendABCLAction(actionMessage, undefined, "wetClothing")
     sendUpdateMyData();
     if (Player.ABCL.Settings.DisableClothingStains) return;
     const wetColor = "#96936C";
@@ -118,15 +133,24 @@ export const abclPlayer = {
 
     queueUpdatePlayerClothes();
   },
-  soilClothing: () => {
+  soilClothing: (sittingOn?: "toilet" | "potty") => {
     abclPlayer.stats.BowelValue = 0;
     if (Player.ABCL.Settings.DisableSoilingLeaks) return;
-
+    let actionMessage = "soils %POSSESSIVE% clothes";
+    if (sittingOn === "toilet") {
+      actionMessage = `forgets to lift up the lid and ${actionMessage}`;
+    } 
     if (hasDiaper()) {
-      sendABCLAction("%NAME%'s diaper leaks and soils %POSSESSIVE% clothes.", undefined, "soilClothing");
-    } else {
-      sendABCLAction("%NAME% soils %POSSESSIVE% clothes.", undefined, "soilClothing");
+      actionMessage = `%POSSESSIVE%'s diaper leaks and ${actionMessage}`
+    } 
+    if (sittingOn === "toilet") {
+      actionMessage = `${actionMessage} while sitting on the toilet`;
+    } else if (sittingOn === "potty") {
+      actionMessage = `${actionMessage} while sitting on the potty`;
     }
+    actionMessage = `%NAME% ${actionMessage}.`;
+    sendABCLAction(actionMessage, undefined, "soilClothing");
+    
     sendUpdateMyData();
     if (Player.ABCL.Settings.DisableClothingStains) return;
 
@@ -154,27 +178,42 @@ export const abclPlayer = {
     }
     queueUpdatePlayerClothes();
   },
-  wetDiaper: () => {
+  wetDiaper: (sittingOn?: "toilet" | "potty") => {
     const diaperSize = getPlayerDiaperSize();
     const absorbedVolume = Math.min(abclPlayer.stats.BladderValue, Math.max(0, diaperSize - abclPlayer.stats.WetnessValue));
-    sendABCLAction("%NAME% wets %POSSESSIVE% diaper.", undefined, "wetDiaper");
+   
+    let actionMessage = "wets %POSSESSIVE% diaper";
+    if (sittingOn === "toilet") {
+      actionMessage = `forgets to lift up the lid and ${actionMessage} while sitting on the toilet`;
+    } else if (sittingOn === "potty") {
+      actionMessage = `${actionMessage} while sitting on the potty`;
+    }
+    actionMessage = `%NAME% ${actionMessage}.`;
+    sendABCLAction(actionMessage, undefined, "wetDiaper");
 
     abclPlayer.stats.BladderValue -= absorbedVolume;
     abclPlayer.stats.WetnessValue += absorbedVolume;
 
     if (abclPlayer.stats.WetnessValue >= diaperSize) {
-      abclPlayer.wetClothing();
+      abclPlayer.wetClothing(sittingOn);
     }
   },
-  soilDiaper: () => {
+  soilDiaper: (sittingOn?: "toilet" | "potty") => {
     const diaperSize = getPlayerDiaperSize();
     const absorbedVolume = Math.min(abclPlayer.stats.BowelValue, Math.max(0, diaperSize - abclPlayer.stats.SoilinessValue));
-    sendABCLAction("%NAME% soils %POSSESSIVE% diaper.", undefined, "soilDiaper");
+    let actionMessage = "soils %POSSESSIVE% diaper";
+    if (sittingOn === "toilet") {
+      actionMessage = `forgets to lift up the lid and ${actionMessage} while sitting on the toilet`;
+    } else if (sittingOn === "potty") {
+      actionMessage = `${actionMessage} while sitting on the potty`;
+    }
+    actionMessage = `%NAME% ${actionMessage}.`;
+    sendABCLAction(actionMessage, undefined, "soilDiaper");
     abclPlayer.stats.BowelValue -= absorbedVolume;
     abclPlayer.stats.SoilinessValue += absorbedVolume;
 
     if (abclPlayer.stats.SoilinessValue >= diaperSize) {
-      abclPlayer.soilClothing();
+      abclPlayer.soilClothing(sittingOn);
     }
   },
   attemptWetting: (force?: boolean) => {
@@ -199,7 +238,7 @@ export const abclPlayer = {
     if (isAccidentsAutoPiloted()) return MessMinigameResult(false);
     MiniGameStart("DistractionRush-Messes" as ModuleScreens["MiniGame"], 1 + chance, "MessMinigameResult");
   },
-  wet: (intentional: boolean = false) => {
+  wet: (intentional: boolean = false, sittingOn?: "toilet" | "potty") => {
     const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;
     const isTooEarly = abclPlayer.stats.BladderFullness < 0.3 - incontinenceOffset;
     const isPossible = !isTooEarly;
@@ -209,7 +248,7 @@ export const abclPlayer = {
       return;
     }
     if (isPossible) {
-      hasDiaper() ? abclPlayer.wetDiaper() : abclPlayer.wetClothing();
+      hasDiaper() ? abclPlayer.wetDiaper(sittingOn) : abclPlayer.wetClothing(sittingOn);
     }
     if (isGood && intentional) {
       abclPlayer.stats.Incontinence -= incontinenceOnAccident(abclPlayer.stats.Incontinence);
@@ -217,7 +256,7 @@ export const abclPlayer = {
       abclPlayer.stats.Incontinence += incontinenceOnAccident(abclPlayer.stats.Incontinence);
     }
   },
-  soil: (intentional: boolean = false) => {
+  soil: (intentional: boolean = false, sittingOn?: "toilet" | "potty") => {
     const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;
     const isTooEarly = abclPlayer.stats.BowelFullness < 0.3 - incontinenceOffset;
     const isPossible = !isTooEarly;
@@ -227,7 +266,7 @@ export const abclPlayer = {
       return;
     }
     if (isPossible) {
-      hasDiaper() ? abclPlayer.soilDiaper() : abclPlayer.soilClothing();
+      hasDiaper() ? abclPlayer.soilDiaper(sittingOn) : abclPlayer.soilClothing(sittingOn);
     }
     if (isGood && intentional) {
       abclPlayer.stats.Incontinence -= 0.01;

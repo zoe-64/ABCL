@@ -6,6 +6,7 @@ import { resizeElements } from "src/core/player/ui";
 import { AboutPage } from "./pages/about";
 import styled from "styled-components";
 import SharedSettingsPage from "./pages/shared-settings";
+import { Changelog } from "./pages/changelog";
 
 const SettingsPageComponent = styled.div<JSX.IntrinsicElements["div"]>`
   height: 77%;
@@ -111,6 +112,9 @@ export default function SettingsPage(): h.JSX.Element {
                     <button onClick={() => setPage("about")} className="ABCL-button">
                       About ABCL {modVersion}
                     </button>
+                    <button onClick={() => setPage("changelog")} className="ABCL-button">
+                      Changelog
+                    </button>
                   </div>
                 </section>
                 <section>
@@ -134,6 +138,7 @@ export default function SettingsPage(): h.JSX.Element {
             misc: <MiscPage setPage={setPage} />,
             stats: <StatsPage setPage={setPage} />,
             about: <AboutPage setPage={setPage} />,
+            changelog: <Changelog setPage={setPage} />,
             sharedSettings: <SharedSettingsPage setPage={setPage} selectedCharacter={selectedCharacter} />,
           }[page]
         }

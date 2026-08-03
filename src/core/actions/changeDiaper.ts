@@ -42,7 +42,14 @@ export const changeDiaper: CombinedAction = {
       const character = targetInputExtractor(parsed) ?? Player;
       if (!changeDiaper.activity!.Criteria!(character))
         return sendChatLocal("Is either not diapered or not an ABCL player or you are restrained or diaper is locked.");
-
+      if (!abclPlayer.settings.CanChangeSelf) {
+        sendABCLAction("%NAME% tries to tug on %POSSESSIVE% diaper tabs, pulling on the waistband and shaking the diaper but nothing works.", undefined, "changeDiaper", character);
+        return
+      }
+      if (!abclPlayer.settings.CanChangeDiapers && character.MemberNumber !== Player.MemberNumber) {
+        sendABCLAction("%NAME% tries to change %OPP_NAME%'s diaper, but finds the task difficult.", undefined, "changeDiaper", character);
+        return
+      }
       changeDiaperRequest(character);
     },
     Description: ` [MemberNumber|Name|Nickname]: Changes someone's diaper.`,

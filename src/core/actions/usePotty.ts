@@ -11,30 +11,47 @@ export const usePottyFunction = () => {
   const isTooEarly = abclPlayer.stats.BladderFullness < 0.3 - incontinenceOffset && abclPlayer.stats.BowelFullness < 0.3 - incontinenceOffset;
   const isTooFarGone = abclPlayer.stats.MentalRegression > 0.9;
   const isEmbarrassed = abclPlayer.stats.MentalRegression < 0.3;
+  const canUsePottyWithDiaper = Player.ABCL.Settings.CanUseBathroomWithDiaper && !isDiaperLocked(Player);
   if (isTooEarly) {
     sendABCLAction("%NAME% tries to use the potty but can't seem to get anything out.", undefined, "usePotty");
     return;
   }
+  if (hasDiaper(Player) && !canUsePottyWithDiaper || !abclPlayer.settings.CanUsePotty) {
+    abclPlayer.wet(true, "potty");
+    abclPlayer.soil(true, "potty");
+    return;
+  }
+ 
   abclPlayer.stats.BowelFullness = 0;
   abclPlayer.stats.BladderFullness = 0;
+  let actionMessage = "";
   let additionalText = "";
+  
+  
   if (isEmbarrassed) {
-    additionalText = "and feels embarrased";
+    additionalText = "and feels embarrassed";
     if (Player.ABCL.Settings.ExpressionsByActivities) {
       CharacterSetFacialExpression(Player, "Blush", "Low", 10);
     }
     abclPlayer.stats.MentalRegression += 0.04 * abclPlayer.stats.MentalRegressionModifier;
-  }
-  if (isGood && !isTooFarGone) {
-    additionalText += isEmbarrassed ? " but is releaved" : "and feels releaved";
-
-    abclPlayer.stats.Incontinence += INCONTINENCE_ON_POTTY_USE;
+  } else {
+    additionalText = "and feels proud";
     abclPlayer.stats.MentalRegression -= 0.02 * abclPlayer.stats.MentalRegressionModifier;
+  }
+
+  if (isGood && !isTooFarGone) {
+    additionalText += isEmbarrassed ? " but is relieved" : " and feels relieved";
+    abclPlayer.stats.Incontinence += INCONTINENCE_ON_POTTY_USE;
     if (Player.ABCL.Settings.ExpressionsByActivities) {
       CharacterSetFacialExpression(Player, "Mouth", "Happy", 8);
     }
   }
-  sendABCLAction("%NAME% sits down and uses the potty " + additionalText + ".", undefined, "usePotty");
+  if (hasDiaper(Player) && canUsePottyWithDiaper) {
+    actionMessage = `%NAME% pulls %POSSESSIVE% diaper down, sits on the potty and uses the potty ${additionalText}.`;
+  } else {
+    actionMessage = `%NAME% sits down and uses the potty ${additionalText}.`;
+  }
+  sendABCLAction(actionMessage, undefined, "usePotty");
 };
 
 export const usePotty: CombinedAction = {
@@ -44,12 +61,12 @@ export const usePotty: CombinedAction = {
     Image: `${publicURL}/activity/potty-temp.png`,
     OnClick: (player: Character, group) => usePottyFunction(),
     TargetSelf: ["ItemButt"],
-    Criteria: (player: Character) => !(hasDiaper(player) && isDiaperLocked()) && !Player.IsRestrained(),
+    Criteria: (player: Character) => player.Appearance.some((item) => item.Asset.Name == "Potty"),
   },
   command: {
     Tag: "use-potty",
     Action: (args, msg, parsed) => {
-      if (!usePotty.activity?.Criteria!(Player)) return sendChatLocal("You are restrained or diaper is locked.");
+      if (!usePotty.activity?.Criteria!(Player)) return sendChatLocal("You don't have a potty to use!");
       usePottyFunction();
     },
     Description: ` Sit down and use the potty.`,

@@ -2,6 +2,8 @@ import { merge, debounce } from "lodash-es";
 import { DiaperSettingValues, MetabolismSettings, PartialDeep } from "../types/types";
 import { sendUpdateMyData as sendUpdateMyData } from "./hooks";
 import { logger } from "./logger";
+import { ModRepo, ModVersion } from "src/types/definitions";
+import { sendChatLocal, summarizeVersionRange } from "./utils";
 
 export const defaultSettings: ModSettings = {
   PauseStats: false,
@@ -43,6 +45,13 @@ export const defaultSettings: ModSettings = {
   ExpressionsByActivities: false,
   AccidentAutopilot: false,
   ShowOwnBadges: true,
+
+  CanChangeSelf: true,
+  CanUseBathroomWithDiaper: false,
+  CanCheckDiaperWithRestraints: true,
+  CanUseToilet: true,
+  CanUsePotty: true,
+  CanChangeDiapers: true,
 };
 
 export const defaultStats: ModStats = {
@@ -119,6 +128,12 @@ export const defaultSettingPermissions: ModStorageModel["SettingPermissions"] = 
   StatusMessages: false,
   AccidentAutopilot: false,
   ShowOwnBadges: false,
+  CanChangeSelf: false,
+  CanUseBathroomWithDiaper: false,
+  CanCheckDiaperWithRestraints: false,
+  CanUseToilet: false,
+  CanUsePotty: false,
+  CanChangeDiapers: false,
 };
 const defaultData: ModStorageModel = {
   Settings: defaultSettings,
@@ -147,8 +162,17 @@ export const loadOrGenerateData = async () => {
         Settings: {},
         Stats: {},
         SettingPermissions: {},
+        Version: ModVersion,
       };
-
+  if (data.Version !== ModVersion) {
+     summarizeVersionRange("https://github.com/zoe-64/ABCL/src/changelog", data.Version, ModVersion).then((result) => {
+      if (!result) return;
+      setTimeout(() => {
+        ServerAccountBeep({ Message: `ABCL Updated!\n${result.combinedText}`, MemberNumber: 164988, MemberName: "Zoe - author of ABCL", ChatRoomSpace: "", ChatRoomName: "", Private: true, BeepType: "" });
+      }, 15000);
+    });
+  }
+   
   // migrations
   if (data.ModVersion === "2.0.0") {
     const metabolismValue = data.Settings.Metabolism;
@@ -166,6 +190,7 @@ export const loadOrGenerateData = async () => {
     data.Version = "2.0.1";
   }
 
+  data.Version = ModVersion; 
   const modStorageObject = merge(
     {
       Settings: defaultSettings,

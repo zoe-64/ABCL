@@ -53,6 +53,13 @@ interface ModSettings {
   AccidentsByActivities: boolean;
   AccidentAutopilot: boolean;
   ShowOwnBadges: boolean;
+
+  CanChangeSelf: boolean;
+  CanChangeDiapers: boolean;
+  CanUseBathroomWithDiaper: boolean;
+  CanCheckDiaperWithRestraints: boolean;
+  CanUseToilet: boolean;
+  CanUsePotty: boolean;
 }
 interface ModStats {
   PuddleSize: {

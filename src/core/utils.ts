@@ -195,3 +195,105 @@ export function createRateLimiter<T extends (...args: any[]) => Promise<any>>(fu
     worker();
   };
 }
+
+export interface VersionSummary {
+  version: string;
+  fileName: string;
+  content: string;
+}
+
+export interface ChangelogSummaryResult {
+  combinedText: string;
+  entries: VersionSummary[];
+}
+
+
+export interface GitHubFileItem {
+  name: string;
+  path: string;
+  type: "file" | "dir" | "symlink" | "submodule";
+  size: number;
+  download_url: string | null;
+  html_url: string;
+}
+
+function parseGitHubUrl(url: string) {
+  const parsed = new URL(url);
+  const parts = parsed.pathname.split("/").filter(Boolean);
+
+  const owner = parts[0];
+  const repo = parts[1];
+  const path = parts.slice(2).join("/");
+
+  return { owner, repo, path };
+}
+
+export async function getDirectoryContents(githubUrl: string): Promise<GitHubFileItem[]> {
+  const { owner, repo, path } = parseGitHubUrl(githubUrl);
+
+  const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+  const response = await fetch(apiUrl, {
+    headers: {
+      Accept: "application/vnd.github.v3+json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitHub API returned status ${response.status}: ${response.statusText}`);
+  }
+
+  const data: GitHubFileItem[] = await response.json();
+  return data;
+}
+import semver from "semver";
+
+function extractSemver(filename: string): string | null {
+  const match = filename.match(/\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?/);
+  if (!match) return null;
+  return semver.clean(match[0]);
+}
+
+export async function summarizeVersionRange(
+  dirUrl: string,
+  startVersion: string,
+  endVersion: string
+): Promise<ChangelogSummaryResult> {
+  const directoryItems: GitHubFileItem[] = await getDirectoryContents(dirUrl);
+  const validFiles = directoryItems
+    .filter((item) => item.type === "file" && item.download_url)
+    .map((item) => ({
+      item,
+      version: extractSemver(item.name),
+    }))
+    .filter((file): file is { item: GitHubFileItem; version: string } => {
+      if (!file.version) return false;
+
+      const isGteStart = semver.gte(file.version, startVersion);
+      const isLteEnd = semver.lte(file.version, endVersion);
+
+      return isGteStart && isLteEnd;
+    })
+    .sort((a, b) => semver.compare(a.version, b.version));
+
+  const entries: VersionSummary[] = await Promise.all(
+    validFiles.map(async ({ item, version }) => {
+      const res = await fetch(item.download_url!);
+      const content = await res.text();
+      return {
+        version,
+        fileName: item.name,
+        content,
+      };
+    })
+  );
+
+  const combinedText = entries
+    .map((entry) => `=== Version ${entry.version} ===\n${entry.content}`)
+    .join("\n\n");
+
+  return {
+    combinedText,
+    entries,
+  };
+}

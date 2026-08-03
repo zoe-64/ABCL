@@ -9,16 +9,32 @@ export const useToiletFunction = () => {
   const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;
   const isTooEarly = abclPlayer.stats.BladderFullness < 0.3 && abclPlayer.stats.BowelFullness < 0.3;
   const isGood = abclPlayer.stats.BladderFullness > 0.6 - incontinenceOffset || abclPlayer.stats.BowelFullness > 0.6 - incontinenceOffset;
-  if (isTooEarly) return sendChatLocal("You try to use the toilet but you can't seem to get anything out.");
+  const canUseBathroomWithDiaper = Player.ABCL.Settings.CanUseBathroomWithDiaper && !isDiaperLocked(Player);
+
+  if (isTooEarly) {
+    return sendChatLocal("You try to use the toilet but you can't seem to get anything out.");
+  }
+
+  if (hasDiaper(Player) && !canUseBathroomWithDiaper || !abclPlayer.settings.CanUseToilet) {
+    abclPlayer.wet(true, "toilet");
+    abclPlayer.soil(true, "toilet");
+    return;
+  }
+  let actionMessage = "";
   let additionalText = "";
+  abclPlayer.stats.BladderFullness = 0;
+  abclPlayer.stats.BowelFullness = 0;
   if (isGood) {
     additionalText = "and feels releaved";
     abclPlayer.stats.MentalRegression -= 0.02 * abclPlayer.stats.MentalRegressionModifier;
     abclPlayer.stats.Incontinence += INCONTINENCE_ON_TOILET_USE;
   }
-  abclPlayer.stats.BladderFullness = 0;
-  abclPlayer.stats.BowelFullness = 0;
-  sendABCLAction("%NAME% goes to the bathroom and uses the toilet " + additionalText + ".", undefined, "useToilet");
+  if (hasDiaper(Player) && canUseBathroomWithDiaper) {
+    actionMessage = `%NAME% pulls %POSSESSIVE% diaper down, sits on the toilet and uses the toilet ${additionalText}.`;
+  } else {
+    actionMessage = `%NAME% sits down and uses the toilet ${additionalText}.`;
+  }
+  sendABCLAction(actionMessage, undefined, "useToilet");
 };
 
 export const useToilet: CombinedAction = {
