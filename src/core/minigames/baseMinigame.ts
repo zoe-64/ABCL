@@ -12,7 +12,7 @@ export abstract class BaseMiniGame {
       return ChatRoomData?.Custom.ImageURL;
     } else {
       return `Backgrounds/${ChatRoomData.Background}.jpg`;
-    }  
+    }
   }
 
   Run() {
@@ -21,16 +21,18 @@ export abstract class BaseMiniGame {
      * Remove & replace `this._GetBackground()` in favor of `ChatRoomGetBackgroundURL()` in R129
      * xref: https://gitgud.io/BondageProjects/Bondage-College/-/merge_requests/6336/diffs#c4a4ecaa7eeeddf307bdcb1c254d8aca9d2bbfac_6870_6879
      */
-    (<any>window)[this.name + "Background"] = this._GetBackground();
+    (<any>window)[this.name + "Background"] = ChatRoomGetBackgroundURL()
     ChatRoomRun(CommonTime());
   }
   Click() {}
-  Load() {}
+  Load() {
+    incontinenceCheck.pause();
+  }
   Unload() {}
   Resize() {}
   KeyDown() {}
   Exit() {}
-  End(victory: boolean) {2
+  End(victory: boolean) {
     CommonSetScreen("Online", "ChatRoom");
     MiniGameVictory = victory;
     MiniGameEnded = true;

@@ -13,7 +13,7 @@ import {
 } from "./diaper";
 import { abclStatsWindow } from "./ui";
 import { ABCLdata } from "../../constants";
-import { MetabolismSettingValues } from "../../types/types";
+import { MetabolismSettingValues, MiniGameDifficultyToNumber } from "../../types/types";
 import { isAccidentsAutopiloted as isAccidentsAutoPiloted, sendABCLAction, sendStatusMessage } from "./playerUtils";
 import { sendUpdateMyData } from "../hooks";
 import { MessMinigame, WetMinigame as WetMiniGame } from "../minigames";
@@ -34,6 +34,9 @@ const regressionThrottler = new Throttler(5 * 60 * 1000);
 export const abclPlayer = {
   get settings() {
     return Player.ABCL.Settings
+  },
+  get miniGameDifficulty(): number {
+    return MiniGameDifficultyToNumber[Player.ABCL.Settings.MiniGameDifficulty]
   },
   onAccident: () => {
     abclPlayer.stats.MentalRegression += mentalRegressionOnAccident();
@@ -225,7 +228,8 @@ export const abclPlayer = {
     if (!force && !incontinenceCheck.check()) return;
     if (window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.PREVENT_RESISTING_URGES)) return new WetMiniGame().End(false);
     if (isAccidentsAutoPiloted()) return WetMinigameResult(false);
-    MiniGameStart("DistractionRush-Wetting" as ModuleScreens["MiniGame"], 1 + chance, "WetMinigameResult");
+    MiniGameStart("DropletCatch" as ModuleScreens["MiniGame"], 1 + abclPlayer.miniGameDifficulty * Math.max(abclPlayer.stats.BladderFullness, chance), "WetMinigameResult");
+    //MiniGameStart("DistractionRush-Wetting" as ModuleScreens["MiniGame"], 1 + chance, "WetMinigameResult");
   },
   attemptSoiling: (force?: boolean) => {
     const limit = incontinenceLimitFormula(abclPlayer.stats.Incontinence);
@@ -236,7 +240,8 @@ export const abclPlayer = {
     if (!force && !incontinenceCheck.check()) return;
     if (window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.PREVENT_RESISTING_URGES)) return new MessMinigame().End(false);
     if (isAccidentsAutoPiloted()) return MessMinigameResult(false);
-    MiniGameStart("DistractionRush-Messes" as ModuleScreens["MiniGame"], 1 + chance, "MessMinigameResult");
+    MiniGameStart("DropletCatch" as ModuleScreens["MiniGame"], 1 + abclPlayer.miniGameDifficulty * Math.max(abclPlayer.stats.BowelFullness, chance), "MessMinigameResult");
+    //MiniGameStart("DistractionRush-Messes" as ModuleScreens["MiniGame"], 1 + chance, "MessMinigameResult");
   },
   wet: (intentional: boolean = false, sittingOn?: "toilet" | "potty") => {
     const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;

@@ -50,6 +50,10 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
   const [canCheckDiaperWithRestraintsLocked, setCanCheckDiaperWithRestraintsLocked] = useState<boolean>(
     selectedCharacter.ABCL.SettingPermissions.CanCheckDiaperWithRestraints,
   );
+
+  const [miniGameDifficulty, setMinigameDifficulty] = useState<MiniGameDifficulty>(selectedCharacter.ABCL.Settings.MiniGameDifficulty);
+  const [miniGameDifficultyLocked, setMinigameDifficultyLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.MiniGameDifficulty);
+
   const [canUseToiletLocked, setCanUseToiletLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.CanUseToilet);
   const [canUsePottyLocked, setCanUsePottyLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.CanUsePotty);
   return (
@@ -81,6 +85,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
               CanCheckDiaperWithRestraints: canCheckDiaperWithRestraints,
               CanUseToilet: canUseToilet,
               CanUsePotty: canUsePotty,
+              MiniGameDifficulty: miniGameDifficulty,
             },
             settingPermissions: {
               PauseStats: pauseStatsLocked,
@@ -99,6 +104,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
               CanCheckDiaperWithRestraints: canCheckDiaperWithRestraintsLocked,
               CanUseToilet: canUseToiletLocked,
               CanUsePotty: canUsePottyLocked,
+              MiniGameDifficulty: miniGameDifficultyLocked,
             },
           });
         }}
@@ -203,6 +209,17 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
             }}
             setLocked={setDiaperChangePromptSettingLocked}
           />
+        </SettingPanel>
+        <SettingPanel title="Minigame Difficulty">
+          <ButtonGroup
+            locked={miniGameDifficultyLocked}
+            options={["Easy", "Normal", "Hard", "Impossible"] satisfies MiniGameDifficulty[]}
+            value={miniGameDifficulty}
+            setValue={(value: string) => {
+              setMinigameDifficulty(value as MiniGameDifficulty);
+            }}
+            setLocked={setMinigameDifficultyLocked}
+          ></ButtonGroup>
         </SettingPanel>
       </Group>
       <div style={{ height: "10em" }}></div>

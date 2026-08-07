@@ -51,6 +51,7 @@ export function getCharacterName(memberNumber: number | undefined): string {
 }
 
 export const isAccidentsAutopiloted = () => {
+  if (document.hidden || document.visibilityState === "hidden") return true;
   return ["Afk", "Brb", "Sleep"].includes(InventoryGet(Player, "Emoticon")?.Property?.Expression ?? "") || Player.ABCL.Settings.AccidentAutopilot;
 };
 

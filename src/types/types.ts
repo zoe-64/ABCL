@@ -19,28 +19,36 @@ export type PartialDeep<T> = {
   [P in keyof T]?: PartialDeep<T[P]>;
 };
 
-export const MetabolismSettings: Record<MetabolismSetting, MetabolismSetting> = {
+export const MetabolismSettings = Object.freeze({
   Disabled: "Disabled",
   Normal: "Normal",
   Slow: "Slow",
   Fast: "Fast",
   Faster: "Faster",
   Fastest: "Fastest",
-} as const;
+}) satisfies Record<MetabolismSetting, MetabolismSetting>;
 
-export const DiaperSettingValues: Record<DiaperChangePromptSetting, DiaperChangePromptSetting> = {
+export const DiaperSettingValues = Object.freeze({
   Deny: "Deny",
   Ask: "Ask",
   Allow: "Allow",
-} as const;
-export const MetabolismSettingValues: Record<MetabolismSetting, number> = {
+}) satisfies Record<DiaperChangePromptSetting, DiaperChangePromptSetting>;
+export const MetabolismSettingValues = Object.freeze({
   Disabled: 0,
   Slow: 0.5,
   Normal: 1,
   Fast: 1.5,
   Faster: 2,
   Fastest: 3,
-} as const;
+}) satisfies Record<MetabolismSetting, number>;
+
+export const MiniGameDifficultyToNumber = Object.freeze({
+  Easy: 3,
+  Normal: 5,
+  Hard: 7,
+  Impossible: 10,
+}) satisfies Record<MiniGameDifficulty, number>;
+
 
 // entries
 export type NewSettingsEntry = {

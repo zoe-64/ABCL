@@ -18,10 +18,12 @@ declare const modIdentifier: string;
 declare const publicURL: string;
 
 type MetabolismSetting = "Disabled" | "Normal" | "Slow" | "Fast" | "Faster" | "Fastest";
+type MiniGameDifficulty = "Easy" | "Normal" | "Hard" | "Impossible";
 
 type DiaperChangePromptSetting = "Deny" | "Ask" | "Allow";
 
 interface ModSettings {
+  MiniGameDifficulty: MiniGameDifficulty;
   PauseStats: boolean;
   PeeMetabolism: MetabolismSetting;
   PoopMetabolism: MetabolismSetting;
@@ -120,5 +122,5 @@ interface Character {
 }
 
 declare interface ModuleScreens {
-  shushTs: "WetMinigame" | "MessMinigame" | "DistractionRush-Wetting" | "DistractionRush-Messes";
+  shushTs: "WetMinigame" | "MessMinigame" | "DistractionRush-Wetting" | "DistractionRush-Messes" | "DropletCatch";
 }

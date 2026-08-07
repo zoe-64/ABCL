@@ -45,6 +45,9 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
   const [accidentsByActivities, setAccidentsByActivities] = useState<boolean>(Player.ABCL.Settings.AccidentsByActivities);
   const [accidentsByActivitiesLocked, _setAccidentsByActivitiesLocked] = useState<boolean>(Player.ABCL.SettingPermissions.AccidentsByActivities);
 
+  const [miniGameDifficulty, setMiniGameDifficulty] = useState<MiniGameDifficulty>(Player.ABCL.Settings.MiniGameDifficulty);
+  const [miniGameDifficultyLocked, _setMiniGameDifficultyLocked] = useState<boolean>(Player.ABCL.SettingPermissions.MiniGameDifficulty);
+
   const [expressionsByActivities, setExpressionsByActivities] = useState<boolean>(Player.ABCL.Settings.ExpressionsByActivities);
   const [expressionsByActivitiesLocked, _setExpressionsByActivitiesLocked] = useState<boolean>(Player.ABCL.SettingPermissions.ExpressionsByActivities);
 
@@ -67,6 +70,8 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
           Player.ABCL.Settings.MentalRegressionModifier = mentalMetabolism;
           Player.ABCL.Settings.OnDiaperChange = diaperChangePromptSetting;
           Player.ABCL.Settings.ExpressionsByActivities = expressionsByActivities;
+
+          Player.ABCL.Settings.MiniGameDifficulty = miniGameDifficulty;
         }}
         className="ABCL-exit-button"
       ></button>
@@ -121,6 +126,17 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
             value={diaperChangePromptSetting}
             setValue={(value: string) => {
               setDiaperChangePromptSetting(value as DiaperChangePromptSetting);
+            }}
+            opaqueLock={true}
+          />
+        </SettingPanel>
+        <SettingPanel title="Minigame Difficulty">
+          <ButtonGroup
+            locked={miniGameDifficultyLocked}
+            options={["Easy", "Normal", "Hard", "Impossible"] satisfies MiniGameDifficulty[]}
+            value={miniGameDifficulty}
+            setValue={(value: string) => {
+              setMiniGameDifficulty(value as MiniGameDifficulty);
             }}
             opaqueLock={true}
           />
