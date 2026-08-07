@@ -91,7 +91,6 @@ export class DropletCatchGame extends BaseMiniGame {
       GAME_CONFIG.MAX_WIDTH,
       Math.round(GAME_CONFIG.BASE_WIDTH * (1 + (difficultyMultiplier - 1) * 0.25))
     );
-     this.uiManager.mountUI();
     this.canvas = document.getElementById("droplet-canvas") as HTMLCanvasElement;
     this.ctx = this.canvas?.getContext("2d") || null;
 
@@ -107,6 +106,8 @@ export class DropletCatchGame extends BaseMiniGame {
     this.lives = GAME_CONFIG.DEFAULT_LIVES;
     this.spawnRate = 60 +  GAME_CONFIG.SPAWN_RATE * ( MiniGameDifficulty || 1);
     this.objects.clear();
+    
+    this.uiManager.mountUI();
 
     this.bucket = new BucketEntity(
       this,

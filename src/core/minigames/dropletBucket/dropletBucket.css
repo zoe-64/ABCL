@@ -1,7 +1,5 @@
 #abcl-minigame.game-container {
   position: relative;
-  height: 50em;
-  margin: 0 auto;
   overflow: hidden;
   box-shadow: 0 0.625em 1.875em rgba(0, 0, 0, 0.35);
   font-family:

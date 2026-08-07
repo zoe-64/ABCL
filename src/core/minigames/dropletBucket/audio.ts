@@ -21,6 +21,7 @@ export class AudioManager {
       win: { path: "win.mp3", config: { volume: 1.0, pitch: 1.0 } },
       lose: { path: "lose.mp3", config: { volume: 1.0, pitch: 1.0 } },
       bomb: { path: "wet-explosion.mp3", config: { volume: 1.0, pitch: 0.9, pitchVariance: 0.15 } },
+      heal: { path: "heal.mp3", config: { volume: 0.8, pitch: 1.0, pitchVariance: 0.1 } },
     };
 
     for (const [key, entry] of Object.entries(soundFiles)) {
@@ -41,7 +42,10 @@ export class AudioManager {
     }
 
     const baseSound = this.sounds[soundName];
-    if (!baseSound) return;
+    if (!baseSound) {
+      console.error(`ABCL Missing sound: ${soundName}`);
+      return;
+    }
 
     const defaultConfig = this.soundConfigs[soundName] || {};
     const volume = overrideConfig?.volume ?? defaultConfig.volume ?? 1.0;

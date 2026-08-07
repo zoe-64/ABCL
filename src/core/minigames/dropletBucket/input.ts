@@ -46,10 +46,10 @@ export class InputManager {
       this.game.togglePause();
       return;
     }
-
+    /*
     if (["a", "A", "ArrowLeft", "d", "D", "ArrowRight"].includes(event.key)) {
       event.preventDefault();
-    }
+    }*/
   }
 
   private handleKeyUp(event: KeyboardEvent): void {}
