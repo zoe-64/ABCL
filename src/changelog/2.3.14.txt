@@ -1,0 +1,2 @@
+Replaced point-and-click minigame with a more interesting minigame
+Added minigame difficulty option

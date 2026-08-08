@@ -49,7 +49,7 @@
     "@types/semver": "^7.8.0",
     "@typescript-eslint/eslint-plugin": "^8.59.4",
     "@typescript-eslint/parser": "^8.59.4",
-    "bc-stubs": "^128.0.0",
+    "bc-stubs": "^131.0.0-Alpha.1",
     "bondage-club-mod-sdk": "^1.2.0",
     "eslint": "^10.4.0",
     "http-server": "^14.1.1",

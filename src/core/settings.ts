@@ -6,6 +6,7 @@ import { ModRepo, ModVersion } from "src/types/definitions";
 import { sendChatLocal, summarizeVersionRange } from "./utils";
 
 export const defaultSettings: ModSettings = {
+  MiniGameDifficulty: "Normal",
   PauseStats: false,
   PeeMetabolism: MetabolismSettings.Normal,
   PoopMetabolism: MetabolismSettings.Normal,
@@ -97,6 +98,7 @@ export const defaultStats: ModStats = {
 };
 
 export const defaultSettingPermissions: ModStorageModel["SettingPermissions"] = {
+  MiniGameDifficulty: false,
   PeeMetabolism: false,
   PoopMetabolism: false,
   MentalRegressionModifier: false,
@@ -135,6 +137,7 @@ export const defaultSettingPermissions: ModStorageModel["SettingPermissions"] = 
   CanUsePotty: false,
   CanChangeDiapers: false,
 };
+
 const defaultData: ModStorageModel = {
   Settings: defaultSettings,
   Stats: defaultStats,

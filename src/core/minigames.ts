@@ -2,6 +2,7 @@ import { HookManager } from "@sugarch/bc-mod-hook-manager";
 import { getRandomInt } from "./utils";
 import { DistractionRushGame } from "./minigames/distractionRush";
 import { BaseMiniGame, MessMinigameResult, WetMinigameResult } from "./minigames/baseMinigame";
+import { DropletCatchGame } from "./minigames/dropletBucket/game";
 
 // for minigame text loading
 // @ts-expect-error ts(2345)
@@ -10,7 +11,8 @@ HookManager.hookFunction("TextLoad", 5, (args, next) => {
     CurrentScreen === "WetMinigame" ||
     CurrentScreen === "MessMinigame" ||
     CurrentScreen === "DistractionRush-Wetting" ||
-    CurrentScreen === "DistractionRush-Messes"
+    CurrentScreen === "DistractionRush-Messes" ||
+    CurrentScreen === "DropletCatch"
   )
     return;
   else return next(args);
@@ -20,6 +22,7 @@ export const initMinigames = () => {
   registerMiniGame(new WetMinigame());
   registerMiniGame(new DistractionRushGame("Wetting"));
   registerMiniGame(new DistractionRushGame("Messes"));
+  registerMiniGame(new DropletCatchGame());
 };
 export function registerMiniGame<T extends BaseMiniGame>(miniGame: T) {
   var name = miniGame.name;
