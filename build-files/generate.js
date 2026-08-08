@@ -1,9 +1,14 @@
+const fs = require("fs");
 const childProcess = require("child_process");
-const pkg = require("../package.json");
+const path = require("path"); // Add this
 const readline = require("readline").createInterface({
   input: process.stdin,
   output: process.stdout,
 });
+
+// Use absolute path resolution
+const packagePath = path.resolve(__dirname, "../package.json");
+const pkg = require(packagePath);
 
 function isVersionGreater(newVersion, currentVersion) {
   const newParts = newVersion.split(".").map(Number);
@@ -19,7 +24,6 @@ function isVersionGreater(newVersion, currentVersion) {
 }
 
 function updatePackageJsonVersion(newVersion) {
-  const packagePath = "../package.json";
   const packageJson = JSON.parse(fs.readFileSync(packagePath, "utf8"));
   packageJson.version = newVersion;
   fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 2));

@@ -179,12 +179,13 @@ const initHooks = async () => {
     return next(args);
   });
   HookManager.hookFunction("CharacterAppearanceSetItem", 1, (args, next) => {
-    let [_character, _slot, _asset] = args;
+    let [_character, _slot, _asset, ..._rest] = args;
     const _result = next(args);
     if (_slot === "ItemPelvis" && _asset) {
-      if (isDiaper({ Asset: _asset })) {
-        abclPlayer.stats.BladderValue = Math.min(abclPlayer.stats.BladderValue, getDiaperSize({ Asset: _asset }));
-        abclPlayer.stats.BowelValue = Math.min(abclPlayer.stats.BowelValue, getDiaperSize({ Asset: _asset }));
+      const item = { Asset: _asset, Color: [], Difficulty: 0, Property: {} } satisfies Item;
+      if (isDiaper(item)) { // it only needs the asset
+        abclPlayer.stats.BladderValue = Math.min(abclPlayer.stats.BladderValue, getDiaperSize(item));
+        abclPlayer.stats.BowelValue = Math.min(abclPlayer.stats.BowelValue, getDiaperSize(item));
         updateDiaperColor();
       }
     }

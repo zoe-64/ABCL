@@ -2,8 +2,8 @@ import { merge, debounce } from "lodash-es";
 import { DiaperSettingValues, MetabolismSettings, PartialDeep } from "../types/types";
 import { sendUpdateMyData as sendUpdateMyData } from "./hooks";
 import { logger } from "./logger";
-import { ModRepo, ModVersion } from "src/types/definitions";
-import { sendChatLocal, summarizeVersionRange } from "./utils";
+import { ModVersion } from "src/types/definitions";
+import { summarizeVersionRange } from "./utils";
 
 export const defaultSettings: ModSettings = {
   MiniGameDifficulty: "Normal",
