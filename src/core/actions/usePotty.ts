@@ -3,7 +3,6 @@ import { CombinedAction } from "../../types/types";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { sendABCLAction } from "../player/playerUtils";
-import { sendChatLocal } from "../utils";
 
 export const usePottyFunction = () => {
   const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;
@@ -74,7 +73,7 @@ export const usePotty: CombinedAction = {
   command: {
     Tag: "use-potty",
     Action: (args, msg, parsed) => {
-      if (!usePotty.activity?.Criteria?.(Player)) return sendChatLocal("You don't have a potty to use!");
+      if (!usePotty.activity?.Criteria?.(Player).success) return;
       usePottyFunction();
     },
     Description: ` Sit down and use the potty.`,

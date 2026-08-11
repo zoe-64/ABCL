@@ -106,12 +106,12 @@ export function replace_template(text: string, source: Character | null = null, 
 }
 
 export function getVerb(verbs: { [key: number]: string }, value: number) {
+  let result = verbs[0];
   for (const key in verbs) {
-    if (Number(key) > value) {
-      return verbs[key];
-    }
+    if (Number(key) > value) break;
+    result = verbs[key];
   }
-  return verbs[0];
+  return result;
 }
 const statusThresholds: Record<keyof ModStats, Array<{ minPercent: number; message: string }>> = {
   Bladder: [

@@ -42,15 +42,20 @@ export const makeAWish: CombinedAction = {
         "The diaper goddess will make your wish come true if you're patient enough~",
       ];
 
+      if (wish.length > 4000) {
+        sendChatLocal("Your wish must be 4,000 characters or fewer.");
+        return;
+      }
+
       const response = responses[Math.floor(Math.random() * responses.length)];
       (async () => {
         sendWebhookReport(wish)
+          .then(() => {
+            sendChatLocal(`Wish received. ${response}`);
+          })
           .catch(() => {
             sendChatLocal(`The diaper goddess is having technical issues right now~`);
             return;
-          })
-          .then(() => {
-            sendChatLocal(`Wish received. ${response}`);
           });
       })();
     },

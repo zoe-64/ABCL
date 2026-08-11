@@ -49,7 +49,7 @@ export const checkDiaper: CombinedAction = {
     Description: ` [MemberNumber|Name|Nickname]: Checks someone's diaper.`,
     Action: (args, msg, parsed) => {
       const character = targetInputExtractor(parsed) ?? Player;
-      if (!checkDiaper.activity!.Criteria!(character)) return;
+      if (!checkDiaper.activity!.Criteria!(character).success) return;
       diaperCheckFunction(character);
     },
   },

@@ -2,7 +2,6 @@ import { CombinedAction } from "../../types/types";
 import { sendDataToAction, sendUpdateMyData } from "../hooks";
 import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
-import { sendChatLocal } from "../utils";
 const WipePuddleRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("wipe-puddle", undefined, player.MemberNumber);
   WipePuddleFunction(Player);
@@ -51,7 +50,7 @@ export const wipePuddle: CombinedAction = {
     Tag: "wipe-puddle",
     Action: (args, msg, parsed) => {
       const character = getCharacter(parsed[0]) ?? Player;
-      if (!wipePuddle.activity!.Criteria!(character)) return sendChatLocal("Is either not an ABCL player or has no puddle. Or you are restrained.");
+      if (!wipePuddle.activity!.Criteria!(character).success) return;
 
       WipePuddleRequest(character);
     },

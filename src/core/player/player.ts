@@ -227,8 +227,7 @@ export const abclPlayer = {
     if (fullness >= 1) {
       abclPlayer.stats.Incontinence += INCONTINENCE_ON_STATS_OVERFLOW * (1 - abclPlayer.stats.Incontinence);
       // maybe a message here
-      WetMinigameResult(false);
-      return;
+      return isWet ? WetMinigameResult(false) : MessMinigameResult(false);
     }
     if (!(Math.random() < chance || fullness > limit)) return;
     if (!force && !incontinenceCheck.check()) return;

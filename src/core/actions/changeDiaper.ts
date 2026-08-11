@@ -69,11 +69,12 @@ export const changeDiaper: CombinedAction = {
           message: "You are restrained.",
         };
       const item = InventoryGet(player, "ItemDevices");
-      if (item && ["MedicalBed", "ChangingTable", "Bed", "床左边", "床右边"].includes(item.Asset.Name))
+      if (!(item && ["MedicalBed", "ChangingTable", "Bed", "床左边", "床右边"].includes(item.Asset.Name)))
         return {
           success: false,
           message: "They are not on a changing table or a flat surface.",
         };
+
       return {
         success: true,
       };
@@ -83,7 +84,7 @@ export const changeDiaper: CombinedAction = {
     Tag: "change-diaper",
     Action: (args, msg, parsed) => {
       const character = targetInputExtractor(parsed) ?? Player;
-      if (!changeDiaper.activity!.Criteria!(character)) return;
+      if (!changeDiaper.activity!.Criteria!(character).success) return;
 
       changeDiaperRequest(character);
     },

@@ -36,7 +36,7 @@ class Activity {
 
   fitsCriteria(player: Character, focusGroup: AssetGroupItemName): boolean {
     return Boolean(
-      (!this.criteria || this.criteria(player)) &&
+      (!this.criteria || this.criteria(player).success) &&
       (this.target?.includes(focusGroup) || (this.targetSelf?.includes(focusGroup) && Player.MemberNumber === player?.MemberNumber)),
     );
   }

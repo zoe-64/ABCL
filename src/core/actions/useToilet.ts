@@ -50,11 +50,12 @@ export const useToilet: CombinedAction = {
           success: false,
           message: "You feel uncomfortable, the toilet is cold and hard almost like ice. You can't use it.",
         };
+      // when CanUseBathroomWithDiaper is false or abclPlayer.settings.CanUseToilet is false then it will deny toilet usage by wetting their clothes or diaper.
       if (!abclPlayer.settings.CanUseBathroomWithDiaper || !abclPlayer.settings.CanUseToilet)
         return {
           success: true,
         };
-      if (!hasDiaper(player) && isDiaperLocked())
+      if (hasDiaper(player) && isDiaperLocked())
         return {
           success: false,
           message: "You can't use the toilet while your diaper is locked.",

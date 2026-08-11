@@ -2,7 +2,6 @@ import { CombinedAction } from "../../types/types";
 import { sendDataToAction, sendUpdateMyData } from "../hooks";
 import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
-import { sendChatLocal } from "../utils";
 
 const lickPuddleRequest = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
@@ -37,7 +36,7 @@ export const lickPuddle: CombinedAction = {
           success: false,
           message: "They are not an ABCL player.",
         };
-      if (player.ABCL!.Stats.PuddleSize.value < 0)
+      if (player.ABCL!.Stats.PuddleSize.value <= 0)
         return {
           success: false,
           message: "They have no puddle of lick.",
@@ -51,7 +50,7 @@ export const lickPuddle: CombinedAction = {
     Tag: "lick-puddle",
     Action: (args, msg, parsed) => {
       const character = targetInputExtractor(parsed) ?? Player;
-      if (!lickPuddle.activity!.Criteria!(character)) return sendChatLocal("Is either not an ABCL player or has no puddle.");
+      if (!lickPuddle.activity!.Criteria!(character).success) return;
       lickPuddleRequest(character);
     },
     Description: ` [MemberNumber|Name|Nickname]: Licks a puddle of pee.`,

@@ -1,4 +1,4 @@
-import { HookManager } from "node_modules/@sugarch/bc-mod-hook-manager/dist";
+import { HookManager } from "@sugarch/bc-mod-hook-manager";
 import { getPlayerDiaperSize, hasDiaper } from "./player/diaper";
 import { abclPlayer } from "./player/player";
 import { isABCLPlayer } from "./player/playerUtils";
