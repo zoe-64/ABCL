@@ -1,11 +1,11 @@
 import { h } from "preact";
 import { useState } from "preact/hooks";
 
+import { isOwned } from "src/core/player/diaper";
 import { Checkbox } from "src/screens/components/checkbox";
 import { Group } from "src/screens/components/positionComponents";
 import { SettingPanel } from "src/screens/components/settingPanel";
 import { SettingsH2 } from "../settingsPage";
-import { isOwned } from "src/core/player/diaper";
 
 export default function MiscPage({ setPage }: { setPage: (page: string) => void }): h.JSX.Element {
   const [wetDiaper, setWetDiaper] = useState<boolean>(Player.ABCL.Settings.VisibleMessages.wetDiaper);
@@ -26,6 +26,8 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
   const [canCheckDiaperWithRestraints, _setCanCheckDiaperWithRestraints] = useState<boolean>(Player.ABCL.Settings.CanCheckDiaperWithRestraints);
   const [canUseToilet, _setCanUseToilet] = useState<boolean>(Player.ABCL.Settings.CanUseToilet);
   const [canUsePotty, _setCanUsePotty] = useState<boolean>(Player.ABCL.Settings.CanUsePotty);
+
+  const [disableParticles, setDisableParticles] = useState<boolean>(Player.ABCL.Settings.DisableParticles);
 
   const [wetDiaperLocked, _setWetDiaperLocked] = useState<boolean>(Player.ABCL.SettingPermissions.wetDiaper);
   const [wetClothingLocked, _setWetClothingLocked] = useState<boolean>(Player.ABCL.SettingPermissions.wetClothing);
@@ -110,6 +112,8 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
           Player.ABCL.SettingPermissions.CanCheckDiaperWithRestraints = canCheckDiaperWithRestraintsLocked;
           Player.ABCL.SettingPermissions.CanUseToilet = canUseToiletLocked;
           Player.ABCL.SettingPermissions.CanUsePotty = canUsePottyLocked;
+
+          Player.ABCL.Settings.DisableParticles = disableParticles;
         }}
         className="ABCL-exit-button"
       ></button>
@@ -117,7 +121,10 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
         <SettingsH2>Miscellaneous</SettingsH2>
         <Group>
           <SettingPanel title="Show own badges / bottle icon">
-            <Checkbox checked={showOwnBadges} setChecked={setShowOwnBadges} opaqueLock={true} />
+            <Checkbox checked={showOwnBadges} setChecked={setShowOwnBadges} showLock={false} />
+          </SettingPanel>
+          <SettingPanel title="Disable particles">
+            <Checkbox checked={disableParticles} setChecked={setDisableParticles} showLock={false} />
           </SettingPanel>
         </Group>
       </div>

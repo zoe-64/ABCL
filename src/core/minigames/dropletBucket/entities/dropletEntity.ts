@@ -5,14 +5,7 @@ import { GameEntity } from "./gameEntity";
 export abstract class DropletEntity extends GameEntity {
   speed: number;
 
-  constructor(
-    game: DropletCatchGame,
-    x: number,
-    y: number,
-    radius: number,
-    speed: number,
-    imageFileName: string
-  ) {
+  constructor(game: DropletCatchGame, x: number, y: number, radius: number, speed: number, imageFileName: string) {
     super(game, radius * 2, radius * 2, x, y);
     this.speed = speed;
     this.loadImage(imageFileName);
@@ -23,7 +16,7 @@ export abstract class DropletEntity extends GameEntity {
     this.y += activeSpeed;
 
     if (this.y - this.height / 2 <= this.game.height) return;
-    
+
     this.destroy();
     this.onMissed();
   }
@@ -31,7 +24,6 @@ export abstract class DropletEntity extends GameEntity {
   protected abstract onMissed(): void;
   public abstract onCaught(): void;
 }
-
 
 export class NormalDropletEntity extends DropletEntity {
   constructor(game: DropletCatchGame, x: number, y: number, radius: number, speed: number) {
@@ -121,7 +113,6 @@ export class BombDropletEntity extends DropletEntity {
       if (entity instanceof DropletEntity && entity !== this && !entity.isDestroyed) {
         entity.destroy();
       }
-      
     }
 
     this.destroy();
@@ -140,10 +131,7 @@ export class ZigZagDropletEntity extends DropletEntity {
   update(): void {
     this.timePassed += 0.05;
     const offset = Math.sin(this.timePassed) * 40;
-    this.x = Math.max(
-      this.width / 2,
-      Math.min(this.game.width - this.width / 2, this.startX + offset)
-    );
+    this.x = Math.max(this.width / 2, Math.min(this.game.width - this.width / 2, this.startX + offset));
 
     super.update();
   }

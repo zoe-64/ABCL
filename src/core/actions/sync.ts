@@ -2,9 +2,9 @@ import { sendUpdateMyData } from "../hooks";
 import { logger } from "../logger";
 
 import { ChatRoomEvents, ChatRoomRemoteEventEmitter } from "@sugarch/bc-event-handler";
-import { updateData } from "../settings";
 import { ModVersion } from "src/types/definitions";
 import { PartialDeep } from "src/types/types";
+import { updateData } from "../settings";
 import { sendChatLocal } from "../utils";
 
 type EventMap = {

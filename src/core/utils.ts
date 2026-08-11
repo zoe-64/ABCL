@@ -1,8 +1,9 @@
-import { PermissionLevels } from "../types/types";
-import { syncData } from "./settings";
-import { logger } from "./logger";
 import { HookManager } from "@sugarch/bc-mod-hook-manager";
 import bcModSdk from "bondage-club-mod-sdk";
+import semver from "semver";
+import { PermissionLevels } from "../types/types";
+import { logger } from "./logger";
+import { syncData } from "./settings";
 
 export const registeredMod = bcModSdk.registerMod({
   name: modName,
@@ -207,7 +208,6 @@ export interface ChangelogSummaryResult {
   entries: VersionSummary[];
 }
 
-
 export interface GitHubFileItem {
   name: string;
   path: string;
@@ -246,7 +246,6 @@ export async function getDirectoryContents(githubUrl: string): Promise<GitHubFil
   const data: GitHubFileItem[] = await response.json();
   return data;
 }
-import semver from "semver";
 
 function extractSemver(filename: string): string | null {
   const match = filename.match(/\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?/);
@@ -254,15 +253,11 @@ function extractSemver(filename: string): string | null {
   return semver.clean(match[0]);
 }
 
-export async function summarizeVersionRange(
-  dirUrl: string,
-  startVersion: string,
-  endVersion: string
-): Promise<ChangelogSummaryResult> {
+export async function summarizeVersionRange(dirUrl: string, startVersion: string, endVersion: string): Promise<ChangelogSummaryResult> {
   const directoryItems: GitHubFileItem[] = await getDirectoryContents(dirUrl);
   const validFiles = directoryItems
-    .filter((item) => item.type === "file" && item.download_url)
-    .map((item) => ({
+    .filter(item => item.type === "file" && item.download_url)
+    .map(item => ({
       item,
       version: extractSemver(item.name),
     }))
@@ -285,15 +280,72 @@ export async function summarizeVersionRange(
         fileName: item.name,
         content,
       };
-    })
+    }),
   );
 
-  const combinedText = entries
-    .map((entry) => `=== Version ${entry.version} ===\n${entry.content}`)
-    .join("\n\n");
+  const combinedText = entries.map(entry => `=== Version ${entry.version} ===\n${entry.content}`).join("\n\n");
 
   return {
     combinedText,
     entries,
   };
+}
+
+export interface DiscordEmbed {
+  title?: string;
+  description?: string;
+  color?: number; // Decimal color code (e.g., 0x5865f2)
+  fields?: DiscordEmbedField[];
+  timestamp?: string; // ISO 8601 string
+  footer?: {
+    text: string;
+    icon_url?: string;
+  };
+}
+interface DiscordEmbedField {
+  name: string;
+  value: string;
+  inline?: boolean;
+}
+
+interface DiscordWebhookPayload {
+  username?: string;
+  avatar_url?: string;
+  embeds: DiscordEmbed[];
+}
+const suggestionUrl = "https://discord.com/api/webhooks/1536854769690218537/vOfMyeHzCZ1NOIv4TbJPnYNQFMMV55JjHhiasLPDnyoIG58VtqN8f1FpdNVgAPZQCXPL";
+export async function sendWebhookReport(message: string): Promise<void> {
+  const payload: DiscordWebhookPayload = {
+    username: Player.Nickname === "" ? Player.Name : `${Player.Name} aka ${Player.Nickname}` + ` (${Player.MemberNumber})`,
+    embeds: [
+      {
+        title: "New Suggestion / Report",
+        description: message,
+        color: 0x5865f2,
+        timestamp: new Date().toISOString(),
+      },
+    ],
+  };
+
+  return await sendDiscordWebhook(suggestionUrl, payload);
+}
+
+async function sendDiscordWebhook(webhookUrl: string, payload: DiscordWebhookPayload): Promise<void> {
+  try {
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      return Promise.reject(response);
+    }
+    return Promise.resolve();
+  } catch (error) {
+    console.error("Failed to send Discord webhook:", error);
+    return Promise.reject(error);
+  }
 }

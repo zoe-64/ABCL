@@ -13,6 +13,7 @@ import { diaperRubFront } from "./actions/diaperRubFront";
 import { diaperSquishBack } from "./actions/diaperSquishBack";
 import { diaperSquishFront } from "./actions/diaperSquishFront";
 import { lickPuddle } from "./actions/lickPuddle";
+import { makeAWish } from "./actions/makeAWish";
 import { onABCLMessage } from "./actions/onABCLMessage";
 import { pauseStats } from "./actions/pauseStats";
 import { toPee } from "./actions/toPee";
@@ -21,6 +22,7 @@ import { usePotty } from "./actions/usePotty";
 import { useToilet } from "./actions/useToilet";
 import { wipePuddle } from "./actions/wipePuddle";
 import { waitForElement } from "./utils";
+
 class Activity {
   constructor(
     public id: string,
@@ -29,13 +31,13 @@ class Activity {
     public onClick?: (player: Character, group: AssetGroupItemName) => void,
     private target?: AssetGroupItemName[],
     private targetSelf?: AssetGroupItemName[],
-    private criteria?: (player: Character) => boolean,
+    private criteria?: (player: Character) => { success: boolean; message?: string },
   ) {}
 
   fitsCriteria(player: Character, focusGroup: AssetGroupItemName): boolean {
     return Boolean(
       (!this.criteria || this.criteria(player)) &&
-        (this.target?.includes(focusGroup) || (this.targetSelf?.includes(focusGroup) && Player.MemberNumber === player?.MemberNumber)),
+      (this.target?.includes(focusGroup) || (this.targetSelf?.includes(focusGroup) && Player.MemberNumber === player?.MemberNumber)),
     );
   }
 
@@ -120,6 +122,7 @@ export const actions: CombinedAction[] = [
   diaperSquishBack,
   diaperSquishFront,
   pauseStats,
+  makeAWish,
 ];
 
 export const commands = actions.reduce((commands, { command }) => (command ? [...commands, command] : commands), [] as ICommand[]);

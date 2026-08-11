@@ -1,8 +1,8 @@
-import { merge, debounce } from "lodash-es";
-import { DiaperSettingValues, MetabolismSettings, PartialDeep } from "../types/types";
-import { sendUpdateMyData as sendUpdateMyData } from "./hooks";
-import { logger } from "./logger";
+import { debounce, merge } from "lodash-es";
 import { ModVersion } from "src/types/definitions";
+import { DiaperSettingValues, MetabolismSettings, PartialDeep } from "../types/types";
+import { sendUpdateMyData } from "./hooks";
+import { logger } from "./logger";
 import { summarizeVersionRange } from "./utils";
 
 export const defaultSettings: ModSettings = {
@@ -53,6 +53,7 @@ export const defaultSettings: ModSettings = {
   CanUseToilet: true,
   CanUsePotty: true,
   CanChangeDiapers: true,
+  DisableParticles: false,
 };
 
 export const defaultStats: ModStats = {
@@ -136,6 +137,7 @@ export const defaultSettingPermissions: ModStorageModel["SettingPermissions"] = 
   CanUseToilet: false,
   CanUsePotty: false,
   CanChangeDiapers: false,
+  DisableParticles: false,
 };
 
 const defaultData: ModStorageModel = {
@@ -168,14 +170,22 @@ export const loadOrGenerateData = async () => {
         Version: ModVersion,
       };
   if (data.Version !== ModVersion) {
-     summarizeVersionRange("https://github.com/zoe-64/ABCL/src/changelog", data.Version, ModVersion).then((result) => {
+    summarizeVersionRange("https://github.com/zoe-64/ABCL/src/changelog", data.Version, ModVersion).then(result => {
       if (!result) return;
       setTimeout(() => {
-        ServerAccountBeep({ Message: `ABCL Updated!\n${result.combinedText}`, MemberNumber: 164988, MemberName: "Zoe - author of ABCL", ChatRoomSpace: "", ChatRoomName: "", Private: true, BeepType: "" });
+        ServerAccountBeep({
+          Message: `ABCL Updated!\n${result.combinedText}`,
+          MemberNumber: 164988,
+          MemberName: "Zoe - author of ABCL",
+          ChatRoomSpace: "",
+          ChatRoomName: "",
+          Private: true,
+          BeepType: "",
+        });
       }, 15000);
     });
   }
-   
+
   // migrations
   if (data.ModVersion === "2.0.0") {
     const metabolismValue = data.Settings.Metabolism;
@@ -193,7 +203,7 @@ export const loadOrGenerateData = async () => {
     data.Version = "2.0.1";
   }
 
-  data.Version = ModVersion; 
+  data.Version = ModVersion;
   const modStorageObject = merge(
     {
       Settings: defaultSettings,

@@ -3,18 +3,22 @@ import { sendDataToAction } from "../hooks";
 import { hasDiaper, isDiaperLocked, updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { getCharacter, getCharacterName, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
-import { sendChatLocal } from "../utils";
 
 export const changeDiaperRequest = (player: Character, force?: boolean) => {
   if (!abclPlayer.settings.CanChangeSelf && player.MemberNumber === Player.MemberNumber) {
-      sendABCLAction("%NAME% tries to tug on %POSSESSIVE% diaper tabs, pulling on the waistband and shaking the diaper but nothing works.", undefined, "changeDiaper", player);
-      return
-    }
-    if (!abclPlayer.settings.CanChangeDiapers && player.MemberNumber !== Player.MemberNumber) {
-      sendABCLAction("%NAME% tries to change %OPP_NAME%'s diaper, but finds the task difficult.", undefined, "changeDiaper", player);
-      return
-    }
- 
+    sendABCLAction(
+      "%NAME% tries to tug on %POSSESSIVE% diaper tabs, pulling on the waistband and shaking the diaper but nothing works.",
+      undefined,
+      "changeDiaper",
+      player,
+    );
+    return;
+  }
+  if (!abclPlayer.settings.CanChangeDiapers && player.MemberNumber !== Player.MemberNumber) {
+    sendABCLAction("%NAME% tries to change %OPP_NAME%'s diaper, but finds the task difficult.", undefined, "changeDiaper", player);
+    return;
+  }
+
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("changeDiaper-pending", { force }, player.MemberNumber);
 
   changeDiaperFunction(player);
@@ -43,15 +47,44 @@ export const changeDiaper: CombinedAction = {
     Image: `${publicURL}/activity/changeDiaper.svg`,
     Target: ["ItemPelvis"],
     OnClick: (player: Character, group: AssetGroupItemName) => changeDiaperRequest(player),
-    Criteria: (player: Character) => hasDiaper(player) && isABCLPlayer(player) && !Player.IsRestrained() && !isDiaperLocked(player),
+    Criteria: (player: Character) => {
+      if (!hasDiaper(player))
+        return {
+          success: false,
+          message: "They are not diapered.",
+        };
+      if (isDiaperLocked(player))
+        return {
+          success: false,
+          message: "Diaper is locked.",
+        };
+      if (!isABCLPlayer(player))
+        return {
+          success: false,
+          message: "They are not an ABCL player.",
+        };
+      if (Player.IsRestrained())
+        return {
+          success: false,
+          message: "You are restrained.",
+        };
+      const item = InventoryGet(player, "ItemDevices");
+      if (item && ["MedicalBed", "ChangingTable", "Bed", "床左边", "床右边"].includes(item.Asset.Name))
+        return {
+          success: false,
+          message: "They are not on a changing table or a flat surface.",
+        };
+      return {
+        success: true,
+      };
+    },
   },
   command: {
     Tag: "change-diaper",
     Action: (args, msg, parsed) => {
       const character = targetInputExtractor(parsed) ?? Player;
-      if (!changeDiaper.activity!.Criteria!(character))
-        return sendChatLocal("Is either not diapered or not an ABCL player or you are restrained or diaper is locked.");
-     
+      if (!changeDiaper.activity!.Criteria!(character)) return;
+
       changeDiaperRequest(character);
     },
     Description: ` [MemberNumber|Name|Nickname]: Changes someone's diaper.`,

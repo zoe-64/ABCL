@@ -26,7 +26,26 @@ export const wipePuddle: CombinedAction = {
     Image: `./Assets/Female3DCG/ItemHandheld/Preview/Towel.png`,
     Target: ["ItemBoots"],
     OnClick: (player: Character, group: AssetGroupItemName) => WipePuddleRequest(player),
-    Criteria: (player: Character) => isABCLPlayer(player) && player.ABCL!.Stats.PuddleSize.value > 0 && !Player.IsRestrained(),
+    Criteria: (player: Character) => {
+      if (!isABCLPlayer(player))
+        return {
+          success: false,
+          message: "They are not an ABCL player.",
+        };
+      if (player.ABCL!.Stats.PuddleSize.value <= 0)
+        return {
+          success: false,
+          message: "They have no puddle.",
+        };
+      if (Player.IsRestrained())
+        return {
+          success: false,
+          message: "You are restrained.",
+        };
+      return {
+        success: true,
+      };
+    },
   },
   command: {
     Tag: "wipe-puddle",

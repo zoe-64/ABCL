@@ -33,7 +33,31 @@ export const diaperFaceRub: CombinedAction = {
     Image: `${publicURL}/activity/diaperFaceRub.png`,
     Target: ["ItemNose"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperFaceRubRequest(player),
-    Criteria: (player: Character) => hasDiaper(Player) && isABCLPlayer(player) && !Player.IsRestrained() && player.MemberNumber !== Player.MemberNumber,
+    Criteria: (player: Character) => {
+      if (!isABCLPlayer(player))
+        return {
+          success: false,
+          message: "They are not an ABCL player.",
+        };
+      if (Player.IsRestrained())
+        return {
+          success: false,
+          message: "You are restrained.",
+        };
+      if (!hasDiaper(Player))
+        return {
+          success: false,
+          message: "You are not diapered.",
+        };
+      if (player.MemberNumber === Player.MemberNumber)
+        return {
+          success: false,
+          message: "You can't rub your own diaper against your face.",
+        };
+      return {
+        success: true,
+      };
+    },
   },
   listeners: {
     "diaper-face-rub": ({ Sender }) => diaperFaceRubFunction(getCharacter(Sender!) ?? Player),

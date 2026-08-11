@@ -35,7 +35,24 @@ export const diaperRubBack: CombinedAction = {
     Image: `${publicURL}/activity/diaperRubBack.png`,
     Target: ["ItemButt"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperRubBackRequest(player),
-    Criteria: (player: Character) => isABCLPlayer(player) && hasDiaper(player) && !Player.IsRestrained(),
+    Criteria: (player: Character) => {
+      if (!isABCLPlayer(player)) return {
+        success: false,
+        message: "They are not an ABCL player.",
+      }
+      if (Player.IsRestrained()) return {
+        success: false,
+        message: "You are restrained.",
+      }
+      if (!hasDiaper(player)) return {
+        success: false,
+        message: "They are not diapered.",
+      }
+      return {
+        success: true,
+      }
+    }
+      
   },
   listeners: {
     "diaper-rub-back": ({ Sender }) => diaperRubBackFunction(getCharacter(Sender!) ?? Player),

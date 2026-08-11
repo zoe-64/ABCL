@@ -9,7 +9,7 @@ export class InputManager {
   private boundMouseMove = this.handleMouseMove.bind(this);
   private boundTouchMove = this.handleTouch.bind(this);
   private boundCanvasClick = this.handleCanvasClick.bind(this);
-    private boundVisibilityChange = this.handleVisibilityChange.bind(this);
+  private boundVisibilityChange = this.handleVisibilityChange.bind(this);
   constructor(game: DropletCatchGame) {
     this.game = game;
   }

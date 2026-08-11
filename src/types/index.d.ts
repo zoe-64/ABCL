@@ -52,6 +52,8 @@ interface ModSettings {
   DisableSoilingLeaks: boolean;
   DisableClothingStains: boolean;
   DisableDiaperStains: boolean;
+  DisableParticles: boolean;
+
   AccidentsByActivities: boolean;
   AccidentAutopilot: boolean;
   ShowOwnBadges: boolean;

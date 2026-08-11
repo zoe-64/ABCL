@@ -16,18 +16,17 @@ export const usePottyFunction = () => {
     sendABCLAction("%NAME% tries to use the potty but can't seem to get anything out.", undefined, "usePotty");
     return;
   }
-  if (hasDiaper(Player) && !canUsePottyWithDiaper || !abclPlayer.settings.CanUsePotty) {
+  if ((hasDiaper(Player) && !canUsePottyWithDiaper) || !abclPlayer.settings.CanUsePotty) {
     abclPlayer.wet(true, "potty");
     abclPlayer.soil(true, "potty");
     return;
   }
- 
+
   abclPlayer.stats.BowelFullness = 0;
   abclPlayer.stats.BladderFullness = 0;
   let actionMessage = "";
   let additionalText = "";
-  
-  
+
   if (isEmbarrassed) {
     additionalText = "and feels embarrassed";
     if (Player.ABCL.Settings.ExpressionsByActivities) {
@@ -61,12 +60,21 @@ export const usePotty: CombinedAction = {
     Image: `${publicURL}/activity/potty-temp.png`,
     OnClick: (player: Character, group) => usePottyFunction(),
     TargetSelf: ["ItemButt"],
-    Criteria: (player: Character) => player.Appearance.some((item) => item.Asset.Name == "Potty"),
+    Criteria: (player: Character) => {
+      if (!player.Appearance.some(item => item.Asset.Name == "Potty"))
+        return {
+          success: false,
+          message: "You don't have a potty to use!",
+        };
+      return {
+        success: true,
+      };
+    },
   },
   command: {
     Tag: "use-potty",
     Action: (args, msg, parsed) => {
-      if (!usePotty.activity?.Criteria!(Player)) return sendChatLocal("You don't have a potty to use!");
+      if (!usePotty.activity?.Criteria?.(Player)) return sendChatLocal("You don't have a potty to use!");
       usePottyFunction();
     },
     Description: ` Sit down and use the potty.`,

@@ -9,6 +9,9 @@ export const INCONTINENCE_ON_MINIGAME_FAILURE = 0.002;
 export const INCONTINENCE_ON_MINIGAME_SUCCESS = -0.01;
 export const INCONTINENCE_ON_POTTY_USE = -0.02;
 export const INCONTINENCE_ON_TOILET_USE = -0.02;
+export const INCONTINENCE_ON_STATS_OVERFLOW = 0.25; // bowel/bladder overflow, += value * (1-incontinence)
+export const STATS_OVERFLOW_LIMIT = 1;
+export const PUDDLE_MAX_SIZE = 250;
 
 export const ACCIDENTS_ON_ACTIVITIES: Partial<Record<Activity["Name"], { wetting?: number; messing?: number }>> = {
   Tickle: { wetting: 0.1, messing: 0.01 },

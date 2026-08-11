@@ -14,7 +14,11 @@ export const pauseStats: CombinedAction = {
     Image: `${publicURL}/activity/pauseStats.png`,
     TargetSelf: ["ItemPelvis"],
     OnClick: (player: Character, group: AssetGroupItemName) => pauseStatsFunction(),
-    Criteria: (player: Character) => true,
+    Criteria: (player: Character) => {
+      return {
+        success: true,
+      };
+    },
   },
   command: {
     Tag: "pause-stats",

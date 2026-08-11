@@ -35,7 +35,26 @@ export const diaperPour: CombinedAction = {
     Image: `${publicURL}/activity/diaperPour.png`,
     Target: ["ItemPelvis"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperPourRequest(player),
-    Criteria: (player: Character) => hasDiaper(player) && isABCLPlayer(player) && !Player.IsRestrained(), // Assume this is correct? target needs to have Diaper, ABCL and player can't do it while restrained?
+    Criteria: (player: Character) => {
+      if (!isABCLPlayer(player))
+        return {
+          success: false,
+          message: "They are not an ABCL player.",
+        };
+      if (Player.IsRestrained())
+        return {
+          success: false,
+          message: "You are restrained.",
+        };
+      if (!hasDiaper(player))
+        return {
+          success: false,
+          message: "They are not diapered.",
+        };
+      return {
+        success: true,
+      };
+    },
   },
   listeners: {
     "diaper-pour": ({ Sender }) => diaperPourFunction(getCharacter(Sender!) ?? Player),

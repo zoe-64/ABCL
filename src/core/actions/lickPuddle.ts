@@ -31,7 +31,21 @@ export const lickPuddle: CombinedAction = {
     Image: `${publicURL}/activity/lickPuddle.png`,
     Target: ["ItemBoots"],
     OnClick: (player: Character, group: AssetGroupItemName) => lickPuddleRequest(player),
-    Criteria: (player: Character) => isABCLPlayer(player) && player.ABCL!.Stats.PuddleSize.value > 0,
+    Criteria: (player: Character) => {
+      if (!isABCLPlayer(player))
+        return {
+          success: false,
+          message: "They are not an ABCL player.",
+        };
+      if (player.ABCL!.Stats.PuddleSize.value < 0)
+        return {
+          success: false,
+          message: "They have no puddle of lick.",
+        };
+      return {
+        success: true,
+      };
+    },
   },
   command: {
     Tag: "lick-puddle",
