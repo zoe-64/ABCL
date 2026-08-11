@@ -27,7 +27,26 @@ export const diaperSquishBack: CombinedAction = {
     Image: `${publicURL}/activity/diaperSquishBack.png`,
     Target: ["ItemButt"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperSquishBackRequest(player),
-    Criteria: (player: Character) => isABCLPlayer(player) && hasDiaper(player) && !Player.IsRestrained(),
+    Criteria: (player: Character) => {
+      if (!isABCLPlayer(player))
+        return {
+          success: false,
+          message: "They are not an ABCL player.",
+        };
+      if (Player.IsRestrained())
+        return {
+          success: false,
+          message: "You are restrained.",
+        };
+      if (!hasDiaper(player))
+        return {
+          success: false,
+          message: "They are not diapered.",
+        };
+      return {
+        success: true,
+      };
+    },
   },
   listeners: {
     "diaper-squish-back": ({ Sender }) => diaperSquishBackFunction(getCharacter(Sender!) ?? Player),

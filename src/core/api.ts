@@ -69,16 +69,16 @@ export function initApi(): void {
       usePotty: () => usePottyFunction(),
 
       get canUseToilet() {
-        return useToilet.activity?.Criteria?.(Player);
+        return useToilet.activity?.Criteria?.(Player).success;
       },
       get canUsePotty() {
-        return usePotty.activity?.Criteria?.(Player);
+        return usePotty.activity?.Criteria?.(Player).success;
       },
       get canChangeDiaper() {
-        return changeDiaper.activity?.Criteria?.(Player);
+        return changeDiaper.activity?.Criteria?.(Player).success;
       },
       get canCheckDiaper() {
-        return checkDiaper.activity?.Criteria?.(Player);
+        return checkDiaper.activity?.Criteria?.(Player).success;
       },
     },
     raw: {

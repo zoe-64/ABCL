@@ -2,7 +2,6 @@ import { CombinedAction } from "../../types/types";
 import { sendDataToAction, sendUpdateMyData } from "../hooks";
 import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
-import { sendChatLocal } from "../utils";
 const WipePuddleRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("wipe-puddle", undefined, player.MemberNumber);
   WipePuddleFunction(Player);
@@ -26,13 +25,32 @@ export const wipePuddle: CombinedAction = {
     Image: `./Assets/Female3DCG/ItemHandheld/Preview/Towel.png`,
     Target: ["ItemBoots"],
     OnClick: (player: Character, group: AssetGroupItemName) => WipePuddleRequest(player),
-    Criteria: (player: Character) => isABCLPlayer(player) && player.ABCL!.Stats.PuddleSize.value > 0 && !Player.IsRestrained(),
+    Criteria: (player: Character) => {
+      if (!isABCLPlayer(player))
+        return {
+          success: false,
+          message: "They are not an ABCL player.",
+        };
+      if (player.ABCL!.Stats.PuddleSize.value <= 0)
+        return {
+          success: false,
+          message: "They have no puddle.",
+        };
+      if (Player.IsRestrained())
+        return {
+          success: false,
+          message: "You are restrained.",
+        };
+      return {
+        success: true,
+      };
+    },
   },
   command: {
     Tag: "wipe-puddle",
     Action: (args, msg, parsed) => {
       const character = getCharacter(parsed[0]) ?? Player;
-      if (!wipePuddle.activity!.Criteria!(character)) return sendChatLocal("Is either not an ABCL player or has no puddle. Or you are restrained.");
+      if (!wipePuddle.activity!.Criteria!(character).success) return;
 
       WipePuddleRequest(character);
     },

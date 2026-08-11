@@ -1,4 +1,3 @@
-import { incontinenceCheck } from "../player/player";
 import { overlay } from "../player/ui";
 import { BaseMiniGame } from "./baseMinigame";
 
@@ -114,7 +113,7 @@ export class DistractionRushGame extends BaseMiniGame {
     this.options = options[type];
   }
   Load() {
-    incontinenceCheck.pause();
+    super.Load();
     this.Element = ElementCreate({
       tag: "div",
       attributes: {

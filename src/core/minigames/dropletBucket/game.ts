@@ -1,11 +1,11 @@
 import { BaseMiniGame } from "../baseMinigame";
+import { AudioManager } from "./audio";
+import "./dropletBucket.css";
 import { BucketEntity } from "./entities/bucketEntity";
 import { GameEntity } from "./entities/gameEntity";
-import "./dropletBucket.css";
-import { AudioManager } from "./audio";
-import { UIManager } from "./ui";
 import { InputManager } from "./input";
 import { SpawnerManager } from "./spawner";
+import { UIManager } from "./ui";
 
 export const GAME_CONFIG = {
   BASE_WIDTH: 400,
@@ -57,7 +57,6 @@ export class DropletCatchGame extends BaseMiniGame {
     this.spawnerManager = new SpawnerManager(this);
   }
 
-
   heal(number = 1): void {
     this.lives += number;
     this.uiManager.updateUI();
@@ -74,7 +73,7 @@ export class DropletCatchGame extends BaseMiniGame {
       this.endGame(false);
     }
   }
- removeEntity(entity: GameEntity): void {
+  removeEntity(entity: GameEntity): void {
     this.objects.delete(entity);
   }
 
@@ -85,12 +84,16 @@ export class DropletCatchGame extends BaseMiniGame {
   }
   Load(): void {
     super.Load();
+    this.isPaused = false;
+    this.timeLeft = GAME_CONFIG.DEFAULT_TIME;
+    this.lives = GAME_CONFIG.DEFAULT_LIVES;
+    this.isSlowed = false;
+    this.spawnRate = 60 + GAME_CONFIG.SPAWN_RATE * (MiniGameDifficulty || 1);
+    this.objects.clear();
 
     const difficultyMultiplier = MiniGameDifficulty || 1;
-    this.width = Math.min(
-      GAME_CONFIG.MAX_WIDTH,
-      Math.round(GAME_CONFIG.BASE_WIDTH * (1 + (difficultyMultiplier - 1) * 0.25))
-    );
+    this.width = Math.min(GAME_CONFIG.MAX_WIDTH, Math.round(GAME_CONFIG.BASE_WIDTH * (1 + (difficultyMultiplier - 1) * 0.25)));
+    this.uiManager.mountUI();
     this.canvas = document.getElementById("droplet-canvas") as HTMLCanvasElement;
     this.ctx = this.canvas?.getContext("2d") || null;
 
@@ -99,32 +102,17 @@ export class DropletCatchGame extends BaseMiniGame {
       this.End(false);
       return;
     }
+
     this.spawnerManager.selectRandomPool();
     this.isRunning = true;
-    this.isPaused = false;
-    this.timeLeft = GAME_CONFIG.DEFAULT_TIME;
-    this.lives = GAME_CONFIG.DEFAULT_LIVES;
-    this.spawnRate = 60 +  GAME_CONFIG.SPAWN_RATE * ( MiniGameDifficulty || 1);
-    this.objects.clear();
-    
-    this.uiManager.mountUI();
 
-    this.bucket = new BucketEntity(
-      this,
-      this.width / 2,
-      this.height - 30,
-      GAME_CONFIG.BUCKET_WIDTH,
-      GAME_CONFIG.BUCKET_HEIGHT
-    );
+    this.bucket = new BucketEntity(this, this.width / 2, this.height - 30, GAME_CONFIG.BUCKET_WIDTH, GAME_CONFIG.BUCKET_HEIGHT);
     this.objects.add(this.bucket);
 
     this.inputManager.setup(this.canvas);
 
     this.gameLoop = requestAnimationFrame(this.update.bind(this));
-    this.spawnInterval = window.setInterval(
-      () => this.handleSpawn(),
-      60000 / this.spawnRate
-    );
+    this.spawnInterval = window.setInterval(() => this.handleSpawn(), 60000 / this.spawnRate);
     this.timerInterval = window.setInterval(() => this.updateTimer(), 1000);
   }
 
@@ -149,7 +137,6 @@ export class DropletCatchGame extends BaseMiniGame {
     if (!this.isRunning || this.isPaused) return;
     this.spawnerManager.spawnDroplet();
   }
-  
 
   private update(): void {
     if (!this.isRunning || !this.ctx || !this.canvas) return;
@@ -157,14 +144,13 @@ export class DropletCatchGame extends BaseMiniGame {
     if (this.isPaused) {
       this.uiManager.drawPauseOverlay(this.ctx);
     } else {
-      this.objects.forEach((entity) => entity.update());
+      this.objects.forEach(entity => entity.update());
       this.ctx.clearRect(0, 0, this.width, this.height);
-      this.objects.forEach((entity) => entity.draw(this.ctx!));
+      this.objects.forEach(entity => entity.draw(this.ctx!));
     }
 
     this.gameLoop = requestAnimationFrame(this.update.bind(this));
   }
-  
 
   private updateTimer(): void {
     if (!this.isRunning || this.isPaused) return;

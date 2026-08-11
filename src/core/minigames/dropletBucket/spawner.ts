@@ -1,23 +1,17 @@
 import { DropletCatchGame } from "./game";
 
 import {
-  DropletEntity,
-  NormalDropletEntity,
   BadDropletEntity,
-  SlowDropletEntity,
-  GoldenDropletEntity,
   BombDropletEntity,
-  ZigZagDropletEntity,
+  DropletEntity,
+  GoldenDropletEntity,
   InstantDeathDropletEntity,
+  NormalDropletEntity,
+  SlowDropletEntity,
+  ZigZagDropletEntity,
 } from "./entities/dropletEntity";
 
-type DropletConstructor = new (
-  game: DropletCatchGame,
-  x: number,
-  y: number,
-  radius: number,
-  speed: number
-) => DropletEntity;
+type DropletConstructor = new (game: DropletCatchGame, x: number, y: number, radius: number, speed: number) => DropletEntity;
 
 interface WeightedDroplet {
   dropletClass: DropletConstructor;
@@ -34,11 +28,7 @@ const ALL_DROPLET_WEIGHTS: WeightedDroplet[] = [
   { dropletClass: InstantDeathDropletEntity, weight: 10 },
 ];
 
-const BAD_DROPLET_CLASSES: DropletConstructor[] = [
-  BadDropletEntity,
-  BombDropletEntity,
-  InstantDeathDropletEntity,
-];
+const BAD_DROPLET_CLASSES: DropletConstructor[] = [BadDropletEntity, BombDropletEntity, InstantDeathDropletEntity];
 
 export class SpawnerManager {
   private game: DropletCatchGame;
@@ -59,34 +49,21 @@ export class SpawnerManager {
 
     const selected = pool.slice(0, 3);
 
-    const hasNormal = selected.some(
-      (item) => item.dropletClass === NormalDropletEntity
-    );
+    const hasNormal = selected.some(item => item.dropletClass === NormalDropletEntity);
 
     if (!hasNormal) {
-      const normalItem = ALL_DROPLET_WEIGHTS.find(
-        (item) => item.dropletClass === NormalDropletEntity
-      )!;
+      const normalItem = ALL_DROPLET_WEIGHTS.find(item => item.dropletClass === NormalDropletEntity)!;
       selected[0] = normalItem;
     }
 
-    const hasBad = selected.some((item) =>
-      BAD_DROPLET_CLASSES.includes(item.dropletClass)
-    );
+    const hasBad = selected.some(item => BAD_DROPLET_CLASSES.includes(item.dropletClass));
 
     if (!hasBad) {
-      const availableBadItems = ALL_DROPLET_WEIGHTS.filter((item) =>
-        BAD_DROPLET_CLASSES.includes(item.dropletClass)
-      );
+      const availableBadItems = ALL_DROPLET_WEIGHTS.filter(item => BAD_DROPLET_CLASSES.includes(item.dropletClass));
 
-      const chosenBad =
-        availableBadItems[
-          Math.floor(Math.random() * availableBadItems.length)
-        ];
+      const chosenBad = availableBadItems[Math.floor(Math.random() * availableBadItems.length)];
 
-      const replaceIndex = selected.findIndex(
-        (item) => item.dropletClass !== NormalDropletEntity
-      );
+      const replaceIndex = selected.findIndex(item => item.dropletClass !== NormalDropletEntity);
 
       if (replaceIndex !== -1) {
         selected[replaceIndex] = chosenBad;
@@ -96,10 +73,7 @@ export class SpawnerManager {
     }
 
     this.activePool = selected;
-    this.totalActiveWeight = this.activePool.reduce(
-      (sum, item) => sum + item.weight,
-      0
-    );
+    this.totalActiveWeight = this.activePool.reduce((sum, item) => sum + item.weight, 0);
   }
 
   spawnDroplet(): void {
@@ -122,8 +96,6 @@ export class SpawnerManager {
     const radius = 16 + Math.random() * 12;
     const speed = this.game.dropletSpeed * (0.8 + Math.random() * 0.8);
 
-    this.game.objects.add(
-      new SelectedClass(this.game, x, -radius, radius, speed)
-    );
+    this.game.objects.add(new SelectedClass(this.game, x, -radius, radius, speed));
   }
 }

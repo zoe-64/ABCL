@@ -15,7 +15,7 @@ export const useToiletFunction = () => {
     return sendChatLocal("You try to use the toilet but you can't seem to get anything out.");
   }
 
-  if (hasDiaper(Player) && !canUseBathroomWithDiaper || !abclPlayer.settings.CanUseToilet) {
+  if ((hasDiaper(Player) && !canUseBathroomWithDiaper) || !abclPlayer.settings.CanUseToilet) {
     abclPlayer.wet(true, "toilet");
     abclPlayer.soil(true, "toilet");
     return;
@@ -44,7 +44,31 @@ export const useToilet: CombinedAction = {
     Image: `${publicURL}/activity/toilet-temp.png`,
     OnClick: (player, group) => useToiletFunction(),
     // if the regression is too high, deny toilet usage
-    Criteria: player => abclPlayer.stats.MentalRegression < 0.3 && !(hasDiaper(player) && isDiaperLocked()) && !Player.IsRestrained(),
+    Criteria: player => {
+      if (abclPlayer.stats.MentalRegression >= 0.3)
+        return {
+          success: false,
+          message: "You feel uncomfortable, the toilet is cold and hard almost like ice. You can't use it.",
+        };
+      // when CanUseBathroomWithDiaper is false or abclPlayer.settings.CanUseToilet is false then it will deny toilet usage by wetting their clothes or diaper.
+      if (!abclPlayer.settings.CanUseBathroomWithDiaper || !abclPlayer.settings.CanUseToilet)
+        return {
+          success: true,
+        };
+      if (hasDiaper(player) && isDiaperLocked())
+        return {
+          success: false,
+          message: "You can't use the toilet while your diaper is locked.",
+        };
+      if (Player.IsRestrained())
+        return {
+          success: false,
+          message: "You are restrained.",
+        };
+      return {
+        success: true,
+      };
+    },
     TargetSelf: ["ItemButt"],
   },
   command: {

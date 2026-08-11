@@ -1,16 +1,17 @@
-import initHooks from "./core/hooks";
-import { logger } from "./core/logger";
-import { loadOrGenerateData } from "./core/settings";
-import { initSettingsScreen } from "./screens/Settings";
-import { initMinigames } from "./core/minigames";
-import { abclPlayer } from "./core/player/player";
-import { initOverlay } from "./core/player/ui";
-import { initActions } from "./core/actionLoader";
+import { HookManager } from "@sugarch/bc-mod-hook-manager";
 import { loopInterval } from "./constants";
+import { initActions } from "./core/actionLoader";
 import { initApi } from "./core/api";
 import { initCustomItems } from "./core/customItems";
-import { HookManager } from "@sugarch/bc-mod-hook-manager";
+import initHooks from "./core/hooks";
+import { logger } from "./core/logger";
+import { initMinigames } from "./core/minigames";
+import { initParticles } from "./core/particleSystem";
+import { abclPlayer } from "./core/player/player";
+import { initOverlay } from "./core/player/ui";
 import { initProperties } from "./core/properties";
+import { loadOrGenerateData } from "./core/settings";
+import { initSettingsScreen } from "./screens/Settings";
 initCustomItems();
 
 const loop = () => {
@@ -20,7 +21,7 @@ const loop = () => {
   abclPlayer.update();
 };
 HookManager.afterInit(() => {
-  if (CraftingValidationRecord?.Effects == null) return
+  if (CraftingValidationRecord?.Effects == null) return;
   CraftingValidationRecord.Effects.Validate = function (c, a) {
     if (!CommonIsObject(c.Effects)) {
       return false;
@@ -29,6 +30,7 @@ HookManager.afterInit(() => {
     return true;
   };
 });
+
 HookManager.afterPlayerLogin(async () => {
   loadOrGenerateData();
   initSettingsScreen();
@@ -38,7 +40,7 @@ HookManager.afterPlayerLogin(async () => {
   initMinigames();
   initOverlay();
   initApi();
-
+  initParticles();
   setInterval(loop, loopInterval);
   logger.info(`Ready.`);
 });

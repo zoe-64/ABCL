@@ -20,7 +20,8 @@ export const getCharacter = (identifier: string | number | Character): Character
     );
   });
   if (characters.length === 0) return undefined;
-  else if (characters.length > 1) return characters[0]; //throw new Error(`More than one character matches ${identifier}!`);
+  else if (characters.length > 1)
+    return characters[0]; //throw new Error(`More than one character matches ${identifier}!`);
   else return characters[0];
 };
 
@@ -104,29 +105,114 @@ export function replace_template(text: string, source: Character | null = null, 
     .replaceAll("%CAP_OPP_INTENSIVE%", oppIntensive);
 }
 
-export const sendStatusMessage = (type: keyof ModStats, delta: number, percent: boolean = false) => {
-  if (delta === 0) return;
-  if (percent) delta = delta * 100;
-  delta = Number(delta.toPrecision(2));
+export function getVerb(verbs: { [key: number]: string }, value: number) {
+  let result = verbs[0];
+  for (const key in verbs) {
+    if (Number(key) > value) break;
+    result = verbs[key];
+  }
+  return result;
+}
+const statusThresholds: Record<keyof ModStats, Array<{ minPercent: number; message: string }>> = {
+  Bladder: [
+    { minPercent: 0, message: "" },
+    { minPercent: 20, message: "%NAME%'s bladder feels tiny bit full" },
+    { minPercent: 40, message: "%NAME%'s bladder feels half full" },
+    { minPercent: 70, message: "%NAME%'s bladder feels pretty full" },
+    { minPercent: 80, message: "%NAME%'s bladder feels very full" },
+    { minPercent: 90, message: "%NAME%'s bladder feels like it is about to burst" },
+  ],
+  Bowel: [
+    { minPercent: 0, message: "" },
+    { minPercent: 20, message: "%NAME%'s bowels feel tiny bit full" },
+    { minPercent: 40, message: "%NAME%'s bowels feel slightly full" },
+    { minPercent: 70, message: "%NAME%'s bowels feel pretty full" },
+    { minPercent: 80, message: "%NAME%'s bowels feel very full" },
+    { minPercent: 90, message: "%NAME%'s bowels feel like they are about to burst" },
+  ],
+  Incontinence: [
+    { minPercent: 0, message: "%NAME%'s feel in complete control" },
+    { minPercent: 20, message: "%NAME%'s feel a bit in control" },
+    { minPercent: 40, message: "%NAME%'s feel a bit weak" },
+    { minPercent: 70, message: "%NAME%'s are struggling to hold it" },
+    { minPercent: 80, message: "%NAME%'s have almost no control left" },
+    { minPercent: 90, message: "%NAME%'s have lost all control" },
+  ],
+  MentalRegression: [
+    { minPercent: 0, message: "%NAME%'s mind feels clear" },
+    { minPercent: 40, message: "%NAME%'s mind feels a bit foggy" },
+    { minPercent: 70, message: "%NAME% feel very childlike" },
+    { minPercent: 80, message: "%NAME%'s thoughts are mostly babble" },
+    { minPercent: 90, message: "%NAME%'s mind is completely regressed" },
+  ],
+  Soiliness: [
+    { minPercent: 0, message: "%NAME% feels clean" },
+    { minPercent: 20, message: "%NAME% feels a bit soiled" },
+    { minPercent: 40, message: "%NAME% feels slightly soiled" },
+    { minPercent: 70, message: "%NAME% feels dirty" },
+    { minPercent: 80, message: "%NAME% feels very messy" },
+    { minPercent: 90, message: "%NAME% is completely soiled" },
+  ],
+  Wetness: [
+    { minPercent: 0, message: "%NAME% feels dry" },
+    { minPercent: 20, message: "%NAME% feels slightly damp" },
+    { minPercent: 40, message: "%NAME% feels moist" },
+    { minPercent: 60, message: "%NAME% feels wet" },
+    { minPercent: 70, message: "%NAME% feels pretty soaked" },
+    { minPercent: 80, message: "%NAME% feels drenched" },
+    { minPercent: 90, message: "%NAME% is completely drenched" },
+  ],
+  PuddleSize: [
+    { minPercent: 0, message: "" },
+    { minPercent: 1, message: "%NAME% feels some droplets fall down" },
+    { minPercent: 10, message: "%NAME% feels some more droplets fall down" },
+    { minPercent: 30, message: "%NAME% feels %POSSESSIVE% feet getting wet" },
+    { minPercent: 60, message: "%NAME% feels a noticeable puddle forming at their feet" },
+    { minPercent: 80, message: "%NAME% feels a large puddle forming at their feet" },
+  ],
+  WaterIntake: [],
+  FoodIntake: [],
+  MinigameStatistics: [],
+};
+
+const getZoneIndex = (percent: number, thresholds: Array<{ minPercent: number; message: string }>): number => {
+  let activeIndex = -1;
+  for (let i = 0; i < thresholds.length; i++) {
+    if (percent >= thresholds[i].minPercent) {
+      activeIndex = i;
+    }
+  }
+  return activeIndex;
+};
+export const sendStatusMessage = (type: keyof ModStats, before: number, after: number, max: number) => {
+  if (before === after || max <= 0) return;
+
   if (typeof Player.ABCL.Settings.StatusMessages[type] === "undefined") return;
   if (!Player.ABCL.Settings.StatusMessages[type]) return;
+
+  const thresholds = statusThresholds[type];
+  if (!thresholds) return;
+
+  const beforePercent = (before / max) * 100;
+  const afterPercent = (after / max) * 100;
+
+  const beforeZone = getZoneIndex(beforePercent, thresholds);
+  const afterZone = getZoneIndex(afterPercent, thresholds);
+
+  if (beforeZone === afterZone || afterZone === -1) return;
+
+  const descMessage = thresholds[afterZone].message;
   const isLocal = Player.ABCL.Settings.StatusMessages[type];
-  const wordConversion: Partial<Record<keyof ModStats, string>> = {
-    Bladder: "PEE",
-    Bowel: "POO",
-    Incontinence: "INCON",
-    MentalRegression: "REG",
-    Soiliness: "MESS",
-    Wetness: "WET",
-    PuddleSize: "PUDL",
-  };
-  const message = `[${delta > 0 ? "+" : "-"}${Math.abs(delta)}${percent ? "%" : ""} ${wordConversion[type]}]`;
-  if (isLocal) {
-    sendChatLocal(message, ["ChatMessageAction", "ChatMessageNonDialogue"], `--label-color:#ff4949`);
-  } else {
-    sendDataToAction("onABCLMessage", { message: `${getCharacterName(Player.MemberNumber)}: ${message}`, local: isLocal });
-  }
+  if (descMessage === "") return;
+  const message = replace_template(descMessage, Player);
+  if (isLocal) return sendChatLocal(message, ["ChatMessageAction", "ChatMessageNonDialogue"], `--label-color:#ff4949`);
+
+  sendDataToAction("onABCLMessage", {
+    message: `${getCharacterName(Player.MemberNumber)}: ${message}`,
+    local: isLocal,
+  });
 };
+
 export function sendABCLAction(action: string, sender: Character | null = null, messageType: keyof ModSettings["VisibleMessages"], target?: Character) {
   let msg = replace_template(action, sender);
   const isLocal = !Player.ABCL.Settings.VisibleMessages[messageType];

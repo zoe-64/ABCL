@@ -1,5 +1,12 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "cSpell.words": ["ABCL", "LSCG", "soiliness", "Subscreen"]
+  "cSpell.words": ["ABCL", "LSCG", "soiliness", "Subscreen"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always",
+    "source.fixAll.prettier": "always",
+    "source.fixAll.eslint": "always",
+    "source.organizeImports": "always",
+    "source.removeUnusedImports": "always"
+  }
 }

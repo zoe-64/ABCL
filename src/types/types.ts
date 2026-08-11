@@ -3,17 +3,17 @@ import { changeDiaperListeners } from "../core/actions/changeDiaper";
 import { lickPuddleListeners } from "../core/actions/lickPuddle";
 import { onABCLMessageListeners } from "../core/actions/onABCLMessage";
 
-import { wipePuddleListeners } from "../core/actions/wipePuddle";
-import { ModVersion } from "./definitions";
-import { diaperRubBackListeners } from "src/core/actions/diaperRubBack";
+import { diaperFaceRubListeners } from "src/core/actions/diaperFaceRub";
+import { diaperFaceSitListeners } from "src/core/actions/diaperFaceSit";
 import { diaperPatBackListeners } from "src/core/actions/diaperPatBack";
 import { diaperPatFrontListeners } from "src/core/actions/diaperPatFront";
-import { diaperSquishBackListeners } from "src/core/actions/diaperSquishBack";
-import { diaperFaceSitListeners } from "src/core/actions/diaperFaceSit";
-import { diaperFaceRubListeners } from "src/core/actions/diaperFaceRub";
-import { diaperPourListeners } from "src/core/actions/diaperPour";
-import { diaperSquishFrontListeners } from "src/core/actions/diaperSquishFront";
 import { diaperPeeOthersDiaperListeners } from "src/core/actions/diaperPeeOthersDiaper";
+import { diaperPourListeners } from "src/core/actions/diaperPour";
+import { diaperRubBackListeners } from "src/core/actions/diaperRubBack";
+import { diaperSquishBackListeners } from "src/core/actions/diaperSquishBack";
+import { diaperSquishFrontListeners } from "src/core/actions/diaperSquishFront";
+import { wipePuddleListeners } from "../core/actions/wipePuddle";
+import { ModVersion } from "./definitions";
 
 export type PartialDeep<T> = {
   [P in keyof T]?: PartialDeep<T[P]>;
@@ -48,7 +48,6 @@ export const MiniGameDifficultyToNumber = Object.freeze({
   Hard: 7,
   Impossible: 10,
 }) satisfies Record<MiniGameDifficulty, number>;
-
 
 // entries
 export type NewSettingsEntry = {
@@ -114,7 +113,7 @@ export type ABCLActivity = {
   OnClick?: (player: Character, group: AssetGroupItemName) => void;
   Target?: AssetGroupItemName[];
   TargetSelf?: AssetGroupItemName[];
-  Criteria?: (player: Character, silent?: boolean) => boolean;
+  Criteria?: (player: Character, silent?: boolean) => { success: boolean; message?: string };
 };
 
 export type HookListener<T> = (raw: PluginServerChatRoomMessage, data: T) => void;

@@ -1,6 +1,6 @@
 import { ABCLdata } from "../../constants";
 import { abclPlayer, queueUpdatePlayerClothes } from "./player";
-import { isABCLPlayer } from "./playerUtils";
+import { getVerb, isABCLPlayer } from "./playerUtils";
 
 // Is/Has
 export const isOwned = (player: Character = Player): boolean => {
@@ -70,9 +70,12 @@ export const getLayerIndexFromColorIndex = (colorIndex: number, asset: Asset) =>
   return (asset.Layer as AssetLayer[]).findIndex(layer => layer.ColorIndex === colorIndex);
 };
 
-export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, player: Character = Player) => {
+export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, player: Character = Player, refresh: boolean = true) => {
   if (Player.ABCL.Settings.DisableDiaperStains) return;
   const item = InventoryGet(player, slot);
+
+  // DiaperDiscolorationLayer i.e diaper discoloration protection
+
   if (item && item.Asset && isDiaper(item)) {
     const color = !item.Color || typeof item.Color === "string" ? [...item.Asset.DefaultColor] : [...item.Color];
     const diaper = ABCLdata.Diapers[(item.Asset.DynamicGroupName + item.Asset.Name) as keyof typeof ABCLdata.Diapers];
@@ -82,7 +85,8 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
         color[index] = averageColor(ABCLdata.DiaperColors.indicatorAccident, item.Asset.DefaultColor[index], dirtiness) as BCColor;
       }
     }
-    if ("gradients" in diaper) {
+    const protection = item?.Craft?.Effects?.["DiaperDiscolorationProtection" as CraftingPropertyType] ?? 0;
+    if ("gradients" in diaper && protection == 0) {
       for (const index of diaper.gradients) {
         item.Property ??= {};
         if (typeof item.Property.Opacity === "number") {
@@ -94,16 +98,11 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
         color[index] = primaryColor as BCColor;
       }
     }
-    //if ("color" in diaper) {
-    //  for (const index of diaper.color) {
-    //    color[index] = primaryColor;
-    //  }
-    //} no longer used
     item.Color = color;
   }
-  queueUpdatePlayerClothes(slot);
+  if (refresh) queueUpdatePlayerClothes(slot);
 };
-export const updateDiaperColor = () => {
+export const updateDiaperColor = (refresh: boolean = true) => {
   const messLevel = abclPlayer.stats.SoilinessValue / getPlayerDiaperSize();
   const wetLevel = abclPlayer.stats.WetnessValue / getPlayerDiaperSize();
 
@@ -117,10 +116,10 @@ export const updateDiaperColor = () => {
   const mixedLevel = Math.max(Math.min((messLevel + (1 - wetLevel)) / 2, 2), 0);
   const primaryColor = averageColor(messColor, wetColor, mixedLevel);
 
-  setDiaperColor("ItemPelvis", primaryColor, Player);
-  setDiaperColor("Panties", primaryColor, Player);
+  setDiaperColor("ItemPelvis", primaryColor, Player, false);
+  setDiaperColor("Panties", primaryColor, Player, false);
   // @ts-expect-error Echo slot
-  setDiaperColor("Panties_笨笨蛋Luzi", primaryColor, Player);
+  setDiaperColor("Panties_笨笨蛋Luzi", primaryColor, Player, refresh);
 };
 
 // Size
@@ -232,20 +231,54 @@ export const mentalRegressionOnAccident = () => {
   if (0.75 > abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 1 && isLeaking()) return modifier / 1500;
   return 0;
 };
-
+const wetnessVerbs = {
+  0: "dry",
+  15: "damp",
+  30: "moist",
+  45: "wet",
+  60: "heavy with urine",
+  75: "soggy",
+  85: "dripping wet",
+  95: "saturated and dripping",
+};
+const soilinessVerbs = {
+  0: "",
+  15: "slightly stained",
+  30: "smudged",
+  45: "soiled",
+  60: "heavy and soiled",
+  75: "full and messy",
+  85: "overflowing with mess",
+  95: "overwhelmingly full",
+};
 export const getDiaperVerb = (player: Character) => {
   if (!hasDiaper(player)) return "";
   const size = getPlayerDiaperSize(player);
 
-  const messy = player.ABCL!.Stats.Soiliness.value / size > 0.5;
-  const wet = player.ABCL!.Stats.Wetness.value / size > 0.5;
-  const soggy = player.ABCL!.Stats.Wetness.value / size > 0.8;
-  const stinky = player.ABCL!.Stats.Soiliness.value / size > 0.8;
+  const wetnessPercent = (player.ABCL!.Stats.Wetness.value / size) * 100;
+  const soilinessPercent = (player.ABCL!.Stats.Soiliness.value / size) * 100;
 
-  if (soggy && stinky) return "soggy and stinky";
-  if (stinky) return "stinky";
-  if (soggy) return "soggy";
-  if (wet) return "wet";
-  if (messy) return "messy";
-  return "dry";
+  const wetnessVerb = getVerb(wetnessVerbs, wetnessPercent);
+  const soilinessVerb = getVerb(soilinessVerbs, soilinessPercent);
+
+  // Combined states for high levels of both
+  if (wetnessPercent > 70 && soilinessPercent > 70) {
+    return "heavily soiled and leaking";
+  }
+  if (wetnessPercent > 90) {
+    return "dripping with moisture";
+  }
+  if (soilinessPercent > 90) {
+    return "distressingly full";
+  }
+
+  if (soilinessVerb == "") {
+    if (wetnessVerb == "") return "";
+    return wetnessVerb;
+  }
+  if (wetnessVerb == "") {
+    if (soilinessVerb == "") return "";
+    return soilinessVerb;
+  }
+  return `${soilinessVerb} and ${wetnessVerb}`;
 };

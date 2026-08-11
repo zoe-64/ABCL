@@ -9,13 +9,13 @@ export abstract class GameEntity {
 
   x: number = 0;
   y: number = 0;
-isDestroyed: boolean = false;
+  isDestroyed: boolean = false;
   constructor(
     protected game: DropletCatchGame,
     public height: number,
     public width: number,
     x: number,
-    y: number
+    y: number,
   ) {
     this.setPosition(x, y);
   }
@@ -23,7 +23,7 @@ isDestroyed: boolean = false;
   abstract update(): void;
 
   protected loadImage(path: string): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.imagePath = path;
       this.image = new Image();
       this.image.onload = () => {
@@ -58,13 +58,7 @@ isDestroyed: boolean = false;
   draw(ctx: CanvasRenderingContext2D): void {
     if (!this.imageLoaded || !this.image) return;
 
-    ctx.drawImage(
-      this.image,
-      this.x - this.width / 2,
-      this.y - this.height / 2,
-      this.width,
-      this.height
-    );
+    ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
   }
 
   destroy(): void {

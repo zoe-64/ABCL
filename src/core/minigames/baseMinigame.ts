@@ -21,7 +21,7 @@ export abstract class BaseMiniGame {
      * Remove & replace `this._GetBackground()` in favor of `ChatRoomGetBackgroundURL()` in R129
      * xref: https://gitgud.io/BondageProjects/Bondage-College/-/merge_requests/6336/diffs#c4a4ecaa7eeeddf307bdcb1c254d8aca9d2bbfac_6870_6879
      */
-    (<any>window)[this.name + "Background"] = ChatRoomGetBackgroundURL()
+    (<any>window)[this.name + "Background"] = ChatRoomGetBackgroundURL();
     ChatRoomRun(CommonTime());
   }
   Click() {}
@@ -31,7 +31,9 @@ export abstract class BaseMiniGame {
   Unload() {}
   Resize() {}
   KeyDown() {}
-  Exit() {}
+  Exit() {
+    incontinenceCheck.resume();
+  }
   End(victory: boolean) {
     CommonSetScreen("Online", "ChatRoom");
     MiniGameVictory = victory;
@@ -44,6 +46,7 @@ export abstract class BaseMiniGame {
 
 export function MessMinigameResult(victory?: boolean) {
   Player.ABCL.Stats.MinigameStatistics.Mess.Total++;
+  incontinenceCheck.resetAllowedCallInterval();
   if (victory ?? MiniGameVictory) {
     abclPlayer.stats.Incontinence -= incontinenceOnAccident(abclPlayer.stats.Incontinence) / 2;
     sendChatLocal("You managed to keep it together!");
@@ -52,7 +55,6 @@ export function MessMinigameResult(victory?: boolean) {
 
   abclPlayer.soil();
   abclPlayer.onAccident();
-  incontinenceCheck.resetAllowedCallInterval();
 }
 export function WetMinigameResult(victory?: boolean) {
   Player.ABCL.Stats.MinigameStatistics.Wet.Total++;

@@ -1,17 +1,17 @@
-import { PluginServerChatRoomMessage, ListenerTypeMap, HookListener } from "../types/types";
+import { HookManager } from "@sugarch/bc-mod-hook-manager";
+import bcModSdk from "bondage-club-mod-sdk";
+import { inModSubscreen } from "src/screens/Settings";
+import { ACCIDENTS_ON_ACTIVITIES, THEME } from "../constants";
+import { ModIdentifier, ModVersion } from "../types/definitions";
+import { HookListener, ListenerTypeMap, PluginServerChatRoomMessage } from "../types/types";
+import { actions } from "./actionLoader";
+import { settingsRemote } from "./actions/sync";
 import { logger } from "./logger";
-import { getDiaperSize, isDiaper, isLeaking, updateDiaperColor } from "./player/diaper";
+import { getPlayerDiaperSize, hasDiaper, isLeaking } from "./player/diaper";
+import { abclPlayer } from "./player/player";
 import { isABCLPlayer } from "./player/playerUtils";
 import { resizeElements } from "./player/ui";
-import { ModIdentifier, ModVersion } from "../types/definitions";
-import { actions } from "./actionLoader";
-import { abclPlayer } from "./player/player";
-import { ACCIDENTS_ON_ACTIVITIES, THEME } from "../constants";
-import { HookManager } from "@sugarch/bc-mod-hook-manager";
 import { getElement, HookPriority, waitFor } from "./utils";
-import bcModSdk from "bondage-club-mod-sdk";
-import { settingsRemote } from "./actions/sync";
-import { inModSubscreen } from "src/screens/Settings";
 export const sendDataToAction = (type: string, data?: any, target?: number) => {
   const ChatRoomMessage: PluginServerChatRoomMessage = {
     Type: "Hidden",
@@ -105,18 +105,22 @@ const initHooks = async () => {
     cache.cache["PropertyDiuretic"] = "Diuretic-laced";
     cache.cache["DescriptionLaxative"] = "Relaxes the wearers bowels";
     cache.cache["DescriptionDiuretic"] = "Numbs the wearers bladder";
+    cache.cache["PropertyHollow"] = "Hollow";
+    cache.cache["DescriptionHollow"] = "Makes the item hollow inside";
+    cache.cache["PropertyDiaperDiscolorationProtection"] = "Discoloration Protection";
+    cache.cache["DescriptionDiaperDiscolorationProtection"] = "Prevents the diaper from discoloring";
     return cache;
   });
   HookManager.hookFunction(
     "DrawRoomBackground",
     HookPriority.OBSERVE,
     (args: Parameters<typeof DrawRoomBackground>, next: (args: Parameters<typeof DrawRoomBackground>) => ReturnType<typeof DrawRoomBackground>) => {
-     const [URL, _bounds, _opts] = args;
+      const [URL, _bounds, _opts] = args;
 
       if (!URL) {
         return next(args);
       }
-      
+
       if (typeof URL === "string" && URL.includes("Sheet.jpg") && inModSubscreen() && !(<any>window)?.ThemedLoaded) {
         let result = next(args);
         MainCanvas.save();
@@ -124,7 +128,7 @@ const initHooks = async () => {
         DrawRect(0, 0, 2000, 1000, THEME === "light" ? "#f1f1f1" : "#4d4d4d");
         MainCanvas.restore();
         return result;
-      } 
+      }
       return next(args);
     },
   );
@@ -178,18 +182,19 @@ const initHooks = async () => {
     receivePacket(args[0] as PluginServerChatRoomMessage);
     return next(args);
   });
-  HookManager.hookFunction("CharacterAppearanceSetItem", 1, (args, next) => {
-    let [_character, _slot, _asset, ..._rest] = args;
-    const _result = next(args);
-    if (_slot === "ItemPelvis" && _asset) {
-      const item = { Asset: _asset, Color: [], Difficulty: 0, Property: {} } satisfies Item;
-      if (isDiaper(item)) { // it only needs the asset
-        abclPlayer.stats.BladderValue = Math.min(abclPlayer.stats.BladderValue, getDiaperSize(item));
-        abclPlayer.stats.BowelValue = Math.min(abclPlayer.stats.BowelValue, getDiaperSize(item));
-        updateDiaperColor();
+  HookManager.hookFunction("CharacterRefresh", 1, (args, next) => {
+    let [_character, _push] = args;
+    if (_character.MemberNumber == Player.MemberNumber) {
+      if (!hasDiaper(_character)) {
+        abclPlayer.stats.WetnessValue = 0;
+        abclPlayer.stats.SoilinessValue = 0;
+        return next(args);
       }
+      const diaperSize = getPlayerDiaperSize();
+      abclPlayer.stats.WetnessValue = Math.min(abclPlayer.stats.WetnessValue, diaperSize);
+      abclPlayer.stats.SoilinessValue = Math.min(abclPlayer.stats.SoilinessValue, diaperSize);
     }
-    return _result;
+    return next(args);
   });
   HookManager.hookFunction("ActivityRun", 1, (args, next) => {
     const result = next(args);

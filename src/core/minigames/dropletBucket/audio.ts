@@ -1,8 +1,8 @@
 declare const publicURL: string;
 
 export interface SoundConfig {
-  volume?: number;      // Range: 0.0 to 1.0 (default: 1.0)
-  pitch?: number;       // Base pitch multiplier (default: 1.0)
+  volume?: number; // Range: 0.0 to 1.0 (default: 1.0)
+  pitch?: number; // Base pitch multiplier (default: 1.0)
   pitchVariance?: number; // Pitch randomization offset range (e.g., 0.1 gives pitch +/- 0.1)
 }
 
