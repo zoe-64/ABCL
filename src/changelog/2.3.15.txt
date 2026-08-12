@@ -17,5 +17,3 @@ News for R131:
 Added stroller that functions like a leash
 Added diaper suit
 Added clip pacifier (thanks to Arelia)
-Added baby powder marking (like the visual baby powder)
-Added catheters
