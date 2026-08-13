@@ -62,15 +62,10 @@ export const abclPlayer = {
   update: () => {
     if (Player.ABCL.Settings.PauseStats)
     {
-      if (Player.ABCL.Settings.UnPauseStatsWhenDiapered && hasDiaper())
-      {
-        // re-enable stats if the player has a diaper on, since they can still have accidents
-        Player.ABCL.Settings.PauseStats = false;
-      }
-      else
-      {
-        return;
-      }
+      if (!Player.ABCL.Settings.UnPauseStatsWhenDiapered || !hasDiaper()) return;
+
+      // re-enable stats if the player has a diaper on, since they can still have accidents
+      Player.ABCL.Settings.PauseStats = false;
     }
 
     bowelThrottler.allowedCallInterval = (120 * 1000) / Math.max(0.1, MetabolismSettingValues[Player.ABCL.Settings.PoopMetabolism]);
