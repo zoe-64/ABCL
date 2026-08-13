@@ -18,6 +18,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
   const [mentalMetabolism, setMentalMetabolism] = useState<MetabolismSetting>(selectedCharacter.ABCL.Settings.MentalRegressionModifier);
   const [diaperChangePromptSetting, setDiaperChangePromptSetting] = useState<DiaperChangePromptSetting>(selectedCharacter.ABCL.Settings.OnDiaperChange);
   const [pauseStats, setPauseStats] = useState<boolean>(selectedCharacter.ABCL.Settings.PauseStats);
+  const [unPauseStatsWhenDiapered, setUnPauseStatsWhenDiapered] = useState<boolean>(selectedCharacter.ABCL.Settings.UnPauseStatsWhenDiapered);
   const [disableWettingLeaks, setDisableWettingLeaks] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableWettingLeaks);
   const [disableSoilingLeaks, setDisableSoilingLeaks] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableSoilingLeaks);
   const [disableClothingStains, setDisableClothingStains] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableClothingStains);
@@ -35,6 +36,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
   const [poopMetabolismLocked, setPoopMetabolismLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.PoopMetabolism);
   const [mentalMetabolismLocked, setMentalMetabolismLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.MentalRegressionModifier);
   const [diaperChangePromptSettingLocked, setDiaperChangePromptSettingLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.OnDiaperChange);
+  const [unPauseStatsWhenDiaperedLocked, setUnPauseStatsWhenDiaperedLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.UnPauseStatsWhenDiapered);
   const [pauseStatsLocked, setPauseStatsLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.PauseStats);
   const [disableWettingLeaksLocked, setDisableWettingLeaksLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.DisableWettingLeaks);
   const [disableSoilingLeaksLocked, setDisableSoilingLeaksLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.DisableSoilingLeaks);
@@ -70,6 +72,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
           settingsRemote.emit(selectedCharacter.MemberNumber, "updateSettings", {
             settings: {
               PauseStats: pauseStats,
+              UnPauseStatsWhenDiapered: unPauseStatsWhenDiapered,
               PeeMetabolism: peeMetabolism,
               PoopMetabolism: poopMetabolism,
               MentalRegressionModifier: mentalMetabolism,
@@ -89,6 +92,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
             },
             settingPermissions: {
               PauseStats: pauseStatsLocked,
+              UnPauseStatsWhenDiapered: unPauseStatsWhenDiaperedLocked,
               PeeMetabolism: peeMetabolismLocked,
               PoopMetabolism: poopMetabolismLocked,
               MentalRegressionModifier: mentalMetabolismLocked,
@@ -113,6 +117,9 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
       <Group>
         <SettingPanel title="Pause Stats">
           <Checkbox checked={pauseStats} setChecked={setPauseStats} locked={pauseStatsLocked} setLocked={setPauseStatsLocked} />
+        </SettingPanel>
+        <SettingPanel title="UnPause Stats When Diapered">
+          <Checkbox checked={unPauseStatsWhenDiapered} setChecked={setUnPauseStatsWhenDiapered} locked={unPauseStatsWhenDiaperedLocked} setLocked={setUnPauseStatsWhenDiaperedLocked} />
         </SettingPanel>
         <SettingPanel title="Wetting Leaks / Puddles">
           <Checkbox
