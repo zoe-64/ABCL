@@ -1,16 +1,16 @@
 import { h } from "preact";
 
-import { ButtonGroup } from "../../components/buttonGroup";
-import { Checkbox } from "../../components/checkbox";
+import styled from "@emotion/styled";
 import { useState } from "preact/hooks";
-import { SettingPanel } from "src/screens/components/settingPanel";
+import { isOwned } from "src/core/player/diaper";
+import { clearData } from "src/core/settings";
 import { MetabolismBar } from "src/screens/components/metabolismDropDown";
 import { Group, Stack } from "src/screens/components/positionComponents";
-import { SettingsH2 } from "../settingsPage";
-import { clearData } from "src/core/settings";
-import styled from "@emotion/styled";
-import { isOwned } from "src/core/player/diaper";
+import { SettingPanel } from "src/screens/components/settingPanel";
 import { RuleId } from "src/types/definitions";
+import { ButtonGroup } from "../../components/buttonGroup";
+import { Checkbox } from "../../components/checkbox";
+import { SettingsH2 } from "../settingsPage";
 
 const ResetButton = styled.button`
   background-color: var(--abcl-warning-color);
@@ -34,6 +34,8 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
 
   const [pauseStats, setPauseStats] = useState<boolean>(Player.ABCL.Settings.PauseStats);
   const [pauseStatsLocked, _setPauseStatsLocked] = useState<boolean>(Player.ABCL.SettingPermissions.PauseStats);
+  const [unPauseStatsWhenDiapered, setUnPauseStatsWhenDiapered] = useState<boolean>(Player.ABCL.Settings.UnPauseStatsWhenDiapered);
+  const [unPauseStatsWhenDiaperedLocked, _setUnPauseStatsWhenDiaperedLocked] = useState<boolean>(Player.ABCL.SettingPermissions.UnPauseStatsWhenDiapered);
   const [disableWettingLeaks, setDisableWettingLeaks] = useState<boolean>(Player.ABCL.Settings.DisableWettingLeaks);
   const [disableWettingLeaksLocked, _setDisableWettingLeaksLocked] = useState<boolean>(Player.ABCL.SettingPermissions.DisableWettingLeaks);
   const [disableSoilingLeaks, setDisableSoilingLeaks] = useState<boolean>(Player.ABCL.Settings.DisableSoilingLeaks);
@@ -58,6 +60,7 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
         onClick={() => {
           setPage("menu");
           Player.ABCL.Settings.PauseStats = pauseStats;
+          Player.ABCL.Settings.UnPauseStatsWhenDiapered = unPauseStatsWhenDiapered;
           Player.ABCL.Settings.DisableWettingLeaks = disableWettingLeaks;
           Player.ABCL.Settings.DisableSoilingLeaks = disableSoilingLeaks;
           Player.ABCL.Settings.DisableClothingStains = disableClothingStains;
@@ -78,6 +81,9 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
       <Group>
         <SettingPanel title="Pause Stats">
           <Checkbox checked={pauseStats} setChecked={setPauseStats} locked={pauseStatsLocked && isOwned()} opaqueLock={true} />
+        </SettingPanel>
+        <SettingPanel title="Resume Stats When Diapered">
+          <Checkbox checked={unPauseStatsWhenDiapered} setChecked={setUnPauseStatsWhenDiapered} locked={unPauseStatsWhenDiaperedLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Wetting Leaks / Puddles">
           <Checkbox checked={disableWettingLeaks} setChecked={setDisableWettingLeaks} locked={disableWettingLeaksLocked && isOwned()} opaqueLock inverted />

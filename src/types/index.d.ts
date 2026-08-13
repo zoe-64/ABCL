@@ -64,6 +64,7 @@ interface ModSettings {
   CanCheckDiaperWithRestraints: boolean;
   CanUseToilet: boolean;
   CanUsePotty: boolean;
+  UnPauseStatsWhenDiapered: boolean;
 }
 interface ModStats {
   PuddleSize: {

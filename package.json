@@ -23,7 +23,6 @@
   "dependencies": {
     "@emotion/styled": "^11.14.1",
     "@preact/signals": "^2.0.1",
-    "@rollup/rollup-linux-x64-gnu": "^4.44.2",
     "@types/lodash-es": "^4.17.12",
     "eventemitter3": "^5.0.1",
     "preact": "^10.26.4",

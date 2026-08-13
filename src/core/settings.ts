@@ -54,6 +54,7 @@ export const defaultSettings: ModSettings = {
   CanUsePotty: true,
   CanChangeDiapers: true,
   DisableParticles: false,
+  UnPauseStatsWhenDiapered: true,
 };
 
 export const defaultStats: ModStats = {
@@ -138,6 +139,7 @@ export const defaultSettingPermissions: ModStorageModel["SettingPermissions"] = 
   CanUsePotty: false,
   CanChangeDiapers: false,
   DisableParticles: false,
+  UnPauseStatsWhenDiapered: true,
 };
 
 const defaultData: ModStorageModel = {
