@@ -5,6 +5,7 @@ import { sendChatLocal } from "../utils";
 export abstract class BaseMiniGame {
   name: string = "";
 
+  // @ts-ignore
   private _GetBackground() {
     if (!ChatRoomData) {
       return "";
