@@ -98,59 +98,35 @@ The build is driven by [`rollup.config.js`](./rollup.config.js), which is a func
 3. `pnpm run check` passes.
 4. Add a per-version changelog entry at `src/changelog/<version>.txt`, following the existing convention (see `src/changelog/2.3.15.txt` etc.).
 
-### Release scripts
+### The build script
 
-There are two release scripts. Choose based on the version bump you want:
-
-| Script | npm script | Bumps `package.json`? | Builds to `latest`? | Builds to `versions/<v>/`? |
-| --- | --- | --- | --- | --- |
-| `build-files/release.js` (older) | `pnpm run release` | Auto-bumps **minor** | ✅ yes | ✅ yes |
-| `build-files/generate.js` (newer) | `pnpm run "generate released version"` | Only if the entered version is greater | ❌ no | ✅ yes |
-
-There is **no "bump major" helper** — major releases use `generate.js` with an explicit version.
-
-### Minor release (e.g. `2.3.15` → `2.4.0`)
-
-**Option A — `release.js` (auto-bumps minor and refreshes `latest` in one step):**
+All building and releasing goes through one interactive script:
 
 ```sh
-pnpm run release
+pnpm run build
 ```
 
-This runs `npm --no-git-tag-version version minor` (bumps the minor in `package.json`), prompts you to confirm the version, then builds into **both** `versions/latest/` and `versions/<version>/`. Best for a routine minor release.
+This presents a menu (type-check, dev build + serve, build a version, release a new version, refresh a channel, regenerate channel loaders, create a changelog stub, git status, verify a build). Each action can also be run non-interactively by passing it as a subcommand, e.g. `pnpm run build -- verify 2.4.0` or `pnpm run build -- release minor` (append `--yes`/`-y` to auto-confirm). The script delegates the actual bundling to `rollup.config.js` and orchestrates everything else around it.
 
-**Option B — `generate.js` (explicit version):**
+### Releasing a version (patch / minor / major / specific)
 
-```sh
-pnpm run "generate released version"
-# At the prompt: Release version <current>? (y/{version})
-# Enter the new minor version, e.g.: 2.4.0
-```
+From the menu choose **Release new version** (or `pnpm run build -- release <patch|minor|major|specific>`). The script will:
 
-It bumps `package.json` (since `2.4.0` > current) and builds `versions/2.4.0/` **only** — it does **not** update `latest`. Refresh the stable channel afterward:
+1. Warn if the working tree is dirty or you are not on `main` (soft — it does not block).
+2. Run `tsc --noEmit` and **abort** if it fails.
+3. Ask for the bump type (`patch` / `minor` / `major` / `specific`). Version math uses the `semver` dependency; for `specific` you type the full version and it warns (but allows) a version that is not greater than the current one.
+4. Optionally create a changelog stub at `src/changelog/<version>.txt`.
+5. Bump `package.json` to the new version (preserving the file's trailing newline).
+6. Build the release into `versions/<version>/` (rollup auto-generates that version's `loader.user.js`).
+7. Offer to **refresh the `latest` channel** — this builds `latest` **directly** (`--configVersion latest`) so the bundled asset URL points at `versions/latest/assets`, then regenerates `latest`'s `loader.user.js` and `bookmark.js`. (Channels are built directly, never copied; the old `rm -rf versions/latest && cp -r …` flow is retired.)
+8. Print the paths to review and commit. **It does not auto-commit** and creates no git tags — releases are still tracked by directory name (`versions/<version>/`).
 
-```sh
-rm -rf versions/latest && cp -r versions/2.4.0 versions/latest
-# Re-apply any channel-specific loader.user.js / bookmark.js for `latest` if needed.
-```
+> Example — minor release `2.3.16` → `2.4.0`: `pnpm run build -- release minor`
+> Example — major release → `3.0.0`: `pnpm run build -- release specific 3.0.0`
 
-### Major release (e.g. `2.3.15` → `3.0.0`)
+### Refreshing a channel independently
 
-There is no major-bump script. Use the interactive `generate.js` and type the full major version:
-
-```sh
-pnpm run "generate released version"
-# At the prompt enter: 3.0.0
-```
-
-`generate.js` bumps `package.json` to `3.0.0` (greater than current) and builds `versions/3.0.0/`. Then refresh the `latest` channel:
-
-```sh
-rm -rf versions/latest && cp -r versions/3.0.0 versions/latest
-# Re-apply any channel-specific loader.user.js / bookmark.js for `latest` if needed.
-```
-
-Add the changelog entry `src/changelog/3.0.0.txt` if you have not already.
+Use **Refresh a channel** (or `pnpm run build -- refresh <latest|beta|unstable|stable>`) to rebuild a channel directly and regenerate its `loader.user.js` + `bookmark.js` (`stable` has no loader). Use **Regenerate channel loaders** (or `pnpm run build -- loaders <channel>`) to rewrite just the loader/bookmark files without rebuilding.
 
 ### After building (all releases)
 

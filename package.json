@@ -1,7 +1,7 @@
 {
   "name": "abcl",
   "displayName": "ABCL",
-  "version": "2.3.16",
+  "version": "2.3.17",
   "description": "An addon for [Bondage Club](https://www.bondageprojects.com/club_game/). Stands for \"Adult baby club lover\"~",
   "repository": {
     "type": "git",
@@ -15,8 +15,7 @@
   },
   "scripts": {
     "check": "tsc --noEmit",
-    "release": "node ./build-files/release.js",
-    "generate released version": "node ./build-files/generate.js",
+    "build": "node ./build-files/build.js",
     "watch": "nodemon --exec \"rollup -c rollup.config.js --configDebug --configDeploy http://localhost:3041 --configVersion dev && http-server ./versions/dev -p 3041 --cors\" -e js,ts,tsx,css --ignore ./versions"
   },
   "license": "MIT",
@@ -55,6 +54,7 @@
     "lodash-es": "^4.17.21",
     "nodemon": "^3.1.4",
     "prettier": "^3.8.3",
+    "prompts": "^2.4.2",
     "rollup": "^4.13.2",
     "rollup-plugin-cleanup": "^3.2.1",
     "rollup-plugin-copy": "^3.5.0",
