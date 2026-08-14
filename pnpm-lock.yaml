@@ -14,9 +14,6 @@ importers:
       '@preact/signals':
         specifier: ^2.0.1
         version: 2.9.0(preact@10.29.2)
-      '@rollup/rollup-linux-x64-gnu':
-        specifier: ^4.44.2
-        version: 4.60.4
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
@@ -495,6 +492,7 @@ packages:
     resolution: {integrity: sha512-Boiz5+MsaROEWDf+GGEwF8VMHGhlUoQMtIPjOgA5fv4osupqTVnJteQNKJwUcnUog2G55jYXH7KZFFiJe0TEzQ==}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-x64-musl@4.60.4':
     resolution: {integrity: sha512-+qfSY27qIrFfI/Hom04KYFw3GKZSGU4lXus51wsb5EuySfFlWRwjkKWoE9emgRw/ukoT4Udsj4W/+xxG8VbPKg==}
@@ -2427,7 +2425,8 @@ snapshots:
   '@rollup/rollup-linux-s390x-gnu@4.60.4':
     optional: true
 
-  '@rollup/rollup-linux-x64-gnu@4.60.4': {}
+  '@rollup/rollup-linux-x64-gnu@4.60.4':
+    optional: true
 
   '@rollup/rollup-linux-x64-musl@4.60.4':
     optional: true
