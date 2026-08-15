@@ -8,9 +8,6 @@ To contribute to a repository:
 Press "Fork" button on the repository page
 
 2. Clone the repository
-```sh
-git clone https://github.com/user/repository.git
-```
 
 3. Install dependancies
 ```sh
