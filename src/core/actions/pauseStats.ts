@@ -2,9 +2,11 @@ import { CombinedAction } from "../../types/types";
 import { sendABCLAction } from "../player/playerUtils";
 
 export const pauseStatsFunction = () => {
-  const isPaused = Player.ABCL.Settings.PauseStats;
-  sendABCLAction(isPaused ? "%NAME% resumed their ABCL stats." : "%NAME% paused their ABCL stats.", Player, "pauseStats");
-  Player.ABCL.Settings.PauseStats = !isPaused;
+  if(Player.ABCL.SettingPermissions.PauseStats) {
+    const isPaused = Player.ABCL.Settings.PauseStats;
+    sendABCLAction(isPaused ? "%NAME% resumed their ABCL stats." : "%NAME% paused their ABCL stats.", Player, "pauseStats");
+    Player.ABCL.Settings.PauseStats = !isPaused;
+  }
 };
 
 export const pauseStats: CombinedAction = {
