@@ -65,6 +65,8 @@ interface ModSettings {
   CanUseToilet: boolean;
   CanUsePotty: boolean;
   UnPauseStatsWhenDiapered: boolean;
+
+  MiniGameAudioMuted: boolean;
 }
 interface ModStats {
   PuddleSize: {

@@ -1,3 +1,6 @@
+import { abclPlayer } from "src/core/player/player";
+import { DropletCatchGame } from "./game";
+
 declare const publicURL: string;
 
 export interface SoundConfig {
@@ -6,23 +9,25 @@ export interface SoundConfig {
   pitchVariance?: number; // Pitch randomization offset range (e.g., 0.1 gives pitch +/- 0.1)
 }
 
+const soundFiles: Record<string, { path: string; config?: SoundConfig }> = {
+  catch: { path: "catch.mp3", config: { volume: 0.8, pitch: 1.0, pitchVariance: 0.1 } },
+  miss: { path: "miss.mp3", config: { volume: 0.9, pitch: 1.0, pitchVariance: 0.05 } },
+  pause: { path: "pause.mp3", config: { volume: 0.7, pitch: 1.0 } },
+  win: { path: "win.mp3", config: { volume: 1.0, pitch: 1.0 } },
+  lose: { path: "lose.mp3", config: { volume: 1.0, pitch: 1.0 } },
+  bomb: { path: "wet-explosion.mp3", config: { volume: 1.0, pitch: 0.9, pitchVariance: 0.15 } },
+  heal: { path: "heal.mp3", config: { volume: 0.8, pitch: 1.0, pitchVariance: 0.1 } },
+  click: { path: "ui-click.mp3", config: { volume: 0.8, pitch: 1.0, pitchVariance: 0.1 } },
+} as const;
+
 export class AudioManager {
   private static sounds: Record<string, HTMLAudioElement> = {};
   private static soundConfigs: Record<string, SoundConfig> = {};
   private static isInitialized = false;
+  public static activeGame: DropletCatchGame | null = null;
 
   public static init(): void {
     if (this.isInitialized) return;
-
-    const soundFiles: Record<string, { path: string; config?: SoundConfig }> = {
-      catch: { path: "catch.mp3", config: { volume: 0.8, pitch: 1.0, pitchVariance: 0.1 } },
-      miss: { path: "miss.mp3", config: { volume: 0.9, pitch: 1.0, pitchVariance: 0.05 } },
-      pause: { path: "pause.mp3", config: { volume: 0.7, pitch: 1.0 } },
-      win: { path: "win.mp3", config: { volume: 1.0, pitch: 1.0 } },
-      lose: { path: "lose.mp3", config: { volume: 1.0, pitch: 1.0 } },
-      bomb: { path: "wet-explosion.mp3", config: { volume: 1.0, pitch: 0.9, pitchVariance: 0.15 } },
-      heal: { path: "heal.mp3", config: { volume: 0.8, pitch: 1.0, pitchVariance: 0.1 } },
-    };
 
     for (const [key, entry] of Object.entries(soundFiles)) {
       const audio = new Audio(`${publicURL}/audio/${entry.path}`);
@@ -36,7 +41,8 @@ export class AudioManager {
     this.isInitialized = true;
   }
 
-  public static playSFX(soundName: string, overrideConfig?: SoundConfig): void {
+  public static playSFX(soundName: keyof typeof soundFiles, overrideConfig?: SoundConfig): void {
+    if (!Player.AudioSettings.PlayItem || abclPlayer.settings.MiniGameAudioMuted) return;
     if (!this.isInitialized) {
       this.init();
     }
@@ -48,7 +54,7 @@ export class AudioManager {
     }
 
     const defaultConfig = this.soundConfigs[soundName] || {};
-    const volume = overrideConfig?.volume ?? defaultConfig.volume ?? 1.0;
+    const volume = (overrideConfig?.volume ?? defaultConfig.volume ?? 1.0) * Player.AudioSettings.Volume;
     const pitch = overrideConfig?.pitch ?? defaultConfig.pitch ?? 1.0;
     const pitchVariance = overrideConfig?.pitchVariance ?? defaultConfig.pitchVariance ?? 0;
 

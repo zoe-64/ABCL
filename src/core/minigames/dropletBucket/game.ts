@@ -1,3 +1,4 @@
+import { abclPlayer } from "src/core/player/player";
 import { BaseMiniGame } from "../baseMinigame";
 import { AudioManager } from "./audio";
 import "./dropletBucket.css";
@@ -121,7 +122,13 @@ export class DropletCatchGame extends BaseMiniGame {
     this.isPaused = !this.isPaused;
     AudioManager.playSFX("pause");
   }
-
+  public toggleAudio(): void {
+    if (!this.isRunning) return;
+    abclPlayer.settings.MiniGameAudioMuted = !abclPlayer.settings.MiniGameAudioMuted;
+    if (!this.uiManager.audioPauseButton) return;
+    this.uiManager.audioPauseButton.innerText = abclPlayer.settings.MiniGameAudioMuted ? "🔇" : "🔊";
+    AudioManager.playSFX("click");
+  }
   public applySlowMotion(durationMs: number): void {
     this.isSlowed = true;
 

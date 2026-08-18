@@ -1,3 +1,4 @@
+import { abclPlayer } from "src/core/player/player";
 import { overlay } from "src/core/player/ui";
 import { DropletCatchGame } from "./game";
 
@@ -6,7 +7,8 @@ export class UIManager {
   private timeElement: HTMLElement | null = null;
   private heartsContainer: HTMLDivElement | null = null;
   private messageTimeout: number | null = null;
-
+  public pauseButton: HTMLButtonElement | null = null;
+  public audioPauseButton: HTMLButtonElement | null = null;
   constructor(game: DropletCatchGame) {
     this.game = game;
   }
@@ -32,19 +34,25 @@ export class UIManager {
       ],
     });
 
-    const pauseButton = ElementCreate({
+    this.pauseButton = ElementCreate({
       tag: "button",
       classList: ["pause-button"],
       children: ["⏸"],
       attributes: { type: "button", "aria-label": "Pause Game" },
     });
-
-    pauseButton.addEventListener("click", () => this.game.togglePause());
+    this.audioPauseButton = ElementCreate({
+      tag: "button",
+      classList: ["pause-button"],
+      children: [abclPlayer.settings.MiniGameAudioMuted ? "🔇" : "🔊"],
+      attributes: { type: "button", "aria-label": "Pause Audio" },
+    });
+    this.audioPauseButton.addEventListener("click", () => this.game.toggleAudio());
+    this.pauseButton.addEventListener("click", () => this.game.togglePause());
 
     const hudLeft = ElementCreate({
       tag: "div",
       classList: ["hud-left"],
-      children: [pauseButton, timerWrapper],
+      children: [this.pauseButton, this.audioPauseButton, timerWrapper],
     });
 
     this.heartsContainer = ElementCreate({
