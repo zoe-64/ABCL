@@ -31,8 +31,10 @@ export function hasDiaper(player: Character = Player): boolean {
   const panties = InventoryGet(player, "Panties");
   // @ts-expect-error Echo slot
   const panties2 = InventoryGet(player, "Panties_笨笨蛋Luzi");
-
-  return Boolean((pelvisItem && isDiaper(pelvisItem)) || (panties && isDiaper(panties)) || (panties2 && isDiaper(panties2)));
+  const suitLower = InventoryGet(player, "SuitLower");
+  return Boolean(
+    (pelvisItem && isDiaper(pelvisItem)) || (panties && isDiaper(panties)) || (panties2 && isDiaper(panties2)) || (suitLower && isDiaper(suitLower)),
+  );
 }
 export const isWearingBabyClothes = () => {
   return Player.Appearance.some(clothing => {
@@ -118,6 +120,7 @@ export const updateDiaperColor = (refresh: boolean = true) => {
 
   setDiaperColor("ItemPelvis", primaryColor, Player, false);
   setDiaperColor("Panties", primaryColor, Player, false);
+  setDiaperColor("SuitLower", primaryColor, Player, false);
   // @ts-expect-error Echo slot
   setDiaperColor("Panties_笨笨蛋Luzi", primaryColor, Player, refresh);
 };
@@ -126,12 +129,16 @@ export const updateDiaperColor = (refresh: boolean = true) => {
 export function getPlayerDiaperSize(player: Character = Player): number {
   const pelvisItem = InventoryGet(player, "ItemPelvis");
   const panties = InventoryGet(player, "Panties");
+  const suitLower = InventoryGet(player, "SuitLower");
   // @ts-expect-error Echo slot
   const panties2 = InventoryGet(player, "Panties_笨笨蛋Luzi");
 
   let size = 50;
   if (pelvisItem && isDiaper(pelvisItem)) {
     size += getDiaperSize(pelvisItem);
+  }
+  if (suitLower && isDiaper(suitLower)) {
+    size += getDiaperSize(suitLower);
   }
   if (panties && isDiaper(panties)) {
     size += getDiaperSize(panties);
@@ -156,13 +163,18 @@ export const getPlayerDiaper = (): {
 } => {
   const pelvisItem = InventoryGet(Player, "ItemPelvis");
   const panties = InventoryGet(Player, "Panties");
+  const suitLower = InventoryGet(Player, "SuitLower");
   // @ts-expect-error Echo slot
   const panties2 = InventoryGet(player, "Panties_笨笨蛋Luzi");
-  let diapers: { ItemPelvis: Item | null; Panties: Item | null; Panties_笨笨蛋Luzi: Item | null } = {
+  let diapers: { ItemPelvis: Item | null; Panties: Item | null; Panties_笨笨蛋Luzi: Item | null; SuitLower: Item | null } = {
     ItemPelvis: null,
     Panties: null,
     Panties_笨笨蛋Luzi: null,
+    SuitLower: null,
   };
+  if (suitLower && isDiaper(suitLower)) {
+    diapers["SuitLower"] = suitLower;
+  }
   if (pelvisItem && isDiaper(pelvisItem)) {
     diapers["ItemPelvis"] = pelvisItem;
   }

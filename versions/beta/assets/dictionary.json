@@ -23,7 +23,8 @@
       "ItemMouthRegressedMilk", // Nursery Milk Bottle
       "ItemMouthHarnessPacifierGag", // Harness Pacifier
       "ItemMouthPacifierGag", // Pacifier
-      "ItemMouthPaciGag" // Pacifier Gag
+      "ItemMouthPaciGag", // Pacifier Gag
+      "ItemMouthPacifierClip" // Pacifier Clip
     ],
     "Pants": [
       "ClothLowerLeggings2", // Long Leggings
@@ -58,7 +59,6 @@
   },
   "Diapers": {
     // echo compat
-
     "Panties_笨笨蛋LuziDiapers1": {
       // Diaper
       "size": "regular",
@@ -112,6 +112,13 @@
       //"color": [0],
       "gradients": [2],
       "size": "moderate_adult"
+    },
+    "SuitDiaperSuit": {
+      "size": "regular"
+    },
+    "SuitLowerDiaperSuit": {
+      "size": "moderate_adult",
+      "gradients": [3]
     },
 
     "PantiesDiapers1": {
