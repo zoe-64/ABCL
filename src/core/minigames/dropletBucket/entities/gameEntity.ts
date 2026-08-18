@@ -22,7 +22,7 @@ export abstract class GameEntity {
 
   abstract update(): void;
 
-  protected loadImage(path: string): Promise<void> {
+  protected loadImage(path: string, retries: number = 3): Promise<void> {
     return new Promise(resolve => {
       this.imagePath = path;
       this.image = new Image();
@@ -33,7 +33,15 @@ export abstract class GameEntity {
       this.image.onerror = () => {
         console.error(`Failed to load image: ${path}`);
         this.imageLoaded = false;
-        resolve();
+        if (retries > 0) {
+          setTimeout(() => {
+            this.loadImage(path, retries - 1);
+          }, 1000);
+        } else {
+          this.game.End(true);
+          ToastManager.error(`Failed to load image: ${path}`);
+          resolve();
+        }
       };
       this.image.src = `${publicURL}/${path}`;
     });

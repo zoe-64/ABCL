@@ -92,18 +92,20 @@ export class Particle {
 
     this.alpha = Math.max(0, Math.min(this.maxAlpha, this.alpha));
   }
-  render(ctx: CanvasRenderingContext2D) {
+  render(ctx: CanvasRenderingContext2D, x: number, y: number, zoom: number = 1) {
+    if (CurrentScreen !== "ChatRoom") return;
+
     ctx.save();
     ctx.globalAlpha = this.alpha;
-    ctx.translate(this.x, this.y);
+    ctx.translate(x + this.x * zoom, y + this.y * zoom);
     ctx.rotate(this.rotation);
-    ctx.drawImage(this.image, -this.size / 2, -this.size / 2, this.size, this.size);
+    ctx.drawImage(this.image, (-this.size * zoom) / 2, (-this.size * zoom) / 2, this.size * zoom, this.size * zoom);
     ctx.restore();
   }
 }
 
 export class ParticleSystem {
-  particles: Particle[] = [];
+  playerParticles: Map<Number, Particle[]> = new Map();
 
   settings = {
     limit: 100,
@@ -125,10 +127,10 @@ export class ParticleSystem {
       Object.assign(this.settings, options);
     }
   }
-  addParticle(x: number, y: number, speed: number, life: number, angle: number = 0, image: string) {
+  addParticle(memberNumber: number, x: number, y: number, speed: number, life: number, angle: number = 0, image: string) {
     const maxAllowed = this.settings.limit * (ChatRoomCharacter?.length || 1);
-
-    if (this.particles.length > maxAllowed || Math.random() > this.settings.spawnChance) {
+    const particles = this.playerParticles.getOrInsert(memberNumber, []);
+    if (particles.length > maxAllowed || Math.random() > this.settings.spawnChance) {
       return;
     }
 
@@ -139,7 +141,7 @@ export class ParticleSystem {
       const ySpeed = Math.sin(spreadAngle) * speed * (1 - this.settings.speedVariance / 2 + Math.random() * this.settings.speedVariance);
       const particleLife = life * (1 - this.settings.lifeVariance / 2 + Math.random() * this.settings.lifeVariance);
 
-      this.particles.push(
+      particles.push(
         new Particle({
           x: x + (Math.random() - 0.5) * this.settings.positionVariance,
           y: y + (Math.random() - 0.5) * this.settings.positionVariance,
@@ -156,15 +158,16 @@ export class ParticleSystem {
     }
   }
   update() {
-    for (let particle of this.particles) {
-      particle.update(1 / ChatRoomCharacter.length);
+    for (let [_, particles] of this.playerParticles) {
+      for (let particle of particles) particle.update();
+      particles = particles.filter(particle => particle.life > 0);
+      this.playerParticles.set(_, particles);
     }
-    this.particles = this.particles.filter(particle => particle.life > 0);
   }
-  render(ctx: CanvasRenderingContext2D) {
-    for (let particle of this.particles) {
-      particle.render(ctx);
-    }
+  render(memberNumber: number, ctx: CanvasRenderingContext2D, x: number, y: number, zoom: number = 1) {
+    const particles = this.playerParticles.get(memberNumber);
+    if (!particles) return;
+    particles.forEach(particle => particle.render(ctx, x, y, zoom));
   }
 }
 
@@ -206,37 +209,23 @@ export function initParticles() {
     if (!isABCLPlayer(_player)) return next(args);
     if (!hasDiaper(_player)) return next(args);
     if (abclPlayer.settings.DisableParticles) return next(args);
+    const memberNumber = _player.MemberNumber!;
     const size = getPlayerDiaperSize(_player);
     if (_player.ABCL!.Stats.Wetness.value / size > 0.75) {
-      front.addParticle(
-        _x + Math.random() * 180 + 150,
-        _y + 220 + 320 + CharacterAppearanceYOffset(_player, _player.HeightRatio),
-        7,
-        50,
-        Math.PI * 2.5,
-        publicURL + "/pee_particle.svg",
-      );
+      front.addParticle(memberNumber, Math.random() * 180 + 150, 220 + 320, 7, 50, Math.PI * 2.5, publicURL + "/pee_particle.svg");
     }
     if (_player.ABCL!.Stats.Soiliness.value / size > 0.5) {
-      back.addParticle(
-        _x + 250 + 100 - Math.random() * 200,
-        _y + 220 + 320 + CharacterAppearanceYOffset(_player, _player.HeightRatio),
-        3,
-        50,
-        Math.PI * 1.5,
-        publicURL + "/stink_particle.svg",
-      );
+      back.addParticle(memberNumber, 250 + 100 - Math.random() * 200, 220 + 320, 3, 50, Math.PI * 1.5, publicURL + "/stink_particle.svg");
     }
 
-    back.render(canvas ?? MainCanvas);
+    const offset = CharacterAppearanceYOffset(_player, _player.HeightRatio);
+    back.render(_player.MemberNumber!, canvas ?? MainCanvas, _x, _y + offset / 2, _zoom);
     const render = next(args);
-    front.render(canvas ?? MainCanvas);
+    front.render(_player.MemberNumber!, canvas ?? MainCanvas, _x, _y + offset / 2, _zoom);
     return render;
   });
   setInterval(() => {
-    requestAnimationFrame(() => {
-      back.update();
-      front.update();
-    });
+    back.update();
+    front.update();
   }, 1000 / 30);
 }
