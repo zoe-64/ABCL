@@ -9,7 +9,7 @@ export interface SoundConfig {
   pitchVariance?: number; // Pitch randomization offset range (e.g., 0.1 gives pitch +/- 0.1)
 }
 
-const soundFiles: Record<string, { path: string; config?: SoundConfig }> = {
+const soundFiles = {
   catch: { path: "catch.mp3", config: { volume: 0.8, pitch: 1.0, pitchVariance: 0.1 } },
   miss: { path: "miss.mp3", config: { volume: 0.9, pitch: 1.0, pitchVariance: 0.05 } },
   pause: { path: "pause.mp3", config: { volume: 0.7, pitch: 1.0 } },
@@ -18,7 +18,7 @@ const soundFiles: Record<string, { path: string; config?: SoundConfig }> = {
   bomb: { path: "wet-explosion.mp3", config: { volume: 1.0, pitch: 0.9, pitchVariance: 0.15 } },
   heal: { path: "heal.mp3", config: { volume: 0.8, pitch: 1.0, pitchVariance: 0.1 } },
   click: { path: "ui-click.mp3", config: { volume: 0.8, pitch: 1.0, pitchVariance: 0.1 } },
-} as const;
+} satisfies Record<string, { path: string; config?: SoundConfig }>;
 
 export class AudioManager {
   private static sounds: Record<string, HTMLAudioElement> = {};

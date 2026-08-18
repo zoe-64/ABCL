@@ -1,4 +1,5 @@
 import { abclPlayer } from "src/core/player/player";
+import { syncData } from "src/core/settings";
 import { BaseMiniGame } from "../baseMinigame";
 import { AudioManager } from "./audio";
 import "./dropletBucket.css";
@@ -125,6 +126,7 @@ export class DropletCatchGame extends BaseMiniGame {
   public toggleAudio(): void {
     if (!this.isRunning) return;
     abclPlayer.settings.MiniGameAudioMuted = !abclPlayer.settings.MiniGameAudioMuted;
+    syncData();
     if (!this.uiManager.audioPauseButton) return;
     this.uiManager.audioPauseButton.innerText = abclPlayer.settings.MiniGameAudioMuted ? "🔇" : "🔊";
     AudioManager.playSFX("click");
