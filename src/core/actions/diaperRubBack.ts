@@ -14,7 +14,7 @@ export const diaperRubBackFunction = (player: Character) => {
   const diaperSound = diaperVerb === "dry" ? "crinkles" : "sloshes";
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfMessage = `%NAME% blushes as %PRONOUN% rubs %POSSESSIVE% ${diaperVerb} diapered butt with both hands, breath hitching at the soft ${diaperSound} under %POSSESSIVE% hands.`;
-  const otherMessage = `%OPP_NAME% runs %OPP_POSSESSIVE% hand over %NAME%'s ${diaperVerb} diapered butt, rubbing affectionate circles into the ${diaperVerb} padding.`;
+  const otherMessage = `%OPP_NAME% runs %OPP_POSSESSIVE% hand over %NAME%'s ${diaperVerb} diapered butt, rubbing affectionate circles into the padding.`;
   sendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
   ActivityEffectFlat(Player, Player, 5, "ItemButt", 1);
   if (abclPlayer.stats.Incontinence > Math.random()) {
@@ -35,24 +35,24 @@ export const diaperRubBack: CombinedAction = {
     Image: `${publicURL}/activity/diaperRubBack.png`,
     Target: ["ItemButt"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperRubBackRequest(player),
-    Criteria: (player: Character) => {
-      if (!isABCLPlayer(player)) return {
-        success: false,
-        message: "They are not an ABCL player.",
-      }
-      if (Player.IsRestrained()) return {
-        success: false,
-        message: "You are restrained.",
-      }
-      if (!hasDiaper(player)) return {
-        success: false,
-        message: "They are not diapered.",
-      }
+    InsertCriteria: function (player: Character) {
+      let message = null;
+      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+      if (!hasDiaper(player)) message ??= "They are not diapered.";
       return {
-        success: true,
-      }
-    }
-      
+        success: message == null,
+        message: message == null ? undefined : message,
+      };
+    },
+    Criteria: function (player: Character, silent?: boolean) {
+      const result = this.InsertCriteria?.(player) ?? null;
+      let message = result?.message ?? null;
+      if (Player.IsRestrained()) message = "You are restrained.";
+      return {
+        success: message == null,
+        message: message == null ? undefined : message,
+      };
+    },
   },
   listeners: {
     "diaper-rub-back": ({ Sender }) => diaperRubBackFunction(getCharacter(Sender!) ?? Player),

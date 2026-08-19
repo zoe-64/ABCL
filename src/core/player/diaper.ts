@@ -36,6 +36,7 @@ export function hasDiaper(player: Character = Player): boolean {
     (pelvisItem && isDiaper(pelvisItem)) || (panties && isDiaper(panties)) || (panties2 && isDiaper(panties2)) || (suitLower && isDiaper(suitLower)),
   );
 }
+
 export const isWearingBabyClothes = () => {
   return Player.Appearance.some(clothing => {
     return ABCLdata.ItemDefinitions.BabyItems.includes(clothing.Asset.DynamicGroupName + clothing.Asset.Name);
@@ -84,7 +85,9 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
     const dirtiness = Math.min(abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue / getPlayerDiaperSize(), 1);
     if ("indicator" in diaper) {
       for (const index of diaper.indicator) {
-        color[index] = averageColor(ABCLdata.DiaperColors.indicatorAccident, item.Asset.DefaultColor[index], dirtiness) as BCColor;
+        const defaultColor = item.Asset.DefaultColor[index];
+        if (defaultColor == null) continue;
+        color[index] = averageColor(ABCLdata.DiaperColors.indicatorAccident, defaultColor, dirtiness) as BCColor;
       }
     }
     const protection = item?.Craft?.Effects?.["DiaperDiscolorationProtection" as CraftingPropertyType] ?? 0;
@@ -202,7 +205,10 @@ export function incontinenceChanceFormula(incontinence: number, fullness: number
 
 // mental regression
 export const mentalRegressionBonus = () => {
-  const matches = Player.Appearance.filter(clothing => clothing.Asset.DynamicGroupName + clothing.Asset.Name in ABCLdata.ItemDefinitions.BabyItems);
+  const matches = Player.Appearance.filter(clothing => {
+    const key = clothing.Asset.DynamicGroupName + clothing.Asset.Name;
+    return ABCLdata.ItemDefinitions.BabyItems.includes(key);
+  });
   return Math.min(matches.length * 0.25, 1);
 };
 export const mentalRegressionOvertime = () => {
@@ -248,21 +254,18 @@ const wetnessVerbs = {
   15: "damp",
   30: "moist",
   45: "wet",
-  60: "heavy with urine",
-  75: "soggy",
-  85: "dripping wet",
-  95: "saturated and dripping",
+  60: "soggy",
+  75: "flooded",
 };
 const soilinessVerbs = {
   0: "",
   15: "slightly stained",
   30: "smudged",
   45: "soiled",
-  60: "heavy and soiled",
-  75: "full and messy",
-  85: "overflowing with mess",
-  95: "overwhelmingly full",
+  60: "messy",
+  75: "heavy",
 };
+
 export const getDiaperVerb = (player: Character) => {
   if (!hasDiaper(player)) return "";
   const size = getPlayerDiaperSize(player);
@@ -281,7 +284,7 @@ export const getDiaperVerb = (player: Character) => {
     return "dripping with moisture";
   }
   if (soilinessPercent > 90) {
-    return "distressingly full";
+    return "full";
   }
 
   if (soilinessVerb == "") {

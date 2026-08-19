@@ -46,7 +46,7 @@ settingsRemote.on("sync", (info, { Settings, Stats, Version, SettingPermissions 
 
   const index = ChatRoomCharacter.findIndex(character => character.MemberNumber === info.sender);
   if (index === -1) return logger.warn(`Could not find character with member number ${info.sender}`);
-
+  if (ChatRoomCharacter[index] == null) return;
   logger.debug(`Updating data for ${info.sender}`);
   ChatRoomCharacter[index].ABCL = {
     Stats,

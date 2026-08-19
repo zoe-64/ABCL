@@ -44,29 +44,26 @@ export const useToilet: CombinedAction = {
     Image: `${publicURL}/activity/toilet-temp.png`,
     OnClick: (player, group) => useToiletFunction(),
     // if the regression is too high, deny toilet usage
-    Criteria: player => {
-      if (abclPlayer.stats.MentalRegression >= 0.3)
-        return {
-          success: false,
-          message: "You feel uncomfortable, the toilet is cold and hard almost like ice. You can't use it.",
-        };
-      // when CanUseBathroomWithDiaper is false or abclPlayer.settings.CanUseToilet is false then it will deny toilet usage by wetting their clothes or diaper.
-      if (!abclPlayer.settings.CanUseBathroomWithDiaper || !abclPlayer.settings.CanUseToilet)
-        return {
-          success: true,
-        };
-      if (hasDiaper(player) && isDiaperLocked())
-        return {
-          success: false,
-          message: "You can't use the toilet while your diaper is locked.",
-        };
-      if (Player.IsRestrained())
-        return {
-          success: false,
-          message: "You are restrained.",
-        };
+    InsertCriteria: function (player: Character) {
+      let message = null;
       return {
-        success: true,
+        success: message == null,
+        message: message == null ? undefined : message,
+      };
+    },
+    Criteria: function (player: Character, silent?: boolean) {
+      const result = this.InsertCriteria?.(player) ?? null;
+      let message = result?.message ?? null;
+      if (abclPlayer.stats.MentalRegression >= 0.3) message ??= "You feel uncomfortable, the toilet is cold and hard almost like ice. You can't use it.";
+      // when CanUseBathroomWithDiaper is false or abclPlayer.settings.CanUseToilet is false then it will deny toilet usage by wetting their clothes or diaper.
+      if ((hasDiaper(player) && !abclPlayer.settings.CanUseBathroomWithDiaper) || !abclPlayer.settings.CanUseToilet) return { success: true };
+      if (hasDiaper(player) && isDiaperLocked()) message ??= "You can't use the toilet while your diaper is locked.";
+      if (Player.IsRestrained()) message ??= "You are restrained.";
+
+      if (!silent && message) sendChatLocal(message);
+      return {
+        success: message == null,
+        message: message == null ? undefined : message,
       };
     },
     TargetSelf: ["ItemButt"],

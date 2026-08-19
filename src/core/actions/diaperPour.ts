@@ -3,6 +3,7 @@ import { sendDataToAction } from "../hooks";
 import { hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
+import { sendChatLocal } from "../utils";
 
 const diaperPourRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-pour", undefined, player.MemberNumber);
@@ -35,24 +36,23 @@ export const diaperPour: CombinedAction = {
     Image: `${publicURL}/activity/diaperPour.png`,
     Target: ["ItemPelvis"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperPourRequest(player),
-    Criteria: (player: Character) => {
-      if (!isABCLPlayer(player))
-        return {
-          success: false,
-          message: "They are not an ABCL player.",
-        };
-      if (Player.IsRestrained())
-        return {
-          success: false,
-          message: "You are restrained.",
-        };
-      if (!hasDiaper(player))
-        return {
-          success: false,
-          message: "They are not diapered.",
-        };
+    InsertCriteria: function (player: Character) {
+      let message = null;
+      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+      if (!hasDiaper(player)) message ??= "They are not diapered.";
       return {
-        success: true,
+        success: message == null,
+        message: message == null ? undefined : message,
+      };
+    },
+    Criteria: function (player: Character, silent?: boolean) {
+      const result = this.InsertCriteria?.(player) ?? null;
+      let message = result?.message ?? null;
+      if (Player.IsRestrained()) message ??= "You are restrained.";
+      if (!silent && message) sendChatLocal(message);
+      return {
+        success: message == null,
+        message: message == null ? undefined : message,
       };
     },
   },

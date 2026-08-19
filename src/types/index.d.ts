@@ -67,6 +67,7 @@ interface ModSettings {
   UnPauseStatsWhenDiapered: boolean;
 
   MiniGameAudioMuted: boolean;
+  UseNewMiniGame: boolean;
 }
 interface ModStats {
   PuddleSize: {

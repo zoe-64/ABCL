@@ -22,8 +22,7 @@ export const resizeElements = () => {
   ElementPositionFixed("ABCL-stats-panel", 1700, 0, 300, 1000);
 
   const exitButtons = document.querySelectorAll(`.${modIdentifier}-exit-button`);
-  for (let i = 0; i < exitButtons.length; i++) {
-    const exitButton = exitButtons[i];
+  for (const exitButton of exitButtons) {
     exitButton.id = exitButton.id || generateUniqueID();
     ElementPositionFixed(exitButton.id, 1815, 75, 90, 90);
   }

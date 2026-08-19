@@ -33,6 +33,11 @@
   align-items: center;
   gap: 1em;
 }
+
+.abcl-minigame-vertical-list .abcl-distraction-rush-button {
+  max-width: 11em;
+  font-size: 0.7em;
+}
 /** Distraction rush */
 .abcl-distraction-rush-button {
   padding: 0.5em;

@@ -3,6 +3,7 @@ import { sendDataToAction } from "../hooks";
 import { hasDiaper, isDiaperLocked, updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { getCharacter, getCharacterName, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
+import { sendChatLocal } from "../utils";
 
 export const changeDiaperRequest = (player: Character, force?: boolean) => {
   if (!abclPlayer.settings.CanChangeSelf && player.MemberNumber === Player.MemberNumber) {
@@ -47,44 +48,39 @@ export const changeDiaper: CombinedAction = {
     Image: `${publicURL}/activity/changeDiaper.svg`,
     Target: ["ItemPelvis"],
     OnClick: (player: Character, group: AssetGroupItemName) => changeDiaperRequest(player),
-    Criteria: (player: Character) => {
-      if (!hasDiaper(player))
-        return {
-          success: false,
-          message: "They are not diapered.",
-        };
-      if (isDiaperLocked(player))
-        return {
-          success: false,
-          message: "Diaper is locked.",
-        };
-      if (!isABCLPlayer(player))
-        return {
-          success: false,
-          message: "They are not an ABCL player.",
-        };
-      if (Player.IsRestrained())
-        return {
-          success: false,
-          message: "You are restrained.",
-        };
-      const item = InventoryGet(player, "ItemDevices");
-      if (!(item && ["MedicalBed", "ChangingTable", "Bed", "床左边", "床右边"].includes(item.Asset.Name)))
-        return {
-          success: false,
-          message: "They are not on a changing table or a flat surface.",
-        };
+    InsertCriteria: function (player: Character) {
+      let message = null;
+      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+      if (isDiaperLocked(player)) message ??= "Diaper is locked.";
+      if (!hasDiaper(player)) message ??= "They are not diapered.";
 
       return {
-        success: true,
+        success: message == null,
+        message: message == null ? undefined : message,
+      };
+    },
+    Criteria: function (player: Character, silent?: boolean) {
+      const result = this.InsertCriteria?.(player) ?? null;
+      let message = result?.message ?? null;
+
+      const item = InventoryGet(player, "ItemDevices");
+      if (item?.Asset.Name != "ChangingTable" && Player.IsRestrained()) message ??= "You are restrained.";
+      if (!(item && ["MedicalBed", "ChangingTable", "Bed", "床左边", "床右边"].includes(item.Asset.Name)))
+        message ??= "They are not on a changing table or a flat surface.";
+
+      if (!silent && message) sendChatLocal(message);
+      return {
+        success: message == null,
+        message: message == null ? undefined : message,
       };
     },
   },
   command: {
     Tag: "change-diaper",
-    Action: (args, msg, parsed) => {
+    Action: function (args, msg, parsed) {
       const character = targetInputExtractor(parsed) ?? Player;
-      if (!changeDiaper.activity!.Criteria!(character).success) return;
+      const result = changeDiaper.activity!.Criteria!(character);
+      if (!result.success) return;
 
       changeDiaperRequest(character);
     },

@@ -60,8 +60,7 @@ export const abclPlayer = {
   },
   /** once per minute */
   update: () => {
-    if (Player.ABCL.Settings.PauseStats)
-    {
+    if (Player.ABCL.Settings.PauseStats) {
       if (!Player.ABCL.Settings.UnPauseStatsWhenDiapered || !hasDiaper()) return;
 
       // re-enable stats if the player has a diaper on, since they can still have accidents
@@ -123,21 +122,13 @@ export const abclPlayer = {
     const panties = InventoryGet(Player, "Panties");
     if (panties && !isDiaper(panties)) {
       const pantiesColors = getColor(panties.Color || (panties.Asset.DefaultColor as ItemColor), panties.Asset);
-      for (let i = 0; i < pantiesColors.length; i++) {
-        if (!isColorable(pantiesColors[i])) continue;
-        pantiesColors[i] = averageColor(pantiesColors[i], wetColor, 0.3);
-      }
-      panties.Color = pantiesColors;
+      panties.Color = pantiesColors.map(color => (isColorable(color) ? averageColor(color, wetColor, 0.3) : color));
     }
 
     for (const item of Player.Appearance) {
       if (ABCLdata.ItemDefinitions.Pants.some(pants => pants === item.Asset.DynamicGroupName + item.Asset.Name)) {
         const colors = getColor(item.Color || (item.Asset.DefaultColor as ItemColor), item.Asset);
-        for (let i = 0; i < colors.length; i++) {
-          if (!isColorable(colors[i])) continue;
-          colors[i] = averageColor(colors[i], wetColor, 0.3);
-        }
-        item.Color = colors;
+        item.Color = colors.map(color => (isColorable(color) ? averageColor(color, wetColor, 0.3) : color));
       }
     }
 
@@ -169,21 +160,13 @@ export const abclPlayer = {
     const panties = InventoryGet(Player, "Panties");
     if (panties && !isDiaper(panties)) {
       const pantiesColors = getColor(panties.Color || (panties.Asset.DefaultColor as ItemColor), panties.Asset);
-      for (let i = 0; i < pantiesColors.length; i++) {
-        if (!isColorable(pantiesColors[i])) continue;
-        pantiesColors[i] = averageColor(pantiesColors[i], messColor, 0.3);
-      }
-      panties.Color = pantiesColors;
+      panties.Color = pantiesColors.map(color => (isColorable(color) ? averageColor(color, messColor, 0.3) : color));
     }
 
     for (const item of Player.Appearance) {
       if (ABCLdata.ItemDefinitions.Pants.some(pants => pants === item.Asset.DynamicGroupName + item.Asset.Name)) {
         const colors = getColor(item.Color || (item.Asset.DefaultColor as ItemColor), item.Asset);
-        for (let i = 0; i < colors.length; i++) {
-          if (!isColorable(colors[i])) continue;
-          colors[i] = averageColor(colors[i], messColor, 0.3);
-        }
-        item.Color = colors;
+        item.Color = colors.map(color => (isColorable(color) ? averageColor(color, messColor, 0.3) : color));
       }
     }
     queueUpdatePlayerClothes();
@@ -254,6 +237,11 @@ export const abclPlayer = {
 
     const difficulty = 1 + abclPlayer.miniGameDifficulty * Math.max(fullness, chance);
     const callback = isWet ? "WetMinigameResult" : "MessMinigameResult";
+    if (!abclPlayer.settings.UseNewMiniGame) {
+      const minigame = isWet ? "DistractionRush-Wetting" : "DistractionRush-Messes";
+      MiniGameStart(minigame as ModuleScreens["MiniGame"], difficulty, callback as any);
+      return;
+    }
     MiniGameStart("DropletCatch" as ModuleScreens["MiniGame"], difficulty, callback as any);
   },
   /** @Deprecated use `attemptAccident` instead */

@@ -1,7 +1,8 @@
 import { CombinedAction } from "../../types/types";
 import { sendDataToAction, sendUpdateMyData } from "../hooks";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
+import { getCharacter, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
+import { sendChatLocal } from "../utils";
 const WipePuddleRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("wipe-puddle", undefined, player.MemberNumber);
   WipePuddleFunction(Player);
@@ -25,31 +26,30 @@ export const wipePuddle: CombinedAction = {
     Image: `./Assets/Female3DCG/ItemHandheld/Preview/Towel.png`,
     Target: ["ItemBoots"],
     OnClick: (player: Character, group: AssetGroupItemName) => WipePuddleRequest(player),
-    Criteria: (player: Character) => {
-      if (!isABCLPlayer(player))
-        return {
-          success: false,
-          message: "They are not an ABCL player.",
-        };
-      if (player.ABCL!.Stats.PuddleSize.value <= 0)
-        return {
-          success: false,
-          message: "They have no puddle.",
-        };
-      if (Player.IsRestrained())
-        return {
-          success: false,
-          message: "You are restrained.",
-        };
+    InsertCriteria: function (player: Character) {
+      let message = null;
+      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+      if (player.ABCL && player.ABCL.Stats.PuddleSize.value <= 0) message ??= "They have no puddle.";
       return {
-        success: true,
+        success: message == null,
+        message: message == null ? undefined : message,
+      };
+    },
+    Criteria: function (player: Character, silent?: boolean) {
+      const result = this.InsertCriteria?.(player) ?? null;
+      let message = result?.message ?? null;
+      if (Player.IsRestrained()) message ??= "You are restrained.";
+      if (!silent && message) sendChatLocal(message);
+      return {
+        success: message == null,
+        message: message == null ? undefined : message,
       };
     },
   },
   command: {
     Tag: "wipe-puddle",
     Action: (args, msg, parsed) => {
-      const character = getCharacter(parsed[0]) ?? Player;
+      const character = targetInputExtractor(parsed) ?? Player;
       if (!wipePuddle.activity!.Criteria!(character).success) return;
 
       WipePuddleRequest(character);

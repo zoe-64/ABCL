@@ -1,6 +1,5 @@
 import { h } from "preact";
 
-import styled from "@emotion/styled";
 import { useState } from "preact/hooks";
 import { isOwned } from "src/core/player/diaper";
 import { clearData } from "src/core/settings";
@@ -8,6 +7,7 @@ import { MetabolismBar } from "src/screens/components/metabolismDropDown";
 import { Group, Stack } from "src/screens/components/positionComponents";
 import { SettingPanel } from "src/screens/components/settingPanel";
 import { RuleId } from "src/types/definitions";
+import styled from "styled-components";
 import { ButtonGroup } from "../../components/buttonGroup";
 import { Checkbox } from "../../components/checkbox";
 import { SettingsH2 } from "../settingsPage";
@@ -83,7 +83,12 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
           <Checkbox checked={pauseStats} setChecked={setPauseStats} locked={pauseStatsLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Resume Stats When Diapered">
-          <Checkbox checked={unPauseStatsWhenDiapered} setChecked={setUnPauseStatsWhenDiapered} locked={unPauseStatsWhenDiaperedLocked && isOwned()} opaqueLock={true} />
+          <Checkbox
+            checked={unPauseStatsWhenDiapered}
+            setChecked={setUnPauseStatsWhenDiapered}
+            locked={unPauseStatsWhenDiaperedLocked && isOwned()}
+            opaqueLock={true}
+          />
         </SettingPanel>
         <SettingPanel title="Wetting Leaks / Puddles">
           <Checkbox checked={disableWettingLeaks} setChecked={setDisableWettingLeaks} locked={disableWettingLeaksLocked && isOwned()} opaqueLock inverted />

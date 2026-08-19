@@ -1,7 +1,7 @@
-import { JSX } from "preact/jsx-runtime";
 import { forwardRef } from "preact/compat";
-import styled from "@emotion/styled";
+import { JSX } from "preact/jsx-runtime";
 import { THEME } from "src/constants";
+import styled from "styled-components";
 
 const LockWidgetComponent = styled.div<JSX.IntrinsicElements["div"] & { noBorderLeft?: boolean; size: number }>`
   display: flex;
@@ -36,7 +36,7 @@ export const LockWidget = forwardRef<HTMLDivElement, LockWidgetProps>(({ locked,
       setLocked?.(!locked);
     }}
     noBorderLeft={noBorderLeft}
-    size={size}
+    size={size ?? 1}
   >
     {locked ? (
       <img src={`${publicURL}/icons/locked${opaque ? "-opaque" : ""}-${THEME}.svg`} alt="locked" />

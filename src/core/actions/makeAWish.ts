@@ -13,7 +13,9 @@ export const makeAWish: CombinedAction = {
           "The diaper goddess can't grant a wish you haven't spoken~",
           "Use your words, baby! The diaper goddess wants to hear your wish~",
         ];
-        sendChatLocal(noWishResponses[Math.floor(Math.random() * noWishResponses.length)]);
+        const response = noWishResponses[Math.floor(Math.random() * noWishResponses.length)];
+        if (response == null) return;
+        sendChatLocal(response);
         return;
       }
 

@@ -31,14 +31,15 @@ class Activity {
     public onClick?: (player: Character, group: AssetGroupItemName) => void,
     private target?: AssetGroupItemName[],
     private targetSelf?: AssetGroupItemName[],
-    private criteria?: (player: Character) => { success: boolean; message?: string },
+    private criteria?: (player: Character, silent?: boolean) => { success: boolean; message?: string },
+    /* when should this activity be shown in the menu */
+    private insertionCriteria?: (player: Character) => { success: boolean; message?: string },
   ) {}
 
   fitsCriteria(player: Character, focusGroup: AssetGroupItemName): boolean {
-    return Boolean(
-      (!this.criteria || this.criteria(player).success) &&
-      (this.target?.includes(focusGroup) || (this.targetSelf?.includes(focusGroup) && Player.MemberNumber === player?.MemberNumber)),
-    );
+    if (!(this.target?.includes(focusGroup) || (this.targetSelf?.includes(focusGroup) && Player.MemberNumber === player?.MemberNumber))) return false;
+    if (this.insertionCriteria?.(player)?.success) return true;
+    return Boolean(!this.criteria || this.criteria(player, true).success);
   }
 
   createButton(): HTMLButtonElement {
@@ -53,7 +54,7 @@ class Activity {
       const player = CurrentCharacter?.FocusGroup ? CurrentCharacter : Player;
       const focusGroup = player?.FocusGroup?.Name;
       if (!this.onClick || !focusGroup) return;
-      this.onClick(player, focusGroup);
+      if (Boolean(!this.criteria || this.criteria(player).success)) this.onClick(player, focusGroup);
       DialogLeave();
     });
 
@@ -90,7 +91,8 @@ export const initActions = (): void => {
         activity.OnClick,
         activity.Target,
         activity.TargetSelf,
-        activity.Criteria,
+        activity.Criteria?.bind(activity),
+        activity.InsertCriteria?.bind(activity),
       );
       if (activityInstance.fitsCriteria(player, focusGroup)) {
         if (!Activity.isInserted(activity.ID)) {

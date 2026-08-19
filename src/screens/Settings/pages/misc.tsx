@@ -59,6 +59,7 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
   const [puddleSize, setPuddleSize] = useState<boolean>(Player.ABCL.Settings.StatusMessages["PuddleSize"] ?? false);
 
   const [showOwnBadges, setShowOwnBadges] = useState<boolean>(Player.ABCL.Settings.ShowOwnBadges);
+  const [useNewMiniGame, setUseNewMiniGame] = useState<boolean>(Player.ABCL.Settings.UseNewMiniGame);
 
   return (
     <div>
@@ -114,6 +115,7 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
           Player.ABCL.SettingPermissions.CanUsePotty = canUsePottyLocked;
 
           Player.ABCL.Settings.DisableParticles = disableParticles;
+          Player.ABCL.Settings.UseNewMiniGame = useNewMiniGame;
         }}
         className="ABCL-exit-button"
       ></button>
@@ -125,6 +127,9 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
           </SettingPanel>
           <SettingPanel title="Disable particles">
             <Checkbox checked={disableParticles} setChecked={setDisableParticles} showLock={false} />
+          </SettingPanel>
+          <SettingPanel title="Use new Minigame (may not stay forever)">
+            <Checkbox checked={useNewMiniGame} setChecked={setUseNewMiniGame} showLock={false} />
           </SettingPanel>
         </Group>
       </div>

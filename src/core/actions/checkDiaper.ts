@@ -3,7 +3,7 @@ import { hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
 import { abclStatsWindow, resizeElements } from "../player/ui";
-import { getElement } from "../utils";
+import { getElement, sendChatLocal } from "../utils";
 
 export const diaperCheckFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
@@ -28,19 +28,23 @@ export const checkDiaper: CombinedAction = {
     Image: `${publicURL}/activity/diaperCheck.png`,
     OnClick: (player: Character, group: AssetGroupItemName) => diaperCheckFunction(player),
     Target: ["ItemPelvis"],
-    Criteria: (player: Character) => {
-      if (!isABCLPlayer(player))
-        return {
-          success: false,
-          message: "They are not an ABCL player.",
-        };
-      if (Player.IsRestrained() && !abclPlayer.settings.CanCheckDiaperWithRestraints)
-        return {
-          success: false,
-          message: "You are restrained.",
-        };
+    InsertCriteria: function (player: Character) {
+      let message = null;
+      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
       return {
-        success: true,
+        success: message == null,
+        message: message == null ? undefined : message,
+      };
+    },
+    Criteria: function (player: Character, silent?: boolean) {
+      const result = this.InsertCriteria?.(player) ?? null;
+      let message = result?.message ?? null;
+
+      if (Player.IsRestrained() && !abclPlayer.settings.CanCheckDiaperWithRestraints) message ??= "You are restrained.";
+      if (!silent && message) sendChatLocal(message);
+      return {
+        success: message == null,
+        message: message == null ? undefined : message,
       };
     },
   },

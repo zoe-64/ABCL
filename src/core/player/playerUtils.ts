@@ -178,7 +178,8 @@ const statusThresholds: Record<keyof ModStats, Array<{ minPercent: number; messa
 const getZoneIndex = (percent: number, thresholds: Array<{ minPercent: number; message: string }>): number => {
   let activeIndex = -1;
   for (let i = 0; i < thresholds.length; i++) {
-    if (percent >= thresholds[i].minPercent) {
+    const { minPercent } = thresholds[i] ?? {};
+    if (minPercent && percent >= minPercent) {
       activeIndex = i;
     }
   }
@@ -200,8 +201,9 @@ export const sendStatusMessage = (type: keyof ModStats, before: number, after: n
   const afterZone = getZoneIndex(afterPercent, thresholds);
 
   if (beforeZone === afterZone || afterZone === -1) return;
-
-  const descMessage = thresholds[afterZone].message;
+  const threshold = thresholds[beforeZone];
+  if (!threshold) return;
+  const descMessage = threshold.message;
   const isLocal = Player.ABCL.Settings.StatusMessages[type];
   if (descMessage === "") return;
   const message = replace_template(descMessage, Player);
@@ -217,7 +219,6 @@ export function sendABCLAction(action: string, sender: Character | null = null, 
   let msg = replace_template(action, sender);
   const isLocal = !Player.ABCL.Settings.VisibleMessages[messageType];
   sendChatLocal(msg, ["ChatMessageAction", "ChatMessageNonDialogue"], "--label-color:#ff4949", isLocal);
-
   if (!isLocal) {
     sendDataToAction("onABCLMessage", { message: msg, local: isLocal });
   } else if (target && target.MemberNumber !== Player.MemberNumber) {

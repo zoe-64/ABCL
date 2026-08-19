@@ -1,7 +1,7 @@
 import { h } from "preact";
-import "./about.css";
 import { Stack } from "src/screens/components/positionComponents";
-import styled from "@emotion/styled";
+import styled from "styled-components";
+import "./about.css";
 
 const CreditItemComponent = styled.p`
   margin: 0;
