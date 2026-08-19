@@ -248,11 +248,17 @@ export class DistractionRushGame extends BaseMiniGame {
     container.innerHTML = "";
 
     const goodIndex = Math.floor(Math.random() * this.options.good.length);
-    const goodOption: { text: string; isGood: boolean } = { ...this.options.good[goodIndex], isGood: true };
-
+    const goodItem = this.options.good[goodIndex];
+    if (!goodItem) return;
+    const goodOption: { text: string; isGood: boolean } = {
+      text: goodItem.text,
+      isGood: true,
+    };
     const badCandidates: { text: string; isGood: boolean }[] = [];
     for (let i = 0; i < Math.max(Math.round(2 * MiniGameDifficulty), 1); i++) {
-      const candidate = { ...this.options.bad[Math.floor(Math.random() * this.options.bad.length)], isGood: false };
+      const bad = this.options.bad[Math.floor(Math.random() * this.options.bad.length)];
+      if (!bad) continue;
+      const candidate = { text: bad.text, isGood: false };
       badCandidates.push(candidate);
     }
 

@@ -114,6 +114,7 @@ export type ABCLActivity = {
   Target?: AssetGroupItemName[];
   TargetSelf?: AssetGroupItemName[];
   Criteria?: (player: Character, silent?: boolean) => { success: boolean; message?: string };
+  InsertCriteria?: (player: Character, silent?: boolean) => { success: boolean; message?: string };
 };
 
 export type HookListener<T> = (raw: PluginServerChatRoomMessage, data: T) => void;

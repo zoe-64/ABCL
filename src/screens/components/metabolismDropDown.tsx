@@ -1,9 +1,9 @@
-import { JSX } from "preact/jsx-runtime";
 import { forwardRef } from "preact/compat";
-import { DropDown, BaseOptionComponent } from "./dropDown";
+import { JSX } from "preact/jsx-runtime";
 import { THEME } from "src/constants";
-import { Group } from "./positionComponents";
 import styled from "styled-components";
+import { BaseOptionComponent, DropDown } from "./dropDown";
+import { Group } from "./positionComponents";
 
 const MetabolismOptionComponent = styled(BaseOptionComponent)<{ locked?: boolean }>`
   justify-content: space-between;
@@ -60,7 +60,7 @@ export type MetabolismOption = {
 export function MetabolismOption({ value, label, icon }: MetabolismOption): JSX.Element {
   return (
     <>
-      <Group $wrap={false} $gap="0">
+      <Group wrap={false} gap="0">
         <img src={publicURL + `/icons/${icon}-metabolism-${THEME}.svg`} alt={label} />
         <span>{label}</span>
       </Group>

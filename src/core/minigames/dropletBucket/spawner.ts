@@ -44,6 +44,7 @@ export class SpawnerManager {
 
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
+      // @ts-expect-error
       [pool[i], pool[j]] = [pool[j], pool[i]];
     }
 
@@ -62,7 +63,7 @@ export class SpawnerManager {
       const availableBadItems = ALL_DROPLET_WEIGHTS.filter(item => BAD_DROPLET_CLASSES.includes(item.dropletClass));
 
       const chosenBad = availableBadItems[Math.floor(Math.random() * availableBadItems.length)];
-
+      if (chosenBad == null) return;
       const replaceIndex = selected.findIndex(item => item.dropletClass !== NormalDropletEntity);
 
       if (replaceIndex !== -1) {
@@ -82,6 +83,7 @@ export class SpawnerManager {
     }
 
     let randomWeight = Math.random() * this.totalActiveWeight;
+    if (this.activePool[0] == null) return;
     let SelectedClass: DropletConstructor = this.activePool[0].dropletClass;
 
     for (const item of this.activePool) {

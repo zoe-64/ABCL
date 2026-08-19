@@ -3,6 +3,7 @@ import { sendDataToAction } from "../hooks";
 import { hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
+import { sendChatLocal } from "../utils";
 
 const diaperFaceRubRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) {
@@ -33,29 +34,24 @@ export const diaperFaceRub: CombinedAction = {
     Image: `${publicURL}/activity/diaperFaceRub.png`,
     Target: ["ItemNose"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperFaceRubRequest(player),
-    Criteria: (player: Character) => {
-      if (!isABCLPlayer(player))
-        return {
-          success: false,
-          message: "They are not an ABCL player.",
-        };
-      if (Player.IsRestrained())
-        return {
-          success: false,
-          message: "You are restrained.",
-        };
-      if (!hasDiaper(Player))
-        return {
-          success: false,
-          message: "You are not diapered.",
-        };
-      if (player.MemberNumber === Player.MemberNumber)
-        return {
-          success: false,
-          message: "You can't rub your own diaper against your face.",
-        };
+    InsertCriteria: function (player: Character) {
+      let message = null;
+      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+      if (!hasDiaper(Player)) message ??= "You are not diapered.";
+      if (player.MemberNumber === Player.MemberNumber) message ??= "You can't rub your own diaper against your face.";
       return {
-        success: true,
+        success: message == null,
+        message: message == null ? undefined : message,
+      };
+    },
+    Criteria: function (player: Character, silent?: boolean) {
+      const result = this.InsertCriteria?.(player) ?? null;
+      let message = result?.message ?? null;
+      if (Player.IsRestrained()) message ??= "You are restrained.";
+      if (!silent && message) sendChatLocal(message);
+      return {
+        success: message == null,
+        message: message == null ? undefined : message,
       };
     },
   },

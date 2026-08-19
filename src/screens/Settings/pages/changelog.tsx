@@ -1,7 +1,7 @@
 import { h, JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { getDirectoryContents, GitHubFileItem } from "src/core/utils";
-import styled from "@emotion/styled";
+import styled from "styled-components";
 
 interface ChangelogEntry {
   title: string;

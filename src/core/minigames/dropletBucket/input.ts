@@ -69,7 +69,7 @@ export class InputManager {
       return;
     }
     e.preventDefault();
-    if (e.touches.length > 0) {
+    if (e.touches.length > 0 && e.touches[0]) {
       this.game.moveBucketTo(this.getCanvasXPosition(e.touches[0].clientX));
     }
   }

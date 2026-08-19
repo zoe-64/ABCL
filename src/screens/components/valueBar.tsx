@@ -1,7 +1,13 @@
-import styled from "@emotion/styled";
 import { h, JSX } from "preact";
+import styled from "styled-components";
 
-const ValueBarContainer = styled.div<JSX.IntrinsicElements["div"]>`
+type ValueBarProps = {
+  color: string;
+  value: number;
+  altBar: number;
+  limit: number;
+};
+const ValueBarContainer = styled.div<JSX.IntrinsicElements["div"] & ValueBarProps>`
   background-color: rgb(255, 255, 255);
   padding: 0.5em;
   display: flex;
@@ -54,11 +60,13 @@ const ValueBarContainer = styled.div<JSX.IntrinsicElements["div"]>`
 export function ValueBar({ value, label, color, stripedSection }: { value: number; label: string; color?: string; stripedSection?: number }): h.JSX.Element {
   let alternative = 0;
   let bar = value;
-  const max = 1 - (stripedSection ?? 0);
+  if (stripedSection === undefined) stripedSection = 0;
+  const max = 1 - stripedSection;
   if (bar > max) {
     alternative = value - max;
     bar = max;
   }
+  if (color === undefined) color = "#000000";
   return (
     <ValueBarContainer color={color} limit={stripedSection} value={bar} altBar={alternative}>
       <p>{label}</p>

@@ -36,7 +36,9 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
   const [poopMetabolismLocked, setPoopMetabolismLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.PoopMetabolism);
   const [mentalMetabolismLocked, setMentalMetabolismLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.MentalRegressionModifier);
   const [diaperChangePromptSettingLocked, setDiaperChangePromptSettingLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.OnDiaperChange);
-  const [unPauseStatsWhenDiaperedLocked, setUnPauseStatsWhenDiaperedLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.UnPauseStatsWhenDiapered);
+  const [unPauseStatsWhenDiaperedLocked, setUnPauseStatsWhenDiaperedLocked] = useState<boolean>(
+    selectedCharacter.ABCL.SettingPermissions.UnPauseStatsWhenDiapered,
+  );
   const [pauseStatsLocked, setPauseStatsLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.PauseStats);
   const [disableWettingLeaksLocked, setDisableWettingLeaksLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.DisableWettingLeaks);
   const [disableSoilingLeaksLocked, setDisableSoilingLeaksLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.DisableSoilingLeaks);
@@ -58,6 +60,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
 
   const [canUseToiletLocked, setCanUseToiletLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.CanUseToilet);
   const [canUsePottyLocked, setCanUsePottyLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.CanUsePotty);
+
   return (
     <div>
       <button
@@ -119,7 +122,12 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
           <Checkbox checked={pauseStats} setChecked={setPauseStats} locked={pauseStatsLocked} setLocked={setPauseStatsLocked} />
         </SettingPanel>
         <SettingPanel title="UnPause Stats When Diapered">
-          <Checkbox checked={unPauseStatsWhenDiapered} setChecked={setUnPauseStatsWhenDiapered} locked={unPauseStatsWhenDiaperedLocked} setLocked={setUnPauseStatsWhenDiaperedLocked} />
+          <Checkbox
+            checked={unPauseStatsWhenDiapered}
+            setChecked={setUnPauseStatsWhenDiapered}
+            locked={unPauseStatsWhenDiaperedLocked}
+            setLocked={setUnPauseStatsWhenDiaperedLocked}
+          />
         </SettingPanel>
         <SettingPanel title="Wetting Leaks / Puddles">
           <Checkbox

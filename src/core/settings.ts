@@ -56,6 +56,7 @@ export const defaultSettings: ModSettings = {
   DisableParticles: false,
   UnPauseStatsWhenDiapered: true,
   MiniGameAudioMuted: false,
+  UseNewMiniGame: true,
 };
 
 export const defaultStats: ModStats = {
@@ -142,6 +143,7 @@ export const defaultSettingPermissions: ModStorageModel["SettingPermissions"] = 
   DisableParticles: false,
   UnPauseStatsWhenDiapered: true,
   MiniGameAudioMuted: false,
+  UseNewMiniGame: false,
 };
 
 const defaultData: ModStorageModel = {

@@ -3,6 +3,7 @@ import { CombinedAction } from "../../types/types";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { sendABCLAction } from "../player/playerUtils";
+import { sendChatLocal } from "../utils";
 
 export const usePottyFunction = () => {
   const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;
@@ -59,14 +60,21 @@ export const usePotty: CombinedAction = {
     Image: `${publicURL}/activity/potty-temp.png`,
     OnClick: (player: Character, group) => usePottyFunction(),
     TargetSelf: ["ItemButt"],
-    Criteria: (player: Character) => {
-      if (!player.Appearance.some(item => item.Asset.Name == "Potty"))
-        return {
-          success: false,
-          message: "You don't have a potty to use!",
-        };
+    InsertCriteria: function (player: Character) {
+      let message = null;
       return {
-        success: true,
+        success: message == null,
+        message: message == null ? undefined : message,
+      };
+    },
+    Criteria: function (player: Character, silent?: boolean) {
+      const result = this.InsertCriteria?.(player) ?? null;
+      let message = result?.message ?? null;
+      if (!player.Appearance.some(item => item.Asset.Name == "Potty")) message ??= "You don't have a potty to use!";
+      if (!silent && message) sendChatLocal(message);
+      return {
+        success: message == null,
+        message: message == null ? undefined : message,
       };
     },
   },

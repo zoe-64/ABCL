@@ -2,6 +2,7 @@ import { CombinedAction } from "../../types/types";
 import { sendDataToAction } from "../hooks";
 import { getDiaperVerb, hasDiaper } from "../player/diaper";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
+import { sendChatLocal } from "../utils";
 
 const diaperPatBackRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-pat-back", undefined, player.MemberNumber);
@@ -29,24 +30,23 @@ export const diaperPatBack: CombinedAction = {
     Image: `${publicURL}/activity/diaperPatBack.png`,
     Target: ["ItemButt"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperPatBackRequest(player),
-    Criteria: (player: Character) => {
-      if (!isABCLPlayer(player))
-        return {
-          success: false,
-          message: "They are not an ABCL player.",
-        };
-      if (Player.IsRestrained())
-        return {
-          success: false,
-          message: "You are restrained.",
-        };
-      if (!hasDiaper(player))
-        return {
-          success: false,
-          message: "They are not diapered.",
-        };
+    InsertCriteria: function (player: Character) {
+      let message = null;
+      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+      if (!hasDiaper(player)) message ??= "They are not diapered.";
       return {
-        success: true,
+        success: message == null,
+        message: message == null ? undefined : message,
+      };
+    },
+    Criteria: function (player: Character, silent?: boolean) {
+      const result = this.InsertCriteria?.(player) ?? null;
+      let message = result?.message ?? null;
+      if (Player.IsRestrained()) message ??= "You are restrained.";
+      if (!silent && message) sendChatLocal(message);
+      return {
+        success: message == null,
+        message: message == null ? undefined : message,
       };
     },
   },

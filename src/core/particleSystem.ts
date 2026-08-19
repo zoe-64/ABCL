@@ -129,7 +129,10 @@ export class ParticleSystem {
   }
   addParticle(memberNumber: number, x: number, y: number, speed: number, life: number, angle: number = 0, image: string) {
     const maxAllowed = this.settings.limit * (ChatRoomCharacter?.length || 1);
-    const particles = this.playerParticles.getOrInsert(memberNumber, []);
+    if (!this.playerParticles.has(memberNumber)) {
+      this.playerParticles.set(memberNumber, []);
+    }
+    const particles = this.playerParticles.get(memberNumber)!;
     if (particles.length > maxAllowed || Math.random() > this.settings.spawnChance) {
       return;
     }
