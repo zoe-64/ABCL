@@ -23,7 +23,7 @@ export type LockWidgetProps = {
   setLocked?: (locked: boolean) => void;
   opaque?: boolean;
   noBorderLeft?: boolean;
-  size?: number;
+  size: number;
 } & JSX.IntrinsicElements["div"];
 
 export const LockWidget = forwardRef<HTMLDivElement, LockWidgetProps>(({ locked, opaque = false, setLocked, noBorderLeft, size, ...props }, ref) => (
@@ -36,7 +36,7 @@ export const LockWidget = forwardRef<HTMLDivElement, LockWidgetProps>(({ locked,
       setLocked?.(!locked);
     }}
     noBorderLeft={noBorderLeft}
-    size={size ?? 1}
+    size={size}
   >
     {locked ? (
       <img src={`${publicURL}/icons/locked${opaque ? "-opaque" : ""}-${THEME}.svg`} alt="locked" />

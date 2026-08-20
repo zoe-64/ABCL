@@ -29,12 +29,19 @@ export const diaperPatFront: CombinedAction = {
     Image: `${publicURL}/activity/diaperPatFront.png`,
     Target: ["ItemVulva"],
     OnClick: (player: Character, group: AssetGroupItemName) => diaperPatFrontRequest(player),
+    InsertCriteria: function (player: Character) {
+      let message = null;
+      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+      if (!hasDiaper(player)) message ??= "They are not diapered.";
+      return {
+        success: message == null,
+        message: message == null ? undefined : message,
+      };
+    },
     Criteria: function (player: Character, silent?: boolean) {
       const result = this.InsertCriteria?.(player) ?? null;
       let message = result?.message ?? null;
-      if (!isABCLPlayer(player)) message = "They are not an ABCL player.";
       if (Player.IsRestrained()) message = "You are restrained.";
-      if (!hasDiaper(player)) message = "They are not diapered.";
       return {
         success: message == null,
         message: message == null ? undefined : message,
