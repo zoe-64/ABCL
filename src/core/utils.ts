@@ -349,3 +349,49 @@ async function sendDiscordWebhook(webhookUrl: string, payload: DiscordWebhookPay
     return Promise.reject(error);
   }
 }
+
+export type ObjectDiff = {
+  [key: string]:
+    | {
+        old: any;
+        new: any;
+      }
+    | ObjectDiff;
+};
+export function getObjectDiff(obj1: Record<string, any>, obj2: Record<string, any>): ObjectDiff {
+  const diff: ObjectDiff = {};
+
+  const allKeys = Array.from(new Set([...Object.keys(obj1), ...Object.keys(obj2)]));
+
+  for (const key of allKeys) {
+    const val1 = obj1[key];
+    const val2 = obj2[key];
+
+    if (typeof val1 === "object" && val1 !== null && typeof val2 === "object" && val2 !== null && !Array.isArray(val1) && !Array.isArray(val2)) {
+      const nestedDiff = getObjectDiff(val1, val2);
+      if (Object.keys(nestedDiff).length > 0) {
+        diff[key] = nestedDiff;
+      }
+    } else if (val1 !== val2) {
+      diff[key] = { old: val1, new: val2 };
+    }
+  }
+
+  return diff;
+}
+
+export function formatDiff(diff: ObjectDiff, parentKey: string = ""): string[] {
+  const lines: string[] = [];
+
+  for (const [key, value] of Object.entries(diff)) {
+    const fullPath = parentKey ? `${parentKey}.${key}` : key;
+
+    if ("new" in value) {
+      lines.push(`${fullPath}: ${JSON.stringify(value.old)} -> ${JSON.stringify(value.new)}`);
+    } else {
+      lines.push(...formatDiff(value, fullPath));
+    }
+  }
+
+  return lines;
+}

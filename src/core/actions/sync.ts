@@ -5,7 +5,7 @@ import { ChatRoomEvents, ChatRoomRemoteEventEmitter } from "@sugarch/bc-event-ha
 import { ModVersion } from "src/types/definitions";
 import { PartialDeep } from "src/types/types";
 import { updateData } from "../settings";
-import { sendChatLocal } from "../utils";
+import { formatDiff, getObjectDiff, sendChatLocal } from "../utils";
 
 type EventMap = {
   updateSettings: [{ settings: PartialDeep<ModSettings>; settingPermissions: PartialDeep<ModStorageModel["SettingPermissions"]> }];
@@ -19,7 +19,11 @@ settingsRemote.on("updateSettings", (info, { settings, settingPermissions }) => 
   if (!character) return;
   if (window.LITTLISH_CLUB.isMommyOf(character, Player) || window.LITTLISH_CLUB.isCaregiverOf(character, Player)) {
     ToastManager.info(`${character.Nickname ?? character.Name} (${character.MemberNumber}) updated your settings.`);
-    sendChatLocal(`${character.Nickname ?? character.Name} (${character.MemberNumber}) updated your settings.`);
+    const newSettings = { ...Player.ABCL.Settings, ...settings };
+    sendChatLocal(
+      `${character.Nickname ?? character.Name} (${character.MemberNumber}) updated your settings: ${formatDiff(getObjectDiff(Player.ABCL.Settings, newSettings)).join("\n")}`,
+    );
+
     updateData({
       Settings: settings,
       SettingPermissions: settingPermissions,

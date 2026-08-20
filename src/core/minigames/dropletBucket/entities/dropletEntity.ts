@@ -27,7 +27,7 @@ export abstract class DropletEntity extends GameEntity {
 
 export class NormalDropletEntity extends DropletEntity {
   constructor(game: DropletCatchGame, x: number, y: number, radius: number, speed: number) {
-    super(game, x, y, radius, speed, "droplet_normal.png");
+    super(game, x, y, radius, speed, "droplet_normal.svg");
   }
 
   protected onMissed(): void {

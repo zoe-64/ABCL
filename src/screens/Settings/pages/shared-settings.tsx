@@ -135,6 +135,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
             setChecked={setDisableWettingLeaks}
             locked={disableWettingLeaksLocked}
             setLocked={setDisableWettingLeaksLocked}
+            inverted
           />
         </SettingPanel>
         <SettingPanel title="Messy Leaks">
@@ -143,6 +144,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
             setChecked={setDisableSoilingLeaks}
             locked={disableSoilingLeaksLocked}
             setLocked={setDisableSoilingLeaksLocked}
+            inverted
           />
         </SettingPanel>
         <SettingPanel title="Clothing Stains">
@@ -151,6 +153,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
             setChecked={setDisableClothingStains}
             locked={disableClothingStainsLocked}
             setLocked={setDisableClothingStainsLocked}
+            inverted
           />
         </SettingPanel>
         <SettingPanel title="Diaper Stains">
@@ -159,6 +162,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
             setChecked={setDisableDiaperStains}
             locked={disableDiaperStainsLocked}
             setLocked={setDisableDiaperStainsLocked}
+            inverted
           />
         </SettingPanel>
         <SettingPanel title="Accidents by Activities">

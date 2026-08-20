@@ -1,0 +1,5 @@
+Fixed inconsistency with remote settings
+Fixed lock icon being small in ui
+Fixed minigame absolutely dying 3 seconds into the minigame
+Added crib as one of the suitable changing places
+Fixed rub front not really working correctly

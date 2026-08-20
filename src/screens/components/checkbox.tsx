@@ -38,7 +38,7 @@ export const Checkbox = forwardRef<HTMLDivElement, CheckboxProps>(
           <img src={publicURL + `/icons/crossmark-${THEME}.svg`} alt="crossmark" />
         )}
       </CheckboxComponent>
-      {showLock && <LockWidget locked={locked} opaque={opaqueLock} setLocked={setLocked} />}
+      {showLock && <LockWidget locked={locked} opaque={opaqueLock} setLocked={setLocked} size={2} />}
     </>
   ),
 );
