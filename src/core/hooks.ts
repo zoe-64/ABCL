@@ -11,6 +11,7 @@ import { getPlayerDiaperSize, hasDiaper, isLeaking } from "./player/diaper";
 import { abclPlayer } from "./player/player";
 import { isABCLPlayer } from "./player/playerUtils";
 import { resizeElements } from "./player/ui";
+import { syncData } from "./settings";
 import { getElement, HookPriority, waitFor } from "./utils";
 export const sendDataToAction = (type: string, data?: any, target?: number) => {
   const ChatRoomMessage: PluginServerChatRoomMessage = {
@@ -28,9 +29,12 @@ export const sendDataToAction = (type: string, data?: any, target?: number) => {
   ServerSend("ChatRoomChat", ChatRoomMessage as ServerChatRoomMessage);
 };
 
+document.addEventListener("unload", () => {
+  syncData.flush();
+});
 /**
  * Sends an update of the player's settings to the specified target or to everyone in the chat room.
- *
+ * use {@link syncData}
  * @param {number} [target] - The MemberNumber of the target player. If not specified, the update is sent to all players.
  */
 export const sendUpdateMyData = (target?: number) => {

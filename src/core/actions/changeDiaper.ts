@@ -3,6 +3,7 @@ import { sendDataToAction } from "../hooks";
 import { hasDiaper, isDiaperLocked, updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { getCharacter, getCharacterName, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
+import { syncData } from "../settings";
 import { sendChatLocal } from "../utils";
 
 export const changeDiaperRequest = (player: Character, force?: boolean) => {
@@ -33,6 +34,7 @@ export const changeDiaperFunction = (player: Character) => {
   abclPlayer.stats.WetnessValue = 0;
   abclPlayer.stats.SoilinessValue = 0;
   updateDiaperColor();
+  syncData();
 };
 
 export type changeDiaperListeners = {

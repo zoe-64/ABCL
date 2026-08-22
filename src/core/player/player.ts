@@ -1,8 +1,8 @@
 import { RuleId } from "src/types/definitions";
 import { ABCLdata, INCONTINENCE_ON_STATS_OVERFLOW, PUDDLE_MAX_SIZE } from "../../constants";
 import { MetabolismSettingValues, MiniGameDifficultyToNumber } from "../../types/types";
-import { sendUpdateMyData } from "../hooks";
 import { MessMinigameResult, WetMinigameResult } from "../minigames/baseMinigame";
+import { syncData } from "../settings";
 import { createRateLimiter, getColor, isColorable, Saver, sendChatLocal, Throttler } from "../utils";
 import {
   averageColor,
@@ -115,7 +115,6 @@ export const abclPlayer = {
     abclPlayer.stats.BladderValue = 0;
 
     sendABCLAction(actionMessage, undefined, "wetClothing");
-    sendUpdateMyData();
     if (Player.ABCL.Settings.DisableClothingStains) return;
     const wetColor = "#96936C";
 
@@ -131,7 +130,7 @@ export const abclPlayer = {
         item.Color = colors.map(color => (isColorable(color) ? averageColor(color, wetColor, 0.3) : color));
       }
     }
-
+    syncData();
     queueUpdatePlayerClothes();
   },
   soilClothing: (sittingOn?: "toilet" | "potty") => {
@@ -152,7 +151,6 @@ export const abclPlayer = {
     actionMessage = `%NAME% ${actionMessage}.`;
     sendABCLAction(actionMessage, undefined, "soilClothing");
 
-    sendUpdateMyData();
     if (Player.ABCL.Settings.DisableClothingStains) return;
 
     const messColor = "#261a16";
@@ -169,6 +167,7 @@ export const abclPlayer = {
         item.Color = colors.map(color => (isColorable(color) ? averageColor(color, messColor, 0.3) : color));
       }
     }
+    syncData();
     queueUpdatePlayerClothes();
   },
   wetDiaper: (sittingOn?: "toilet" | "potty") => {
@@ -186,7 +185,7 @@ export const abclPlayer = {
 
     abclPlayer.stats.BladderValue -= absorbedVolume;
     abclPlayer.stats.WetnessValue += absorbedVolume;
-
+    syncData();
     if (abclPlayer.stats.WetnessValue >= diaperSize) {
       abclPlayer.wetClothing(sittingOn);
     }
@@ -204,7 +203,7 @@ export const abclPlayer = {
     sendABCLAction(actionMessage, undefined, "soilDiaper");
     abclPlayer.stats.BowelValue -= absorbedVolume;
     abclPlayer.stats.SoilinessValue += absorbedVolume * 4; // soiling should be more impactful
-
+    syncData();
     if (abclPlayer.stats.SoilinessValue >= diaperSize) {
       abclPlayer.soilClothing(sittingOn);
     }

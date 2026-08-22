@@ -156,7 +156,6 @@ export const updateData = (newData: PartialDeep<ModStorageModel>) => {
   Player.ABCL = merge(Player.ABCL || defaultData, newData);
   syncData();
 };
-
 export const syncData = debounce(() => {
   const compressed = LZString.compressToBase64(JSON.stringify(Player.ABCL));
   Player.ExtensionSettings.ABCL = compressed;
