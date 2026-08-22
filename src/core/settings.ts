@@ -3,6 +3,7 @@ import { ModVersion } from "src/types/definitions";
 import { DiaperSettingValues, MetabolismSettings, PartialDeep } from "../types/types";
 import { sendUpdateMyData } from "./hooks";
 import { logger } from "./logger";
+import { updatePlayerClothes } from "./player/player";
 import { summarizeVersionRange } from "./utils";
 
 export const defaultSettings: ModSettings = {
@@ -161,6 +162,7 @@ export const syncData = debounce(() => {
   Player.ExtensionSettings.ABCL = compressed;
   ServerPlayerExtensionSettingsSync(modIdentifier);
   sendUpdateMyData();
+  updatePlayerClothes();
 }, 1000);
 
 //const devMode = false; use clearData() // Manually toggle during local development if needed to clear settings

@@ -55,6 +55,7 @@ export function AboutPage({ setPage }: { setPage: (page: string) => void }): h.J
           Thanks to
           <Stack className="ABCL-thanks-list">
             <CreditItem name="Firefly" reason="for the original idea" />
+            <CreditItem name="JennaWbbb" reason="for contributing to the addon" link="https://github.com/JennaWbbb" />
             <CreditItem name="Maple" reason="for the mod plugin template" link="https://github.com/mochamaple" />
             <CreditItem name="Zoi" reason="for helping get themed to work" link="https://github.com/FurryZoi" />
             <CreditItem name="minimar" reason="for helping with typos" link="https://github.com/minimar" />
