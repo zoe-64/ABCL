@@ -3,6 +3,7 @@ import { CombinedAction } from "../../types/types";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { sendABCLAction } from "../player/playerUtils";
+import { syncData } from "../settings";
 import { sendChatLocal } from "../utils";
 
 export const useToiletFunction = () => {
@@ -35,6 +36,7 @@ export const useToiletFunction = () => {
     actionMessage = `%NAME% sits down and uses the toilet ${additionalText}.`;
   }
   sendABCLAction(actionMessage, undefined, "useToilet");
+  syncData();
 };
 
 export const useToilet: CombinedAction = {

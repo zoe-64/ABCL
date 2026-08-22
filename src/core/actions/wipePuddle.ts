@@ -1,7 +1,8 @@
 import { CombinedAction } from "../../types/types";
-import { sendDataToAction, sendUpdateMyData } from "../hooks";
+import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
+import { syncData } from "../settings";
 import { sendChatLocal } from "../utils";
 const WipePuddleRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("wipe-puddle", undefined, player.MemberNumber);
@@ -9,7 +10,7 @@ const WipePuddleRequest = (player: Character) => {
 };
 const WipePuddleFunction = (player: Character) => {
   abclPlayer.stats.PuddleSize = 0;
-  sendUpdateMyData();
+  syncData();
   if (player.MemberNumber !== Player.MemberNumber)
     return sendABCLAction(replace_template("%OPP_NAME% wipes %NAME%'s puddle of pee.", player), undefined, "wipePuddle", player);
 

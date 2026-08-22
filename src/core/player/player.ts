@@ -1,8 +1,8 @@
 import { RuleId } from "src/types/definitions";
 import { ABCLdata, INCONTINENCE_ON_STATS_OVERFLOW, PUDDLE_MAX_SIZE } from "../../constants";
 import { MetabolismSettingValues, MiniGameDifficultyToNumber } from "../../types/types";
-import { sendUpdateMyData } from "../hooks";
 import { MessMinigameResult, WetMinigameResult } from "../minigames/baseMinigame";
+import { syncData } from "../settings";
 import { createRateLimiter, getColor, isColorable, Saver, sendChatLocal, Throttler } from "../utils";
 import {
   averageColor,
@@ -115,7 +115,7 @@ export const abclPlayer = {
     abclPlayer.stats.BladderValue = 0;
 
     sendABCLAction(actionMessage, undefined, "wetClothing");
-    sendUpdateMyData();
+    syncData();
     if (Player.ABCL.Settings.DisableClothingStains) return;
     const wetColor = "#96936C";
 
@@ -152,7 +152,7 @@ export const abclPlayer = {
     actionMessage = `%NAME% ${actionMessage}.`;
     sendABCLAction(actionMessage, undefined, "soilClothing");
 
-    sendUpdateMyData();
+    syncData();
     if (Player.ABCL.Settings.DisableClothingStains) return;
 
     const messColor = "#261a16";

@@ -30,7 +30,7 @@ export const sendDataToAction = (type: string, data?: any, target?: number) => {
 
 /**
  * Sends an update of the player's settings to the specified target or to everyone in the chat room.
- *
+ * use {@link syncData}
  * @param {number} [target] - The MemberNumber of the target player. If not specified, the update is sent to all players.
  */
 export const sendUpdateMyData = (target?: number) => {
