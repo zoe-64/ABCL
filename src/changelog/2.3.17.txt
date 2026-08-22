@@ -1,2 +1,0 @@
-Fixed issue where baby could pause stats when they didn't have permission
-Made an option to auto-unpause when you have a diaper

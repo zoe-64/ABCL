@@ -1,4 +1,0 @@
-Added an option to switch back to the old minigame
-Adjusted the diaper verbs to be more appropriate
-Fixed not being able to change yourself (if you are a big girl)
-Fixed an issue where everyone was stuck at 80% regression~

@@ -1,0 +1,36 @@
+This is the release of the beta 2.3.14 - 2.4.0, if you tested the beta then you may recognize most changes.
+Thank you to all who participated. 
+
+Release 2.4.0:
+Replaced point-and-click minigame with a more interesting minigame
+Added an option to switch back to the old minigame
+Added minigame difficulty option
+
+Made changing diapers require a piece of furniture like a changing table for immersion
+Made bladder and bowels limited to 100 percent and going beyond that will cause an accident
+Made bladder and bowel messages more vague and less technical
+Lowered diaper capacity for messes
+Added particles to show diaper state
+
+Made an option to auto-unpause when you have a diaper
+Adjusted the diaper verbs to be more appropriate
+
+Added crafting properties (requires device level on FUSAM to save properly):
+Discoloration Protection - protects diapers from changing color when wet or messy
+Hollow - normal plugs become hollow
+
+Added a command to make suggestions in game:
+/abcl-wish message (up to 4000 characters)
+
+Fixes:
+Fixed or attempted to fix an infinite loop that would update the player's appearance repeatedly
+Fixed rub front not really working correctly
+Fixed inconsistency with remote settings
+Fixed an issue where everyone was stuck at 80% regression~
+Fixed issue where baby could pause stats when they didn't have permission
+Fixed removing all diapers not taking away mess and wetness
+
+News for R131:
+Added stroller that functions like a leash
+Added diaper suit
+Added clip pacifier (thanks to Arelia)
