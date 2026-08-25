@@ -74,18 +74,20 @@ export function replace_template(text: string, source: Character | null = null, 
 
   let pronounItem = CharacterPronounDescription(Player);
   let isPlayerMale = pronounItem === "He/Him";
+  let isPlayerFemale = pronounItem === "She/Her";
 
-  let possessive = isPlayerMale ? "His" : "Her";
-  let intensive = isPlayerMale ? "Him" : "Her";
-  let pronoun = isPlayerMale ? "He" : "She";
+  let possessive = isPlayerMale ? "His" : isPlayerFemale ? "Her" : "Their";
+  let intensive = isPlayerMale ? "Him" : isPlayerFemale ?  "Her": "Them";
+  let pronoun = isPlayerMale ? "He" : isPlayerFemale ? "She" : "They";
 
   let opp_pronounItem = !source ? "They/Them" : CharacterPronounDescription(source);
   let isOppMale = opp_pronounItem === "He/Him";
+  let isOppFemale = opp_pronounItem === "She/Her";
 
-  let oppName = source?.IsPlayer() ? (isOppMale ? "himself" : "herself") : !!source ? CharacterNickname(source) : fallbackSourceName;
-  let oppPossessive = isOppMale ? "His" : "Her";
-  let oppIntensive = source == Player ? (isOppMale ? "Himself" : "Herself") : isOppMale ? "Him" : "Her";
-  let oppPronoun = isOppMale ? "He" : "She";
+  let oppName = source?.IsPlayer() ? (isOppMale ? "himself" : isOppFemale ? "herself" : "themself") : !!source ? CharacterNickname(source) : fallbackSourceName;
+  let oppPossessive = isOppMale ? "His" : isOppFemale ? "Her" : "Their";
+  let oppIntensive = source == Player ? (isOppMale ? "Himself" : isOppFemale ? "Herself" : "Themself") : isOppMale ? "Him" : isOppFemale ? "Her" : "Them";
+  let oppPronoun = isOppMale ? "He" : isOppFemale ? "She" : "They";
 
   return result
     .replaceAll("%NAME%", CharacterNickname(Player))
