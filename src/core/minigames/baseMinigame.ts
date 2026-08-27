@@ -59,6 +59,9 @@ export function MessMinigameResult(victory?: boolean) {
 }
 export function WetMinigameResult(victory?: boolean) {
   Player.ABCL.Stats.MinigameStatistics.Wet.Total++;
+  if (abclPlayer.pendingMiniGameTimeout) clearTimeout(abclPlayer.pendingMiniGameTimeout);
+  ElementRemove("#abcl-chat-button-resist");
+  ElementRemove("#abcl-chat-button-letgo");
   incontinenceCheck.resetAllowedCallInterval();
   if (victory ?? MiniGameVictory) {
     abclPlayer.stats.Incontinence -= incontinenceOnAccident(abclPlayer.stats.Incontinence) / 2;

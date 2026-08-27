@@ -114,6 +114,7 @@ interface ModStats {
 type SettingKeys = Exclude<keyof ModSettings, "VisibleMessages"> | keyof ModSettings["VisibleMessages"];
 interface ModStorageModel {
   Version?: string;
+  LastVersion?: string;
   Settings: ModSettings;
   SettingPermissions: Record<SettingKeys, boolean>;
   Stats: ModStats;

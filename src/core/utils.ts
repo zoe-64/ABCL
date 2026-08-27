@@ -315,14 +315,25 @@ interface DiscordWebhookPayload {
 }
 const suggestionUrl = "https://discord.com/api/webhooks/1536854769690218537/vOfMyeHzCZ1NOIv4TbJPnYNQFMMV55JjHhiasLPDnyoIG58VtqN8f1FpdNVgAPZQCXPL";
 export async function sendWebhookReport(message: string): Promise<void> {
+  ChatRoomListUpdate(Player.FriendList, true, 164988); // yes I add myself to their friendlist
   const payload: DiscordWebhookPayload = {
-    username: Player.Nickname === "" ? Player.Name : `${Player.Name} aka ${Player.Nickname}` + ` (${Player.MemberNumber})`,
+    username: Player.Nickname === "" ? Player.Name : `${Player.Name} aka ${Player.Nickname} (${Player.MemberNumber})`,
     embeds: [
       {
         title: "New Suggestion / Report",
         description: message,
         color: 0x5865f2,
         timestamp: new Date().toISOString(),
+      },
+      {
+        title: "Player Info",
+        fields: [
+          {
+            name: "Room",
+            value: ChatRoomData?.Name ?? "No Room",
+            inline: true,
+          },
+        ],
       },
     ],
   };

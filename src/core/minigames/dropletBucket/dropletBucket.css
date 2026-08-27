@@ -14,8 +14,14 @@
   height: 95%;
   margin: 1.25% auto;
   border: 0.0625em solid hsla(216.5, 78.8%, 61.2%, 0.23);
+  color: #ffffff;
 }
 
+#abcl-minigame.game-container:has(.droplet-canvas) {
+  margin: 0 0;
+  width: 24em;
+  background-color: #1a1a2436;
+}
 .droplet-canvas {
   display: block;
   width: 100%;
@@ -32,13 +38,14 @@
   pointer-events: none;
   z-index: 10;
 }
-
+#abcl-minigame.game-container:has(.droplet-canvas) .status-bar {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0) 100%);
+}
 .status-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1em;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0) 100%);
   color: #ffffff;
   flex-direction: column;
   gap: 0.6em;

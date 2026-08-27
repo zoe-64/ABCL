@@ -9,6 +9,7 @@ export class UIManager {
   private messageTimeout: number | null = null;
   public pauseButton: HTMLButtonElement | null = null;
   public audioPauseButton: HTMLButtonElement | null = null;
+  public forfeitButton: HTMLButtonElement | null = null;
   constructor(game: DropletCatchGame) {
     this.game = game;
   }
@@ -46,13 +47,19 @@ export class UIManager {
       children: [abclPlayer.settings.MiniGameAudioMuted ? "🔇" : "🔊"],
       attributes: { type: "button", "aria-label": "Pause Audio" },
     });
+    this.forfeitButton = ElementCreate({
+      tag: "button",
+      classList: ["pause-button", "forfeit-button"],
+      children: ["🏳️"],
+      attributes: { type: "button", "aria-label": "Forfeit Game" },
+    });
     this.audioPauseButton.addEventListener("click", () => this.game.toggleAudio());
     this.pauseButton.addEventListener("click", () => this.game.togglePause());
-
+    this.forfeitButton.addEventListener("click", () => this.game.endGame(false));
     const hudLeft = ElementCreate({
       tag: "div",
       classList: ["hud-left"],
-      children: [this.pauseButton, this.audioPauseButton, timerWrapper],
+      children: [this.pauseButton, this.audioPauseButton, this.forfeitButton, timerWrapper],
     });
 
     this.heartsContainer = ElementCreate({

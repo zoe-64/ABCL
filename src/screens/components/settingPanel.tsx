@@ -17,16 +17,24 @@ const SettingPanelComponent = styled.div`
     text-wrap: nowrap;
     color: var(--abcl-text);
   }
+  p {
+    margin: 0;
+    font-size: 2.5vmin;
+    text-wrap: nowrap;
+    color: var(--abcl-text);
+  }
 `;
 
 export type SettingPanelProps = {
   title: string;
+  description?: string;
 } & JSX.IntrinsicElements["div"] &
   PropsWithChildren;
 
 export const SettingPanel = forwardRef<HTMLDivElement, SettingPanelProps>(({ title, children, ...props }, ref) => (
   <SettingPanelComponent {...props} ref={ref}>
     <h2>{title}</h2>
+    {props.description && <p>{props.description}</p>}
     <Group gap="0" wrap={false}>
       {children}
     </Group>

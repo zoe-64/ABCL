@@ -277,23 +277,21 @@ export const getDiaperVerb = (player: Character) => {
   const soilinessVerb = getVerb(soilinessVerbs, soilinessPercent);
 
   // Combined states for high levels of both
-  if (wetnessPercent > 70 && soilinessPercent > 70) {
-    return "soiled and leaking";
+  if (soilinessPercent > 90) {
+    return "stinky";
   }
   if (wetnessPercent > 90) {
     return "soaked";
   }
-  if (soilinessPercent > 90) {
-    return "stinky";
-  }
 
-  if (soilinessVerb == "") {
+  if (wetnessPercent > 70 && soilinessPercent > 70) {
+    return "dirty";
+  }
+  if (wetnessPercent > soilinessPercent) {
     if (wetnessVerb == "") return "";
     return wetnessVerb;
-  }
-  if (wetnessVerb == "") {
+  } else {
     if (soilinessVerb == "") return "";
     return soilinessVerb;
   }
-  return `${soilinessVerb} and ${wetnessVerb}`;
 };
