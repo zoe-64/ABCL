@@ -45,10 +45,14 @@ export default function Intro({ setPage }: { setPage: (page: string) => void }):
           if (!wetting) {
             Player.ABCL.Settings.PeeMetabolism = "Disabled";
             Player.ABCL.Settings.DisableWettingLeaks = !wetting;
+          } else if (Player.ABCL.Settings.PeeMetabolism == "Disabled") {
+            Player.ABCL.Settings.PeeMetabolism = "Normal";
           }
           if (!messing) {
             Player.ABCL.Settings.PoopMetabolism = "Disabled";
             Player.ABCL.Settings.DisableSoilingLeaks = !messing;
+          } else if (Player.ABCL.Settings.PoopMetabolism == "Disabled") {
+            Player.ABCL.Settings.PoopMetabolism = "Normal";
           }
 
           Player.ABCL.Settings.OnDiaperChange = diaperChangePromptSetting;

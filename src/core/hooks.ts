@@ -261,19 +261,19 @@ const initHooks = async () => {
 
     result.substitutions.push([
       "TargetCharacterGlands",
-      hasDiaper(character) ? `glands through PronounPossessive ${sourceDiaperVerb} diaper` : "glands",
+      hasDiaper(character) ? `glands through PronounPossessive ${targetDiaperVerb} diaper` : "glands",
     ] satisfies CommonSubtituteSubstitution);
     result.substitutions.push([
       "TargetCharacterPussy",
-      hasDiaper(character) ? `pussy through PronounPossessive ${sourceDiaperVerb} diaper` : "vulva",
+      hasDiaper(character) ? `pussy through PronounPossessive ${targetDiaperVerb} diaper` : "vulva",
     ] satisfies CommonSubtituteSubstitution);
     result.substitutions.push([
       "TargetCharacterPenis",
-      hasDiaper(character) ? `penis through PronounPossessive ${sourceDiaperVerb} diaper` : "penis",
+      hasDiaper(character) ? `penis through PronounPossessive ${targetDiaperVerb} diaper` : "penis",
     ] satisfies CommonSubtituteSubstitution);
     result.substitutions.push([
       "TargetCharacterClitoris",
-      hasDiaper(character) ? `clitoris through PronounPossessive ${sourceDiaperVerb} diaper` : "clitoris",
+      hasDiaper(character) ? `clitoris through PronounPossessive ${targetDiaperVerb} diaper` : "clitoris",
     ] satisfies CommonSubtituteSubstitution);
     result.substitutions.push(["TargetCharacterButt", hasDiaper(character) ? `${targetDiaperVerb} diaper` : "butt"] satisfies CommonSubtituteSubstitution);
     result.substitutions.push([

@@ -267,7 +267,7 @@ const soilinessVerbs = {
 };
 
 export const getDiaperVerb = (player: Character) => {
-  if (!hasDiaper(player)) return "";
+  if (!hasDiaper(player) || !isABCLPlayer(player)) return "";
   const size = getPlayerDiaperSize(player);
 
   const wetnessPercent = (player.ABCL!.Stats.Wetness.value / size) * 100;

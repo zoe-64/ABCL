@@ -63,7 +63,7 @@ export const abclPlayer = {
   update: () => {
     if (Player.ABCL.Settings.PauseStats) {
       if (!Player.ABCL.Settings.UnPauseStatsWhenDiapered || !hasDiaper()) return;
-      sendChatLocal("Stats paused due to setting unpause when diapered.");
+      sendChatLocal("Stats unpaused due to setting unpause when diapered.");
       // re-enable stats if the player has a diaper on, since they can still have accidents
       Player.ABCL.Settings.PauseStats = false;
     }
@@ -101,7 +101,7 @@ export const abclPlayer = {
       actionMessage = `forgets to lift up the lid and ${actionMessage}`;
     }
     if (hasDiaper()) {
-      actionMessage = `diaper leaks and ${actionMessage}`;
+      actionMessage = `'s diaper leaks and ${actionMessage}`;
     }
 
     if (sittingOn === "toilet") {
@@ -237,6 +237,9 @@ export const abclPlayer = {
     const callback = isWet ? "WetMinigameResult" : "MessMinigameResult";
 
     this.pendingMiniGameTimeout = setTimeout(() => {
+      if (!abclPlayer.pendingMiniGameTimeout) return;
+      clearTimeout(abclPlayer.pendingMiniGameTimeout);
+      abclPlayer.pendingMiniGameTimeout = null;
       isWet ? WetMinigameResult(false) : MessMinigameResult(false);
     }, 30 * 1000);
     ElementRemove("#abcl-chat-button-resist");
@@ -256,6 +259,7 @@ export const abclPlayer = {
           function () {
             if (!abclPlayer.pendingMiniGameTimeout) return;
             clearTimeout(abclPlayer.pendingMiniGameTimeout);
+            abclPlayer.pendingMiniGameTimeout = null;
             isWet ? WetMinigameResult(false) : MessMinigameResult(false);
           },
           null,
@@ -418,6 +422,7 @@ export const abclPlayer = {
       }
       sendStatusMessage("Wetness", this.WetnessValue, value, max);
       Player.ABCL.Stats.Wetness.value = value;
+      updateDiaperColor();
       syncData();
       abclStatsWindow.update();
     },

@@ -20,7 +20,7 @@ const SettingPanelComponent = styled.div`
   p {
     margin: 0;
     font-size: 2.5vmin;
-    text-wrap: nowrap;
+    overflow-wrap: anywhere
     color: var(--abcl-text);
   }
 `;
