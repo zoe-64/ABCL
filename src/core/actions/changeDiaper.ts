@@ -67,7 +67,7 @@ export const changeDiaper: CombinedAction = {
 
       const item = InventoryGet(player, "ItemDevices");
       if (item?.Asset.Name != "ChangingTable" && Player.IsRestrained()) message ??= "You are restrained.";
-      if (!(item && ["Crib", "MedicalBed", "ChangingTable", "Bed", "床左边", "床右边"].includes(item.Asset.Name)))
+      if (!(item && ["Crib", "BondageBench", "MedicalBed", "ChangingTable", "Bed", "床左边", "床右边"].includes(item.Asset.Name)))
         message ??= "They are not on a changing table or a flat surface.";
       if (!silent && message) sendChatLocal(message);
       return {
@@ -96,6 +96,7 @@ export const changeDiaper: CombinedAction = {
         case DiaperSettingValues.Ask:
           ToastManager.custom(`${getCharacterName(Sender)} wants to change your diaper.`, "info", {
             duration: 10 * 1000,
+            onClick: (_, toast) => {},
             onClose: (toast, reason) => {
               if (reason === "click") toast.setAttribute("aria-checked", "true");
               if (toast.getAttribute("aria-checked") !== "true") sendDataToAction("changeDiaper-rejected", undefined, Sender);

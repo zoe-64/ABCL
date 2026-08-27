@@ -14,7 +14,8 @@ export const GAME_CONFIG = {
   MAX_WIDTH: 800,
   HEIGHT: 800,
   DEFAULT_LIVES: 5,
-  DEFAULT_TIME: 25,
+  DEFAULT_TIME: 15,
+  WARMUP_TIME: 5,
   BASE_DROPLET_SPEED: 6,
   BUCKET_WIDTH: 80,
   BUCKET_HEIGHT: 40,
@@ -30,11 +31,13 @@ export class DropletCatchGame extends BaseMiniGame {
   lives = GAME_CONFIG.DEFAULT_LIVES;
   maxLives = GAME_CONFIG.DEFAULT_LIVES;
   timeLeft = GAME_CONFIG.DEFAULT_TIME;
+  warmupTime = GAME_CONFIG.WARMUP_TIME;
   dropletSpeed = GAME_CONFIG.BASE_DROPLET_SPEED;
 
   isRunning = false;
   isPaused = false;
   isSlowed = false;
+  isWarmingUp = false;
 
   uiManager: UIManager;
   inputManager: InputManager;
@@ -50,6 +53,7 @@ export class DropletCatchGame extends BaseMiniGame {
   private gameLoop: number | null = null;
   private spawnInterval: number | null = null;
   private timerInterval: number | null = null;
+  private warmupInterval: number | null = null;
 
   constructor() {
     super();
@@ -67,7 +71,9 @@ export class DropletCatchGame extends BaseMiniGame {
       this.lives = this.maxLives;
     }
   }
+
   damage(number = 1): void {
+    if (this.isWarmingUp) return;
     this.lives -= number;
     this.uiManager.updateUI();
     AudioManager.playSFX("miss");
@@ -75,6 +81,7 @@ export class DropletCatchGame extends BaseMiniGame {
       this.endGame(false);
     }
   }
+
   removeEntity(entity: GameEntity): void {
     this.objects.delete(entity);
   }
@@ -84,12 +91,15 @@ export class DropletCatchGame extends BaseMiniGame {
       this.bucket.setTargetX(x);
     }
   }
+
   Load(): void {
     super.Load();
     this.isPaused = false;
     this.timeLeft = GAME_CONFIG.DEFAULT_TIME;
     this.lives = GAME_CONFIG.DEFAULT_LIVES;
+    this.warmupTime = GAME_CONFIG.WARMUP_TIME;
     this.isSlowed = false;
+    this.isWarmingUp = true;
     this.spawnRate = 60 + GAME_CONFIG.SPAWN_RATE * (MiniGameDifficulty || 1);
     this.objects.clear();
 
@@ -114,6 +124,25 @@ export class DropletCatchGame extends BaseMiniGame {
     this.inputManager.setup(this.canvas);
 
     this.gameLoop = requestAnimationFrame(this.update.bind(this));
+    this.startWarmupTimer();
+  }
+
+  private startWarmupTimer(): void {
+    this.warmupInterval = window.setInterval(() => {
+      if (this.isPaused) return;
+
+      this.warmupTime--;
+      this.uiManager.updateUI();
+
+      if (this.warmupTime <= 0) {
+        if (this.warmupInterval !== null) clearInterval(this.warmupInterval);
+        this.isWarmingUp = false;
+        this.startMainLoop();
+      }
+    }, 1000);
+  }
+
+  private startMainLoop(): void {
     this.spawnInterval = window.setInterval(() => this.handleSpawn(), 60000 / this.spawnRate);
     this.timerInterval = window.setInterval(() => this.updateTimer(), 1000);
   }
@@ -123,6 +152,7 @@ export class DropletCatchGame extends BaseMiniGame {
     this.isPaused = !this.isPaused;
     AudioManager.playSFX("pause");
   }
+
   public toggleAudio(): void {
     if (!this.isRunning) return;
     abclPlayer.settings.MiniGameAudioMuted = !abclPlayer.settings.MiniGameAudioMuted;
@@ -131,6 +161,7 @@ export class DropletCatchGame extends BaseMiniGame {
     this.uiManager.audioPauseButton.innerText = abclPlayer.settings.MiniGameAudioMuted ? "🔇" : "🔊";
     AudioManager.playSFX("click");
   }
+
   public applySlowMotion(durationMs: number): void {
     this.isSlowed = true;
 
@@ -142,8 +173,9 @@ export class DropletCatchGame extends BaseMiniGame {
       this.isSlowed = false;
     }, durationMs);
   }
+
   private handleSpawn(): void {
-    if (!this.isRunning || this.isPaused) return;
+    if (!this.isRunning || this.isPaused || this.isWarmingUp) return;
     this.spawnerManager.spawnDroplet();
   }
 
@@ -156,13 +188,31 @@ export class DropletCatchGame extends BaseMiniGame {
       this.objects.forEach(entity => entity.update());
       this.ctx.clearRect(0, 0, this.width, this.height);
       this.objects.forEach(entity => entity.draw(this.ctx!));
+
+      if (this.isWarmingUp) {
+        this.drawWarmupOverlay(this.ctx);
+      }
     }
 
     this.gameLoop = requestAnimationFrame(this.update.bind(this));
   }
 
+  private drawWarmupOverlay(ctx: CanvasRenderingContext2D): void {
+    ctx.save();
+    ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+    ctx.fillRect(0, 0, this.width, this.height);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 48px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(`Get Ready!`, this.width / 2, this.height / 2 - 30);
+    ctx.fillText(`${this.warmupTime}`, this.width / 2, this.height / 2 + 30);
+    ctx.restore();
+  }
+
   private updateTimer(): void {
-    if (!this.isRunning || this.isPaused) return;
+    if (!this.isRunning || this.isPaused || this.isWarmingUp) return;
 
     this.timeLeft--;
     this.uiManager.updateUI();
@@ -183,6 +233,7 @@ export class DropletCatchGame extends BaseMiniGame {
     if (this.gameLoop !== null) cancelAnimationFrame(this.gameLoop);
     if (this.spawnInterval !== null) clearInterval(this.spawnInterval);
     if (this.timerInterval !== null) clearInterval(this.timerInterval);
+    if (this.warmupInterval !== null) clearInterval(this.warmupInterval);
     if (this.slowTimeout !== null) clearTimeout(this.slowTimeout);
   }
 

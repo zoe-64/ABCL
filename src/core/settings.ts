@@ -4,7 +4,7 @@ import { DiaperSettingValues, MetabolismSettings, PartialDeep } from "../types/t
 import { sendUpdateMyData } from "./hooks";
 import { logger } from "./logger";
 import { updatePlayerClothes } from "./player/player";
-import { summarizeVersionRange } from "./utils";
+import { getElement, summarizeVersionRange } from "./utils";
 
 export const defaultSettings: ModSettings = {
   MiniGameDifficulty: "Normal",
@@ -142,7 +142,7 @@ export const defaultSettingPermissions: ModStorageModel["SettingPermissions"] = 
   CanUsePotty: false,
   CanChangeDiapers: false,
   DisableParticles: false,
-  UnPauseStatsWhenDiapered: true,
+  UnPauseStatsWhenDiapered: false,
   MiniGameAudioMuted: false,
   UseNewMiniGame: false,
 };
@@ -181,7 +181,7 @@ export const loadOrGenerateData = async () => {
       if (!result) return;
       setTimeout(() => {
         ServerAccountBeep({
-          Message: `ABCL Updated!\n${result.combinedText}`,
+          Message: `ABCL Updated! ${data.Version} -> ${ModVersion}\nSee settings for full changelog.\n\n${result}`,
           MemberNumber: 164988,
           MemberName: "Zoe - author of ABCL",
           ChatRoomSpace: "",
@@ -209,16 +209,43 @@ export const loadOrGenerateData = async () => {
     data.ModVersion = undefined;
     data.Version = "2.0.1";
   }
+  if (data.LastVersion == null) {
+    ToastManager.custom("Do you want to see introduction for ABCL?", "info", {
+      duration: 10 * 3 * 1000,
+      onClick: (_, toast) => {},
+      onClose: (toast, reason) => {
+        if (reason === "click") toast.setAttribute("aria-checked", "true");
+      },
+      buttons: [
+        {
+          label: "Yes",
+          onClick: async (_, toast) => {
+            toast?._dismiss?.("click");
+            getElement<HTMLButtonElement>(document.body, "#ABCL-intro-button").click();
+          },
+        },
+        {
+          label: "No",
+          onClick: (_, toast) => {
+            toast?._dismiss?.("click");
+          },
+        },
+      ],
+    });
+  }
+  data.LastVersion = data.Version;
 
-  data.Version = ModVersion;
   const modStorageObject = merge(
     {
       Settings: defaultSettings,
       Stats: defaultStats,
       SettingPermissions: defaultSettingPermissions,
-      Version: modVersion,
-    },
+    } satisfies ModStorageModel,
     data,
+    {
+      Version: modVersion,
+      //  LastVersion: data.Version,
+    },
   );
   logger.debug({ message: "Merged settings object", modStorageObject });
   Player.ABCL = modStorageObject;

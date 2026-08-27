@@ -155,7 +155,10 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
       </Group>
       <ResetButton
         onClick={() => {
-          if (isOwned() && window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.DISABLE_RESET_SETTINGS_BUTTON)) return;
+          if (isOwned() && window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.DISABLE_RESET_SETTINGS_BUTTON)) {
+            ToastManager.warning("You cannot reset your settings because your mommy prevents you.");
+            return;
+          }
           ToastManager.warning("This will reset abcl and reload the page. Do you want to reset?", {
             duration: 10 * 1000,
             buttons: [

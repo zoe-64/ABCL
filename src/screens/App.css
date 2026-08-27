@@ -82,3 +82,16 @@
   position: relative;
   color: white;
 }
+.abcl-chat-button {
+  padding: 0.2em 0.5em;
+  margin: 0.2em 0.1em;
+  color: black;
+}
+.abcl-chat-buttons {
+  gap: 0.5em;
+  display: flex;
+}
+
+.toast-button {
+  height: 3.2em;
+}

@@ -7,7 +7,7 @@ import { HookListener, ListenerTypeMap, PluginServerChatRoomMessage } from "../t
 import { actions } from "./actionLoader";
 import { settingsRemote } from "./actions/sync";
 import { logger } from "./logger";
-import { getPlayerDiaperSize, hasDiaper, isLeaking } from "./player/diaper";
+import { getDiaperVerb, getPlayerDiaperSize, hasDiaper, isLeaking } from "./player/diaper";
 import { abclPlayer } from "./player/player";
 import { isABCLPlayer } from "./player/playerUtils";
 import { resizeElements } from "./player/ui";
@@ -97,8 +97,18 @@ const receivePacket = (receivedMessage: PluginServerChatRoomMessage) => {
  * Initializes hooks for intercepting chat room messages and synchronizing player data.
  * This function waits until the server is connected before setting up hooks.
  */
-
+const activityReplacements: Record<string, string> = {};
 const initHooks = async () => {
+  CommonFetch(publicURL + "/activities.csv").then(async response => {
+    if (response.status !== 200) return;
+    const text = await response.text();
+    const parsed = CommonParseCSV(text);
+    parsed.forEach(row => {
+      if (!row[0] || !row[1]) return;
+      activityReplacements[row[0]] = row[1];
+    });
+  });
+
   await waitFor(() => ServerSocket && ServerIsConnected);
   HookManager.hookFunction("TextPrefetchFile", 1, (args, next) => {
     if (args[0] !== "Screens/Room/Crafting/Text_Crafting.csv") {
@@ -215,6 +225,64 @@ const initHooks = async () => {
     }
     return result;
   });
+  HookManager.hookFunction("ActivityDictionaryText", 1, (args, next) => {
+    const [key] = args;
+    const string = activityReplacements[key];
+    if (string == null) return next(args);
+    return string;
+  });
+  HookManager.hookFunction("ChatRoomMessageRunExtractors", 1, (args, next) => {
+    const result = next(args);
+    const [message, character] = args;
+    if (result.substitutions == null) return result;
+    const sourceDiaperVerb = getDiaperVerb(Player);
+    const targetDiaperVerb = getDiaperVerb(character);
+    result.substitutions.push([
+      "SourceCharacterGlands",
+      hasDiaper(Player) ? `glands through PronounPossessive ${sourceDiaperVerb} diaper` : "glands",
+    ] satisfies CommonSubtituteSubstitution);
+    result.substitutions.push([
+      "SourceCharacterPussy",
+      hasDiaper(Player) ? `pussy through PronounPossessive ${sourceDiaperVerb} diaper` : "vulva",
+    ] satisfies CommonSubtituteSubstitution);
+    result.substitutions.push([
+      "SourceCharacterPenis",
+      hasDiaper(Player) ? `penis through PronounPossessive ${sourceDiaperVerb} diaper` : "penis",
+    ] satisfies CommonSubtituteSubstitution);
+    result.substitutions.push([
+      "SourceCharacterClitoris",
+      hasDiaper(Player) ? `clitoris through PronounPossessive ${sourceDiaperVerb} diaper` : "clitoris",
+    ] satisfies CommonSubtituteSubstitution);
+    result.substitutions.push(["SourceCharacterButt", hasDiaper(Player) ? `${sourceDiaperVerb} diaper` : "butt"] satisfies CommonSubtituteSubstitution);
+    result.substitutions.push([
+      "SourceCharacterAss",
+      hasDiaper(Player) ? `ass in PronounPossessive ${sourceDiaperVerb} diaper` : "ass",
+    ] satisfies CommonSubtituteSubstitution);
+
+    result.substitutions.push([
+      "TargetCharacterGlands",
+      hasDiaper(character) ? `glands through PronounPossessive ${targetDiaperVerb} diaper` : "glands",
+    ] satisfies CommonSubtituteSubstitution);
+    result.substitutions.push([
+      "TargetCharacterPussy",
+      hasDiaper(character) ? `pussy through PronounPossessive ${targetDiaperVerb} diaper` : "vulva",
+    ] satisfies CommonSubtituteSubstitution);
+    result.substitutions.push([
+      "TargetCharacterPenis",
+      hasDiaper(character) ? `penis through PronounPossessive ${targetDiaperVerb} diaper` : "penis",
+    ] satisfies CommonSubtituteSubstitution);
+    result.substitutions.push([
+      "TargetCharacterClitoris",
+      hasDiaper(character) ? `clitoris through PronounPossessive ${targetDiaperVerb} diaper` : "clitoris",
+    ] satisfies CommonSubtituteSubstitution);
+    result.substitutions.push(["TargetCharacterButt", hasDiaper(character) ? `${targetDiaperVerb} diaper` : "butt"] satisfies CommonSubtituteSubstitution);
+    result.substitutions.push([
+      "TargetCharacterAss",
+      hasDiaper(character) ? `ass in PronounPossessive ${targetDiaperVerb} diaper` : "ass",
+    ] satisfies CommonSubtituteSubstitution);
+
+    return result;
+  });
   /* HookManager.hookFunction("PreferenceSubscreenChatClick", 1, (args, next) => {
     if (MouseIn(1815, 75, 90, 90)) {
       const theme = Player.ChatSettings?.ColorTheme ?? "Light";
@@ -258,8 +326,8 @@ const initHooks = async () => {
     if (isABCLPlayer(_C) && isLeaking("any", _C)) {
       nickname = "🍼 " + nickname;
     }
-    //   En,     Maria, Arelia, Lorenzi, Mai,  Loona,  Amy,    Ivy
-    if ([155633, 54811, 126467, 178496, 33367, 198473, 149267, 213616].includes(_C.MemberNumber ?? -1)) {
+    //   En,     Maria, Arelia, Lorenzi, Mai,  Loona,  Amy,    Ivy,    JennaWbbb
+    if ([155633, 54811, 126467, 178496, 33367, 198473, 149267, 213616, 250801].includes(_C.MemberNumber ?? -1)) {
       nickname = "❀ " + nickname;
     }
     if (_C.MemberNumber === 164988) {

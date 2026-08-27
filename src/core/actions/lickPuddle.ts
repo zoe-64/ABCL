@@ -2,7 +2,6 @@ import { CombinedAction } from "../../types/types";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
-import { syncData } from "../settings";
 import { sendChatLocal } from "../utils";
 
 const lickPuddleRequest = (player: Character) => {
@@ -19,7 +18,6 @@ const LickPuddleFunction = (player: Character) => {
     CharacterSetFacialExpression(Player, "Fluids", "DroolLow", 20);
   }
   abclPlayer.stats.PuddleSize -= 50;
-  syncData();
 };
 export type lickPuddleListeners = {
   "lick-puddle": undefined;
