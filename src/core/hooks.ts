@@ -233,7 +233,7 @@ const initHooks = async () => {
   });
   HookManager.hookFunction("ChatRoomMessageRunExtractors", 1, (args, next) => {
     const result = next(args);
-    const [message, character] = args;
+    const [_message, character] = args;
     if (result.substitutions == null) return result;
     const sourceDiaperVerb = getDiaperVerb(Player);
     const targetDiaperVerb = getDiaperVerb(character);
