@@ -244,9 +244,9 @@ export const incontinenceOnAccident = (incontinence: number) => {
 export const mentalRegressionOnAccident = () => {
   const modifier = 1 + mentalRegressionBonus() * abclPlayer.stats.MentalRegressionModifier;
   if (abclPlayer.stats.MentalRegression < 0.25) return modifier / 500;
-  if (0.25 > abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 0.5 && isDiaperDirty()) return modifier / 500;
-  if (0.5 > abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 0.75 && isLeaking()) return modifier / 1000;
-  if (0.75 > abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 1 && isLeaking()) return modifier / 1500;
+  if (0.25 < abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 0.5 && isDiaperDirty()) return modifier / 500;
+  if (0.5 < abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 0.75 && isLeaking()) return modifier / 1000;
+  if (0.75 < abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 1 && isLeaking()) return modifier / 1500;
   return 0;
 };
 const wetnessVerbs = {
