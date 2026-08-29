@@ -168,7 +168,7 @@ export const getPlayerDiaper = (): {
   const panties = InventoryGet(Player, "Panties");
   const suitLower = InventoryGet(Player, "SuitLower");
   // @ts-expect-error Echo slot
-  const panties2 = InventoryGet(player, "Panties_笨笨蛋Luzi");
+  const panties2 = InventoryGet(Player, "Panties_笨笨蛋Luzi");
   let diapers: { ItemPelvis: Item | null; Panties: Item | null; Panties_笨笨蛋Luzi: Item | null; SuitLower: Item | null } = {
     ItemPelvis: null,
     Panties: null,
