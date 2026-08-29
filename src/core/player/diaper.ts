@@ -82,7 +82,7 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
   if (item && item.Asset && isDiaper(item)) {
     const color = !item.Color || typeof item.Color === "string" ? [...item.Asset.DefaultColor] : [...item.Color];
     const diaper = ABCLdata.Diapers[(item.Asset.DynamicGroupName + item.Asset.Name) as keyof typeof ABCLdata.Diapers];
-    const dirtiness = Math.min(abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue / getPlayerDiaperSize(), 1);
+    const dirtiness = Math.min((abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue) / getPlayerDiaperSize(), 1);
     if ("indicator" in diaper) {
       for (const index of diaper.indicator) {
         const defaultColor = item.Asset.DefaultColor[index];
@@ -118,7 +118,7 @@ export const updateDiaperColor = (refresh: boolean = true) => {
   // when both are equal it should be 0.5
   // if wet is 0 and mess is one then it should be 1
   // if wet is 1 and mess is 0 then it should be 0
-  const mixedLevel = Math.max(Math.min((messLevel + (1 - wetLevel)) / 2, 2), 0);
+  const mixedLevel = Math.max(Math.min((messLevel + (1 - wetLevel)) / 2, 1), 0);
   const primaryColor = averageColor(messColor, wetColor, mixedLevel);
 
   setDiaperColor("ItemPelvis", primaryColor, Player, false);
