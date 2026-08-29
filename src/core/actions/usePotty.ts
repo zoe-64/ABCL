@@ -28,13 +28,13 @@ export const usePottyFunction = () => {
   let additionalText = "";
 
   if (isEmbarrassed) {
-    additionalText = "and feels embarrassed";
+    additionalText = " and feels embarrassed";
     if (Player.ABCL.Settings.ExpressionsByActivities) {
       CharacterSetFacialExpression(Player, "Blush", "Low", 10);
     }
     abclPlayer.stats.MentalRegression += 0.04 * abclPlayer.stats.MentalRegressionModifier;
   } else {
-    additionalText = "and feels proud";
+    additionalText = " and feels proud";
     abclPlayer.stats.MentalRegression -= 0.02 * abclPlayer.stats.MentalRegressionModifier;
   }
 
@@ -46,9 +46,9 @@ export const usePottyFunction = () => {
     }
   }
   if (hasDiaper(Player) && canUsePottyWithDiaper) {
-    actionMessage = `%NAME% pulls %POSSESSIVE% diaper down, sits on the potty and uses the potty ${additionalText}.`;
+    actionMessage = `%NAME% pulls %POSSESSIVE% diaper down, sits on the potty and uses it${additionalText}.`;
   } else {
-    actionMessage = `%NAME% sits down and uses the potty ${additionalText}.`;
+    actionMessage = `%NAME% sits down and uses the potty${additionalText}.`;
   }
   sendABCLAction(actionMessage, undefined, "usePotty");
 };

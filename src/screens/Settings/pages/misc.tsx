@@ -190,7 +190,7 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
           <SettingPanel title="Licking Puddles">
             <Checkbox checked={lickPuddle} setChecked={setLickPuddle} locked={lickPuddleLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
-          <SettingPanel title="Wiping Puddle">
+          <SettingPanel title="Wiping Puddles">
             <Checkbox checked={wipePuddle} setChecked={setWipePuddle} locked={wipePuddleLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
           <SettingPanel title="Using Potty">

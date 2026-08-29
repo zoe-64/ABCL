@@ -88,7 +88,7 @@ export default function Intro({ setPage }: { setPage: (page: string) => void }):
             <Checkbox checked={wetting} setChecked={setWetting} locked={wettingLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
 
-          <SettingPanel title="Accidents By Activities" description="Such by spanking, shocks, tickling... etc">
+          <SettingPanel title="Accidents By Activities" description="Such as spanking, shocks, tickling... etc">
             <Checkbox
               checked={accidentsByActivities}
               setChecked={setAccidentsByActivities}
@@ -113,7 +113,7 @@ export default function Intro({ setPage }: { setPage: (page: string) => void }):
           </SettingPanel>
           <SettingPanel
             title="Use new Minigame (may not stay forever)"
-            description="The new minigame (catch droplets falling from above) can be more challanging but it is less boring than the old one (point and click)"
+            description="The new minigame (catch droplets falling from above) can be more challenging but it is less boring than the old one (point and click)"
           >
             <Checkbox checked={useNewMiniGame} setChecked={setUseNewMiniGame} showLock={false} />
           </SettingPanel>

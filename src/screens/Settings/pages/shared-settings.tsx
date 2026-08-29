@@ -121,7 +121,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
         <SettingPanel title="Pause Stats">
           <Checkbox checked={pauseStats} setChecked={setPauseStats} locked={pauseStatsLocked} setLocked={setPauseStatsLocked} />
         </SettingPanel>
-        <SettingPanel title="UnPause Stats When Diapered">
+        <SettingPanel title="Resume Stats When Diapered">
           <Checkbox
             checked={unPauseStatsWhenDiapered}
             setChecked={setUnPauseStatsWhenDiapered}
