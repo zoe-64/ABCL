@@ -109,6 +109,7 @@ function renderLoader(channel) {
     `// @author ${pkg.author}`,
     "// @match https://*.bondageprojects.elementfx.com/R*/*",
     "// @match https://*.bondage-europe.com/R*/*",
+    "// @match https://*.bondageeurope.com/R*/*",
     "// @match https://*.bondageprojects.com/R*/*",
     "// @match http://localhost:*/*",
     `// @icon  ${base}/assets/favicon.ico`,
