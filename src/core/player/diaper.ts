@@ -1,4 +1,5 @@
 import { ABCLdata } from "../../constants";
+import { getCrafts, sendChatLocal } from "../utils";
 import { abclPlayer, queueUpdatePlayerClothes } from "./player";
 import { getVerb, isABCLPlayer } from "./playerUtils";
 
@@ -25,6 +26,12 @@ export const isDiaper = (item: Item | null): boolean => {
   if (!item || !item.Asset) return false;
   return item.Asset.DynamicGroupName + item.Asset.Name in ABCLdata.Diapers;
 };
+
+export const isPacifier = (item: Item | null): boolean => {
+  if (!item || !item.Asset) return false;
+  return ABCLdata.ItemDefinitions.Pacifiers.includes("ItemMouth" + item.Asset.Name);
+};
+
 export function hasDiaper(player: Character = Player): boolean {
   if (!player) return false;
   const pelvisItem = InventoryGet(player, "ItemPelvis");
@@ -35,6 +42,14 @@ export function hasDiaper(player: Character = Player): boolean {
   return Boolean(
     (pelvisItem && isDiaper(pelvisItem)) || (panties && isDiaper(panties)) || (panties2 && isDiaper(panties2)) || (suitLower && isDiaper(suitLower)),
   );
+}
+
+export function hasPacifier(player: Character = Player): boolean {
+  if (!player) return false;
+  const itemMouth1 = InventoryGet(player, "ItemMouth");
+  const itemMouth2 = InventoryGet(player, "ItemMouth2");
+  const itemMouth3 = InventoryGet(player, "ItemMouth3");
+  return Boolean((itemMouth1 && isPacifier(itemMouth1)) || (itemMouth2 && isPacifier(itemMouth2)) || (itemMouth3 && isPacifier(itemMouth3)));
 }
 
 export const isWearingBabyClothes = () => {
@@ -240,6 +255,56 @@ export const incontinenceOnAccident = (incontinence: number) => {
   }
   return 0;
 };
+
+export function applyRandomPelvisDiaper(player: Character = Player) {
+  const diapers = ["PoofyDiaper", "UntrainersThin", "LatexDiaper", "BulkyDiaper"];
+  const assetName = diapers[Math.floor(Math.random() * diapers.length)];
+  const items = getCrafts("ItemPelvis").filter(item => isDiaper(item));
+
+  if (items.length > 0 && Math.random() > 0.25) {
+    const item = items[Math.floor(Math.random() * items.length)];
+    if (!item || !item.Craft) return;
+    InventoryWear(Player, item.Asset.Name, "ItemPelvis");
+    InventoryCraft(null, Player, "ItemPelvis", item.Craft, true);
+    sendChatLocal("The diaper goddess pacifies you");
+    return;
+  }
+
+  if (assetName) {
+    InventoryWear(player, assetName, "ItemPelvis");
+    InventoryLock(player, "ItemPelvis", "ExclusivePadlock", null, true);
+    sendChatLocal("The diaper goddess diapers you back up");
+  }
+}
+
+export function applyRandomPacifier(player: Character = Player) {
+  const itemMouth1 = InventoryGet(player, "ItemMouth");
+  const itemMouth2 = InventoryGet(player, "ItemMouth2");
+  let slot: AssetGroupName = "ItemMouth3";
+  if (!itemMouth1) {
+    slot = "ItemMouth";
+  } else if (!itemMouth2) {
+    slot = "ItemMouth2";
+  }
+  const items = getCrafts(slot).filter(item => isPacifier(item));
+
+  const diapers = ["PacifierClip", "PaciGag", "HarnessPacifierGag", "PacifierGag"];
+  const assetName = diapers[Math.floor(Math.random() * diapers.length)];
+
+  if (items.length > 0 && Math.random() > 0.25) {
+    const item = items[Math.floor(Math.random() * items.length)];
+    if (!item || !item.Craft) return;
+    InventoryWear(Player, item.Asset.Name, slot);
+    InventoryCraft(null, Player, slot, item.Craft, true);
+    sendChatLocal("The diaper goddess pacifies you");
+    return;
+  }
+
+  if (assetName) {
+    InventoryWear(Player, assetName, slot);
+    sendChatLocal("The diaper goddess pacifies you");
+  }
+}
 
 export const mentalRegressionOnAccident = () => {
   const modifier = 1 + mentalRegressionBonus() * abclPlayer.stats.MentalRegressionModifier;

@@ -68,6 +68,14 @@ interface ModSettings {
 
   MiniGameAudioMuted: boolean;
   UseNewMiniGame: boolean;
+
+  // cruel settings
+  IncontinenceOnlyIncrease: boolean;
+  MentalRegressionOnlyIncrease: boolean;
+  ForceDiapers: boolean;
+  ForcePacifiers: boolean;
+  PrefixNamesWithCaregiverTitles: boolean;
+  HideStats: boolean;
 }
 interface ModStats {
   PuddleSize: {

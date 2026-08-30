@@ -406,3 +406,30 @@ export function formatDiff(diff: ObjectDiff, parentKey: string = ""): string[] {
 
   return lines;
 }
+
+export function getCrafts(assetGroup: AssetGroupName): Item[] {
+  const crafts = [];
+  for (const Craft of Player.Crafting ?? []) {
+    if (Craft == null || Craft.Disabled) {
+      continue;
+    }
+
+    for (const Asset of CraftingAssets[Craft.Item] ?? []) {
+      if (Asset.Group.Name === assetGroup && DialogCanUseCraftedItem(Player, Craft, Asset)) {
+        crafts.push(fromAsset(Asset, { craft: Craft }));
+      }
+    }
+  }
+  return crafts;
+}
+
+export function fromAsset(asset: Asset, options: Item.Options) {
+  options ??= {};
+  return {
+    Asset: asset,
+    Color: options.color ? ServerParseColor(asset, options.color, asset.Group.ColorSchema) : [...asset.DefaultColor],
+    Difficulty: options.difficulty ?? 0,
+    Property: options.property ? CommonCloneDeep(options.property) : {},
+    Craft: options.craft ? CommonCloneDeep(options.craft) : undefined,
+  };
+}
