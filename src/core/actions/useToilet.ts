@@ -32,7 +32,7 @@ export const useToiletFunction = () => {
   if (hasDiaper(Player) && canUseBathroomWithDiaper) {
     actionMessage = `%NAME% pulls %POSSESSIVE% diaper down, sits on the toilet and uses it${additionalText}.`;
   } else {
-    actionMessage = `%NAME% sits down and uses the toilet ${additionalText}.`;
+    actionMessage = `%NAME% sits down and uses the toilet${additionalText}.`;
   }
   sendABCLAction(actionMessage, undefined, "useToilet");
 };
