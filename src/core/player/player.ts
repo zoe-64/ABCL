@@ -357,6 +357,9 @@ export const abclPlayer = {
     set MentalRegression(value: number) {
       if (value < 0) value = 0;
       if (value > 1) value = 1;
+      if (Player.ABCL.Settings.MentalRegressionOnlyIncrease && value < Player.ABCL.Stats.MentalRegression.value) {
+        return;
+      }
       sendStatusMessage("MentalRegression", Player.ABCL.Stats.MentalRegression.value, value, 1);
       Player.ABCL.Stats.MentalRegression.value = value;
       abclStatsWindow.update();
@@ -367,6 +370,9 @@ export const abclPlayer = {
     set Incontinence(value: number) {
       if (value < 0) value = 0;
       if (value > 1) value = 1;
+      if (Player.ABCL.Settings.IncontinenceOnlyIncrease && value < Player.ABCL.Stats.Incontinence.value) {
+        return;
+      }
       sendStatusMessage("Incontinence", Player.ABCL.Stats.Incontinence.value, value, 1);
       Player.ABCL.Stats.Incontinence.value = value;
       abclStatsWindow.update();

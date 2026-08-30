@@ -4,6 +4,7 @@ import { resizeElements } from "src/core/player/ui";
 import styled from "styled-components";
 import { AboutPage } from "./pages/about";
 import { Changelog } from "./pages/changelog";
+import CruelPage from "./pages/cruel";
 import Intro from "./pages/intro";
 import MiscPage from "./pages/misc";
 import SharedSettingsPage from "./pages/shared-settings";
@@ -20,7 +21,7 @@ const SettingsPageComponent = styled.div<JSX.IntrinsicElements["div"]>`
     margin-bottom: 0.1em;
     margin-top: 0;
   }
-  > h2 {
+  h2 {
     margin: 0;
     margin-bottom: 0.25em;
   }
@@ -66,7 +67,7 @@ const MenuPage = styled.div<JSX.IntrinsicElements["div"]>`
     > * {
       flex: 1 1 auto;
       text-align: left;
-      padding: 10px;
+      padding: 0.5em;
       border: var(--abcl-border);
       color: inherit;
     }
@@ -116,10 +117,13 @@ export default function SettingsPage(): h.JSX.Element {
                   <h2>Menu</h2>
                   <div id="ABCL-page-list">
                     <button onClick={() => setPage("misc")} className="ABCL-button">
-                      Misc
+                      Misc Page
                     </button>
                     <button onClick={() => setPage("stats")} className="ABCL-button">
-                      Stats
+                      Stats Page
+                    </button>
+                    <button onClick={() => setPage("cruel")} className="ABCL-button">
+                      Cruel Page
                     </button>
                     <button onClick={() => setPage("about")} className="ABCL-button">
                       About ABCL {modVersion}
@@ -152,21 +156,22 @@ export default function SettingsPage(): h.JSX.Element {
             about: <AboutPage setPage={setPage} />,
             changelog: <Changelog setPage={setPage} />,
             intro: <Intro setPage={setPage} />,
+            cruel: <CruelPage setPage={setPage} />,
             sharedSettings: <SharedSettingsPage setPage={setPage} selectedCharacter={selectedCharacter} />,
           }[page]
         }
       </SettingsPageComponent>
       <button
-        onClick={async () => {
-          await openSettings();
+        onClick={async function () {
           setSelectedCharacter(InformationSheetSelection ?? undefined);
+          await openSettings();
           setPage("sharedSettings");
         }}
         id="ABCL-shared-settings-button"
         className={"ABCL-hidden"}
       ></button>
       <button
-        onClick={async () => {
+        onClick={async function () {
           await openSettings();
           setSelectedCharacter(Player);
           setPage("intro");

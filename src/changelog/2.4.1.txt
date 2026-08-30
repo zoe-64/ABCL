@@ -4,3 +4,10 @@ Added a 5 second warm-up timer for the new minigame
 Fixed syncing being very problematic
 Added ABCL introduction for new users
 Added neutral pronouns support
+Added cruel settings page:
+Forced diapers
+Forced pacifiers
+Regression only increase
+Incontinence only increase
+Mommy/Daddy/Caregiver prefixes for all other players
+Hide stats from the baby

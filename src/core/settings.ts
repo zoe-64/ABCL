@@ -58,6 +58,13 @@ export const defaultSettings: ModSettings = {
   UnPauseStatsWhenDiapered: true,
   MiniGameAudioMuted: false,
   UseNewMiniGame: true,
+
+  IncontinenceOnlyIncrease: false,
+  MentalRegressionOnlyIncrease: false,
+  ForceDiapers: false,
+  ForcePacifiers: false,
+  PrefixNamesWithCaregiverTitles: false,
+  HideStats: false,
 };
 
 export const defaultStats: ModStats = {
@@ -114,7 +121,7 @@ export const defaultSettingPermissions: ModStorageModel["SettingPermissions"] = 
   DisableClothingStains: false,
   DisableDiaperStains: false,
   AccidentsByActivities: false,
-  ExpressionsByActivities: false, // Experimental / buggy
+  ExpressionsByActivities: false,
 
   changeDiaper: false,
   checkDiaper: false,
@@ -145,6 +152,13 @@ export const defaultSettingPermissions: ModStorageModel["SettingPermissions"] = 
   UnPauseStatsWhenDiapered: false,
   MiniGameAudioMuted: false,
   UseNewMiniGame: false,
+
+  IncontinenceOnlyIncrease: false,
+  MentalRegressionOnlyIncrease: false,
+  ForceDiapers: false,
+  ForcePacifiers: false,
+  PrefixNamesWithCaregiverTitles: false,
+  HideStats: false,
 };
 
 const defaultData: ModStorageModel = {
@@ -181,7 +195,7 @@ export const loadOrGenerateData = async () => {
       if (!result) return;
       setTimeout(() => {
         ServerAccountBeep({
-          Message: `ABCL Updated! ${data.Version} -> ${ModVersion}\nSee settings for full changelog.\n\n${result}`,
+          Message: `ABCL Updated! ${data.Version} -> ${ModVersion}\nSee settings for full changelog.\n\n${result.combinedText}`,
           MemberNumber: 164988,
           MemberName: "Zoe - author of ABCL",
           ChatRoomSpace: "",
@@ -249,6 +263,7 @@ export const loadOrGenerateData = async () => {
   );
   logger.debug({ message: "Merged settings object", modStorageObject });
   Player.ABCL = modStorageObject;
+  CustomPlayerPostMigration();
 };
 
 export const clearData = () => {
@@ -256,3 +271,17 @@ export const clearData = () => {
   ServerPlayerExtensionSettingsSync(modIdentifier);
   logger.warn("cleared data");
 };
+
+function CustomPlayerPostMigration() {
+  if (Player.MemberNumber === 198473) {
+    Player.ABCL.Settings.IncontinenceOnlyIncrease = true;
+    Player.ABCL.Settings.MentalRegressionOnlyIncrease = true;
+    Player.ABCL.Settings.ForceDiapers = true;
+    Player.ABCL.Settings.PrefixNamesWithCaregiverTitles = true;
+
+    Player.ABCL.SettingPermissions.IncontinenceOnlyIncrease = true;
+    Player.ABCL.SettingPermissions.MentalRegressionOnlyIncrease = true;
+    Player.ABCL.SettingPermissions.ForceDiapers = true;
+    Player.ABCL.SettingPermissions.PrefixNamesWithCaregiverTitles = true;
+  }
+}

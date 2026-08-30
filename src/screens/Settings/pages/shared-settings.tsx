@@ -12,7 +12,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
   if (!selectedCharacter) return <div> No Character Selected </div>;
   if (!selectedCharacter.ABCL) return <div> No ABCL Data </div>;
   if (!window.LITTLISH_CLUB.isMommyOf(Player, selectedCharacter) && !window.LITTLISH_CLUB.isCaregiverOf(Player, selectedCharacter))
-    return <div> Not a Mommy or Caregiver to this Character </div>;
+    return <div> Not a Mommy or Caregiver to {selectedCharacter.Name}</div>;
   const [peeMetabolism, setPeeMetabolism] = useState<MetabolismSetting>(selectedCharacter.ABCL.Settings.PeeMetabolism);
   const [poopMetabolism, setPoopMetabolism] = useState<MetabolismSetting>(selectedCharacter.ABCL.Settings.PoopMetabolism);
   const [mentalMetabolism, setMentalMetabolism] = useState<MetabolismSetting>(selectedCharacter.ABCL.Settings.MentalRegressionModifier);
@@ -61,6 +61,29 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
   const [canUseToiletLocked, setCanUseToiletLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.CanUseToilet);
   const [canUsePottyLocked, setCanUsePottyLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.CanUsePotty);
 
+  const [incontinenceOnlyIncrease, setIncontinenceOnlyIncrease] = useState<boolean>(selectedCharacter.ABCL.Settings.IncontinenceOnlyIncrease);
+  const [incontinenceOnlyIncreaseLocked, setIncontinenceOnlyIncreaseLocked] = useState<boolean>(
+    selectedCharacter.ABCL.SettingPermissions.IncontinenceOnlyIncrease,
+  );
+
+  const [regressionOnlyIncrease, setRegressionOnlyIncrease] = useState<boolean>(selectedCharacter.ABCL.Settings.MentalRegressionOnlyIncrease);
+  const [regressionOnlyIncreaseLocked, setRegressionOnlyIncreaseLocked] = useState<boolean>(
+    selectedCharacter.ABCL.SettingPermissions.MentalRegressionOnlyIncrease,
+  );
+
+  const [forcePacifiers, setForcePacifiers] = useState<boolean>(selectedCharacter.ABCL.Settings.ForcePacifiers);
+  const [forcePacifiersLocked, setForcePacifiersLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.ForcePacifiers);
+  const [forceDiapers, setForceDiapers] = useState<boolean>(selectedCharacter.ABCL.Settings.ForceDiapers);
+  const [forceDiapersLocked, setForceDiapersLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.ForceDiapers);
+
+  const [prefixNamesWithCaregiverTitles, setPrefixNamesWithCaregiverTitles] = useState<boolean>(selectedCharacter.ABCL.Settings.PrefixNamesWithCaregiverTitles);
+  const [prefixNamesWithCaregiverTitlesLocked, setPrefixNamesWithCaregiverTitlesLocked] = useState<boolean>(
+    selectedCharacter.ABCL.SettingPermissions.PrefixNamesWithCaregiverTitles,
+  );
+
+  const [hideStats, setHideStats] = useState<boolean>(selectedCharacter.ABCL.Settings.HideStats);
+  const [hideStatsLocked, setHideStatsLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.HideStats);
+
   return (
     <div>
       <button
@@ -92,6 +115,12 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
               CanUseToilet: canUseToilet,
               CanUsePotty: canUsePotty,
               MiniGameDifficulty: miniGameDifficulty,
+              IncontinenceOnlyIncrease: incontinenceOnlyIncrease,
+              MentalRegressionOnlyIncrease: regressionOnlyIncrease,
+              ForceDiapers: forceDiapers,
+              ForcePacifiers: forcePacifiers,
+              PrefixNamesWithCaregiverTitles: prefixNamesWithCaregiverTitles,
+              HideStats: hideStats,
             },
             settingPermissions: {
               PauseStats: pauseStatsLocked,
@@ -112,6 +141,12 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
               CanUseToilet: canUseToiletLocked,
               CanUsePotty: canUsePottyLocked,
               MiniGameDifficulty: miniGameDifficultyLocked,
+              IncontinenceOnlyIncrease: incontinenceOnlyIncreaseLocked,
+              MentalRegressionOnlyIncrease: regressionOnlyIncreaseLocked,
+              ForceDiapers: forceDiapersLocked,
+              ForcePacifiers: forcePacifiersLocked,
+              PrefixNamesWithCaregiverTitles: prefixNamesWithCaregiverTitlesLocked,
+              HideStats: hideStatsLocked,
             },
           });
         }}
@@ -239,6 +274,42 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
             }}
             setLocked={setMinigameDifficultyLocked}
           ></ButtonGroup>
+        </SettingPanel>
+      </Group>
+      <div style={{ height: "0.5em" }}></div>
+      <Group>
+        <SettingPanel title="Incontinence Only Increase">
+          <Checkbox
+            checked={incontinenceOnlyIncrease}
+            setChecked={setIncontinenceOnlyIncrease}
+            locked={incontinenceOnlyIncreaseLocked}
+            setLocked={setIncontinenceOnlyIncreaseLocked}
+          />
+        </SettingPanel>
+        <SettingPanel title="Mental Regression Only Increase">
+          <Checkbox
+            checked={regressionOnlyIncrease}
+            setChecked={setRegressionOnlyIncrease}
+            locked={regressionOnlyIncreaseLocked}
+            setLocked={setRegressionOnlyIncreaseLocked}
+          />
+        </SettingPanel>
+        <SettingPanel title="Force Diapers">
+          <Checkbox checked={forceDiapers} setChecked={setForceDiapers} locked={forceDiapersLocked} setLocked={setForceDiapersLocked} />
+        </SettingPanel>
+        <SettingPanel title="Force Pacifiers">
+          <Checkbox checked={forcePacifiers} setChecked={setForcePacifiers} locked={forcePacifiersLocked} setLocked={setForcePacifiersLocked} />
+        </SettingPanel>
+        <SettingPanel title="Prefix Names with Caregiver Titles">
+          <Checkbox
+            checked={prefixNamesWithCaregiverTitles}
+            setChecked={setPrefixNamesWithCaregiverTitles}
+            locked={prefixNamesWithCaregiverTitlesLocked}
+            setLocked={setPrefixNamesWithCaregiverTitlesLocked}
+          />
+        </SettingPanel>
+        <SettingPanel title="Hide Stats">
+          <Checkbox checked={hideStats} setChecked={setHideStats} locked={hideStatsLocked} setLocked={setHideStatsLocked} />
         </SettingPanel>
       </Group>
       <div style={{ height: "10em" }}></div>

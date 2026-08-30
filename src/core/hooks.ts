@@ -7,7 +7,7 @@ import { HookListener, ListenerTypeMap, PluginServerChatRoomMessage } from "../t
 import { actions } from "./actionLoader";
 import { settingsRemote } from "./actions/sync";
 import { logger } from "./logger";
-import { getDiaperVerb, getPlayerDiaperSize, hasDiaper, isLeaking } from "./player/diaper";
+import { applyRandomPacifier, applyRandomPelvisDiaper, getDiaperVerb, getPlayerDiaperSize, hasDiaper, hasPacifier, isLeaking } from "./player/diaper";
 import { abclPlayer } from "./player/player";
 import { isABCLPlayer } from "./player/playerUtils";
 import { resizeElements } from "./player/ui";
@@ -199,7 +199,20 @@ const initHooks = async () => {
   HookManager.hookFunction("CharacterRefresh", 1, (args, next) => {
     let [_character, _push] = args;
     if (_character.MemberNumber == Player.MemberNumber) {
-      if (!hasDiaper(_character)) {
+      if (!hasPacifier(Player) && Player.ABCL.Settings.ForcePacifiers) {
+        setTimeout(() => {
+          if (!Player.ABCL.Settings.ForcePacifiers || hasPacifier(Player)) return;
+          applyRandomPacifier();
+        }, 5000);
+      }
+      if (!hasDiaper(Player)) {
+        if (Player.ABCL.Settings.ForceDiapers) {
+          setTimeout(() => {
+            if (!Player.ABCL.Settings.ForceDiapers || hasDiaper(Player)) return;
+            applyRandomPelvisDiaper();
+          }, 5000);
+          return next(args);
+        }
         abclPlayer.stats.WetnessValue = 0;
         abclPlayer.stats.SoilinessValue = 0;
         return next(args);
@@ -320,9 +333,16 @@ const initHooks = async () => {
   HookManager.hookFunction("CharacterNickname", 1, (args, next) => {
     const [_C] = args;
     let nickname = next(args);
+    if (Player.ABCL.Settings.PrefixNamesWithCaregiverTitles && Player.MemberNumber != _C.MemberNumber) {
+      if (_C.GetPronouns() == "SheHer") nickname = "Mommy " + nickname;
+      else if (_C.GetPronouns() == "HeHim") nickname = "Daddy " + nickname;
+      else nickname = "Caregiver " + nickname;
+    }
+
     if (isABCLPlayer(_C) && !_C.ABCL!.Settings.ShowOwnBadges) {
       return nickname;
     }
+
     if (isABCLPlayer(_C) && isLeaking("any", _C)) {
       nickname = "🍼 " + nickname;
     }

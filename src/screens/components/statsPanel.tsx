@@ -1,10 +1,10 @@
-import { useEffect, useState } from "preact/hooks";
-import { ValueBar } from "./valueBar";
-import { getCharacter, getCharacterName, isABCLPlayer } from "src/core/player/playerUtils";
-import { getPlayerDiaperSize, incontinenceLimitFormula } from "src/core/player/diaper";
-import { resizeElements, abclStatsWindow } from "src/core/player/ui";
 import { h, JSX } from "preact";
+import { useEffect, useState } from "preact/hooks";
+import { getPlayerDiaperSize, incontinenceLimitFormula } from "src/core/player/diaper";
+import { getCharacter, getCharacterName, isABCLPlayer } from "src/core/player/playerUtils";
+import { abclStatsWindow, resizeElements } from "src/core/player/ui";
 import styled from "styled-components";
+import { ValueBar } from "./valueBar";
 const StatsPanelComponent = styled.div<JSX.IntrinsicElements["div"]>`
   .ABCL-stats-overlay {
     width: 100%;
@@ -58,6 +58,7 @@ export default function StatsPanel(): h.JSX.Element {
   const isABCL = selectedCharacter && isABCLPlayer(selectedCharacter);
 
   // Calculate stats directly from the selected character
+  const shouldObfuscate = Player.MemberNumber === memberNumber && Player.ABCL.Settings.HideStats;
   const regression = isABCL ? selectedCharacter.ABCL!.Stats.MentalRegression.value : 0;
   const incontinence = isABCL ? selectedCharacter.ABCL!.Stats.Incontinence.value : 0;
   const soiliness = isABCL ? selectedCharacter.ABCL!.Stats.Soiliness.value / getPlayerDiaperSize(selectedCharacter) : 0;
@@ -93,20 +94,34 @@ export default function StatsPanel(): h.JSX.Element {
             </option>
           ))}
         </select>
-
-        <div className="ABCL-stats-container">
-          <ValueBar value={incontinence} label="Incontinence" color="#e26c6cff" />
-          <ValueBar value={regression} label="Mental Regression" color="#cf6ce2ff" />
-          <ValueBar value={soiliness} label="Soiliness" color="#e2aa6cff" />
-          <ValueBar value={wetness} label="Wetness" color="#e2d06cff" />
-          <ValueBar value={bowel} label="Bowel Fullness" color="#e2aa6cff" stripedSection={1 - incontinenceLimitFormula(incontinence)} />
-          <ValueBar value={bladder} label="Bladder Fullness" color="#e2d06cff" stripedSection={1 - incontinenceLimitFormula(incontinence)} />
-          <p>
-            <span>Stats: </span>
-            <span>{pauseStats ? "Paused" : "Active"}</span>
-          </p>
-          <button onClick={() => resizeElements()}>Refresh</button>
-        </div>
+        {shouldObfuscate ? (
+          <div className="ABCL-stats-container">
+            <p>
+              Your body feels fuzzy, {regression > 0.5 ? "you feel docile and relaxed, " : ""}{" "}
+              {incontinence > 0.5 ? "you have forgotten how your bladder feels, " : ""}{" "}
+            </p>
+            <p>Your stats are hidden, babies don't need them anyways~</p>
+            <p>
+              <span>Stats: </span>
+              <span>{pauseStats ? "Paused" : "Active"}</span>
+            </p>
+            <button onClick={() => resizeElements()}>Refresh</button>
+          </div>
+        ) : (
+          <div className="ABCL-stats-container">
+            <ValueBar value={incontinence} label="Incontinence" color="#e26c6cff" />
+            <ValueBar value={regression} label="Mental Regression" color="#cf6ce2ff" />
+            <ValueBar value={soiliness} label="Soiliness" color="#e2aa6cff" />
+            <ValueBar value={wetness} label="Wetness" color="#e2d06cff" />
+            <ValueBar value={bowel} label="Bowel Fullness" color="#e2aa6cff" stripedSection={1 - incontinenceLimitFormula(incontinence)} />
+            <ValueBar value={bladder} label="Bladder Fullness" color="#e2d06cff" stripedSection={1 - incontinenceLimitFormula(incontinence)} />
+            <p>
+              <span>Stats: </span>
+              <span>{pauseStats ? "Paused" : "Active"}</span>
+            </p>
+            <button onClick={() => resizeElements()}>Refresh</button>
+          </div>
+        )}
       </div>
     </StatsPanelComponent>
   );
