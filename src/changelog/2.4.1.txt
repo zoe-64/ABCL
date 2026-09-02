@@ -4,6 +4,7 @@ Added a 5 second warm-up timer for the new minigame
 Fixed syncing being very problematic
 Added ABCL introduction for new users
 Added neutral pronouns support
+Stopped ABCL from being active in ABDL blocked rooms
 Added cruel settings page:
 Forced diapers
 Forced pacifiers

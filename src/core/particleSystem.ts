@@ -1,6 +1,6 @@
 import { HookManager } from "@sugarch/bc-mod-hook-manager";
 import { getPlayerDiaperSize, hasDiaper } from "./player/diaper";
-import { abclPlayer } from "./player/player";
+import { abclPlayer, shouldABCLActivate } from "./player/player";
 import { isABCLPlayer } from "./player/playerUtils";
 
 export class Particle {
@@ -210,6 +210,7 @@ export function initParticles() {
   HookManager.hookFunction("DrawCharacter", 1, (args, next) => {
     const [_player, _x, _y, _zoom, _resize, canvas] = args;
     if (!isABCLPlayer(_player)) return next(args);
+    if (!shouldABCLActivate()) return next(args);
     if (!hasDiaper(_player)) return next(args);
     if (abclPlayer.settings.DisableParticles) return next(args);
     const memberNumber = _player.MemberNumber!;

@@ -352,11 +352,10 @@ export const getDiaperVerb = (player: Character) => {
   if (wetnessPercent > 70 && soilinessPercent > 70) {
     return "dirty";
   }
-  if (wetnessPercent > soilinessPercent) {
-    if (wetnessVerb == "") return "";
+  if (wetnessVerb != "" && wetnessPercent > soilinessPercent) {
     return wetnessVerb;
   } else {
-    if (soilinessVerb == "") return "";
+    if (soilinessVerb == "") return "dry";
     return soilinessVerb;
   }
 };

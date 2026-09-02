@@ -8,7 +8,7 @@ import { actions } from "./actionLoader";
 import { settingsRemote } from "./actions/sync";
 import { logger } from "./logger";
 import { applyRandomPacifier, applyRandomPelvisDiaper, getDiaperVerb, getPlayerDiaperSize, hasDiaper, hasPacifier, isLeaking } from "./player/diaper";
-import { abclPlayer } from "./player/player";
+import { abclPlayer, shouldABCLActivate } from "./player/player";
 import { isABCLPlayer } from "./player/playerUtils";
 import { resizeElements } from "./player/ui";
 import { syncData } from "./settings";
@@ -150,7 +150,7 @@ const initHooks = async () => {
   HookManager.hookFunction("DrawCharacter", 1, (args, next) => {
     const [C, CharX, CharY, Zoom] = args;
 
-    if (isABCLPlayer(C) && C.ABCL!.Stats.PuddleSize.value > 0) {
+    if (isABCLPlayer(C) && shouldABCLActivate() && C.ABCL!.Stats.PuddleSize.value > 0) {
       let puddleSizeFactor = C.ABCL!.Stats.PuddleSize.value / 300;
       if (puddleSizeFactor > 1.5) puddleSizeFactor = 1.5;
       const width = 512 * puddleSizeFactor;
@@ -198,7 +198,7 @@ const initHooks = async () => {
   });
   HookManager.hookFunction("CharacterRefresh", 1, (args, next) => {
     let [_character, _push] = args;
-    if (_character.MemberNumber == Player.MemberNumber) {
+    if (_character.MemberNumber == Player.MemberNumber && shouldABCLActivate()) {
       if (!hasPacifier(Player) && Player.ABCL.Settings.ForcePacifiers) {
         setTimeout(() => {
           if (!Player.ABCL.Settings.ForcePacifiers || hasPacifier(Player)) return;
@@ -246,52 +246,55 @@ const initHooks = async () => {
   });
   HookManager.hookFunction("ChatRoomMessageRunExtractors", 1, (args, next) => {
     const result = next(args);
-    const [_message, character] = args;
+    const [_message, sender] = args;
     if (result.substitutions == null) return result;
-    const sourceDiaperVerb = getDiaperVerb(Player);
-    const targetDiaperVerb = getDiaperVerb(character);
+    const sourcePlayer = result.metadata?.SourceCharacter ?? Player;
+    const targetPlayer = result.metadata?.TargetCharacter ?? Player;
+
+    const sourceDiaperVerb = getDiaperVerb(sourcePlayer);
+    const targetDiaperVerb = getDiaperVerb(targetPlayer);
     result.substitutions.push([
       "SourceCharacterGlands",
-      hasDiaper(Player) ? `glands through PronounPossessive ${sourceDiaperVerb} diaper` : "glands",
+      hasDiaper(sourcePlayer) ? `glands through PronounPossessive ${sourceDiaperVerb} diaper` : "glands",
     ] satisfies CommonSubtituteSubstitution);
     result.substitutions.push([
       "SourceCharacterPussy",
-      hasDiaper(Player) ? `pussy through PronounPossessive ${sourceDiaperVerb} diaper` : "vulva",
+      hasDiaper(sourcePlayer) ? `pussy through PronounPossessive ${sourceDiaperVerb} diaper` : "vulva",
     ] satisfies CommonSubtituteSubstitution);
     result.substitutions.push([
       "SourceCharacterPenis",
-      hasDiaper(Player) ? `penis through PronounPossessive ${sourceDiaperVerb} diaper` : "penis",
+      hasDiaper(sourcePlayer) ? `penis through PronounPossessive ${sourceDiaperVerb} diaper` : "penis",
     ] satisfies CommonSubtituteSubstitution);
     result.substitutions.push([
       "SourceCharacterClitoris",
-      hasDiaper(Player) ? `clitoris through PronounPossessive ${sourceDiaperVerb} diaper` : "clitoris",
+      hasDiaper(sourcePlayer) ? `clitoris through PronounPossessive ${sourceDiaperVerb} diaper` : "clitoris",
     ] satisfies CommonSubtituteSubstitution);
-    result.substitutions.push(["SourceCharacterButt", hasDiaper(Player) ? `${sourceDiaperVerb} diaper` : "butt"] satisfies CommonSubtituteSubstitution);
+    result.substitutions.push(["SourceCharacterButt", hasDiaper(sourcePlayer) ? `${sourceDiaperVerb} diaper` : "butt"] satisfies CommonSubtituteSubstitution);
     result.substitutions.push([
       "SourceCharacterAss",
-      hasDiaper(Player) ? `ass in PronounPossessive ${sourceDiaperVerb} diaper` : "ass",
+      hasDiaper(sourcePlayer) ? `ass in PronounPossessive ${sourceDiaperVerb} diaper` : "ass",
     ] satisfies CommonSubtituteSubstitution);
 
     result.substitutions.push([
       "TargetCharacterGlands",
-      hasDiaper(character) ? `glands through PronounPossessive ${targetDiaperVerb} diaper` : "glands",
+      hasDiaper(targetPlayer) ? `glands through PronounPossessive ${targetDiaperVerb} diaper` : "glands",
     ] satisfies CommonSubtituteSubstitution);
     result.substitutions.push([
       "TargetCharacterPussy",
-      hasDiaper(character) ? `pussy through PronounPossessive ${targetDiaperVerb} diaper` : "vulva",
+      hasDiaper(targetPlayer) ? `pussy through PronounPossessive ${targetDiaperVerb} diaper` : "vulva",
     ] satisfies CommonSubtituteSubstitution);
     result.substitutions.push([
       "TargetCharacterPenis",
-      hasDiaper(character) ? `penis through PronounPossessive ${targetDiaperVerb} diaper` : "penis",
+      hasDiaper(targetPlayer) ? `penis through PronounPossessive ${targetDiaperVerb} diaper` : "penis",
     ] satisfies CommonSubtituteSubstitution);
     result.substitutions.push([
       "TargetCharacterClitoris",
-      hasDiaper(character) ? `clitoris through PronounPossessive ${targetDiaperVerb} diaper` : "clitoris",
+      hasDiaper(targetPlayer) ? `clitoris through PronounPossessive ${targetDiaperVerb} diaper` : "clitoris",
     ] satisfies CommonSubtituteSubstitution);
-    result.substitutions.push(["TargetCharacterButt", hasDiaper(character) ? `${targetDiaperVerb} diaper` : "butt"] satisfies CommonSubtituteSubstitution);
+    result.substitutions.push(["TargetCharacterButt", hasDiaper(targetPlayer) ? `${targetDiaperVerb} diaper` : "butt"] satisfies CommonSubtituteSubstitution);
     result.substitutions.push([
       "TargetCharacterAss",
-      hasDiaper(character) ? `ass in PronounPossessive ${targetDiaperVerb} diaper` : "ass",
+      hasDiaper(targetPlayer) ? `ass in PronounPossessive ${targetDiaperVerb} diaper` : "ass",
     ] satisfies CommonSubtituteSubstitution);
 
     return result;
@@ -329,11 +332,21 @@ const initHooks = async () => {
     }
     next(args);
   });
-
+  function isCaregiver(player: Character): boolean {
+    if (Player.MemberNumber != player.MemberNumber) return false;
+    if (player.ABCL?.Settings.PrefixNamesWithCaregiverTitles) return false;
+    if ((player.ABCL?.Stats.MentalRegression.value ?? 0) > 0.8) return false;
+    if (player.Nickname?.toLowerCase()?.includes("little")) return false;
+    if (player.Nickname?.toLowerCase()?.includes("baby")) return false;
+    if (window.LITTLISH_CLUB.isMommyOf(player, Player) || window.LITTLISH_CLUB.isCaregiverOf(player, Player)) return true;
+    if (player.Title && (["Baby", "LittleOne", "Submissive", "Puppy", "Pet", "Brat"] as TitleName[]).includes(player.Title)) return false;
+    if (ChatRoomData?.BlockCategory?.includes("ABDL")) return false;
+    return true;
+  }
   HookManager.hookFunction("CharacterNickname", 1, (args, next) => {
     const [_C] = args;
     let nickname = next(args);
-    if (Player.ABCL.Settings.PrefixNamesWithCaregiverTitles && Player.MemberNumber != _C.MemberNumber) {
+    if (Player.ABCL.Settings.PrefixNamesWithCaregiverTitles && isCaregiver(_C)) {
       if (_C.GetPronouns() == "SheHer") nickname = "Mommy " + nickname;
       else if (_C.GetPronouns() == "HeHim") nickname = "Daddy " + nickname;
       else nickname = "Caregiver " + nickname;
@@ -346,8 +359,8 @@ const initHooks = async () => {
     if (isABCLPlayer(_C) && isLeaking("any", _C)) {
       nickname = "🍼 " + nickname;
     }
-    //   En,     Maria, Arelia, Lorenzi, Mai,  Loona,  Amy,    Ivy,    JennaWbbb
-    if ([155633, 54811, 126467, 178496, 33367, 198473, 149267, 213616, 250801].includes(_C.MemberNumber ?? -1)) {
+    //   En,     Maria, Arelia, Lorenzi, Mai,  Loona,  Amy,    Ivy,    JennaWbbb, Lumi
+    if ([155633, 54811, 126467, 178496, 33367, 198473, 149267, 213616, 250801, 257511].includes(_C.MemberNumber ?? -1)) {
       nickname = "❀ " + nickname;
     }
     if (_C.MemberNumber === 164988) {
