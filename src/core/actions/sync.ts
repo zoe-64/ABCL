@@ -17,7 +17,8 @@ export const settingsRemote = new ChatRoomRemoteEventEmitter<EventMap>(modIdenti
 settingsRemote.on("updateSettings", (info, { settings, settingPermissions }) => {
   const character = ChatRoomCharacter.find(character => character.MemberNumber === info.sender);
   if (!character) return;
-  if (window.LITTLISH_CLUB.isMommyOf(character, Player) || window.LITTLISH_CLUB.isCaregiverOf(character, Player)) {
+  if (!window.LITTLISH_CLUB) return;
+  if ((window.LITTLISH_CLUB.isMommyOf(character, Player) || window.LITTLISH_CLUB.isCaregiverOf(character, Player)) && window.LITTLISH_CLUB.hasAccessRightTo(character, Player, "MANAGE_ABCL_SETTINGS")) {
     ToastManager.info(`${character.Nickname ?? character.Name} (${character.MemberNumber}) updated your settings.`);
     const newSettings = { ...Player.ABCL.Settings, ...settings };
     sendChatLocal(

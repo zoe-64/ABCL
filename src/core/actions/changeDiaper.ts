@@ -9,7 +9,7 @@ import { sendChatLocal } from "../utils";
 export const changeDiaperRequest = (player: Character, force?: boolean) => {
   if (!abclPlayer.settings.CanChangeSelf && player.MemberNumber === Player.MemberNumber) {
     sendABCLAction(
-      "%NAME% tries to tug on %POSSESSIVE% diaper tabs, pulling on the waistband and shaking the diaper but nothing works.",
+      "%NAME% tries to tug on %POSSESSIVE% diaper tabs, pulling on the waistband and shaking the diaper, but nothing works.",
       undefined,
       "changeDiaper",
       player,

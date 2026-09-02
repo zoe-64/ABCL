@@ -51,6 +51,7 @@ export function MessMinigameResult(victory?: boolean) {
   if (victory ?? MiniGameVictory) {
     abclPlayer.stats.Incontinence -= incontinenceOnAccident(abclPlayer.stats.Incontinence) / 2;
     sendChatLocal("You managed to keep it together!");
+    Player.ABCL.Stats.MinigameStatistics.Mess.Success++;
     return;
   }
 

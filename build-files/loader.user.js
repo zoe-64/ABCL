@@ -6,6 +6,7 @@
 // @author __AUTHOR__
 // @match https://*.bondageprojects.elementfx.com/R*/*
 // @match https://*.bondage-europe.com/R*/*
+// @match https://*.bondageeurope.com/R*/*
 // @match https://*.bondageprojects.com/R*/*
 // @match http://localhost:*/*
 // @icon  __DEPLOY_SITE__/assets/favicon.ico

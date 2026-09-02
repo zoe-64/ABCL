@@ -25,14 +25,14 @@ export const useToiletFunction = () => {
   abclPlayer.stats.BladderFullness = 0;
   abclPlayer.stats.BowelFullness = 0;
   if (isGood) {
-    additionalText = "and feels releaved";
+    additionalText = " and feels relieved";
     abclPlayer.stats.MentalRegression -= 0.02 * abclPlayer.stats.MentalRegressionModifier;
     abclPlayer.stats.Incontinence += INCONTINENCE_ON_TOILET_USE;
   }
   if (hasDiaper(Player) && canUseBathroomWithDiaper) {
-    actionMessage = `%NAME% pulls %POSSESSIVE% diaper down, sits on the toilet and uses the toilet ${additionalText}.`;
+    actionMessage = `%NAME% pulls %POSSESSIVE% diaper down, sits on the toilet and uses it${additionalText}.`;
   } else {
-    actionMessage = `%NAME% sits down and uses the toilet ${additionalText}.`;
+    actionMessage = `%NAME% sits down and uses the toilet${additionalText}.`;
   }
   sendABCLAction(actionMessage, undefined, "useToilet");
 };

@@ -97,7 +97,7 @@ export const setDiaperColor = (slot: AssetGroupName, primaryColor: string, playe
   if (item && item.Asset && isDiaper(item)) {
     const color = !item.Color || typeof item.Color === "string" ? [...item.Asset.DefaultColor] : [...item.Color];
     const diaper = ABCLdata.Diapers[(item.Asset.DynamicGroupName + item.Asset.Name) as keyof typeof ABCLdata.Diapers];
-    const dirtiness = Math.min(abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue / getPlayerDiaperSize(), 1);
+    const dirtiness = Math.min((abclPlayer.stats.SoilinessValue + abclPlayer.stats.WetnessValue) / getPlayerDiaperSize(), 1);
     if ("indicator" in diaper) {
       for (const index of diaper.indicator) {
         const defaultColor = item.Asset.DefaultColor[index];
@@ -133,7 +133,7 @@ export const updateDiaperColor = (refresh: boolean = true) => {
   // when both are equal it should be 0.5
   // if wet is 0 and mess is one then it should be 1
   // if wet is 1 and mess is 0 then it should be 0
-  const mixedLevel = Math.max(Math.min((messLevel + (1 - wetLevel)) / 2, 2), 0);
+  const mixedLevel = Math.max(Math.min((messLevel + (1 - wetLevel)) / 2, 1), 0);
   const primaryColor = averageColor(messColor, wetColor, mixedLevel);
 
   setDiaperColor("ItemPelvis", primaryColor, Player, false);
@@ -183,7 +183,7 @@ export const getPlayerDiaper = (): {
   const panties = InventoryGet(Player, "Panties");
   const suitLower = InventoryGet(Player, "SuitLower");
   // @ts-expect-error Echo slot
-  const panties2 = InventoryGet(player, "Panties_笨笨蛋Luzi");
+  const panties2 = InventoryGet(Player, "Panties_笨笨蛋Luzi");
   let diapers: { ItemPelvis: Item | null; Panties: Item | null; Panties_笨笨蛋Luzi: Item | null; SuitLower: Item | null } = {
     ItemPelvis: null,
     Panties: null,
@@ -309,9 +309,9 @@ export function applyRandomPacifier(player: Character = Player) {
 export const mentalRegressionOnAccident = () => {
   const modifier = 1 + mentalRegressionBonus() * abclPlayer.stats.MentalRegressionModifier;
   if (abclPlayer.stats.MentalRegression < 0.25) return modifier / 500;
-  if (0.25 > abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 0.5 && isDiaperDirty()) return modifier / 500;
-  if (0.5 > abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 0.75 && isLeaking()) return modifier / 1000;
-  if (0.75 > abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 1 && isLeaking()) return modifier / 1500;
+  if (0.25 <= abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 0.5 && isDiaperDirty()) return modifier / 500;
+  if (0.5 <= abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 0.75 && isLeaking()) return modifier / 1000;
+  if (0.75 <= abclPlayer.stats.MentalRegression && abclPlayer.stats.MentalRegression < 1 && isLeaking()) return modifier / 1500;
   return 0;
 };
 const wetnessVerbs = {

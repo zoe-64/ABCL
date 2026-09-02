@@ -11,10 +11,9 @@ const diaperPatBackRequest = (player: Character) => {
 export const diaperPatBackFunction = (player: Character) => {
   const diaperVerb = getDiaperVerb(Player);
   const diaperSound = diaperVerb === "dry" ? "crinkles" : "sloshes";
-  const diaperSoundSingular = diaperVerb === "dry" ? "crinkle" : "slosh";
   const isSelf = player.MemberNumber === Player.MemberNumber;
   const selfMessage = `%NAME% playfully pats %POSSESSIVE% ${diaperVerb} diapered butt, enjoying the soft ${diaperSound} it makes.`;
-  const otherMessage = `%OPP_NAME% gives %NAME%'s diapered butt a playful pat, as the ${diaperVerb} diaper ${diaperSoundSingular} softly.`;
+  const otherMessage = `%OPP_NAME% gives %NAME%'s diapered butt a playful pat, as the ${diaperVerb} diaper ${diaperSound} softly.`;
   ActivityEffectFlat(Player, Player, 1, "ItemButt", 1);
   sendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "playerActivity", player);
 };

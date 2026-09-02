@@ -4,7 +4,7 @@ import { sendChatLocal } from "../utils";
 
 export const pauseStatsFunction = () => {
   const isPaused = Player.ABCL.Settings.PauseStats;
-  sendABCLAction(isPaused ? "%NAME% resumed their ABCL stats." : "%NAME% paused their ABCL stats.", Player, "pauseStats");
+  sendABCLAction(isPaused ? "%NAME% resumed %POSSESSIVE% ABCL stats." : "%NAME% paused %POSSESSIVE% ABCL stats.", Player, "pauseStats");
   Player.ABCL.Settings.PauseStats = !isPaused;
 };
 

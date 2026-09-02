@@ -96,12 +96,12 @@ export const abclPlayer = {
       return;
     }
 
-    let actionMessage = "wets %POSSESSIVE% clothes";
+    let actionMessage = " wets %POSSESSIVE% clothes";
     if (sittingOn === "toilet") {
-      actionMessage = `forgets to lift up the lid and ${actionMessage}`;
+      actionMessage = ` forgets to lift up the lid and${actionMessage}`;
     }
     if (hasDiaper()) {
-      actionMessage = `'s diaper leaks and ${actionMessage}`;
+      actionMessage = `'s diaper leaks and${actionMessage}`;
     }
 
     if (sittingOn === "toilet") {
@@ -109,8 +109,7 @@ export const abclPlayer = {
     } else if (sittingOn === "potty") {
       actionMessage = `${actionMessage} while sitting on the potty`;
     }
-    actionMessage = `${actionMessage}, causing a puddle to form on the floor.`;
-    actionMessage = `%NAME% ${actionMessage}.`;
+    actionMessage = `%NAME%${actionMessage}, causing a puddle to form on the floor.`;
 
     abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
     abclPlayer.stats.BladderValue = 0;
@@ -141,7 +140,7 @@ export const abclPlayer = {
       actionMessage = `forgets to lift up the lid and ${actionMessage}`;
     }
     if (hasDiaper()) {
-      actionMessage = `%POSSESSIVE%'s diaper leaks and ${actionMessage}`;
+      actionMessage = `'s diaper leaks and ${actionMessage}`;
     }
     if (sittingOn === "toilet") {
       actionMessage = `${actionMessage} while sitting on the toilet`;

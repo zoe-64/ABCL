@@ -159,7 +159,7 @@ export default function StatsPage({ setPage }: { setPage: (page: string) => void
             ToastManager.warning("You cannot reset your settings because your mommy prevents you.");
             return;
           }
-          ToastManager.warning("This will reset abcl and reload the page. Do you want to reset?", {
+          ToastManager.warning("This will reset ABCL and reload the page. Do you want to reset?", {
             duration: 10 * 1000,
             buttons: [
               {

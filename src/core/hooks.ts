@@ -190,7 +190,7 @@ const initHooks = async () => {
     if (args[0].Content === "ServerEnter" && args[0].Sender === Player.MemberNumber) {
       // Announce (via an init packet) that we're ready to receive data models.
       sendRequestOtherDataPacket();
-      return;
+      return next(args);
     }
 
     receivePacket(args[0] as PluginServerChatRoomMessage);

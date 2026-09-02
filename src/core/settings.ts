@@ -224,7 +224,7 @@ export const loadOrGenerateData = async () => {
     data.Version = "2.0.1";
   }
   if (data.LastVersion == null) {
-    ToastManager.custom("Do you want to see introduction for ABCL?", "info", {
+    ToastManager.custom("Do you want to see the introduction for ABCL?", "info", {
       duration: 10 * 3 * 1000,
       onClick: (_, toast) => {},
       onClose: (toast, reason) => {
