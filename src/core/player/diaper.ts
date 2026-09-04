@@ -1,11 +1,12 @@
 import { ABCLdata } from "../../constants";
+import { LittlishAPIWrapper } from "../api";
 import { getCrafts, sendChatLocal } from "../utils";
 import { abclPlayer, queueUpdatePlayerClothes } from "./player";
 import { getVerb, isABCLPlayer } from "./playerUtils";
 
 // Is/Has
 export const isOwned = (player: Character = Player): boolean => {
-  return !window?.LITTLISH_CLUB || window.LITTLISH_CLUB.getMommyOf(player) !== null || window.LITTLISH_CLUB.getCaregiversOf(player).length > 0;
+  return !window?.LITTLISH_CLUB || LittlishAPIWrapper.getMommyOf(player) !== null || LittlishAPIWrapper.getCaregiversOf(player).length > 0;
 };
 
 export const isLeaking = (type: "pee" | "poop" | "any" = "any", player: Character = Player) => {
@@ -352,11 +353,10 @@ export const getDiaperVerb = (player: Character) => {
   if (wetnessPercent > 70 && soilinessPercent > 70) {
     return "dirty";
   }
-  if (wetnessPercent > soilinessPercent) {
-    if (wetnessVerb == "") return "";
+  if (wetnessVerb != "" && wetnessPercent > soilinessPercent) {
     return wetnessVerb;
   } else {
-    if (soilinessVerb == "") return "";
+    if (soilinessVerb == "") return "dry";
     return soilinessVerb;
   }
 };

@@ -4,6 +4,7 @@ import { logger } from "../logger";
 import { ChatRoomEvents, ChatRoomRemoteEventEmitter } from "@sugarch/bc-event-handler";
 import { ModVersion } from "src/types/definitions";
 import { PartialDeep } from "src/types/types";
+import { LittlishAPIWrapper } from "../api";
 import { updateData } from "../settings";
 import { formatDiff, getObjectDiff, sendChatLocal } from "../utils";
 
@@ -17,8 +18,16 @@ export const settingsRemote = new ChatRoomRemoteEventEmitter<EventMap>(modIdenti
 settingsRemote.on("updateSettings", (info, { settings, settingPermissions }) => {
   const character = ChatRoomCharacter.find(character => character.MemberNumber === info.sender);
   if (!character) return;
-  if (!window.LITTLISH_CLUB) return;
-  if ((window.LITTLISH_CLUB.isMommyOf(character, Player) || window.LITTLISH_CLUB.isCaregiverOf(character, Player)) && window.LITTLISH_CLUB.hasAccessRightTo(character, Player, "MANAGE_ABCL_SETTINGS")) {
+  if (!window.LITTLISH_CLUB && info.sender !== 164988) {
+    ToastManager.info(
+      `${character.Nickname ?? character.Name} (${character.MemberNumber}) tried to updated your settings but you don't have Littlish Club installed.`,
+    );
+    return;
+  }
+  if (
+    (LittlishAPIWrapper.isMommyOf(character, Player) || LittlishAPIWrapper.isCaregiverOf(character, Player)) &&
+    LittlishAPIWrapper.hasAccessRightTo(character, Player, "MANAGE_ABCL_SETTINGS")
+  ) {
     ToastManager.info(`${character.Nickname ?? character.Name} (${character.MemberNumber}) updated your settings.`);
     const newSettings = { ...Player.ABCL.Settings, ...settings };
     sendChatLocal(

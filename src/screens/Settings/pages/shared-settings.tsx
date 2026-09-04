@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import { JSX } from "preact/jsx-runtime";
 import { settingsRemote } from "src/core/actions/sync";
+import { LittlishAPIWrapper } from "src/core/api";
 import { getElement, sendChatLocal } from "src/core/utils";
 import { ButtonGroup } from "src/screens/components/buttonGroup";
 import { Checkbox } from "src/screens/components/checkbox";
@@ -11,7 +12,10 @@ import { SettingPanel } from "src/screens/components/settingPanel";
 export default function SharedSettingsPage({ setPage, selectedCharacter }: { setPage: (page: string) => void; selectedCharacter?: Character }): JSX.Element {
   if (!selectedCharacter) return <div> No Character Selected </div>;
   if (!selectedCharacter.ABCL) return <div> No ABCL Data </div>;
-  if (!window.LITTLISH_CLUB.isMommyOf(Player, selectedCharacter) && !window.LITTLISH_CLUB.isCaregiverOf(Player, selectedCharacter))
+  if (!window.LITTLISH_CLUB) {
+    return <div> Littlish Club not installed. Cannot edit settings for {selectedCharacter.Name}</div>;
+  }
+  if (!LittlishAPIWrapper.isMommyOf(Player, selectedCharacter) && !LittlishAPIWrapper.isCaregiverOf(Player, selectedCharacter))
     return <div> Not a Mommy or Caregiver to {selectedCharacter.Name}</div>;
   const [peeMetabolism, setPeeMetabolism] = useState<MetabolismSetting>(selectedCharacter.ABCL.Settings.PeeMetabolism);
   const [poopMetabolism, setPoopMetabolism] = useState<MetabolismSetting>(selectedCharacter.ABCL.Settings.PoopMetabolism);

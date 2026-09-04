@@ -1,21 +1,42 @@
 import { h } from "preact";
-import { Stack } from "src/screens/components/positionComponents";
 import styled from "styled-components";
-import "./about.css";
 
-const CreditItemComponent = styled.p`
-  margin: 0;
+const CreditItemComponent = styled.p<{ stroke?: string }>`
+  margin: 0.25em 0;
+  font-size: 1.2em;
   > a {
-    text-decoration: none;
-    color: inherit;
+    font-weight: bold;
+    color: hsl(${({ stroke }) => stroke ?? 0}, 100%, 70%);
+  }
+  > span:first-child {
+    font-weight: bold;
+    color: hsl(${({ stroke }) => stroke ?? 0}, 100%, 70%);
   }
   > span {
     color: inherit;
   }
 `;
-function CreditItem({ name, reason, link }: { name: string; reason: string; link?: string }): h.JSX.Element {
+const CreditBox = styled.div`
+  background: rgb(39, 39, 39);
+  padding: 0.5em;
+  border: 0.1em black solid;
+  border-radius: 0.5em;
+  margin: 0.5em 0;
+  display: flex;
+  flex-flow: wrap;
+  gap: 0.5em;
+`;
+function stringToHue(str: string): number {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 33) ^ str.charCodeAt(i);
+  }
+
+  return Math.abs(hash) % 360;
+}
+function CreditItem({ name, reason, link }: { name: string; reason?: string; link?: string }): h.JSX.Element {
   return (
-    <CreditItemComponent>
+    <CreditItemComponent stroke={stringToHue(name).toString()}>
       {link ? (
         <a target="_blank" href={link}>
           <span>{name}</span>
@@ -23,7 +44,7 @@ function CreditItem({ name, reason, link }: { name: string; reason: string; link
       ) : (
         <span>{name}</span>
       )}
-      - <span>{reason}</span>
+      {reason && <span> - {reason}</span>}
     </CreditItemComponent>
   );
 }
@@ -53,17 +74,30 @@ export function AboutPage({ setPage }: { setPage: (page: string) => void }): h.J
         </p>
         <p>
           Thanks to
-          <Stack className="ABCL-thanks-list">
-            <CreditItem name="Firefly" reason="for the original idea" />
-            <CreditItem name="JennaWbbb" reason="for contributing to the addon" link="https://github.com/JennaWbbb" />
-            <CreditItem name="Maple" reason="for the mod plugin template" link="https://github.com/mochamaple" />
-            <CreditItem name="Zoi" reason="for helping get themed to work" link="https://github.com/FurryZoi" />
-            <CreditItem name="minimar" reason="for helping with typos" link="https://github.com/minimar" />
-            <CreditItem name="Deep" reason="for helping with code review and testing" link="https://github.com/dDeepLb" />
-            <CreditItem name="Da'Inihlus" reason="for providing great library mods" link="https://github.com/dynilath" />
-            <CreditItem name="Nemesea" reason="for getting me started with modding in bc" link="https://github.com/tetris245" />
-            <CreditItem name="Sera" reason="for helping during the development process" link="https://github.com/littlesera" />
-          </Stack>
+          <CreditBox>
+            <CreditItem name="Firefly" />
+            <CreditItem name="Arelia" />
+            <CreditItem name="Lorenzi" />
+            <CreditItem name="Tenjõ" link="https://github.com/tenjou-no-kitsune" />
+            <CreditItem name="Lumi" link="https://github.com/blorbly" />
+            <CreditItem name="JennaWbbb" link="https://github.com/JennaWbbb" />
+            <CreditItem name="Maple" link="https://github.com/mochamaple" />
+            <CreditItem name="Zoi" link="https://github.com/FurryZoi" />
+            <CreditItem name="minimar" link="https://github.com/minimar" />
+            <CreditItem name="Deep" link="https://github.com/dDeepLb" />
+            <CreditItem name="Da'Inihlus" link="https://github.com/dynilath" />
+            <CreditItem name="Nemesea" link="https://github.com/tetris245" />
+            <CreditItem name="Sera" link="https://github.com/littlesera" />
+            <CreditItem name="Ashlor" link="https://github.com/Ashlor" />
+            <CreditItem name="Code Rabbit Ai" link="https://github.com/coderabbitai" />
+          </CreditBox>
+          <br />
+          <div>Supporters:</div>
+          <CreditBox>
+            <CreditItem name="Madelyn" />
+            <CreditItem name="Candi" />
+            <CreditItem name="JennaWbbb" />
+          </CreditBox>
         </p>
         <p>
           Source code available on{" "}

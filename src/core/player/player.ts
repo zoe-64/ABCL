@@ -43,6 +43,7 @@ export const abclPlayer = {
   },
   /** called frequently */
   tick: () => {
+    if (!shouldABCLActivate()) return;
     if (Player.ABCL.Settings.PeeMetabolism !== "Disabled") {
       const diureticCount = CommonClamp(InventoryCraftCount(Player, "Diuretic" as CraftingPropertyType, true), 0, 5);
 
@@ -61,6 +62,7 @@ export const abclPlayer = {
   },
   /** once per minute */
   update: () => {
+    if (!shouldABCLActivate()) return;
     if (Player.ABCL.Settings.PauseStats) {
       if (!Player.ABCL.Settings.UnPauseStatsWhenDiapered || !hasDiaper()) return;
       sendChatLocal("Stats unpaused due to setting unpause when diapered.");
@@ -509,7 +511,10 @@ export const abclPlayer = {
     },
   },
 };
-
+export function shouldABCLActivate() {
+  if (ChatRoomData?.BlockCategory?.includes("ABDL")) return false;
+  return true;
+}
 const playerSaver = new Saver(2 * 60 * 1000);
 
 export const incontinenceCheck = new Throttler(2 * 60 * 1000);
