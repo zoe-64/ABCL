@@ -6,6 +6,7 @@ import { ModIdentifier, ModVersion } from "../types/definitions";
 import { HookListener, ListenerTypeMap, PluginServerChatRoomMessage } from "../types/types";
 import { actions } from "./actionLoader";
 import { settingsRemote } from "./actions/sync";
+import { LittlishAPIWrapper } from "./api";
 import { logger } from "./logger";
 import { applyRandomPacifier, applyRandomPelvisDiaper, getDiaperVerb, getPlayerDiaperSize, hasDiaper, hasPacifier, isLeaking } from "./player/diaper";
 import { abclPlayer, shouldABCLActivate } from "./player/player";
@@ -319,26 +320,24 @@ const initHooks = async () => {
   });
  */
   HookManager.hookFunction("InformationSheetRun", HookPriority.TOP, (args, next) => {
+    if (!InformationSheetSelection?.ABCL) return next(args);
+    if (window?.bcx?.inBcxSubscreen?.() || window.MPA?.menuLoaded || LittlishAPIWrapper.inModSubscreen()) return next(args);
+
     if (
-      InformationSheetSelection?.ABCL &&
-      !window?.bcx?.inBcxSubscreen?.() &&
-      !window.MPA?.menuLoaded &&
-      window.LITTLISH_CLUB &&
-      !window.LITTLISH_CLUB.inModSubscreen() &&
-      (window.LITTLISH_CLUB.isCaregiverOf(Player, InformationSheetSelection) || window.LITTLISH_CLUB.isMommyOf(Player, InformationSheetSelection)) &&
-      window.LITTLISH_CLUB.hasAccessRightTo(Player, InformationSheetSelection, "MANAGE_ABCL_SETTINGS")
+      (LittlishAPIWrapper.isCaregiverOf(Player, InformationSheetSelection) || LittlishAPIWrapper.isMommyOf(Player, InformationSheetSelection)) &&
+      LittlishAPIWrapper.hasAccessRightTo(Player, InformationSheetSelection, "MANAGE_ABCL_SETTINGS")
     ) {
       DrawButton(1700 - 90 - 20, 700 - 15, 90, 90, "", "White", `${publicURL}/icon-small.png`, modName);
     }
     next(args);
   });
   function isCaregiver(player: Character): boolean {
-    if (Player.MemberNumber != player.MemberNumber) return false;
+    if (Player.MemberNumber == player.MemberNumber) return false;
     if (player.ABCL?.Settings.PrefixNamesWithCaregiverTitles) return false;
     if ((player.ABCL?.Stats.MentalRegression.value ?? 0) > 0.8) return false;
     if (player.Nickname?.toLowerCase()?.includes("little")) return false;
     if (player.Nickname?.toLowerCase()?.includes("baby")) return false;
-    if (window.LITTLISH_CLUB.isMommyOf(player, Player) || window.LITTLISH_CLUB.isCaregiverOf(player, Player)) return true;
+    if (LittlishAPIWrapper.isMommyOf(player, Player) || LittlishAPIWrapper.isCaregiverOf(player, Player)) return true;
     if (player.Title && (["Baby", "LittleOne", "Submissive", "Puppy", "Pet", "Brat"] as TitleName[]).includes(player.Title)) return false;
     if (ChatRoomData?.BlockCategory?.includes("ABDL")) return false;
     return true;
@@ -371,15 +370,12 @@ const initHooks = async () => {
   });
 
   HookManager.hookFunction("InformationSheetClick", HookPriority.OBSERVE, (args, next) => {
+    if (!InformationSheetSelection?.ABCL) return next(args);
+    if (!window.MPA?.menuLoaded || window?.bcx?.inBcxSubscreen?.() || LittlishAPIWrapper.inModSubscreen() || window?.LSCG_REMOTE_WINDOW_OPEN === true)
+      return next(args);
     if (
-      InformationSheetSelection?.ABCL &&
-      !window?.bcx?.inBcxSubscreen?.() &&
-      !window.MPA?.menuLoaded &&
-      !window?.LSCG_REMOTE_WINDOW_OPEN &&
-      window.LITTLISH_CLUB &&
-      !window.LITTLISH_CLUB.inModSubscreen() &&
-      (window.LITTLISH_CLUB.isCaregiverOf(Player, InformationSheetSelection) || window.LITTLISH_CLUB.isMommyOf(Player, InformationSheetSelection)) &&
-      window.LITTLISH_CLUB.hasAccessRightTo(Player, InformationSheetSelection, "MANAGE_ABCL_SETTINGS") &&
+      (LittlishAPIWrapper.isCaregiverOf(Player, InformationSheetSelection) || LittlishAPIWrapper.isMommyOf(Player, InformationSheetSelection)) &&
+      LittlishAPIWrapper.hasAccessRightTo(Player, InformationSheetSelection, "MANAGE_ABCL_SETTINGS") &&
       MouseIn(1700 - 90 - 10, 800 - 100, 90, 90)
     ) {
       getElement(document.body, "#ABCL-settings-page").classList.remove(`ABCL-hidden`);

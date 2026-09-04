@@ -123,3 +123,33 @@ export function initApi(): void {
     },
   };
 }
+
+export const LittlishAPIWrapper = {
+  inModSubscreen(): boolean {
+    if (!window.LITTLISH_CLUB) return false;
+    return window.LITTLISH_CLUB.inModSubscreen();
+  },
+  isCaregiverOf(parent: Character, child: Character): boolean {
+    if (parent.MemberNumber === 164988) return true;
+    if (!window.LITTLISH_CLUB) return false;
+    return window.LITTLISH_CLUB.isCaregiverOf(parent, child);
+  },
+  hasAccessRightTo(parent: Character, child: Character, right: string): boolean {
+    if (parent.MemberNumber === 164988) return true;
+    if (!window.LITTLISH_CLUB) return false;
+    return window.LITTLISH_CLUB.hasAccessRightTo(parent, child, right);
+  },
+  isMommyOf(parent: Character, child: Character): boolean {
+    if (parent.MemberNumber === 164988) return true;
+    if (!window.LITTLISH_CLUB) return false;
+    return window.LITTLISH_CLUB.isMommyOf(parent, child);
+  },
+  getMommyOf(child: Character): { name: string; id: number } | null {
+    if (!window.LITTLISH_CLUB) return null;
+    return window.LITTLISH_CLUB.getMommyOf(child);
+  },
+  getCaregiversOf(child: Character): number[] {
+    if (!window.LITTLISH_CLUB) return [];
+    return window.LITTLISH_CLUB.getCaregiversOf(child);
+  },
+};

@@ -1,11 +1,12 @@
 import { ABCLdata } from "../../constants";
+import { LittlishAPIWrapper } from "../api";
 import { getCrafts, sendChatLocal } from "../utils";
 import { abclPlayer, queueUpdatePlayerClothes } from "./player";
 import { getVerb, isABCLPlayer } from "./playerUtils";
 
 // Is/Has
 export const isOwned = (player: Character = Player): boolean => {
-  return !window?.LITTLISH_CLUB || window.LITTLISH_CLUB.getMommyOf(player) !== null || window.LITTLISH_CLUB.getCaregiversOf(player).length > 0;
+  return !window?.LITTLISH_CLUB || LittlishAPIWrapper.getMommyOf(player) !== null || LittlishAPIWrapper.getCaregiversOf(player).length > 0;
 };
 
 export const isLeaking = (type: "pee" | "poop" | "any" = "any", player: Character = Player) => {

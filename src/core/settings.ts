@@ -190,7 +190,7 @@ export const loadOrGenerateData = async () => {
         SettingPermissions: {},
         Version: ModVersion,
       };
-  if (data.Version !== ModVersion) {
+  if (data.LastVersion !== ModVersion) {
     summarizeVersionRange("https://github.com/zoe-64/ABCL/src/changelog", data.Version, ModVersion).then(result => {
       if (!result) return;
       setTimeout(() => {

@@ -1,7 +1,7 @@
 import { h, JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { resizeElements } from "src/core/player/ui";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { AboutPage } from "./pages/about";
 import { Changelog } from "./pages/changelog";
 import CruelPage from "./pages/cruel";
@@ -83,9 +83,63 @@ const MenuPage = styled.div<JSX.IntrinsicElements["div"]>`
     &:hover {
       background-color: var(--abcl-hover-color);
     }
+    text-decoration: none;
+  }
+`;
+const shineSweep = keyframes`
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
   }
 `;
 
+const PatreonLink = styled.a`
+  /* Layout & Sizing */
+  position: relative;
+  display: inline-block;
+  padding: 0.5em;
+  overflow: hidden;
+  user-select: none;
+  text-decoration: none;
+
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+
+  background: linear-gradient(135deg, hsl(0, 100%, 65%), hsl(340, 90%, 60%));
+
+  color: #ffffff;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: #ffffffc9;
+    transform: skewX(-25deg);
+    transition: none;
+  }
+
+  &:hover::before {
+    animation: ${shineSweep} 0.85s ease-in-out;
+  }
+  &:hover {
+    background: linear-gradient(135deg, hsl(0, 79%, 59%), hsl(340, 86%, 60%));
+  }
+
+  &:active {
+    background: linear-gradient(135deg, hsl(0, 100%, 76%), hsl(340, 81%, 71%));
+  }
+`;
 async function openSettings() {
   InformationSheetLoadCharacter(Player);
   await CommonSetScreen("Character", "Preference");
@@ -136,17 +190,20 @@ export default function SettingsPage(): h.JSX.Element {
                 <section>
                   <h2>Support</h2>
                   <div className="ABCL-contact-info" id="ABCL-contact-info">
-                    <button onClick={() => window.open("https://discord.gg/ENYGwmgDmQ", "_blank")} className="ABCL-button">
+                    <PatreonLink href="https://www.patreon.com/cutezoe" target="_blank" rel="noopener noreferrer">
+                      Support Zoe's Work!
+                    </PatreonLink>
+                    <a href="https://discord.gg/ENYGwmgDmQ" className="ABCL-button" target="_blank" rel="noopener noreferrer">
                       Join our Discord
-                    </button>
-                    <button
-                      onClick={() =>
-                        window.open("https://docs.google.com/forms/d/e/1FAIpQLSdOMGAEmOlFTpbcdkdn8b380p50WAE8qPux-45WvFM3qhf9_w/viewform", "_blank")
-                      }
+                    </a>
+                    <a
+                      href="https://docs.google.com/forms/d/e/1FAIpQLSdOMGAEmOlFTpbcdkdn8b380p50WAE8qPux-45WvFM3qhf9_w/viewform"
                       className="ABCL-button"
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
                       Give Feedback
-                    </button>
+                    </a>
                   </div>
                 </section>
               </MenuPage>
