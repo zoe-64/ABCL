@@ -371,7 +371,7 @@ const initHooks = async () => {
 
   HookManager.hookFunction("InformationSheetClick", HookPriority.OBSERVE, (args, next) => {
     if (!InformationSheetSelection?.ABCL) return next(args);
-    if (!window.MPA?.menuLoaded || window?.bcx?.inBcxSubscreen?.() || LittlishAPIWrapper.inModSubscreen() || window?.LSCG_REMOTE_WINDOW_OPEN === true)
+    if (window.MPA?.menuLoaded || window?.bcx?.inBcxSubscreen?.() || LittlishAPIWrapper.inModSubscreen() || window?.LSCG_REMOTE_WINDOW_OPEN === true)
       return next(args);
     if (
       (LittlishAPIWrapper.isCaregiverOf(Player, InformationSheetSelection) || LittlishAPIWrapper.isMommyOf(Player, InformationSheetSelection)) &&
