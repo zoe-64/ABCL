@@ -6,6 +6,7 @@
 // @author Zoe, Maple, En
 // @match https://*.bondageprojects.elementfx.com/R*/*
 // @match https://*.bondage-europe.com/R*/*
+// @match https://*.bondageeurope.com/R*/*
 // @match https://*.bondageprojects.com/R*/*
 // @match http://localhost:*/*
 // @icon  https://zoe-64.github.io/ABCL/versions/beta/assets/favicon.ico
