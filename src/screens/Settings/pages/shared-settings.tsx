@@ -8,6 +8,7 @@ import { Checkbox } from "src/screens/components/checkbox";
 import { MetabolismBar } from "src/screens/components/metabolismDropDown";
 import { Group } from "src/screens/components/positionComponents";
 import { SettingPanel } from "src/screens/components/settingPanel";
+import { PartialDeep } from "src/types/types";
 
 export default function SharedSettingsPage({ setPage, selectedCharacter }: { setPage: (page: string) => void; selectedCharacter?: Character }): JSX.Element {
   if (!selectedCharacter) return <div> No Character Selected </div>;
@@ -17,24 +18,24 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
   }
   if (!LittlishAPIWrapper.isMommyOf(Player, selectedCharacter) && !LittlishAPIWrapper.isCaregiverOf(Player, selectedCharacter))
     return <div> Not a Mommy or Caregiver to {selectedCharacter.Name}</div>;
-  const [peeMetabolism, setPeeMetabolism] = useState<MetabolismSetting>(selectedCharacter.ABCL.Settings.PeeMetabolism);
-  const [poopMetabolism, setPoopMetabolism] = useState<MetabolismSetting>(selectedCharacter.ABCL.Settings.PoopMetabolism);
-  const [mentalMetabolism, setMentalMetabolism] = useState<MetabolismSetting>(selectedCharacter.ABCL.Settings.MentalRegressionModifier);
-  const [diaperChangePromptSetting, setDiaperChangePromptSetting] = useState<DiaperChangePromptSetting>(selectedCharacter.ABCL.Settings.OnDiaperChange);
-  const [pauseStats, setPauseStats] = useState<boolean>(selectedCharacter.ABCL.Settings.PauseStats);
-  const [unPauseStatsWhenDiapered, setUnPauseStatsWhenDiapered] = useState<boolean>(selectedCharacter.ABCL.Settings.UnPauseStatsWhenDiapered);
-  const [disableWettingLeaks, setDisableWettingLeaks] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableWettingLeaks);
-  const [disableSoilingLeaks, setDisableSoilingLeaks] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableSoilingLeaks);
-  const [disableClothingStains, setDisableClothingStains] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableClothingStains);
-  const [disableDiaperStains, setDisableDiaperStains] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableDiaperStains);
-  const [accidentsByActivities, setAccidentsByActivities] = useState<boolean>(selectedCharacter.ABCL.Settings.AccidentsByActivities);
+  const [PeeMetabolism, setPeeMetabolism] = useState<MetabolismSetting>(selectedCharacter.ABCL.Settings.PeeMetabolism);
+  const [PoopMetabolism, setPoopMetabolism] = useState<MetabolismSetting>(selectedCharacter.ABCL.Settings.PoopMetabolism);
+  const [MentalRegressionModifier, setMentalMetabolism] = useState<MetabolismSetting>(selectedCharacter.ABCL.Settings.MentalRegressionModifier);
+  const [OnDiaperChange, setDiaperChangePromptSetting] = useState<DiaperChangePromptSetting>(selectedCharacter.ABCL.Settings.OnDiaperChange);
+  const [PauseStats, setPauseStats] = useState<boolean>(selectedCharacter.ABCL.Settings.PauseStats);
+  const [UnPauseStatsWhenDiapered, setUnPauseStatsWhenDiapered] = useState<boolean>(selectedCharacter.ABCL.Settings.UnPauseStatsWhenDiapered);
+  const [DisableWettingLeaks, setDisableWettingLeaks] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableWettingLeaks);
+  const [DisableSoilingLeaks, setDisableSoilingLeaks] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableSoilingLeaks);
+  const [DisableClothingStains, setDisableClothingStains] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableClothingStains);
+  const [DisableDiaperStains, setDisableDiaperStains] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableDiaperStains);
+  const [AccidentsByActivities, setAccidentsByActivities] = useState<boolean>(selectedCharacter.ABCL.Settings.AccidentsByActivities);
 
-  const [canChangeDiapers, setCanChangeDiapers] = useState<boolean>(selectedCharacter.ABCL.Settings.CanChangeDiapers);
-  const [canChangeSelf, setCanChangeSelf] = useState<boolean>(selectedCharacter.ABCL.Settings.CanChangeSelf);
-  const [canUseBathroomWithDiaper, setCanUseBathroomWithDiaper] = useState<boolean>(selectedCharacter.ABCL.Settings.CanUseBathroomWithDiaper);
-  const [canCheckDiaperWithRestraints, setCanCheckDiaperWithRestraints] = useState<boolean>(selectedCharacter.ABCL.Settings.CanCheckDiaperWithRestraints);
-  const [canUseToilet, setCanUseToilet] = useState<boolean>(selectedCharacter.ABCL.Settings.CanUseToilet);
-  const [canUsePotty, setCanUsePotty] = useState<boolean>(selectedCharacter.ABCL.Settings.CanUsePotty);
+  const [CanChangeDiapers, setCanChangeDiapers] = useState<boolean>(selectedCharacter.ABCL.Settings.CanChangeDiapers);
+  const [CanChangeSelf, setCanChangeSelf] = useState<boolean>(selectedCharacter.ABCL.Settings.CanChangeSelf);
+  const [CanUseBathroomWithDiaper, setCanUseBathroomWithDiaper] = useState<boolean>(selectedCharacter.ABCL.Settings.CanUseBathroomWithDiaper);
+  const [CanCheckDiaperWithRestraints, setCanCheckDiaperWithRestraints] = useState<boolean>(selectedCharacter.ABCL.Settings.CanCheckDiaperWithRestraints);
+  const [CanUseToilet, setCanUseToilet] = useState<boolean>(selectedCharacter.ABCL.Settings.CanUseToilet);
+  const [CanUsePotty, setCanUsePotty] = useState<boolean>(selectedCharacter.ABCL.Settings.CanUsePotty);
 
   const [peeMetabolismLocked, setPeeMetabolismLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.PeeMetabolism);
   const [poopMetabolismLocked, setPoopMetabolismLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.PoopMetabolism);
@@ -59,33 +60,33 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
     selectedCharacter.ABCL.SettingPermissions.CanCheckDiaperWithRestraints,
   );
 
-  const [miniGameDifficulty, setMinigameDifficulty] = useState<MiniGameDifficulty>(selectedCharacter.ABCL.Settings.MiniGameDifficulty);
+  const [MiniGameDifficulty, setMinigameDifficulty] = useState<MiniGameDifficulty>(selectedCharacter.ABCL.Settings.MiniGameDifficulty);
   const [miniGameDifficultyLocked, setMinigameDifficultyLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.MiniGameDifficulty);
 
   const [canUseToiletLocked, setCanUseToiletLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.CanUseToilet);
   const [canUsePottyLocked, setCanUsePottyLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.CanUsePotty);
 
-  const [incontinenceOnlyIncrease, setIncontinenceOnlyIncrease] = useState<boolean>(selectedCharacter.ABCL.Settings.IncontinenceOnlyIncrease);
+  const [IncontinenceOnlyIncrease, setIncontinenceOnlyIncrease] = useState<boolean>(selectedCharacter.ABCL.Settings.IncontinenceOnlyIncrease);
   const [incontinenceOnlyIncreaseLocked, setIncontinenceOnlyIncreaseLocked] = useState<boolean>(
     selectedCharacter.ABCL.SettingPermissions.IncontinenceOnlyIncrease,
   );
 
-  const [regressionOnlyIncrease, setRegressionOnlyIncrease] = useState<boolean>(selectedCharacter.ABCL.Settings.MentalRegressionOnlyIncrease);
+  const [MentalRegressionOnlyIncrease, setRegressionOnlyIncrease] = useState<boolean>(selectedCharacter.ABCL.Settings.MentalRegressionOnlyIncrease);
   const [regressionOnlyIncreaseLocked, setRegressionOnlyIncreaseLocked] = useState<boolean>(
     selectedCharacter.ABCL.SettingPermissions.MentalRegressionOnlyIncrease,
   );
 
-  const [forcePacifiers, setForcePacifiers] = useState<boolean>(selectedCharacter.ABCL.Settings.ForcePacifiers);
+  const [ForcePacifiers, setForcePacifiers] = useState<boolean>(selectedCharacter.ABCL.Settings.ForcePacifiers);
   const [forcePacifiersLocked, setForcePacifiersLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.ForcePacifiers);
-  const [forceDiapers, setForceDiapers] = useState<boolean>(selectedCharacter.ABCL.Settings.ForceDiapers);
+  const [ForceDiapers, setForceDiapers] = useState<boolean>(selectedCharacter.ABCL.Settings.ForceDiapers);
   const [forceDiapersLocked, setForceDiapersLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.ForceDiapers);
 
-  const [prefixNamesWithCaregiverTitles, setPrefixNamesWithCaregiverTitles] = useState<boolean>(selectedCharacter.ABCL.Settings.PrefixNamesWithCaregiverTitles);
+  const [PrefixNamesWithCaregiverTitles, setPrefixNamesWithCaregiverTitles] = useState<boolean>(selectedCharacter.ABCL.Settings.PrefixNamesWithCaregiverTitles);
   const [prefixNamesWithCaregiverTitlesLocked, setPrefixNamesWithCaregiverTitlesLocked] = useState<boolean>(
     selectedCharacter.ABCL.SettingPermissions.PrefixNamesWithCaregiverTitles,
   );
 
-  const [hideStats, setHideStats] = useState<boolean>(selectedCharacter.ABCL.Settings.HideStats);
+  const [HideStats, setHideStats] = useState<boolean>(selectedCharacter.ABCL.Settings.HideStats);
   const [hideStatsLocked, setHideStatsLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.HideStats);
 
   return (
@@ -95,74 +96,63 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
           getElement(document.body, "#ABCL-settings-page").classList.add(`ABCL-hidden`);
           setPage("menu");
           InformationSheetLoadCharacter(selectedCharacter);
-          ToastManager.success(`Updated ${selectedCharacter.Name}'s settings.`);
-          sendChatLocal(`Updated ${selectedCharacter.Name}'s settings.`);
           InformationSheetReturnScreen = ["Online", "ChatRoom"];
           if (!selectedCharacter.ABCL || typeof selectedCharacter.MemberNumber !== "number") return;
+          // prettier-ignore
+          const settings: PartialDeep<ModSettings> = {
+            PauseStats, UnPauseStatsWhenDiapered, PeeMetabolism, PoopMetabolism, MentalRegressionModifier,
+            OnDiaperChange, DisableClothingStains, DisableDiaperStains, AccidentsByActivities, DisableWettingLeaks,
+            DisableSoilingLeaks, CanChangeSelf, CanChangeDiapers, CanUseBathroomWithDiaper, CanCheckDiaperWithRestraints,
+            CanUseToilet, CanUsePotty, MiniGameDifficulty, IncontinenceOnlyIncrease, MentalRegressionOnlyIncrease,
+            ForceDiapers, ForcePacifiers, PrefixNamesWithCaregiverTitles, HideStats
+          };
+          const permissions: PartialDeep<Record<SettingKeys, boolean>> = {
+            PauseStats: pauseStatsLocked,
+            UnPauseStatsWhenDiapered: unPauseStatsWhenDiaperedLocked,
+            PeeMetabolism: peeMetabolismLocked,
+            PoopMetabolism: poopMetabolismLocked,
+            MentalRegressionModifier: mentalMetabolismLocked,
+            OnDiaperChange: diaperChangePromptSettingLocked,
+            DisableClothingStains: disableClothingStainsLocked,
+            DisableDiaperStains: disableDiaperStainsLocked,
+            AccidentsByActivities: accidentsByActivitiesLocked,
+            DisableWettingLeaks: disableWettingLeaksLocked,
+            DisableSoilingLeaks: disableSoilingLeaksLocked,
+            CanChangeSelf: canChangeSelfLocked,
+            CanChangeDiapers: canChangeDiapersLocked,
+            CanUseBathroomWithDiaper: canUseBathroomWithDiaperLocked,
+            CanCheckDiaperWithRestraints: canCheckDiaperWithRestraintsLocked,
+            CanUseToilet: canUseToiletLocked,
+            CanUsePotty: canUsePottyLocked,
+            MiniGameDifficulty: miniGameDifficultyLocked,
+            IncontinenceOnlyIncrease: incontinenceOnlyIncreaseLocked,
+            MentalRegressionOnlyIncrease: regressionOnlyIncreaseLocked,
+            ForceDiapers: forceDiapersLocked,
+            ForcePacifiers: forcePacifiersLocked,
+            PrefixNamesWithCaregiverTitles: prefixNamesWithCaregiverTitlesLocked,
+            HideStats: hideStatsLocked,
+          };
+          if (
+            CommonDeepEqual({ ...selectedCharacter.ABCL.Settings, ...settings }, selectedCharacter.ABCL.Settings) &&
+            CommonDeepEqual({ ...selectedCharacter.ABCL.SettingPermissions, ...permissions }, selectedCharacter.ABCL.SettingPermissions)
+          )
+            return;
+          sendChatLocal(`Updated ${selectedCharacter.Name}'s settings.`);
+          ToastManager.success(`Updated ${selectedCharacter.Name}'s settings.`);
           settingsRemote.emit(selectedCharacter.MemberNumber, "updateSettings", {
-            settings: {
-              PauseStats: pauseStats,
-              UnPauseStatsWhenDiapered: unPauseStatsWhenDiapered,
-              PeeMetabolism: peeMetabolism,
-              PoopMetabolism: poopMetabolism,
-              MentalRegressionModifier: mentalMetabolism,
-              OnDiaperChange: diaperChangePromptSetting,
-              DisableClothingStains: disableClothingStains,
-              DisableDiaperStains: disableDiaperStains,
-              AccidentsByActivities: accidentsByActivities,
-              DisableWettingLeaks: disableWettingLeaks,
-              DisableSoilingLeaks: disableSoilingLeaks,
-              CanChangeSelf: canChangeSelf,
-              CanChangeDiapers: canChangeDiapers,
-              CanUseBathroomWithDiaper: canUseBathroomWithDiaper,
-              CanCheckDiaperWithRestraints: canCheckDiaperWithRestraints,
-              CanUseToilet: canUseToilet,
-              CanUsePotty: canUsePotty,
-              MiniGameDifficulty: miniGameDifficulty,
-              IncontinenceOnlyIncrease: incontinenceOnlyIncrease,
-              MentalRegressionOnlyIncrease: regressionOnlyIncrease,
-              ForceDiapers: forceDiapers,
-              ForcePacifiers: forcePacifiers,
-              PrefixNamesWithCaregiverTitles: prefixNamesWithCaregiverTitles,
-              HideStats: hideStats,
-            },
-            settingPermissions: {
-              PauseStats: pauseStatsLocked,
-              UnPauseStatsWhenDiapered: unPauseStatsWhenDiaperedLocked,
-              PeeMetabolism: peeMetabolismLocked,
-              PoopMetabolism: poopMetabolismLocked,
-              MentalRegressionModifier: mentalMetabolismLocked,
-              OnDiaperChange: diaperChangePromptSettingLocked,
-              DisableClothingStains: disableClothingStainsLocked,
-              DisableDiaperStains: disableDiaperStainsLocked,
-              AccidentsByActivities: accidentsByActivitiesLocked,
-              DisableWettingLeaks: disableWettingLeaksLocked,
-              DisableSoilingLeaks: disableSoilingLeaksLocked,
-              CanChangeSelf: canChangeSelfLocked,
-              CanChangeDiapers: canChangeDiapersLocked,
-              CanUseBathroomWithDiaper: canUseBathroomWithDiaperLocked,
-              CanCheckDiaperWithRestraints: canCheckDiaperWithRestraintsLocked,
-              CanUseToilet: canUseToiletLocked,
-              CanUsePotty: canUsePottyLocked,
-              MiniGameDifficulty: miniGameDifficultyLocked,
-              IncontinenceOnlyIncrease: incontinenceOnlyIncreaseLocked,
-              MentalRegressionOnlyIncrease: regressionOnlyIncreaseLocked,
-              ForceDiapers: forceDiapersLocked,
-              ForcePacifiers: forcePacifiersLocked,
-              PrefixNamesWithCaregiverTitles: prefixNamesWithCaregiverTitlesLocked,
-              HideStats: hideStatsLocked,
-            },
+            settings: settings,
+            settingPermissions: permissions,
           });
         }}
         className="ABCL-exit-button"
       />
       <Group>
         <SettingPanel title="Pause Stats">
-          <Checkbox checked={pauseStats} setChecked={setPauseStats} locked={pauseStatsLocked} setLocked={setPauseStatsLocked} />
+          <Checkbox checked={PauseStats} setChecked={setPauseStats} locked={pauseStatsLocked} setLocked={setPauseStatsLocked} />
         </SettingPanel>
         <SettingPanel title="Resume Stats When Diapered">
           <Checkbox
-            checked={unPauseStatsWhenDiapered}
+            checked={UnPauseStatsWhenDiapered}
             setChecked={setUnPauseStatsWhenDiapered}
             locked={unPauseStatsWhenDiaperedLocked}
             setLocked={setUnPauseStatsWhenDiaperedLocked}
@@ -170,7 +160,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
         </SettingPanel>
         <SettingPanel title="Wetting Leaks / Puddles">
           <Checkbox
-            checked={disableWettingLeaks}
+            checked={DisableWettingLeaks}
             setChecked={setDisableWettingLeaks}
             locked={disableWettingLeaksLocked}
             setLocked={setDisableWettingLeaksLocked}
@@ -179,7 +169,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
         </SettingPanel>
         <SettingPanel title="Messy Leaks">
           <Checkbox
-            checked={disableSoilingLeaks}
+            checked={DisableSoilingLeaks}
             setChecked={setDisableSoilingLeaks}
             locked={disableSoilingLeaksLocked}
             setLocked={setDisableSoilingLeaksLocked}
@@ -188,7 +178,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
         </SettingPanel>
         <SettingPanel title="Clothing Stains">
           <Checkbox
-            checked={disableClothingStains}
+            checked={DisableClothingStains}
             setChecked={setDisableClothingStains}
             locked={disableClothingStainsLocked}
             setLocked={setDisableClothingStainsLocked}
@@ -197,7 +187,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
         </SettingPanel>
         <SettingPanel title="Diaper Stains">
           <Checkbox
-            checked={disableDiaperStains}
+            checked={DisableDiaperStains}
             setChecked={setDisableDiaperStains}
             locked={disableDiaperStainsLocked}
             setLocked={setDisableDiaperStainsLocked}
@@ -206,21 +196,21 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
         </SettingPanel>
         <SettingPanel title="Accidents by Activities">
           <Checkbox
-            checked={accidentsByActivities}
+            checked={AccidentsByActivities}
             setChecked={setAccidentsByActivities}
             locked={accidentsByActivitiesLocked}
             setLocked={setAccidentsByActivitiesLocked}
           />
         </SettingPanel>
         <SettingPanel title="Can Change Self">
-          <Checkbox checked={canChangeSelf} setChecked={setCanChangeSelf} locked={canChangeSelfLocked} setLocked={setCanChangeSelfLocked} />
+          <Checkbox checked={CanChangeSelf} setChecked={setCanChangeSelf} locked={canChangeSelfLocked} setLocked={setCanChangeSelfLocked} />
         </SettingPanel>
         <SettingPanel title="Can Change Diapers">
-          <Checkbox checked={canChangeDiapers} setChecked={setCanChangeDiapers} locked={canChangeDiapersLocked} setLocked={setCanChangeDiapersLocked} />
+          <Checkbox checked={CanChangeDiapers} setChecked={setCanChangeDiapers} locked={canChangeDiapersLocked} setLocked={setCanChangeDiapersLocked} />
         </SettingPanel>
         <SettingPanel title="Can Use Potty/Toilet With Diaper">
           <Checkbox
-            checked={canUseBathroomWithDiaper}
+            checked={CanUseBathroomWithDiaper}
             setChecked={setCanUseBathroomWithDiaper}
             locked={canUseBathroomWithDiaperLocked}
             setLocked={setCanUseBathroomWithDiaperLocked}
@@ -228,30 +218,30 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
         </SettingPanel>
         <SettingPanel title="Can Check Diaper With Restraints">
           <Checkbox
-            checked={canCheckDiaperWithRestraints}
+            checked={CanCheckDiaperWithRestraints}
             setChecked={setCanCheckDiaperWithRestraints}
             locked={canCheckDiaperWithRestraintsLocked}
             setLocked={setCanCheckDiaperWithRestraintsLocked}
           />
         </SettingPanel>
         <SettingPanel title="Can Use Toilet">
-          <Checkbox checked={canUseToilet} setChecked={setCanUseToilet} locked={canUseToiletLocked} setLocked={setCanUseToiletLocked} />
+          <Checkbox checked={CanUseToilet} setChecked={setCanUseToilet} locked={canUseToiletLocked} setLocked={setCanUseToiletLocked} />
         </SettingPanel>
         <SettingPanel title="Can Use Potty">
-          <Checkbox checked={canUsePotty} setChecked={setCanUsePotty} locked={canUsePottyLocked} setLocked={setCanUsePottyLocked} />
+          <Checkbox checked={CanUsePotty} setChecked={setCanUsePotty} locked={canUsePottyLocked} setLocked={setCanUsePottyLocked} />
         </SettingPanel>
       </Group>
       <div style={{ height: "0.5em" }}></div>
       <Group>
         <SettingPanel title="Pee Metabolism">
-          <MetabolismBar value={peeMetabolism} setValue={setPeeMetabolism} locked={peeMetabolismLocked} setLocked={setPeeMetabolismLocked}></MetabolismBar>
+          <MetabolismBar value={PeeMetabolism} setValue={setPeeMetabolism} locked={peeMetabolismLocked} setLocked={setPeeMetabolismLocked}></MetabolismBar>
         </SettingPanel>
         <SettingPanel title="Bowel Metabolism">
-          <MetabolismBar value={poopMetabolism} setValue={setPoopMetabolism} locked={poopMetabolismLocked} setLocked={setPoopMetabolismLocked}></MetabolismBar>
+          <MetabolismBar value={PoopMetabolism} setValue={setPoopMetabolism} locked={poopMetabolismLocked} setLocked={setPoopMetabolismLocked}></MetabolismBar>
         </SettingPanel>
         <SettingPanel title="Mental Regression">
           <MetabolismBar
-            value={mentalMetabolism}
+            value={MentalRegressionModifier}
             setValue={setMentalMetabolism}
             locked={mentalMetabolismLocked}
             setLocked={setMentalMetabolismLocked}
@@ -261,7 +251,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
           <ButtonGroup
             locked={diaperChangePromptSettingLocked}
             options={["Deny", "Ask", "Allow"] as DiaperChangePromptSetting[]}
-            value={diaperChangePromptSetting}
+            value={OnDiaperChange}
             setValue={(value: string) => {
               setDiaperChangePromptSetting(value as DiaperChangePromptSetting);
             }}
@@ -272,7 +262,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
           <ButtonGroup
             locked={miniGameDifficultyLocked}
             options={["Easy", "Normal", "Hard", "Impossible"] satisfies MiniGameDifficulty[]}
-            value={miniGameDifficulty}
+            value={MiniGameDifficulty}
             setValue={(value: string) => {
               setMinigameDifficulty(value as MiniGameDifficulty);
             }}
@@ -284,7 +274,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
       <Group>
         <SettingPanel title="Incontinence Only Increase">
           <Checkbox
-            checked={incontinenceOnlyIncrease}
+            checked={IncontinenceOnlyIncrease}
             setChecked={setIncontinenceOnlyIncrease}
             locked={incontinenceOnlyIncreaseLocked}
             setLocked={setIncontinenceOnlyIncreaseLocked}
@@ -292,28 +282,28 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
         </SettingPanel>
         <SettingPanel title="Mental Regression Only Increase">
           <Checkbox
-            checked={regressionOnlyIncrease}
+            checked={MentalRegressionOnlyIncrease}
             setChecked={setRegressionOnlyIncrease}
             locked={regressionOnlyIncreaseLocked}
             setLocked={setRegressionOnlyIncreaseLocked}
           />
         </SettingPanel>
         <SettingPanel title="Force Diapers">
-          <Checkbox checked={forceDiapers} setChecked={setForceDiapers} locked={forceDiapersLocked} setLocked={setForceDiapersLocked} />
+          <Checkbox checked={ForceDiapers} setChecked={setForceDiapers} locked={forceDiapersLocked} setLocked={setForceDiapersLocked} />
         </SettingPanel>
         <SettingPanel title="Force Pacifiers">
-          <Checkbox checked={forcePacifiers} setChecked={setForcePacifiers} locked={forcePacifiersLocked} setLocked={setForcePacifiersLocked} />
+          <Checkbox checked={ForcePacifiers} setChecked={setForcePacifiers} locked={forcePacifiersLocked} setLocked={setForcePacifiersLocked} />
         </SettingPanel>
         <SettingPanel title="Prefix Names with Caregiver Titles">
           <Checkbox
-            checked={prefixNamesWithCaregiverTitles}
+            checked={PrefixNamesWithCaregiverTitles}
             setChecked={setPrefixNamesWithCaregiverTitles}
             locked={prefixNamesWithCaregiverTitlesLocked}
             setLocked={setPrefixNamesWithCaregiverTitlesLocked}
           />
         </SettingPanel>
         <SettingPanel title="Hide Stats">
-          <Checkbox checked={hideStats} setChecked={setHideStats} locked={hideStatsLocked} setLocked={setHideStatsLocked} />
+          <Checkbox checked={HideStats} setChecked={setHideStats} locked={hideStatsLocked} setLocked={setHideStatsLocked} />
         </SettingPanel>
       </Group>
       <div style={{ height: "10em" }}></div>
