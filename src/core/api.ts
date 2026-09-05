@@ -130,17 +130,14 @@ export const LittlishAPIWrapper = {
     return window.LITTLISH_CLUB.inModSubscreen();
   },
   isCaregiverOf(parent: Character, child: Character): boolean {
-    if (parent.MemberNumber === 164988) return true;
     if (!window.LITTLISH_CLUB) return false;
     return window.LITTLISH_CLUB.isCaregiverOf(parent, child);
   },
   hasAccessRightTo(parent: Character, child: Character, right: string): boolean {
-    if (parent.MemberNumber === 164988) return true;
     if (!window.LITTLISH_CLUB) return false;
     return window.LITTLISH_CLUB.hasAccessRightTo(parent, child, right);
   },
   isMommyOf(parent: Character, child: Character): boolean {
-    if (parent.MemberNumber === 164988) return true;
     if (!window.LITTLISH_CLUB) return false;
     return window.LITTLISH_CLUB.isMommyOf(parent, child);
   },
