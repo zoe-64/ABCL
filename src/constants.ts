@@ -3,6 +3,9 @@ export const ABCLdata = abclData;
 
 export const loopInterval = 60 * 1000;
 
+export const ABCLOwner = 164988;
+export const ABCLAdmins = [ABCLOwner];
+
 //balancing
 export const THEME = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 export const INCONTINENCE_ON_MINIGAME_FAILURE = 0.002;

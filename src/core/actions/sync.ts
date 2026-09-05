@@ -2,6 +2,7 @@ import { sendUpdateMyData } from "../hooks";
 import { logger } from "../logger";
 
 import { ChatRoomEvents, ChatRoomRemoteEventEmitter } from "@sugarch/bc-event-handler";
+import { ABCLAdmins } from "src/constants";
 import { ModVersion } from "src/types/definitions";
 import { PartialDeep } from "src/types/types";
 import { LittlishAPIWrapper } from "../api";
@@ -18,7 +19,7 @@ export const settingsRemote = new ChatRoomRemoteEventEmitter<EventMap>(modIdenti
 settingsRemote.on("updateSettings", (info, { settings, settingPermissions }) => {
   const character = ChatRoomCharacter.find(character => character.MemberNumber === info.sender);
   if (!character) return;
-  if (!window.LITTLISH_CLUB && info.sender !== 164988) {
+  if (!window.LITTLISH_CLUB && ABCLAdmins.includes(info.sender)) {
     ToastManager.info(
       `${character.Nickname ?? character.Name} (${character.MemberNumber}) tried to updated your settings but you don't have Littlish Club installed.`,
     );
