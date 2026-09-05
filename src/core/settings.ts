@@ -1,4 +1,5 @@
 import { debounce, merge } from "lodash-es";
+import { ABCLOwner } from "src/constants";
 import { ModVersion } from "src/types/definitions";
 import { DiaperSettingValues, MetabolismSettings, PartialDeep } from "../types/types";
 import { sendUpdateMyData } from "./hooks";
@@ -196,7 +197,7 @@ export const loadOrGenerateData = async () => {
       setTimeout(() => {
         ServerAccountBeep({
           Message: `ABCL Updated! ${data.Version} -> ${ModVersion}\nSee settings for full changelog.\n\n${result.combinedText}`,
-          MemberNumber: 164988,
+          MemberNumber: ABCLOwner,
           MemberName: "Zoe - author of ABCL",
           ChatRoomSpace: "",
           ChatRoomName: "",

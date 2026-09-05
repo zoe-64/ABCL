@@ -170,7 +170,7 @@ export class DistractionRushGame extends BaseMiniGame {
     this.correctAnswers = 0;
     this.mistakes = 0;
     this.renderGame();
-    this.timeLeft = DistractionRushGame.timerLength / MiniGameDifficulty;
+    this.timeLeft = Math.floor(DistractionRushGame.timerLength / MiniGameDifficulty);
     this.timer = setInterval(() => {
       this.timeLeft--;
       const timer = document.getElementById("abcl-minigame-timer");
