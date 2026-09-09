@@ -258,9 +258,14 @@ export const incontinenceOnAccident = (incontinence: number) => {
 };
 
 export function applyRandomPelvisDiaper(player: Character = Player) {
-  const diapers = ["PoofyDiaper", "UntrainersThin", "LatexDiaper", "BulkyDiaper"];
-  const assetName = diapers[Math.floor(Math.random() * diapers.length)];
-  const items = getCrafts("ItemPelvis").filter(item => isDiaper(item));
+  const diapers = [
+    AssetGet("Female3DCG", "ItemPelvis", "PoofyDiaper"),
+    AssetGet("Female3DCG", "ItemPelvis", "UntrainersThin"),
+    AssetGet("Female3DCG", "ItemPelvis", "LatexDiaper"),
+    AssetGet("Female3DCG", "ItemPelvis", "BulkyDiaper"),
+  ].filter((item): item is Asset => Boolean(item));
+  const asset = InventoryGetRandom(Player, "ItemMouth", diapers);
+  const items = getCrafts("ItemPelvis").filter(item => item.Asset.Name === asset?.Name);
 
   if (items.length > 0 && Math.random() > 0.25) {
     const item = items[Math.floor(Math.random() * items.length)];
@@ -271,26 +276,27 @@ export function applyRandomPelvisDiaper(player: Character = Player) {
     return;
   }
 
-  if (assetName) {
-    InventoryWear(player, assetName, "ItemPelvis");
-    InventoryLock(player, "ItemPelvis", "ExclusivePadlock", null, true);
-    sendChatLocal("The diaper goddess diapers you back up");
-  }
+  if (!asset) return;
+  InventoryWear(player, asset?.Name, "ItemPelvis");
+  InventoryLock(player, "ItemPelvis", "ExclusivePadlock", null, true);
+  sendChatLocal("The diaper goddess diapers you back up");
 }
 
 export function applyRandomPacifier(player: Character = Player) {
   const itemMouth1 = InventoryGet(player, "ItemMouth");
   const itemMouth2 = InventoryGet(player, "ItemMouth2");
   let slot: AssetGroupName = "ItemMouth3";
-  if (!itemMouth1) {
-    slot = "ItemMouth";
-  } else if (!itemMouth2) {
-    slot = "ItemMouth2";
-  }
-  const items = getCrafts(slot).filter(item => isPacifier(item));
+  if (!itemMouth1) slot = "ItemMouth";
+  else if (!itemMouth2) slot = "ItemMouth2";
 
-  const diapers = ["PacifierClip", "PaciGag", "HarnessPacifierGag", "PacifierGag"];
-  const assetName = diapers[Math.floor(Math.random() * diapers.length)];
+  const pacifiers = [
+    AssetGet("Female3DCG", slot, "PacifierClip"),
+    AssetGet("Female3DCG", slot, "PaciGag"),
+    AssetGet("Female3DCG", slot, "HarnessPacifierGag"),
+    AssetGet("Female3DCG", slot, "PacifierGag"),
+  ].filter((item): item is Asset => Boolean(item));
+  const asset = InventoryGetRandom(Player, "ItemMouth", pacifiers);
+  const items = getCrafts(slot).filter(item => item.Asset.Name === asset?.Name);
 
   if (items.length > 0 && Math.random() > 0.25) {
     const item = items[Math.floor(Math.random() * items.length)];
@@ -301,10 +307,9 @@ export function applyRandomPacifier(player: Character = Player) {
     return;
   }
 
-  if (assetName) {
-    InventoryWear(Player, assetName, slot);
-    sendChatLocal("The diaper goddess pacifies you");
-  }
+  if (!asset) return;
+  InventoryWear(Player, asset.Name, slot);
+  sendChatLocal("The diaper goddess pacifies you");
 }
 
 export const mentalRegressionOnAccident = () => {
