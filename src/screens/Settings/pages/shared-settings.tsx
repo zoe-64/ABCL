@@ -291,7 +291,7 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
         <SettingPanel title="Force Diapers">
           <Checkbox checked={ForceDiapers} setChecked={setForceDiapers} locked={forceDiapersLocked} setLocked={setForceDiapersLocked} />
         </SettingPanel>
-        <SettingPanel title="Force Pacifiers">
+        <SettingPanel title="Force Pacifiers (Experimental)">
           <Checkbox checked={ForcePacifiers} setChecked={setForcePacifiers} locked={forcePacifiersLocked} setLocked={setForcePacifiersLocked} />
         </SettingPanel>
         <SettingPanel title="Prefix Names with Caregiver Titles">

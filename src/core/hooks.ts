@@ -363,7 +363,7 @@ const initHooks = async () => {
       nickname = "❀ " + nickname;
     }
     if (_C.MemberNumber === 164988) {
-      nickname = "ᐢ. ₓ .ᐢ " + nickname;
+      nickname = "ი𐑼 " + nickname;
     }
 
     return nickname;

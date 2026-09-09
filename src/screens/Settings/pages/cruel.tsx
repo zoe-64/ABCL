@@ -64,7 +64,7 @@ export default function CruelPage({ setPage }: { setPage: (page: string) => void
         <SettingPanel title="Force Diapers">
           <Checkbox checked={forceDiapers} setChecked={setForceDiapers} locked={forceDiapersLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
-        <SettingPanel title="Force Pacifiers">
+        <SettingPanel title="Force Pacifiers (Experimental)">
           <Checkbox checked={forcePacifiers} setChecked={setForcePacifiers} locked={forcePacifiersLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
         <SettingPanel title="Prefix Names with Caregiver Titles">

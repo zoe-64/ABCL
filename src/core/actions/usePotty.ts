@@ -7,7 +7,7 @@ import { sendChatLocal } from "../utils";
 
 export const usePottyFunction = () => {
   const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;
-  const isGood = abclPlayer.stats.BladderFullness > 0.6 || abclPlayer.stats.BowelFullness > 0.6;
+  const isGood = abclPlayer.stats.BladderFullness > 0.6 - incontinenceOffset || abclPlayer.stats.BowelFullness > 0.6 - incontinenceOffset;
   const isTooEarly = abclPlayer.stats.BladderFullness < 0.3 - incontinenceOffset && abclPlayer.stats.BowelFullness < 0.3 - incontinenceOffset;
   const isTooFarGone = abclPlayer.stats.MentalRegression > 0.9;
   const isEmbarrassed = abclPlayer.stats.MentalRegression < 0.3;
