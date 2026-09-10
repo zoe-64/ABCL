@@ -35,6 +35,12 @@
       "ClothLowerJeans1", // Jeans
       "ClothLowerJeans2", // Ripped Jeans
       "ClothLowerPajama1" // Pajama
+    ],
+    "Pacifiers": [
+      "ItemMouthHarnessPacifierGag", // Harness Pacifier
+      "ItemMouthPacifierGag", // Pacifier
+      "ItemMouthPaciGag", // Pacifier Gag
+      "ItemMouthPacifierClip" // Pacifier Clip
     ]
   },
   "DiaperColors": {
@@ -57,6 +63,7 @@
     "heavy_adult": 2500,
     "specialized": 3500
   },
+
   "Diapers": {
     // echo compat
     "Panties_笨笨蛋LuziDiapers1": {
