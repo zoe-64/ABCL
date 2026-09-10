@@ -97,6 +97,7 @@ export function AboutPage({ setPage }: { setPage: (page: string) => void }): h.J
             <CreditItem name="Madelyn" />
             <CreditItem name="Candi" />
             <CreditItem name="JennaWbbb" />
+            <CreditItem name="Moonie" />
           </CreditBox>
         </p>
         <p>

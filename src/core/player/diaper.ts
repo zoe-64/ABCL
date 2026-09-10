@@ -264,7 +264,7 @@ export function applyRandomPelvisDiaper(player: Character = Player) {
     AssetGet("Female3DCG", "ItemPelvis", "LatexDiaper"),
     AssetGet("Female3DCG", "ItemPelvis", "BulkyDiaper"),
   ].filter((item): item is Asset => Boolean(item));
-  const asset = InventoryGetRandom(Player, "ItemMouth", diapers);
+  const asset = InventoryGetRandom(Player, "ItemPelvis", diapers);
   const items = getCrafts("ItemPelvis").filter(item => item.Asset.Name === asset?.Name);
 
   if (items.length > 0 && Math.random() > 0.25) {
@@ -272,7 +272,7 @@ export function applyRandomPelvisDiaper(player: Character = Player) {
     if (!item || !item.Craft) return;
     InventoryWear(Player, item.Asset.Name, "ItemPelvis");
     InventoryCraft(null, Player, "ItemPelvis", item.Craft, true);
-    sendChatLocal("The diaper goddess pacifies you");
+    sendChatLocal("The diaper goddess diapers you back up");
     return;
   }
 
