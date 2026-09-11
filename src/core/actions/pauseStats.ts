@@ -1,11 +1,13 @@
 import { CombinedAction } from "../../types/types";
 import { sendABCLAction } from "../player/playerUtils";
+import { syncData } from "../settings";
 import { sendChatLocal } from "../utils";
 
 export const pauseStatsFunction = () => {
   const isPaused = Player.ABCL.Settings.PauseStats;
   sendABCLAction(isPaused ? "%NAME% resumed %POSSESSIVE% ABCL stats." : "%NAME% paused %POSSESSIVE% ABCL stats.", Player, "pauseStats");
   Player.ABCL.Settings.PauseStats = !isPaused;
+  syncData();
 };
 
 export const pauseStats: CombinedAction = {
