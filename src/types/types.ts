@@ -3,6 +3,8 @@ import { changeDiaperListeners } from "../core/actions/changeDiaper";
 import { lickPuddleListeners } from "../core/actions/lickPuddle";
 import { onABCLMessageListeners } from "../core/actions/onABCLMessage";
 
+import { CustomActivity } from "@sugarch/bc-activity-manager";
+
 import { diaperFaceRubListeners } from "src/core/actions/diaperFaceRub";
 import { diaperFaceSitListeners } from "src/core/actions/diaperFaceSit";
 import { diaperPatBackListeners } from "src/core/actions/diaperPatBack";
@@ -134,7 +136,7 @@ export type ListenerTypeMap = wipePuddleListeners &
   diaperSquishFrontListeners;
 
 export type CombinedAction = {
-  activity?: ABCLActivity;
+  activity?: CustomActivity;
   command?: ICommand;
   listeners?: Partial<{
     [K in keyof ListenerTypeMap]: HookListener<ListenerTypeMap[K]>;

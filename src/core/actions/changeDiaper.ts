@@ -1,4 +1,5 @@
 import { CombinedAction, DiaperSettingValues } from "../../types/types";
+import { CriteriaResult, Prerequisiter } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { hasDiaper, isDiaperLocked, updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
@@ -43,45 +44,47 @@ export type changeDiaperListeners = {
   "changeDiaper-pending": { force?: boolean };
 };
 
-export const changeDiaper: CombinedAction = {
+// moved InsertCriteria and Criteria outside of activity definition
+function InsertCriteria(player: Character): CriteriaResult {
+  let message = null;
+  if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+  if (isDiaperLocked(player)) message ??= "Diaper is locked.";
+  if (!hasDiaper(player)) message ??= "They are not diapered.";
+
+  return CriteriaResult.fromMessage(message);
+}
+
+function Criteria(player: Character, silent?: boolean): CriteriaResult {
+  const result = InsertCriteria?.(player);
+  let message = result.toMessage();
+
+  const item = InventoryGet(player, "ItemDevices");
+  if (item?.Asset.Name != "ChangingTable" && Player.IsRestrained()) message ??= "You are restrained.";
+  if (!(item && ["Crib", "BondageBench", "MedicalBed", "ChangingTable", "Bed", "床左边", "床右边"].includes(item.Asset.Name)))
+    message ??= "They are not on a changing table or a flat surface.";
+  if (!silent && message) sendChatLocal(message);
+  return CriteriaResult.fromMessage(message);
+}
+
+export const changeDiaper = <CombinedAction>{
   activity: {
-    ID: "change-diaper",
-    Name: "Change Diaper",
-    Image: `${publicURL}/activity/changeDiaper.svg`,
-    Target: ["ItemPelvis"],
-    OnClick: (player: Character, group: AssetGroupItemName) => changeDiaperRequest(player),
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-      if (isDiaperLocked(player)) message ??= "Diaper is locked.";
-      if (!hasDiaper(player)) message ??= "They are not diapered.";
-
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
+    activity: {
+      Name: "Change Diaper",
+      MaxProgress: 0,
+      Target: ["ItemPelvis"],
+      TargetSelf: ["ItemPelvis"],
+      Prerequisite: [
+        Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)
+      ],
     },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-
-      const item = InventoryGet(player, "ItemDevices");
-      if (item?.Asset.Name != "ChangingTable" && Player.IsRestrained()) message ??= "You are restrained.";
-      if (!(item && ["Crib", "BondageBench", "MedicalBed", "ChangingTable", "Bed", "床左边", "床右边"].includes(item.Asset.Name)))
-        message ??= "They are not on a changing table or a flat surface.";
-      if (!silent && message) sendChatLocal(message);
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+    run: (acted, acting, info) => changeDiaperRequest(acted)
   },
   command: {
     Tag: "change-diaper",
     Action: function (args, msg, parsed) {
       const character = targetInputExtractor(parsed) ?? Player;
-      const result = changeDiaper.activity!.Criteria!(character);
-      if (!result.success) return;
+      const result = Criteria(character);
+      if (!result) return;
 
       changeDiaperRequest(character);
     },

@@ -1,28 +1,45 @@
-import { HookManager } from "@sugarch/bc-mod-hook-manager";
-import { ABCLActivity, CombinedAction } from "../types/types";
-import { changeDiaper } from "./actions/changeDiaper";
-import { checkDiaper } from "./actions/checkDiaper";
-import { diaperFaceRub } from "./actions/diaperFaceRub";
-import { diaperFaceSit } from "./actions/diaperFaceSit";
-import { diaperPatBack } from "./actions/diaperPatBack";
-import { diaperPatFront } from "./actions/diaperPatFront";
-import { diaperPeeOthersDiaper } from "./actions/diaperPeeOthersDiaper";
-import { diaperPour } from "./actions/diaperPour";
-import { diaperRubBack } from "./actions/diaperRubBack";
-import { diaperRubFront } from "./actions/diaperRubFront";
-import { diaperSquishBack } from "./actions/diaperSquishBack";
-import { diaperSquishFront } from "./actions/diaperSquishFront";
-import { lickPuddle } from "./actions/lickPuddle";
-import { makeAWish } from "./actions/makeAWish";
-import { onABCLMessage } from "./actions/onABCLMessage";
-import { pauseStats } from "./actions/pauseStats";
-import { toPee } from "./actions/toPee";
-import { toPoop } from "./actions/toPoop";
-import { usePotty } from "./actions/usePotty";
-import { useToilet } from "./actions/useToilet";
-import { wipePuddle } from "./actions/wipePuddle";
-import { waitForElement } from "./utils";
+export class CriteriaResult {
+  readonly type: "ok" | "err";
+  readonly message?: string;
 
+  private constructor(type: "ok" | "err", message?: string) {
+    this.type = type;
+    this.message = message;
+  }
+
+  static ok(): CriteriaResult {
+    return new CriteriaResult("ok");
+  }
+
+  static err(message: string): CriteriaResult {
+    return new CriteriaResult("err", message);
+  }
+
+  public toMessage(): string | undefined {
+    return this.message
+  }
+
+  public isOk(): boolean {
+    return this.type == "ok"
+  }
+
+  public isErr(): boolean {
+    return this.type == "err"
+  }
+
+  public static fromMessage(message: string | undefined | null): CriteriaResult {
+    return message ? CriteriaResult.err(message) : CriteriaResult.ok();
+  }
+}
+
+export function Prerequisiter<RestOfArgs extends unknown[]>(f: (acted: Character | PlayerCharacter, ...args: RestOfArgs) => CriteriaResult, ...args: RestOfArgs): (prereq: ActivityPrerequisite, acting: Character | PlayerCharacter, acted: Character | PlayerCharacter, group: AssetGroup) => boolean {
+  return (prereq: ActivityPrerequisite, acting: Character | PlayerCharacter, acted: Character | PlayerCharacter, group: AssetGroup) => {
+    return f(acted, ...args).isOk();
+  };
+}
+
+// TODO
+/* 
 class Activity {
   constructor(
     public id: string,
@@ -32,7 +49,7 @@ class Activity {
     private target?: AssetGroupItemName[],
     private targetSelf?: AssetGroupItemName[],
     private criteria?: (player: Character, silent?: boolean) => { success: boolean; message?: string },
-    /* when should this activity be shown in the menu */
+    // when should this activity be shown in the menu
     private insertionCriteria?: (player: Character) => { success: boolean; message?: string },
   ) {}
 
@@ -129,3 +146,4 @@ export const actions: CombinedAction[] = [
 
 export const commands = actions.reduce((commands, { command }) => (command ? [...commands, command] : commands), [] as ICommand[]);
 export const activites = actions.reduce((activites, { activity }) => (activity ? [...activites, activity] : activites), [] as ABCLActivity[]);
+*/
