@@ -64,8 +64,7 @@ export const changeDiaper: CombinedAction = {
     Tag: "change-diaper",
     Action: function (args, msg, parsed) {
       const character = targetInputExtractor(parsed) ?? Player;
-      const result = Criteria(character);
-      if (!result) return;
+      if (Criteria(character).isErr()) return;
 
       changeDiaperRequest(character);
     },
