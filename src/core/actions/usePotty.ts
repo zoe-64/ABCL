@@ -1,11 +1,11 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { INCONTINENCE_ON_POTTY_USE } from "../../constants";
 import { CombinedAction } from "../../types/types";
-import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
+import { checkHasPotty } from "../actionCheck";
+import { ABCLTarget, Prerequisiter, Printable } from "../actionLoader";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { sendABCLAction } from "../player/playerUtils";
-import { sendChatLocal } from "../utils";
 
 export const usePottyFunction = () => {
   const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;
@@ -55,24 +55,22 @@ export const usePottyFunction = () => {
   sendABCLAction(actionMessage, undefined, "usePotty");
 };
 
-function InsertCriteria(player: Character): CriteriaResult {
-  let message = null;
-  return CriteriaResult.fromMessage(message);
-}
-function Criteria(player: Character, silent?: boolean): CriteriaResult {
-  const result = InsertCriteria?.(player);
-  let message = result?.toMessage();
-  if (!player.Appearance.some(item => item.Asset.Name == "Potty")) message ??= "You don't have a potty to use!";
-  if (!silent && message) sendChatLocal(message);
-  return CriteriaResult.fromMessage(message);
-}
+const Criteria = Printable(checkHasPotty);
+
+// function Criteria(player: Character, silent?: boolean): CriteriaResult {
+//   const result = InsertCriteria?.(player);
+//   let message = result?.toMessage();
+//   if (!player.Appearance.some(item => item.Asset.Name == "Potty")) message ??= "You don't have a potty to use!";
+//   if (!silent && message) sendChatLocal(message);
+//   return CriteriaResult.fromMessage(message);
+// }
 
 export const usePotty: CombinedAction = {
   activity: {
     Name: "Sit and Use Potty",
     Target: [ABCLTarget.Self("ItemButt")],
     MaxProgress: 0,
-    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
+    Prerequisite: [Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/potty-temp.png`,
     run: (player: Character, sender, info) => usePottyFunction(),
   },

@@ -22,6 +22,7 @@ import { toPoop } from "./actions/toPoop";
 import { usePotty } from "./actions/usePotty";
 import { useToilet } from "./actions/useToilet";
 import { wipePuddle } from "./actions/wipePuddle";
+import { sendChatLocal } from "./utils";
 
 export class CriteriaResult {
   readonly type: "ok" | "err";
@@ -54,6 +55,10 @@ export class CriteriaResult {
 
   public static fromMessage(message: string | undefined | null): CriteriaResult {
     return message ? CriteriaResult.err(message) : CriteriaResult.ok();
+  }
+
+  public static OkIf(condition: boolean, message: string): CriteriaResult {
+    return condition ? CriteriaResult.ok() : CriteriaResult.err(message);
   }
 }
 
@@ -124,6 +129,28 @@ export function Prerequisiter<RestOfArgs extends unknown[]>(
 ): (prereq: ActivityPrerequisite, acting: Character | PlayerCharacter, acted: Character | PlayerCharacter, group: AssetGroup) => boolean {
   return (prereq: ActivityPrerequisite, acting: Character | PlayerCharacter, acted: Character | PlayerCharacter, group: AssetGroup) => {
     return f(acted, ...args).isOk();
+  };
+}
+
+export function Printable(f: (player: Character) => CriteriaResult): (player: Character, silent?: boolean) => CriteriaResult {
+  return (player, silent?) => {
+    const res = f(player);
+    if (!silent && res.toMessage()) sendChatLocal(res.toMessage as unknown as string);
+    return res;
+  };
+}
+
+export function DoCheckIf(
+  condition: boolean | ((player: Character) => boolean),
+  run: (player: Character) => CriteriaResult,
+): (player: Character) => CriteriaResult {
+  return player => {
+    if (typeof condition === "boolean") {
+      if (condition) return run(player);
+    } else if (condition(player)) {
+      return run(player);
+    }
+    return CriteriaResult.ok();
   };
 }
 
@@ -210,87 +237,3 @@ export const activites = actions.reduce(
   (activites, { activity }) => (activity ? [...activites, activity] : activites),
   [] as ABCLActivity<ActivityPrerequisite>[],
 );
-
-// TODO
-/* 
-class Activity {
-  constructor(
-    public id: string,
-    public name: string,
-    public image: string,
-    public onClick?: (player: Character, group: AssetGroupItemName) => void,
-    private target?: AssetGroupItemName[],
-    private targetSelf?: AssetGroupItemName[],
-    private criteria?: (player: Character, silent?: boolean) => { success: boolean; message?: string },
-    // when should this activity be shown in the menu
-    private insertionCriteria?: (player: Character) => { success: boolean; message?: string },
-  ) {}
-
-  fitsCriteria(player: Character, focusGroup: AssetGroupItemName): boolean {
-    if (!(this.target?.includes(focusGroup) || (this.targetSelf?.includes(focusGroup) && Player.MemberNumber === player?.MemberNumber))) return false;
-    if (this.insertionCriteria?.(player)?.success) return true;
-    return Boolean(!this.criteria || this.criteria(player, true).success);
-  }
-
-  createButton(): HTMLButtonElement {
-    const button = document.createElement("button");
-    button.id = this.id;
-    button.name = `${modIdentifier}_${this.name}`;
-    button.dataset.group = "ItemArms";
-    button.className = `blank-button button button-styling HideOnPopup dialog-grid-button`;
-    button.innerHTML = `<img decoding="async" loading="lazy" src="${this.image}" class="button-image"><span class="button-label button-label-bottom">${this.name}</span>`;
-
-    button.addEventListener("click", e => {
-      const player = CurrentCharacter?.FocusGroup ? CurrentCharacter : Player;
-      const focusGroup = player?.FocusGroup?.Name;
-      if (!this.onClick || !focusGroup) return;
-      if (Boolean(!this.criteria || this.criteria(player).success)) this.onClick(player, focusGroup);
-      DialogLeave();
-    });
-
-    return button;
-  }
-
-  static isInserted(id: string): boolean {
-    return Boolean(document.getElementById(id));
-  }
-}
-
-export const initActions = (): void => {
-  HookManager.hookFunction("DialogMenuMapping.activities.GetClickStatus", 1, (args, next) => {
-    const [_C, _clickedObj, _equippedItem] = args;
-    if (!_clickedObj) return null;
-    return next(args);
-  });
-
-  HookManager.hookFunction("DialogChangeMode", 1, async (args, next) => {
-    const [_mode] = args;
-    next(args);
-    if (_mode !== "activities") return;
-    const player = CurrentCharacter?.FocusGroup ? CurrentCharacter : Player;
-    const activityGrid = await waitForElement("#dialog-activity-grid");
-    const focusGroup = player.FocusGroup?.Name;
-    if (!focusGroup) return;
-
-    for (const { activity } of actions) {
-      if (!activity) continue;
-      const activityInstance = new Activity(
-        activity.ID,
-        activity.Name,
-        activity.Image,
-        activity.OnClick,
-        activity.Target,
-        activity.TargetSelf,
-        activity.Criteria?.bind(activity),
-        activity.InsertCriteria?.bind(activity),
-      );
-      if (activityInstance.fitsCriteria(player, focusGroup)) {
-        if (!Activity.isInserted(activity.ID)) {
-          activityGrid.appendChild(activityInstance.createButton());
-        }
-      }
-    }
-  });
-  CommandCombine(commands);
-};
-*/

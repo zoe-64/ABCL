@@ -1,11 +1,10 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
-import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
+import { checkBladderIsntEmpty, checkIsABCL, checkIsDiapered, checkIsRestrained } from "../actionCheck";
+import { ABCLTarget, ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
-import { hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
-import { sendChatLocal } from "../utils";
+import { getCharacter, replace_template, sendABCLAction } from "../player/playerUtils";
 
 const diaperPeeOthersDiaperRequest = (player: Character, volume: number) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-pee-others-diaper", { volume: volume }, player.MemberNumber);
@@ -27,23 +26,26 @@ export type diaperPeeOthersDiaperListeners = {
   "diaper-pee-others-diaper": { volume: number };
 };
 
-function InsertCriteria(player: Character): CriteriaResult {
-  let message = null;
-  if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-  if (!hasDiaper(player)) message ??= "They are not diapered.";
-  return CriteriaResult.fromMessage(message);
-}
+const InsertCriteria = ComposePrerequisites(checkIsABCL, checkIsDiapered);
+const Criteria = Printable(ComposePrerequisites(InsertCriteria, checkIsRestrained, checkBladderIsntEmpty));
 
-function Criteria(player: Character, silent?: boolean) {
-  const result = InsertCriteria?.(player);
-  let message = result?.toMessage();
-  if (Player.IsRestrained()) message ??= "You are restrained.";
-  if (player === Player) message ??= "You can't pee in your own diaper."; // that's a funny one
-  if (abclPlayer.stats.BladderFullness < 0.15) message ??= "Your bladder is empty.";
+// function InsertCriteria(player: Character): CriteriaResult {
+//   let message = null;
+//   if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+//   if (!hasDiaper(player)) message ??= "They are not diapered.";
+//   return CriteriaResult.fromMessage(message);
+// }
 
-  if (!silent && message) sendChatLocal(message);
-  return CriteriaResult.fromMessage(message);
-}
+// function Criteria(player: Character, silent?: boolean) {
+//   const result = InsertCriteria?.(player);
+//   let message = result?.toMessage();
+//   if (Player.IsRestrained()) message ??= "You are restrained.";
+//   if (player === Player) message ??= "You can't pee in your own diaper."; // that's a funny one
+//   if (abclPlayer.stats.BladderFullness < 0.15) message ??= "Your bladder is empty.";
+
+//   if (!silent && message) sendChatLocal(message);
+//   return CriteriaResult.fromMessage(message);
+// }
 
 export const diaperPeeOthersDiaper: CombinedAction = {
   activity: {

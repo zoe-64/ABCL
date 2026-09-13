@@ -1,10 +1,10 @@
 import { CombinedAction } from "../../types/types";
-import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
+import { checkHasPuddle, checkIsABCL, checkIsRestrained } from "../actionCheck";
+import { ABCLTarget, ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
+import { getCharacter, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
 import { syncData } from "../settings";
-import { sendChatLocal } from "../utils";
 const WipePuddleRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("wipe-puddle", undefined, player.MemberNumber);
   WipePuddleFunction(Player);
@@ -21,20 +21,22 @@ export type wipePuddleListeners = {
   "wipe-puddle": undefined;
 };
 
-function InsertCriteria(player: Character): CriteriaResult {
-  let message = null;
-  if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-  if (player.ABCL && player.ABCL.Stats.PuddleSize.value <= 0) message ??= "They have no puddle.";
-  return CriteriaResult.fromMessage(message);
-}
+const InsertCriteria = ComposePrerequisites(checkIsABCL, checkHasPuddle);
+const Criteria = Printable(ComposePrerequisites(InsertCriteria, checkIsRestrained));
+// function InsertCriteria(player: Character): CriteriaResult {
+//   let message = null;
+//   if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+//   if (player.ABCL && player.ABCL.Stats.PuddleSize.value <= 0) message ??= "They have no puddle.";
+//   return CriteriaResult.fromMessage(message);
+// }
 
-function Criteria(player: Character, silent?: boolean): CriteriaResult {
-  const result = InsertCriteria?.(player);
-  let message = result?.message ?? null;
-  if (Player.IsRestrained()) message ??= "You are restrained.";
-  if (!silent && message) sendChatLocal(message);
-  return CriteriaResult.fromMessage(message);
-}
+// function Criteria(player: Character, silent?: boolean): CriteriaResult {
+//   const result = InsertCriteria?.(player);
+//   let message = result?.message ?? null;
+//   if (Player.IsRestrained()) message ??= "You are restrained.";
+//   if (!silent && message) sendChatLocal(message);
+//   return CriteriaResult.fromMessage(message);
+// }
 
 export const wipePuddle: CombinedAction = {
   activity: {

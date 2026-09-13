@@ -1,10 +1,10 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
-import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
+import { checkHasPuddle, checkIsABCL, checkIsDiapered } from "../actionCheck";
+import { ABCLTarget, ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
-import { sendChatLocal } from "../utils";
+import { getCharacter, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
 
 const lickPuddleRequest = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
@@ -25,19 +25,22 @@ export type lickPuddleListeners = {
   "lick-puddle": undefined;
 };
 
-function InsertCriteria(player: Character) {
-  let message = null;
-  if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-  if (player?.ABCL && player.ABCL!.Stats.PuddleSize.value <= 0) message ??= "They have no puddle of pee.";
-  return CriteriaResult.fromMessage(message);
-}
+const InsertCriteria = ComposePrerequisites(checkIsABCL, checkIsDiapered, checkHasPuddle);
+const Criteria = Printable(InsertCriteria);
 
-function Criteria(player: Character, silent?: boolean) {
-  const result = InsertCriteria?.(player);
-  let message = result?.toMessage();
-  if (!silent && message) sendChatLocal(message);
-  return CriteriaResult.fromMessage(message);
-}
+// function InsertCriteria(player: Character) {
+//   let message = null;
+//   if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+//   if (player?.ABCL && player.ABCL!.Stats.PuddleSize.value <= 0) message ??= "They have no puddle of pee.";
+//   return CriteriaResult.fromMessage(message);
+// }
+
+// function Criteria(player: Character, silent?: boolean) {
+//   const result = InsertCriteria?.(player);
+//   let message = result?.toMessage();
+//   if (!silent && message) sendChatLocal(message);
+//   return CriteriaResult.fromMessage(message);
+// }
 
 export const lickPuddle: CombinedAction = {
   activity: {

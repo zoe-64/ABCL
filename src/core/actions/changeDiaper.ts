@@ -1,11 +1,11 @@
 import { CombinedAction, DiaperSettingValues } from "../../types/types";
-import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
+import { checkIsABCL, checkIsDiapered, checkIsDiaperLocked, checkIsOnFlatSurface } from "../actionCheck";
+import { ABCLTarget, ComposePrerequisites, CriteriaResult, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
-import { hasDiaper, isDiaperLocked, updateDiaperColor } from "../player/diaper";
+import { updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, getCharacterName, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
+import { getCharacter, getCharacterName, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
 import { syncData } from "../settings";
-import { sendChatLocal } from "../utils";
 
 export const changeDiaperRequest = (player: Character, force?: boolean) => {
   if (!abclPlayer.settings.CanChangeSelf && player.MemberNumber === Player.MemberNumber) {
@@ -44,27 +44,13 @@ export type changeDiaperListeners = {
   "changeDiaper-pending": { force?: boolean };
 };
 
-// moved InsertCriteria and Criteria outside of activity definition
-function InsertCriteria(player: Character): CriteriaResult {
-  let message = null;
-  if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-  if (isDiaperLocked(player)) message ??= "Diaper is locked.";
-  if (!hasDiaper(player)) message ??= "They are not diapered.";
-
-  return CriteriaResult.fromMessage(message);
-}
-
-function Criteria(player: Character, silent?: boolean): CriteriaResult {
-  const result = InsertCriteria?.(player);
-  let message = result.toMessage();
-
-  const item = InventoryGet(player, "ItemDevices");
-  if (item?.Asset.Name != "ChangingTable" && Player.IsRestrained()) message ??= "You are restrained.";
-  if (!(item && ["Crib", "BondageBench", "MedicalBed", "ChangingTable", "Bed", "床左边", "床右边"].includes(item.Asset.Name)))
-    message ??= "They are not on a changing table or a flat surface.";
-  if (!silent && message) sendChatLocal(message);
-  return CriteriaResult.fromMessage(message);
-}
+const InsertCriteria = ComposePrerequisites(checkIsABCL, checkIsDiaperLocked, checkIsDiapered);
+const Criteria = Printable(
+  ComposePrerequisites(
+    player => CriteriaResult.OkIf(!(InventoryGet(player, "ItemDevices")?.Asset.Name != "ChangingTable" && Player.IsRestrained()), "You are restrained"),
+    checkIsOnFlatSurface,
+  ),
+);
 
 export const changeDiaper = <CombinedAction>{
   activity: {
@@ -72,11 +58,8 @@ export const changeDiaper = <CombinedAction>{
     MaxProgress: 0,
     Target: [ABCLTarget.Any("ItemPelvis")],
     TargetSelf: ["ItemPelvis"],
-    Prerequisite: [
-      Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)
-    ],
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     run: (acted, acting, info) => changeDiaperRequest(acted),
-    
   },
   command: {
     Tag: "change-diaper",

@@ -1,28 +1,33 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
-import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
+import { checkIsABCL, checkIsDiapered, checkIsRestrained } from "../actionCheck";
+import { ABCLTarget, ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
-import { getDiaperVerb, hasDiaper } from "../player/diaper";
-import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
+import { getDiaperVerb } from "../player/diaper";
+import { getCharacter, replace_template, sendABCLAction } from "../player/playerUtils";
 
 const diaperPatFrontRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-pat-front", undefined, player.MemberNumber);
 
   diaperPatFrontFunction(player);
 };
-function InsertCriteria(player: Character): CriteriaResult {
-  let message = null;
-  if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-  if (!hasDiaper(player)) message ??= "They are not diapered.";
-  return CriteriaResult.fromMessage(message);
-}
 
-function Criteria(player: Character, silent?: boolean): CriteriaResult {
-  const result = InsertCriteria?.(player);
-  let message = result?.toMessage();
-  if (Player.IsRestrained()) message = "You are restrained.";
-  return CriteriaResult.fromMessage(message);
-}
+const InsertCriteria = ComposePrerequisites(checkIsABCL, checkIsDiapered);
+const Criteria = Printable(ComposePrerequisites(InsertCriteria, checkIsRestrained));
+
+// function InsertCriteria(player: Character): CriteriaResult {
+//   let message = null;
+//   if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+//   if (!hasDiaper(player)) message ??= "They are not diapered.";
+//   return CriteriaResult.fromMessage(message);
+// }
+
+// function Criteria(player: Character, silent?: boolean): CriteriaResult {
+//   const result = InsertCriteria?.(player);
+//   let message = result?.toMessage();
+//   if (Player.IsRestrained()) message = "You are restrained.";
+//   return CriteriaResult.fromMessage(message);
+// }
 
 export const diaperPatFrontFunction = (player: Character) => {
   const diaperVerb = getDiaperVerb(Player);

@@ -1,11 +1,11 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
-import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
+import { checkCanCheckDiaper, checkIsABCL } from "../actionCheck";
+import { ABCLTarget, ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { hasDiaper } from "../player/diaper";
-import { abclPlayer } from "../player/player";
-import { isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
+import { replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
 import { abclStatsWindow, resizeElements } from "../player/ui";
-import { getElement, sendChatLocal } from "../utils";
+import { getElement } from "../utils";
 
 export const diaperCheckFunction = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
@@ -23,26 +23,15 @@ export const diaperCheckFunction = (player: Character) => {
   return sendABCLAction(replace_template(isSelf ? selfClothesMessage : otherClothesMessage, player), undefined, "checkDiaper", player);
 };
 
-function InsertCriteria(player: Character): CriteriaResult {
-  let message = null;
-  if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-  return CriteriaResult.fromMessage(message);
-}
-function Criteria(player: Character, silent?: boolean) {
-  const result = InsertCriteria?.(player);
-  let message = result?.toMessage();
-
-  if (Player.IsRestrained() && !abclPlayer.settings.CanCheckDiaperWithRestraints) message ??= "You are restrained.";
-  if (!silent && message) sendChatLocal(message);
-  return CriteriaResult.fromMessage(message);
-}
+const InsertCriteria = checkIsABCL;
+const Criteria = Printable(ComposePrerequisites(InsertCriteria, checkCanCheckDiaper));
 
 export const checkDiaper: CombinedAction = {
   activity: {
     Name: "Check Diaper",
     Target: [ABCLTarget.Any("ItemPelvis")],
     MaxProgress: 0,
-    Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria), ],
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperCheck.png`,
     run: (player, sender, info) => diaperCheckFunction(player),
   },
