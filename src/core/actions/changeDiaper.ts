@@ -47,6 +47,7 @@ export type changeDiaperListeners = {
 const InsertCriteria = ComposePrerequisites(checkIsABCL, checkIsDiaperLocked, checkIsDiapered);
 const Criteria = Printable(
   ComposePrerequisites(
+    InsertCriteria,
     player => CriteriaResult.OkIf(!(InventoryGet(player, "ItemDevices")?.Asset.Name != "ChangingTable" && Player.IsRestrained()), "You are restrained"),
     checkIsOnFlatSurface,
   ),

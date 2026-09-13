@@ -1,6 +1,6 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { ABCLTarget, CombinedAction } from "../../types/types";
-import { checkHasPuddle, checkIsABCL, checkIsDiapered } from "../actionCheck";
+import { checkHasPuddle, checkIsABCL } from "../actionCheck";
 import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
@@ -25,7 +25,7 @@ export type lickPuddleListeners = {
   "lick-puddle": undefined;
 };
 
-const InsertCriteria = ComposePrerequisites(checkIsABCL, checkIsDiapered, checkHasPuddle);
+const InsertCriteria = ComposePrerequisites(checkIsABCL, checkHasPuddle);
 const Criteria = Printable(InsertCriteria);
 
 // function InsertCriteria(player: Character) {

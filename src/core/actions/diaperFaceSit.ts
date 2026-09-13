@@ -1,6 +1,6 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { ABCLTarget, CombinedAction } from "../../types/types";
-import { checkIsABCL, checkIsDiapered, checkIsRestrained } from "../actionCheck";
+import { checkIsABCL, checkIsRestrained, checkIsSelfDiapered } from "../actionCheck";
 import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
@@ -28,7 +28,7 @@ export const diaperFaceSitFunction = (player: Character) => {
 export type diaperFaceSitListeners = {
   "diaper-face-sit": void;
 };
-const InsertCriteria = ComposePrerequisites(checkIsABCL, checkIsDiapered);
+const InsertCriteria = ComposePrerequisites(checkIsABCL, checkIsSelfDiapered);
 const Criteria = Printable(ComposePrerequisites(InsertCriteria, checkIsRestrained));
 // function InsertCriteria(player: Character): CriteriaResult {
 //   let message = null;

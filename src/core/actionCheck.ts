@@ -18,7 +18,7 @@ export function checkIsSelfDiapered(_player: Character): CriteriaResult {
 }
 
 export function checkIsDiaperLocked(player: Character): CriteriaResult {
-  return CriteriaResult.OkIf(isDiaperLocked(player), "Their diaper is locked.");
+  return CriteriaResult.OkIf(!isDiaperLocked(player), "Their diaper is locked.");
 }
 
 export function checkIsRestrained(player: Character): CriteriaResult {
@@ -60,5 +60,5 @@ export function checkHasPotty(player: Character): CriteriaResult {
 }
 
 export function checkIsMentalRegressionTooHighSelf(player: Character): CriteriaResult {
-  return CriteriaResult.OkIf(abclPlayer.stats.MentalRegression >= 0.3, "You don't have a potty to use!");
+  return CriteriaResult.OkIf(abclPlayer.stats.MentalRegression < 0.3, "Your mental regression is too high to use the toilet.");
 }
