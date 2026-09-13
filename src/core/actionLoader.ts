@@ -100,7 +100,7 @@ function ABCLActToSugarch<P extends string = ActivityPrerequisite>(abcl: ABCLAct
       MaxProgress: abcl.MaxProgress,
       Prerequisite: abcl.Prerequisite ?? [],
       Target: abcl.Target.filter(x => x.mode.type === "any" || x.mode.type === "others").map(x => x.ItemGroup),
-      TargetSelf: abcl.Target.filter(x => x.mode.type === "self").map(x => x.ItemGroup),
+      TargetSelf: abcl.Target.filter(x => x.mode.type === "any" || x.mode.type === "self").map(x => x.ItemGroup),
     },
     useImage: abcl.useImage,
     run: abcl.run,
