@@ -74,21 +74,21 @@ function addToDictCache(dict: TextCache, activity: ABCLActivity) {
       t.mode.label ??= activity.Name;
 
       textCachePush("Label-ChatOther-" + t.ItemGroup + "-" + activity.Name, t.mode.label);
-      textCachePush("Label-ChatOther-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
+      textCachePush("ChatOther-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
     } else if (t.mode.type == "self") {
       t.mode.label ??= activity.Name;
 
       textCachePush("Label-ChatSelf-" + t.ItemGroup + "-" + activity.Name, t.mode.label);
-      textCachePush("Label-ChatSelf-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
+      textCachePush("ChatSelf-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
     } else {
       t.mode.labelOthers ??= activity.Name;
       t.mode.labelSelf ??= t.mode.labelOthers;
 
       textCachePush("Label-ChatOther-" + t.ItemGroup + "-" + activity.Name, t.mode.labelOthers);
-      textCachePush("Label-ChatOther-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
+      textCachePush("ChatOther-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
 
       textCachePush("Label-ChatSelf-" + t.ItemGroup + "-" + activity.Name, t.mode.labelSelf);
-      textCachePush("Label-ChatSelf-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
+      textCachePush("ChatSelf-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
     }
   });
 }
