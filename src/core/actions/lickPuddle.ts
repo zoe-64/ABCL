@@ -1,4 +1,6 @@
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
+import { CriteriaResult, Prerequisiter } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
@@ -23,37 +25,36 @@ export type lickPuddleListeners = {
   "lick-puddle": undefined;
 };
 
+function InsertCriteria(player: Character) {
+  let message = null;
+  if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+  if (player?.ABCL && player.ABCL!.Stats.PuddleSize.value <= 0) message ??= "They have no puddle of pee.";
+  return CriteriaResult.fromMessage(message);
+}
+
+function Criteria(player: Character, silent?: boolean) {
+  const result = InsertCriteria?.(player);
+  let message = result?.toMessage();
+  if (!silent && message) sendChatLocal(message);
+  return CriteriaResult.fromMessage(message);
+}
+
 export const lickPuddle: CombinedAction = {
   activity: {
-    ID: "lick-puddle",
-    Name: "Lick Puddle",
-    Image: `${publicURL}/activity/lickPuddle.png`,
-    Target: ["ItemBoots"],
-    OnClick: (player: Character, group: AssetGroupItemName) => lickPuddleRequest(player),
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-      if (player?.ABCL && player.ABCL!.Stats.PuddleSize.value <= 0) message ??= "They have no puddle of pee.";
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
+    activity: {
+      Name: "Lick Puddle",
+      Target: ["ItemBoots"],
+      MaxProgress: 0,
+      Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)]
     },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-      if (!silent && message) sendChatLocal(message);
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+    useImage: <ActivityImageSetting>`${publicURL}/activity/lickPuddle.png`,
+    run: (player: Character, sender, info) => lickPuddleRequest(player),
   },
   command: {
     Tag: "lick-puddle",
     Action: (args, msg, parsed) => {
       const character = targetInputExtractor(parsed) ?? Player;
-      if (!lickPuddle.activity!.Criteria!(character).success) return;
+      if (!Criteria!(character).isOk()) return;
       lickPuddleRequest(character);
     },
     Description: ` [MemberNumber|Name|Nickname]: Licks a puddle of pee.`,

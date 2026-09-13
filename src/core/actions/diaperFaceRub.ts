@@ -1,4 +1,6 @@
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
+import { CriteriaResult, Prerequisiter } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
@@ -27,34 +29,33 @@ export type diaperFaceRubListeners = {
   "diaper-face-rub": void;
 };
 
+function InsertCriteria(player: Character): CriteriaResult {
+  let message = null;
+  if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+  if (!hasDiaper(Player)) message ??= "You are not diapered.";
+  if (player.MemberNumber === Player.MemberNumber) message ??= "You can't rub your own diaper against your face.";
+  return CriteriaResult.fromMessage(message);
+}
+function Criteria(player: Character, silent?: boolean): CriteriaResult {
+  const result = InsertCriteria?.(player);
+  let message = result.toMessage();
+  if (Player.IsRestrained()) message ??= "You are restrained.";
+  if (!silent && message) sendChatLocal(message);
+  return CriteriaResult.fromMessage(message);
+}
 export const diaperFaceRub: CombinedAction = {
   activity: {
-    ID: "diaper-face-rub",
-    Name: "Rub Diaper Against Face",
-    Image: `${publicURL}/activity/diaperFaceRub.png`,
-    Target: ["ItemNose"],
-    OnClick: (player: Character, group: AssetGroupItemName) => diaperFaceRubRequest(player),
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-      if (!hasDiaper(Player)) message ??= "You are not diapered.";
-      if (player.MemberNumber === Player.MemberNumber) message ??= "You can't rub your own diaper against your face.";
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
+      activity: {
+      Name: "Rub Diaper Against Face",
+      Target: ["ItemNose"],
+      MaxProgress: 0,
+      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true) ],
     },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-      if (Player.IsRestrained()) message ??= "You are restrained.";
-      if (!silent && message) sendChatLocal(message);
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+
+    useImage: <ActivityImageSetting>`${publicURL}/activity/diaperFaceRub.png`,
+    run: (player, sender, info) => diaperFaceRubRequest(player),
   },
+  
   listeners: {
     "diaper-face-rub": ({ Sender }) => diaperFaceRubFunction(getCharacter(Sender!) ?? Player),
   },

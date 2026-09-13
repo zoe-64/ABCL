@@ -1,4 +1,6 @@
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
+import { CriteriaResult, Prerequisiter } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { getDiaperVerb, hasDiaper } from "../player/diaper";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
@@ -21,32 +23,29 @@ export type diaperSquishBackListeners = {
   "diaper-squish-back": void;
 };
 
+function InsertCriteria(player: Character): CriteriaResult {
+  let message = null;
+  if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+  if (!hasDiaper(player)) message ??= "They are not diapered.";
+  return CriteriaResult.fromMessage(message);
+}
+function Criteria(player: Character, silent?: boolean) {
+  const result = InsertCriteria?.(player);
+  let message = result?.toMessage();
+  if (Player.IsRestrained()) message ??= "You are restrained.";
+  if (!silent && message) sendChatLocal(message);
+  return CriteriaResult.fromMessage(message);
+}
 export const diaperSquishBack: CombinedAction = {
   activity: {
-    ID: "diaper-squish-back",
-    Name: "Diaper Squish Bottom",
-    Image: `${publicURL}/activity/diaperSquishBack.png`,
-    Target: ["ItemButt"],
-    OnClick: (player: Character, group: AssetGroupItemName) => diaperSquishBackRequest(player),
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-      if (!hasDiaper(player)) message ??= "They are not diapered.";
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
+    activity: {
+      Name: "Diaper Squish Bottom",
+      Target: ["ItemButt"],
+      MaxProgress: 0,
+      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true) ],
     },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-      if (Player.IsRestrained()) message ??= "You are restrained.";
-      if (!silent && message) sendChatLocal(message);
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+    useImage: <ActivityImageSetting>`${publicURL}/activity/diaperSquishBack.png`,
+    run: (player: Character, sender, info) => diaperSquishBackRequest(player),
   },
   listeners: {
     "diaper-squish-back": ({ Sender }) => diaperSquishBackFunction(getCharacter(Sender!) ?? Player),

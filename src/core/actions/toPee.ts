@@ -1,13 +1,18 @@
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
 import { abclPlayer } from "../player/player";
 
 export const toPee: CombinedAction = {
   activity: {
-    ID: "pee",
-    Name: "Pee",
-    Image: `${publicURL}/activity/wetDiaper.svg`,
-    OnClick: (player: Character, group: AssetGroupItemName) => abclPlayer.wet(true),
-    TargetSelf: ["ItemPelvis"],
+    activity: {
+      Name: "Pee",
+      MaxProgress: 0,
+      Target: [],
+      TargetSelf: ["ItemPelvis"],
+      Prerequisite: []
+    },
+    useImage: <ActivityImageSetting>`${publicURL}/activity/wetDiaper.svg`,
+    run: (player: Character, sender, info) => abclPlayer.wet(true),
   },
   command: {
     Tag: "pee",

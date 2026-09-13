@@ -1,4 +1,6 @@
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
+import { CriteriaResult, Prerequisiter } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
@@ -25,35 +27,34 @@ export type diaperPeeOthersDiaperListeners = {
   "diaper-pee-others-diaper": { volume: number };
 };
 
+function InsertCriteria(player: Character): CriteriaResult {
+  let message = null;
+  if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+  if (!hasDiaper(player)) message ??= "They are not diapered.";
+  return CriteriaResult.fromMessage(message);
+}
+
+function Criteria(player: Character, silent?: boolean) {
+  const result = InsertCriteria?.(player);
+  let message = result?.toMessage();
+  if (Player.IsRestrained()) message ??= "You are restrained.";
+  if (player === Player) message ??= "You can't pee in your own diaper."; // that's a funny one
+  if (abclPlayer.stats.BladderFullness < 0.15) message ??= "Your bladder is empty.";
+
+  if (!silent && message) sendChatLocal(message);
+  return CriteriaResult.fromMessage(message);
+}
+
 export const diaperPeeOthersDiaper: CombinedAction = {
   activity: {
-    ID: "pee-in-diaper",
-    Name: "Pees in Diaper",
-    Image: `${publicURL}/activity/diaperPeeOthersDiaper.png`,
-    Target: ["ItemPelvis"],
-    OnClick: (player: Character, group: AssetGroupItemName) => diaperPeeOthersDiaperRequest(player, abclPlayer.stats.BladderValue),
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-      if (!hasDiaper(player)) message ??= "They are not diapered.";
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
+    activity: {
+      Name: "Pees in Diaper",
+      Target: ["ItemPelvis"],
+      MaxProgress: 0,
+      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true) ]
     },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-      if (Player.IsRestrained()) message ??= "You are restrained.";
-      if (player === Player) message ??= "You can't pee in your own diaper."; // that's a funny one
-      if (abclPlayer.stats.BladderFullness < 0.15) message ??= "Your bladder is empty.";
-
-      if (!silent && message) sendChatLocal(message);
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+    useImage: <ActivityImageSetting>`${publicURL}/activity/diaperPeeOthersDiaper.png`,
+    run: (player: Character, sender, info) => diaperPeeOthersDiaperRequest(player, abclPlayer.stats.BladderValue)
   },
   listeners: {
     "diaper-pee-others-diaper": ({ Sender }, { volume }) => diaperPeeOthersDiaperFunction(getCharacter(Sender!) ?? Player, volume),

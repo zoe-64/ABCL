@@ -1,4 +1,6 @@
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
+import { CriteriaResult, Prerequisiter } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { getDiaperVerb, hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
@@ -28,31 +30,31 @@ export type diaperRubBackListeners = {
   "diaper-rub-back": void;
 };
 
+function InsertCriteria(player: Character): CriteriaResult {
+  let message = null;
+  if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+  if (!hasDiaper(player)) message ??= "They are not diapered.";
+  return CriteriaResult.fromMessage(message);
+}
+
+function Criteria(player: Character, silent?: boolean): CriteriaResult {
+  const result = InsertCriteria?.(player) ?? null;
+  let message = result?.toMessage();
+  if (Player.IsRestrained()) message = "You are restrained.";
+  return CriteriaResult.fromMessage(message);
+}
+
 export const diaperRubBack: CombinedAction = {
   activity: {
-    ID: "diaper-rub-back",
-    Name: "Diaper Rub Bottom",
-    Image: `${publicURL}/activity/diaperRubBack.png`,
-    Target: ["ItemButt"],
-    OnClick: (player: Character, group: AssetGroupItemName) => diaperRubBackRequest(player),
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-      if (!hasDiaper(player)) message ??= "They are not diapered.";
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
+    activity: {
+      Name: "Diaper Rub Bottom",
+      Target: ["ItemButt"],
+      MaxProgress: 0,
+      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true) ],
     },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-      if (Player.IsRestrained()) message = "You are restrained.";
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+
+    useImage: <ActivityImageSetting>`${publicURL}/activity/diaperRubBack.png`,
+    run: (player: Character, sender, info) => diaperRubBackRequest(player),
   },
   listeners: {
     "diaper-rub-back": ({ Sender }) => diaperRubBackFunction(getCharacter(Sender!) ?? Player),

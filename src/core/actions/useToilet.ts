@@ -1,5 +1,7 @@
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { INCONTINENCE_ON_TOILET_USE } from "../../constants";
 import { CombinedAction } from "../../types/types";
+import { CriteriaResult, Prerequisiter } from "../actionLoader";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { sendABCLAction } from "../player/playerUtils";
@@ -36,37 +38,35 @@ export const useToiletFunction = () => {
   }
   sendABCLAction(actionMessage, undefined, "useToilet");
 };
+// if the regression is too high, deny toilet usage
+function InsertCriteria(player: Character): CriteriaResult {
+  return CriteriaResult.ok()
+}
+
+function Criteria(player: Character, silent?: boolean): CriteriaResult {
+  const result = InsertCriteria?.(player);
+  let message = result?.toMessage();
+  if (abclPlayer.stats.MentalRegression >= 0.3) message ??= "You feel uncomfortable, the toilet is cold and hard almost like ice. You can't use it.";
+  // when CanUseBathroomWithDiaper is false or abclPlayer.settings.CanUseToilet is false then it will deny toilet usage by wetting their clothes or diaper.
+  if ((hasDiaper(player) && !abclPlayer.settings.CanUseBathroomWithDiaper) || !abclPlayer.settings.CanUseToilet) return CriteriaResult.ok();
+  if (hasDiaper(player) && isDiaperLocked()) message ??= "You can't use the toilet while your diaper is locked.";
+  if (Player.IsRestrained()) message ??= "You are restrained.";
+
+  if (!silent && message) sendChatLocal(message);
+  return CriteriaResult.fromMessage(message);
+}
 
 export const useToilet: CombinedAction = {
   activity: {
-    ID: "toilet",
-    Name: "Sit and Use Toilet",
-    Image: `${publicURL}/activity/toilet-temp.png`,
-    OnClick: (player, group) => useToiletFunction(),
-    // if the regression is too high, deny toilet usage
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
+    activity: {
+      Name: "Sit and Use Toilet",
+      Target: [],
+      TargetSelf: ["ItemButt"],
+      MaxProgress: 0,
+      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true) ]
     },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-      if (abclPlayer.stats.MentalRegression >= 0.3) message ??= "You feel uncomfortable, the toilet is cold and hard almost like ice. You can't use it.";
-      // when CanUseBathroomWithDiaper is false or abclPlayer.settings.CanUseToilet is false then it will deny toilet usage by wetting their clothes or diaper.
-      if ((hasDiaper(player) && !abclPlayer.settings.CanUseBathroomWithDiaper) || !abclPlayer.settings.CanUseToilet) return { success: true };
-      if (hasDiaper(player) && isDiaperLocked()) message ??= "You can't use the toilet while your diaper is locked.";
-      if (Player.IsRestrained()) message ??= "You are restrained.";
-
-      if (!silent && message) sendChatLocal(message);
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
-    TargetSelf: ["ItemButt"],
+    useImage: <ActivityImageSetting>`${publicURL}/activity/toilet-temp.png`,
+    run: (player, sender, info) => useToiletFunction(),
   },
   command: {
     Tag: "use-toilet",
