@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { INCONTINENCE_ON_TOILET_USE } from "../../constants";
 import { CombinedAction } from "../../types/types";
-import { CriteriaResult, Prerequisiter } from "../actionLoader";
+import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { sendABCLAction } from "../player/playerUtils";
@@ -40,7 +40,7 @@ export const useToiletFunction = () => {
 };
 // if the regression is too high, deny toilet usage
 function InsertCriteria(player: Character): CriteriaResult {
-  return CriteriaResult.ok()
+  return CriteriaResult.ok();
 }
 
 function Criteria(player: Character, silent?: boolean): CriteriaResult {
@@ -58,13 +58,10 @@ function Criteria(player: Character, silent?: boolean): CriteriaResult {
 
 export const useToilet: CombinedAction = {
   activity: {
-    activity: {
-      Name: "Sit and Use Toilet",
-      Target: [],
-      TargetSelf: ["ItemButt"],
-      MaxProgress: 0,
-      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true) ]
-    },
+    Name: "Sit and Use Toilet",
+    Target: [ABCLTarget.Self("ItemButt")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/toilet-temp.png`,
     run: (player, sender, info) => useToiletFunction(),
   },

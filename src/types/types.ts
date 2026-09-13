@@ -3,8 +3,8 @@ import { changeDiaperListeners } from "../core/actions/changeDiaper";
 import { lickPuddleListeners } from "../core/actions/lickPuddle";
 import { onABCLMessageListeners } from "../core/actions/onABCLMessage";
 
-import { CustomActivity } from "@sugarch/bc-activity-manager";
 
+import { ABCLActivity } from "src/core/actionLoader";
 import { diaperFaceRubListeners } from "src/core/actions/diaperFaceRub";
 import { diaperFaceSitListeners } from "src/core/actions/diaperFaceSit";
 import { diaperPatBackListeners } from "src/core/actions/diaperPatBack";
@@ -108,16 +108,16 @@ export enum PermissionLevels {
   Owner = 5, // TODO: Consider BCX owners, BCC Mommies, etc
   Self = 6,
 }
-export type ABCLActivity = {
-  ID: string;
-  Name: string;
-  Image: string;
-  OnClick?: (player: Character, group: AssetGroupItemName) => void;
-  Target?: AssetGroupItemName[];
-  TargetSelf?: AssetGroupItemName[];
-  Criteria?: (player: Character, silent?: boolean) => { success: boolean; message?: string };
-  InsertCriteria?: (player: Character, silent?: boolean) => { success: boolean; message?: string };
-};
+// export type ABCLActivity = {
+//   ID: string;
+//   Name: string;
+//   Image: string;
+//   OnClick?: (player: Character, group: AssetGroupItemName) => void;
+//   Target?: AssetGroupItemName[];
+//   TargetSelf?: AssetGroupItemName[];
+//   Criteria?: (player: Character, silent?: boolean) => { success: boolean; message?: string };
+//   InsertCriteria?: (player: Character, silent?: boolean) => { success: boolean; message?: string };
+// };
 
 export type HookListener<T> = (raw: PluginServerChatRoomMessage, data: T) => void;
 export type ListenerTypeMap = wipePuddleListeners &
@@ -136,7 +136,7 @@ export type ListenerTypeMap = wipePuddleListeners &
   diaperSquishFrontListeners;
 
 export type CombinedAction = {
-  activity?: CustomActivity;
+  activity?: ABCLActivity;
   command?: ICommand;
   listeners?: Partial<{
     [K in keyof ListenerTypeMap]: HookListener<ListenerTypeMap[K]>;

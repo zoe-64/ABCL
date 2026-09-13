@@ -1,6 +1,6 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
-import { CriteriaResult, Prerequisiter } from "../actionLoader";
+import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
@@ -41,12 +41,10 @@ function Criteria(player: Character, silent?: boolean) {
 
 export const lickPuddle: CombinedAction = {
   activity: {
-    activity: {
-      Name: "Lick Puddle",
-      Target: ["ItemBoots"],
-      MaxProgress: 0,
-      Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)]
-    },
+    Name: "Lick Puddle",
+    Target: [ABCLTarget.Any("ItemBoots")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/lickPuddle.png`,
     run: (player: Character, sender, info) => lickPuddleRequest(player),
   },

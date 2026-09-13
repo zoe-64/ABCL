@@ -1,6 +1,6 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
-import { CriteriaResult, Prerequisiter } from "../actionLoader";
+import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { getDiaperVerb, hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
@@ -30,7 +30,7 @@ export type diaperRubFrontListeners = {
   "diaper-rub-front": void;
 };
 
-function InsertCriteria(player: Character): CriteriaResult{
+function InsertCriteria(player: Character): CriteriaResult {
   let message = null;
   if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
   if (!hasDiaper(player)) message ??= "They are not diapered.";
@@ -46,12 +46,11 @@ function Criteria(player: Character, silent?: boolean): CriteriaResult {
 }
 export const diaperRubFront: CombinedAction = {
   activity: {
-    activity: {
-      Name: "Diaper Rub",
-      Target: ["ItemVulva"],
-      MaxProgress: 0,
-      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true) ],
-    },
+    Name: "Diaper Rub",
+    Target: [ABCLTarget.Others("ItemVulva")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
+
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperRubFront.png`,
     run: (player: Character, sender, info) => diaperRubFrontRequest(player),
   },

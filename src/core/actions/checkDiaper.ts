@@ -1,6 +1,6 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
-import { CriteriaResult, Prerequisiter } from "../actionLoader";
+import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
 import { hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
@@ -39,12 +39,10 @@ function Criteria(player: Character, silent?: boolean) {
 
 export const checkDiaper: CombinedAction = {
   activity: {
-    activity: {
-      Name: "Check Diaper",
-      Target: ["ItemPelvis"],
-      MaxProgress: 0,
-      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria), ]
-    },
+    Name: "Check Diaper",
+    Target: [ABCLTarget.Any("ItemPelvis")],
+    MaxProgress: 0,
+    Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria), ],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperCheck.png`,
     run: (player, sender, info) => diaperCheckFunction(player),
   },

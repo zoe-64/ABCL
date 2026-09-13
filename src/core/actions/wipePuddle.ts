@@ -1,5 +1,5 @@
 import { CombinedAction } from "../../types/types";
-import { CriteriaResult, Prerequisiter } from "../actionLoader";
+import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
@@ -38,12 +38,10 @@ function Criteria(player: Character, silent?: boolean): CriteriaResult {
 
 export const wipePuddle: CombinedAction = {
   activity: {
-    activity: {
-      Name: "Wipe Puddle",
-      Target: ["ItemBoots"],
-      MaxProgress: 0,      
-      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true) ],
-    },
+    Name: "Wipe Puddle",
+    Target: [ABCLTarget.Any("ItemBoots")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     // TODO need to figure this out
     // useImage: `./Assets/Female3DCG/ItemHandheld/Preview/Towel.png`,
     run: (player: Character, sender, info) => WipePuddleRequest(player),

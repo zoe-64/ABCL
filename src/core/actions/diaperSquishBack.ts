@@ -1,6 +1,6 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
-import { CriteriaResult, Prerequisiter } from "../actionLoader";
+import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { getDiaperVerb, hasDiaper } from "../player/diaper";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
@@ -38,12 +38,10 @@ function Criteria(player: Character, silent?: boolean) {
 }
 export const diaperSquishBack: CombinedAction = {
   activity: {
-    activity: {
-      Name: "Diaper Squish Bottom",
-      Target: ["ItemButt"],
-      MaxProgress: 0,
-      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true) ],
-    },
+    Name: "Diaper Squish Bottom",
+    Target: [ABCLTarget.Others("ItemButt")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperSquishBack.png`,
     run: (player: Character, sender, info) => diaperSquishBackRequest(player),
   },

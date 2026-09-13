@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { INCONTINENCE_ON_POTTY_USE } from "../../constants";
 import { CombinedAction } from "../../types/types";
-import { CriteriaResult, Prerequisiter } from "../actionLoader";
+import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { sendABCLAction } from "../player/playerUtils";
@@ -55,7 +55,6 @@ export const usePottyFunction = () => {
   sendABCLAction(actionMessage, undefined, "usePotty");
 };
 
-
 function InsertCriteria(player: Character): CriteriaResult {
   let message = null;
   return CriteriaResult.fromMessage(message);
@@ -70,13 +69,10 @@ function Criteria(player: Character, silent?: boolean): CriteriaResult {
 
 export const usePotty: CombinedAction = {
   activity: {
-    activity: {
-      Name: "Sit and Use Potty",
-      Target: [],
-      TargetSelf: ["ItemButt"],
-      MaxProgress: 0,
-      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true) ],
-    },
+    Name: "Sit and Use Potty",
+    Target: [ABCLTarget.Self("ItemButt")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/potty-temp.png`,
     run: (player: Character, sender, info) => usePottyFunction(),
   },

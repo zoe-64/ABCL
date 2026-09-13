@@ -1,6 +1,6 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
-import { CriteriaResult, Prerequisiter } from "../actionLoader";
+import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
@@ -47,14 +47,12 @@ function Criteria(player: Character, silent?: boolean) {
 
 export const diaperPeeOthersDiaper: CombinedAction = {
   activity: {
-    activity: {
-      Name: "Pees in Diaper",
-      Target: ["ItemPelvis"],
-      MaxProgress: 0,
-      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true) ]
-    },
+    Name: "Pees in Diaper",
+    Target: [ABCLTarget.Others("ItemPelvis")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperPeeOthersDiaper.png`,
-    run: (player: Character, sender, info) => diaperPeeOthersDiaperRequest(player, abclPlayer.stats.BladderValue)
+    run: (player: Character, sender, info) => diaperPeeOthersDiaperRequest(player, abclPlayer.stats.BladderValue),
   },
   listeners: {
     "diaper-pee-others-diaper": ({ Sender }, { volume }) => diaperPeeOthersDiaperFunction(getCharacter(Sender!) ?? Player, volume),

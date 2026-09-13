@@ -1,6 +1,6 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
-import { CriteriaResult, Prerequisiter } from "../actionLoader";
+import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
 import { sendABCLAction } from "../player/playerUtils";
 import { syncData } from "../settings";
 import { sendChatLocal } from "../utils";
@@ -27,13 +27,11 @@ function Criteria(player: Character, silent?: boolean): CriteriaResult {
 
 export const pauseStats: CombinedAction = {
   activity: {
-    activity: {
-      Name: "Pause Stats",
-      Target: [],
-      TargetSelf: ["ItemPelvis"],
-      MaxProgress: 0,
-      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true) ],
-    },
+    Name: "Pause Stats",
+    Target: [ABCLTarget.Self("ItemPelvis")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
+
     useImage: <ActivityImageSetting>`${publicURL}/activity/pauseStats.png`,
     run: (player: Character, sender, info) => pauseStatsFunction(),
   },

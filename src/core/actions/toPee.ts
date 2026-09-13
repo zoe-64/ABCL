@@ -1,16 +1,14 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
+import { ABCLTarget } from "../actionLoader";
 import { abclPlayer } from "../player/player";
 
 export const toPee: CombinedAction = {
   activity: {
-    activity: {
-      Name: "Pee",
-      MaxProgress: 0,
-      Target: [],
-      TargetSelf: ["ItemPelvis"],
-      Prerequisite: []
-    },
+    Name: "Pee",
+    MaxProgress: 0,
+    Target: [ABCLTarget.Self("ItemPelvis")],
+    Prerequisite: [],
     useImage: <ActivityImageSetting>`${publicURL}/activity/wetDiaper.svg`,
     run: (player: Character, sender, info) => abclPlayer.wet(true),
   },

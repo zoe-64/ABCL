@@ -1,6 +1,6 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { CombinedAction } from "../../types/types";
-import { CriteriaResult, Prerequisiter } from "../actionLoader";
+import { ABCLTarget, CriteriaResult, Prerequisiter } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { getDiaperVerb, hasDiaper } from "../player/diaper";
 import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
@@ -40,12 +40,10 @@ export type diaperPatFrontListeners = {
 
 export const diaperPatFront: CombinedAction = {
   activity: {
-    activity: {
-      Name: "Diaper Pat Crotch",
-      Target: ["ItemVulva"],
-      MaxProgress: 50,
-      Prerequisite: [ Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true) ] 
-    },
+    Name: "Diaper Pat Crotch",
+    Target: [ABCLTarget.Others("ItemVulva")],
+    MaxProgress: 50,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperPatFront.png`,
     run: (player, sender, info) => diaperPatFrontRequest(player),
   },
