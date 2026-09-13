@@ -1,6 +1,6 @@
-import { CombinedAction, DiaperSettingValues } from "../../types/types";
+import { ABCLTarget, CombinedAction, CriteriaResult, DiaperSettingValues } from "../../types/types";
 import { checkIsABCL, checkIsDiapered, checkIsDiaperLocked, checkIsOnFlatSurface } from "../actionCheck";
-import { ABCLTarget, ComposePrerequisites, CriteriaResult, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
@@ -52,12 +52,11 @@ const Criteria = Printable(
   ),
 );
 
-export const changeDiaper = <CombinedAction>{
+export const changeDiaper: CombinedAction = {
   activity: {
     Name: "Change Diaper",
     MaxProgress: 0,
     Target: [ABCLTarget.Any("ItemPelvis")],
-    TargetSelf: ["ItemPelvis"],
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     run: (acted, acting, info) => changeDiaperRequest(acted),
   },

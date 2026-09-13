@@ -1,4 +1,4 @@
-import { CriteriaResult } from "./actionLoader";
+import { CriteriaResult } from "src/types/types";
 import { hasDiaper, isDiaperLocked } from "./player/diaper";
 import { abclPlayer } from "./player/player";
 import { isABCLPlayer } from "./player/playerUtils";

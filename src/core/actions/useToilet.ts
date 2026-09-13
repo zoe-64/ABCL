@@ -1,8 +1,8 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { INCONTINENCE_ON_TOILET_USE } from "../../constants";
-import { CombinedAction } from "../../types/types";
+import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkIsDiaperLocked, checkIsMentalRegressionTooHighSelf, checkIsRestrained } from "../actionCheck";
-import { ABCLTarget, ComposePrerequisites, DoCheckIf, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, DoCheckIf, Prerequisiter, Printable } from "../actionLoader";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { sendABCLAction } from "../player/playerUtils";

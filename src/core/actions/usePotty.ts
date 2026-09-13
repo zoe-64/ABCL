@@ -1,8 +1,8 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { INCONTINENCE_ON_POTTY_USE } from "../../constants";
-import { CombinedAction } from "../../types/types";
+import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkHasPotty } from "../actionCheck";
-import { ABCLTarget, Prerequisiter, Printable } from "../actionLoader";
+import { Prerequisiter, Printable } from "../actionLoader";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { sendABCLAction } from "../player/playerUtils";

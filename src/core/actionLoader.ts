@@ -1,6 +1,5 @@
-import { ActivityImageSetting, ActivityManager, CustomActivity, ExCustomActivityPrerequisite } from "@sugarch/bc-activity-manager";
-import { ActivityInfo } from "@sugarch/bc-mod-types";
-import { CombinedAction } from "src/types/types";
+import { ActivityManager, CustomActivity } from "@sugarch/bc-activity-manager";
+import { ABCLActivity, CombinedAction, CriteriaResult } from "src/types/types";
 import { changeDiaper } from "./actions/changeDiaper";
 import { checkDiaper } from "./actions/checkDiaper";
 import { diaperFaceRub } from "./actions/diaperFaceRub";
@@ -23,94 +22,6 @@ import { usePotty } from "./actions/usePotty";
 import { useToilet } from "./actions/useToilet";
 import { wipePuddle } from "./actions/wipePuddle";
 import { sendChatLocal } from "./utils";
-
-export class CriteriaResult {
-  readonly type: "ok" | "err";
-  readonly message?: string;
-
-  private constructor(type: "ok" | "err", message?: string) {
-    this.type = type;
-    this.message = message;
-  }
-
-  static ok(): CriteriaResult {
-    return new CriteriaResult("ok");
-  }
-
-  static err(message: string): CriteriaResult {
-    return new CriteriaResult("err", message);
-  }
-
-  public toMessage(): string | undefined {
-    return this.message;
-  }
-
-  public isOk(): boolean {
-    return this.type == "ok";
-  }
-
-  public isErr(): boolean {
-    return this.type == "err";
-  }
-
-  public static fromMessage(message: string | undefined | null): CriteriaResult {
-    return message ? CriteriaResult.err(message) : CriteriaResult.ok();
-  }
-
-  public static OkIf(condition: boolean, message: string): CriteriaResult {
-    return condition ? CriteriaResult.ok() : CriteriaResult.err(message);
-  }
-}
-
-export interface ABCLActivity<CustomPrereq extends string = ActivityPrerequisite> {
-  Name: string;
-  Target: ABCLTarget[];
-  MaxProgress: number;
-  Prerequisite?: ExCustomActivityPrerequisite<CustomPrereq>[];
-  useImage?: ActivityImageSetting;
-  run?: (player: Character, sender: Character, info: ActivityInfo) => void | undefined;
-}
-
-type TargetMode =
-  | {
-      type: "others";
-      label?: string;
-    }
-  | {
-      type: "self";
-      label?: string;
-    }
-  | {
-      type: "any";
-      labelSelf?: string;
-      labelOthers?: string;
-    };
-
-export class ABCLTarget {
-  private constructor(item: AssetGroupItemName, mode: TargetMode) {
-    this.ItemGroup = item;
-    this.mode = mode;
-  }
-
-  ItemGroup: AssetGroupItemName;
-  mode: TargetMode;
-
-  public static Self(group: AssetGroupItemName, label?: string): ABCLTarget {
-    return new ABCLTarget(group, { type: "self", label: label });
-  }
-
-  public static Others(group: AssetGroupItemName, label?: string): ABCLTarget {
-    return new ABCLTarget(group, { type: "others", label: label });
-  }
-
-  public static AnySameLabel(group: AssetGroupItemName, label?: string): ABCLTarget {
-    return new ABCLTarget(group, { type: "any", labelSelf: label, labelOthers: label });
-  }
-
-  public static Any(group: AssetGroupItemName, labelOthers?: string, labelSelf?: string): ABCLTarget {
-    return new ABCLTarget(group, { type: "any", labelSelf: labelSelf, labelOthers: labelOthers });
-  }
-}
 
 export function ComposePrerequisites(...args: ((player: Character) => CriteriaResult)[]): (player: Character) => CriteriaResult {
   return (player: Character) => {

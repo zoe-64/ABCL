@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
-import { CombinedAction } from "../../types/types";
+import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkCanPauseStats } from "../actionCheck";
-import { ABCLTarget, Prerequisiter, Printable } from "../actionLoader";
+import { Prerequisiter, Printable } from "../actionLoader";
 import { sendABCLAction } from "../player/playerUtils";
 import { syncData } from "../settings";
 

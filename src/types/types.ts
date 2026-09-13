@@ -3,8 +3,6 @@ import { changeDiaperListeners } from "../core/actions/changeDiaper";
 import { lickPuddleListeners } from "../core/actions/lickPuddle";
 import { onABCLMessageListeners } from "../core/actions/onABCLMessage";
 
-
-import { ABCLActivity } from "src/core/actionLoader";
 import { diaperFaceRubListeners } from "src/core/actions/diaperFaceRub";
 import { diaperFaceSitListeners } from "src/core/actions/diaperFaceSit";
 import { diaperPatBackListeners } from "src/core/actions/diaperPatBack";
@@ -17,6 +15,8 @@ import { diaperSquishFrontListeners } from "src/core/actions/diaperSquishFront";
 import { wipePuddleListeners } from "../core/actions/wipePuddle";
 import { ModVersion } from "./definitions";
 
+import { ActivityImageSetting, ExCustomActivityPrerequisite } from "@sugarch/bc-activity-manager";
+import { ActivityInfo } from "@sugarch/bc-mod-types";
 export type PartialDeep<T> = {
   [P in keyof T]?: PartialDeep<T[P]>;
 };
@@ -108,16 +108,6 @@ export enum PermissionLevels {
   Owner = 5, // TODO: Consider BCX owners, BCC Mommies, etc
   Self = 6,
 }
-// export type ABCLActivity = {
-//   ID: string;
-//   Name: string;
-//   Image: string;
-//   OnClick?: (player: Character, group: AssetGroupItemName) => void;
-//   Target?: AssetGroupItemName[];
-//   TargetSelf?: AssetGroupItemName[];
-//   Criteria?: (player: Character, silent?: boolean) => { success: boolean; message?: string };
-//   InsertCriteria?: (player: Character, silent?: boolean) => { success: boolean; message?: string };
-// };
 
 export type HookListener<T> = (raw: PluginServerChatRoomMessage, data: T) => void;
 export type ListenerTypeMap = wipePuddleListeners &
@@ -142,3 +132,91 @@ export type CombinedAction = {
     [K in keyof ListenerTypeMap]: HookListener<ListenerTypeMap[K]>;
   }>;
 };
+
+export class CriteriaResult {
+  readonly type: "ok" | "err";
+  readonly message?: string;
+
+  private constructor(type: "ok" | "err", message?: string) {
+    this.type = type;
+    this.message = message;
+  }
+
+  static ok(): CriteriaResult {
+    return new CriteriaResult("ok");
+  }
+
+  static err(message: string): CriteriaResult {
+    return new CriteriaResult("err", message);
+  }
+
+  public toMessage(): string | undefined {
+    return this.message;
+  }
+
+  public isOk(): boolean {
+    return this.type == "ok";
+  }
+
+  public isErr(): boolean {
+    return this.type == "err";
+  }
+
+  public static fromMessage(message: string | undefined | null): CriteriaResult {
+    return message ? CriteriaResult.err(message) : CriteriaResult.ok();
+  }
+
+  public static OkIf(condition: boolean, message: string): CriteriaResult {
+    return condition ? CriteriaResult.ok() : CriteriaResult.err(message);
+  }
+}
+
+type TargetMode =
+  | {
+      type: "others";
+      label?: string;
+    }
+  | {
+      type: "self";
+      label?: string;
+    }
+  | {
+      type: "any";
+      labelSelf?: string;
+      labelOthers?: string;
+    };
+
+export class ABCLTarget {
+  private constructor(item: AssetGroupItemName, mode: TargetMode) {
+    this.ItemGroup = item;
+    this.mode = mode;
+  }
+
+  ItemGroup: AssetGroupItemName;
+  mode: TargetMode;
+
+  public static Self(group: AssetGroupItemName, label?: string): ABCLTarget {
+    return new ABCLTarget(group, { type: "self", label: label });
+  }
+
+  public static Others(group: AssetGroupItemName, label?: string): ABCLTarget {
+    return new ABCLTarget(group, { type: "others", label: label });
+  }
+
+  public static AnySameLabel(group: AssetGroupItemName, label?: string): ABCLTarget {
+    return new ABCLTarget(group, { type: "any", labelSelf: label, labelOthers: label });
+  }
+
+  public static Any(group: AssetGroupItemName, labelOthers?: string, labelSelf?: string): ABCLTarget {
+    return new ABCLTarget(group, { type: "any", labelSelf: labelSelf, labelOthers: labelOthers });
+  }
+}
+
+export interface ABCLActivity<CustomPrereq extends string = ActivityPrerequisite> {
+  Name: string;
+  Target: ABCLTarget[];
+  MaxProgress: number;
+  Prerequisite?: ExCustomActivityPrerequisite<CustomPrereq>[];
+  useImage?: ActivityImageSetting;
+  run?: (player: Character, sender: Character, info: ActivityInfo) => void | undefined;
+}

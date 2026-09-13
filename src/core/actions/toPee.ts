@@ -1,6 +1,5 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
-import { CombinedAction } from "../../types/types";
-import { ABCLTarget } from "../actionLoader";
+import { ABCLTarget, CombinedAction } from "../../types/types";
 import { abclPlayer } from "../player/player";
 
 export const toPee: CombinedAction = {

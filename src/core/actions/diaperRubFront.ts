@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
-import { CombinedAction } from "../../types/types";
+import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkIsABCL, checkIsDiapered, checkIsRestrained } from "../actionCheck";
-import { ABCLTarget, ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { getDiaperVerb } from "../player/diaper";
 import { abclPlayer } from "../player/player";
