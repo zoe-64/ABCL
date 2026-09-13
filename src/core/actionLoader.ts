@@ -46,7 +46,7 @@ export function Prerequisiter<RestOfArgs extends unknown[]>(
 export function Printable(f: (player: Character) => CriteriaResult): (player: Character, silent?: boolean) => CriteriaResult {
   return (player, silent?) => {
     const res = f(player);
-    if (!silent && res.toMessage()) sendChatLocal(res.toMessage as unknown as string);
+    if (!silent && res.toMessage()) sendChatLocal(res.toMessage() as unknown as string);
     return res;
   };
 }
