@@ -1,0 +1,2 @@
+Fix issue where pausing starts via the command didn't persist
+Added support for LSCG and ABCL activities
