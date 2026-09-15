@@ -119,7 +119,9 @@ export default function StatsPanel(): h.JSX.Element {
               <span>Stats: </span>
               <span>{pauseStats ? "Paused" : "Active"}</span>
             </p>
-            <button onClick={() => resizeElements()}>Refresh</button>
+            <button className="ABCL-button" onClick={() => resizeElements()}>
+              Refresh
+            </button>
           </div>
         )}
       </div>
