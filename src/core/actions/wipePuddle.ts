@@ -46,7 +46,7 @@ export const wipePuddle: CombinedAction = {
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     // TODO need to figure this out
     // useImage: `./Assets/Female3DCG/ItemHandheld/Preview/Towel.png`,
-    run: (player: Character, sender, info) => WipePuddleRequest(player),
+    run: (player: Character, sender, info) => WipePuddleRequest(getCharacter(info.TargetCharacter)!),
   },
   command: {
     Tag: "wipe-puddle",

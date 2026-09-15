@@ -46,7 +46,7 @@ export const diaperSquishBack: CombinedAction = {
     MaxProgress: 0,
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperSquishBack.png`,
-    run: (player: Character, sender, info) => diaperSquishBackRequest(player),
+    run: (player: Character, sender, info) => diaperSquishBackRequest(getCharacter(info.TargetCharacter)!),
   },
   listeners: {
     "diaper-squish-back": ({ Sender }) => diaperSquishBackFunction(getCharacter(Sender!) ?? Player),

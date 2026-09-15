@@ -46,11 +46,11 @@ export type diaperPatFrontListeners = {
 export const diaperPatFront: CombinedAction = {
   activity: {
     Name: "Diaper Pat Crotch",
-    Target: [ABCLTarget.Others("ItemVulva")],
+    Target: [ABCLTarget.Any("ItemVulva")],
     MaxProgress: 50,
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperPatFront.png`,
-    run: (player, sender, info) => diaperPatFrontRequest(player),
+    run: (player, sender, info) => diaperPatFrontRequest(getCharacter(info.TargetCharacter)!),
   },
   listeners: {
     "diaper-pat-front": ({ Sender }) => diaperPatFrontFunction(getCharacter(Sender!) ?? Player),

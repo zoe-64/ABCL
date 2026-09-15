@@ -49,7 +49,7 @@ export const diaperPatBack: CombinedAction = {
     MaxProgress: 50,
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperPatBack.png`,
-    run: (player: Character, sender, info) => diaperPatBackRequest(player),
+    run: (player: Character, sender, info) => diaperPatBackRequest(getCharacter(info.TargetCharacter)!),
   },
   listeners: {
     "diaper-pat-back": ({ Sender }) => diaperPatBackFunction(getCharacter(Sender!) ?? Player),

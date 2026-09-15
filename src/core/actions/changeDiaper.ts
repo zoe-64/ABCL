@@ -61,7 +61,7 @@ export const changeDiaper: CombinedAction = {
     Target: [ABCLTarget.Any("ItemPelvis")],
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/changeDiaper.svg`,
-    run: (acted, acting, info) => changeDiaperRequest(acted),
+    run: (acted, acting, info) => changeDiaperRequest(getCharacter(info.TargetCharacter)!),
   },
   command: {
     Tag: "change-diaper",

@@ -54,7 +54,7 @@ export const diaperPeeOthersDiaper: CombinedAction = {
     MaxProgress: 0,
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperPeeOthersDiaper.png`,
-    run: (player: Character, sender, info) => diaperPeeOthersDiaperRequest(player, abclPlayer.stats.BladderValue),
+    run: (player: Character, sender, info) => diaperPeeOthersDiaperRequest(getCharacter(info.TargetCharacter)!, abclPlayer.stats.BladderValue),
   },
   listeners: {
     "diaper-pee-others-diaper": ({ Sender }, { volume }) => diaperPeeOthersDiaperFunction(getCharacter(Sender!) ?? Player, volume),

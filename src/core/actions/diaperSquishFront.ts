@@ -50,7 +50,7 @@ export const diaperSquishFront: CombinedAction = {
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     MaxProgress: 0,
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperSquishFront.png`,
-    run: (player: Character, sedner, info) => diaperSquishFrontRequest(player),
+    run: (player: Character, sedner, info) => diaperSquishFrontRequest(getCharacter(info.TargetCharacter)!),
   },
   listeners: {
     "diaper-squish-front": ({ Sender }) => diaperSquishFrontFunction(getCharacter(Sender!) ?? Player),

@@ -52,7 +52,7 @@ export const diaperFaceSit: CombinedAction = {
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     Target: [ABCLTarget.Others("ItemNose")],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperFaceSit.png`,
-    run: (player, sender, info) => diaperFaceSitRequest(player),
+    run: (player, sender, info) => diaperFaceSitRequest(getCharacter(info.TargetCharacter)!),
   },
   listeners: {
     "diaper-face-sit": ({ Sender }) => diaperFaceSitFunction(getCharacter(Sender!) ?? Player),

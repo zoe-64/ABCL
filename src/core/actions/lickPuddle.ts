@@ -49,7 +49,7 @@ export const lickPuddle: CombinedAction = {
     MaxProgress: 0,
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/lickPuddle.png`,
-    run: (player: Character, sender, info) => lickPuddleRequest(player),
+    run: (player: Character, sender, info) => lickPuddleRequest(getCharacter(info.TargetCharacter)!),
   },
   command: {
     Tag: "lick-puddle",

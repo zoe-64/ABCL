@@ -57,7 +57,7 @@ export const diaperPour: CombinedAction = {
     MaxProgress: 50,
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperPour.png`,
-    run: (player: Character, sender, info) => diaperPourRequest(player),
+    run: (player, sender, info) => diaperPourRequest(getCharacter(info.TargetCharacter)!),
   },
   listeners: {
     "diaper-pour": ({ Sender }) => diaperPourFunction(getCharacter(Sender!) ?? Player),

@@ -52,7 +52,7 @@ export const diaperFaceRub: CombinedAction = {
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
 
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperFaceRub.png`,
-    run: (player, sender, info) => diaperFaceRubRequest(player),
+    run: (player, sender, info) => diaperFaceRubRequest(getCharacter(info.TargetCharacter)!),
   },
 
   listeners: {

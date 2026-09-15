@@ -55,7 +55,7 @@ export const diaperRubFront: CombinedAction = {
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
 
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperRubFront.png`,
-    run: (player: Character, sender, info) => diaperRubFrontRequest(player),
+    run: (player: Character, sender, info) => diaperRubFrontRequest(getCharacter(info.TargetCharacter)!),
   },
   listeners: {
     "diaper-rub-front": ({ Sender }) => diaperRubFrontFunction(getCharacter(Sender!) ?? Player),
