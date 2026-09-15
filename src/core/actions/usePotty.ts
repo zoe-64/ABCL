@@ -1,9 +1,11 @@
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { INCONTINENCE_ON_POTTY_USE } from "../../constants";
-import { CombinedAction } from "../../types/types";
+import { ABCLTarget, CombinedAction } from "../../types/types";
+import { checkHasPotty } from "../actionCheck";
+import { Prerequisiter, Printable } from "../actionLoader";
 import { hasDiaper, isDiaperLocked } from "../player/diaper";
 import { abclPlayer } from "../player/player";
 import { sendABCLAction } from "../player/playerUtils";
-import { sendChatLocal } from "../utils";
 
 export const usePottyFunction = () => {
   const incontinenceOffset = 0.3 * abclPlayer.stats.Incontinence;
@@ -53,35 +55,29 @@ export const usePottyFunction = () => {
   sendABCLAction(actionMessage, undefined, "usePotty");
 };
 
+const Criteria = Printable(checkHasPotty);
+
+// function Criteria(player: Character, silent?: boolean): CriteriaResult {
+//   const result = InsertCriteria?.(player);
+//   let message = result?.toMessage();
+//   if (!player.Appearance.some(item => item.Asset.Name == "Potty")) message ??= "You don't have a potty to use!";
+//   if (!silent && message) sendChatLocal(message);
+//   return CriteriaResult.fromMessage(message);
+// }
+
 export const usePotty: CombinedAction = {
   activity: {
-    ID: "potty",
     Name: "Sit and Use Potty",
-    Image: `${publicURL}/activity/potty-temp.png`,
-    OnClick: (player: Character, group) => usePottyFunction(),
-    TargetSelf: ["ItemButt"],
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-      if (!player.Appearance.some(item => item.Asset.Name == "Potty")) message ??= "You don't have a potty to use!";
-      if (!silent && message) sendChatLocal(message);
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+    Target: [ABCLTarget.Self("ItemButt")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(Criteria, true)],
+    useImage: <ActivityImageSetting>`${publicURL}/activity/potty-temp.png`,
+    run: (player: Character, sender, info) => usePottyFunction(),
   },
   command: {
     Tag: "use-potty",
     Action: (args, msg, parsed) => {
-      if (!usePotty.activity?.Criteria?.(Player).success) return;
+      if (!Criteria?.(Player).isOk()) return;
       usePottyFunction();
     },
     Description: ` Sit down and use the potty.`,

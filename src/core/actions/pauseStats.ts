@@ -1,7 +1,9 @@
-import { CombinedAction } from "../../types/types";
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
+import { ABCLTarget, CombinedAction } from "../../types/types";
+import { checkCanPauseStats } from "../actionCheck";
+import { Prerequisiter, Printable } from "../actionLoader";
 import { sendABCLAction } from "../player/playerUtils";
 import { syncData } from "../settings";
-import { sendChatLocal } from "../utils";
 
 export const pauseStatsFunction = () => {
   const isPaused = Player.ABCL.Settings.PauseStats;
@@ -10,35 +12,30 @@ export const pauseStatsFunction = () => {
   syncData();
 };
 
+const Criteria = Printable(checkCanPauseStats);
+
+// function Criteria(player: Character, silent?: boolean): CriteriaResult {
+//   const result = InsertCriteria?.(player);
+//   let message = result?.toMessage();
+//   if (Player.ABCL.SettingPermissions.PauseStats) message ??= "Your parent(s) don't allow you to pause your stats";
+//   if (!silent && message) sendChatLocal(message);
+//   return CriteriaResult.fromMessage(message);
+// }
+
 export const pauseStats: CombinedAction = {
   activity: {
-    ID: "pauseStats",
     Name: "Pause Stats",
-    Image: `${publicURL}/activity/pauseStats.png`,
-    TargetSelf: ["ItemPelvis"],
-    OnClick: (player: Character, group: AssetGroupItemName) => pauseStatsFunction(),
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-      if (Player.ABCL.SettingPermissions.PauseStats) message ??= "Your parent(s) don't allow you to pause your stats";
-      if (!silent && message) sendChatLocal(message);
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+    Target: [ABCLTarget.Self("ItemPelvis")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(Criteria, true)],
+
+    useImage: <ActivityImageSetting>`${publicURL}/activity/pauseStats.png`,
+    run: (player: Character, sender, info) => pauseStatsFunction(),
   },
   command: {
     Tag: "pause-stats",
     Action: (args, msg, parsed) => {
-      if (!pauseStats.activity!.Criteria!(Player).success) return;
+      if (!Criteria!(Player).isOk()) return;
       pauseStatsFunction();
     },
     Description: ` Pauses the ABCL stats.`,

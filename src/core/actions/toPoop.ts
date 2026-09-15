@@ -1,13 +1,15 @@
-import { CombinedAction } from "../../types/types";
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
+import { ABCLTarget, CombinedAction } from "../../types/types";
 import { abclPlayer } from "../player/player";
 
 export const toPoop: CombinedAction = {
   activity: {
-    ID: "poop",
     Name: "Poop",
-    Image: `${publicURL}/activity/soilDiaper.svg`,
-    OnClick: (player: Character, group) => abclPlayer.soil(true),
-    TargetSelf: ["ItemPelvis"],
+    MaxProgress: 0,
+    Target: [ABCLTarget.Self("ItemPelvis")],
+    Prerequisite: [],
+    useImage: <ActivityImageSetting>`${publicURL}/activity/soilDiaper.svg`,
+    run: (player, sender, info) => abclPlayer.soil(true),
   },
   command: {
     Tag: "poop",

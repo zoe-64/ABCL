@@ -1,8 +1,10 @@
-import { CombinedAction } from "../../types/types";
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
+import { ABCLTarget, CombinedAction } from "../../types/types";
+import { checkHasPuddle, checkIsABCL } from "../actionCheck";
+import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
-import { sendChatLocal } from "../utils";
+import { getCharacter, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
 
 const lickPuddleRequest = (player: Character) => {
   const isSelf = player.MemberNumber === Player.MemberNumber;
@@ -23,37 +25,37 @@ export type lickPuddleListeners = {
   "lick-puddle": undefined;
 };
 
+const InsertCriteria = ComposePrerequisites(checkIsABCL, checkHasPuddle);
+const Criteria = Printable(InsertCriteria);
+
+// function InsertCriteria(player: Character) {
+//   let message = null;
+//   if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+//   if (player?.ABCL && player.ABCL!.Stats.PuddleSize.value <= 0) message ??= "They have no puddle of pee.";
+//   return CriteriaResult.fromMessage(message);
+// }
+
+// function Criteria(player: Character, silent?: boolean) {
+//   const result = InsertCriteria?.(player);
+//   let message = result?.toMessage();
+//   if (!silent && message) sendChatLocal(message);
+//   return CriteriaResult.fromMessage(message);
+// }
+
 export const lickPuddle: CombinedAction = {
   activity: {
-    ID: "lick-puddle",
     Name: "Lick Puddle",
-    Image: `${publicURL}/activity/lickPuddle.png`,
-    Target: ["ItemBoots"],
-    OnClick: (player: Character, group: AssetGroupItemName) => lickPuddleRequest(player),
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-      if (player?.ABCL && player.ABCL!.Stats.PuddleSize.value <= 0) message ??= "They have no puddle of pee.";
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-      if (!silent && message) sendChatLocal(message);
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+    Target: [ABCLTarget.Any("ItemBoots")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
+    useImage: <ActivityImageSetting>`${publicURL}/activity/lickPuddle.png`,
+    run: (player: Character, sender, info) => lickPuddleRequest(player),
   },
   command: {
     Tag: "lick-puddle",
     Action: (args, msg, parsed) => {
       const character = targetInputExtractor(parsed) ?? Player;
-      if (!lickPuddle.activity!.Criteria!(character).success) return;
+      if (!Criteria!(character).isOk()) return;
       lickPuddleRequest(character);
     },
     Description: ` [MemberNumber|Name|Nickname]: Licks a puddle of pee.`,

@@ -1,9 +1,11 @@
-import { CombinedAction } from "../../types/types";
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
+import { ABCLTarget, CombinedAction } from "../../types/types";
+import { checkIsABCL, checkIsDiapered, checkIsRestrained } from "../actionCheck";
+import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
-import { getDiaperVerb, hasDiaper } from "../player/diaper";
+import { getDiaperVerb } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
-import { sendChatLocal } from "../utils";
+import { getCharacter, replace_template, sendABCLAction } from "../player/playerUtils";
 
 const diaperRubFrontRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-rub-front", undefined, player.MemberNumber);
@@ -28,32 +30,32 @@ export type diaperRubFrontListeners = {
   "diaper-rub-front": void;
 };
 
+const InsertCriteria = ComposePrerequisites(checkIsABCL, checkIsDiapered);
+const Criteria = Printable(ComposePrerequisites(InsertCriteria, checkIsRestrained));
+
+// function InsertCriteria(player: Character): CriteriaResult {
+//   let message = null;
+//   if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+//   if (!hasDiaper(player)) message ??= "They are not diapered.";
+//   return CriteriaResult.fromMessage(message);
+// }
+
+// function Criteria(player: Character, silent?: boolean): CriteriaResult {
+//   const result = InsertCriteria?.(player);
+//   let message = result?.toMessage();
+//   if (Player.IsRestrained()) message ??= "You are restrained.";
+//   if (!silent && message) sendChatLocal(message);
+//   return CriteriaResult.fromMessage(message);
+// }
 export const diaperRubFront: CombinedAction = {
   activity: {
-    ID: "diaper-rub-front",
     Name: "Diaper Rub",
-    Image: `${publicURL}/activity/diaperRubFront.png`,
-    Target: ["ItemVulva"],
-    OnClick: (player: Character, group: AssetGroupItemName) => diaperRubFrontRequest(player),
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-      if (!hasDiaper(player)) message ??= "They are not diapered.";
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-      if (Player.IsRestrained()) message ??= "You are restrained.";
-      if (!silent && message) sendChatLocal(message);
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+    Target: [ABCLTarget.Others("ItemVulva")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
+
+    useImage: <ActivityImageSetting>`${publicURL}/activity/diaperRubFront.png`,
+    run: (player: Character, sender, info) => diaperRubFrontRequest(player),
   },
   listeners: {
     "diaper-rub-front": ({ Sender }) => diaperRubFrontFunction(getCharacter(Sender!) ?? Player),

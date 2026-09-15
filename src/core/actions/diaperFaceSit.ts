@@ -1,9 +1,10 @@
-import { CombinedAction } from "../../types/types";
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
+import { ABCLTarget, CombinedAction } from "../../types/types";
+import { checkIsABCL, checkIsRestrained, checkIsSelfDiapered } from "../actionCheck";
+import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
-import { hasDiaper } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
-import { sendChatLocal } from "../utils";
+import { getCharacter, replace_template, sendABCLAction } from "../player/playerUtils";
 
 const diaperFaceSitRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) {
@@ -27,34 +28,31 @@ export const diaperFaceSitFunction = (player: Character) => {
 export type diaperFaceSitListeners = {
   "diaper-face-sit": void;
 };
+const InsertCriteria = ComposePrerequisites(checkIsABCL, checkIsSelfDiapered);
+const Criteria = Printable(ComposePrerequisites(InsertCriteria, checkIsRestrained));
+// function InsertCriteria(player: Character): CriteriaResult {
+//   let message = null;
+//   if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+//   if (!hasDiaper(Player)) message ??= "You are not diapered.";
+//   if (player.MemberNumber === Player.MemberNumber) message = "You can't sit with your own diaper on your face.";
+//   return CriteriaResult.fromMessage(message);
+// }
+// function Criteria(player: Character, silent?: boolean): CriteriaResult {
+//   const result = InsertCriteria?.(player) ?? null;
+//   let message = result?.toMessage();
+//   if (Player.IsRestrained()) message ??= "You are restrained.";
+//   if (!silent && message) sendChatLocal(message);
+//   return CriteriaResult.fromMessage(message);
+// }
 
 export const diaperFaceSit: CombinedAction = {
   activity: {
-    ID: "diaper-face-sit",
     Name: "Sits with Diaper on Face",
-    Image: `${publicURL}/activity/diaperFaceSit.png`,
-    Target: ["ItemNose"],
-    OnClick: (player: Character, group: AssetGroupItemName) => diaperFaceSitRequest(player),
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-      if (!hasDiaper(Player)) message ??= "You are not diapered.";
-      if (player.MemberNumber === Player.MemberNumber) message = "You can't sit with your own diaper on your face.";
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-      if (Player.IsRestrained()) message ??= "You are restrained.";
-      if (!silent && message) sendChatLocal(message);
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
+    Target: [ABCLTarget.Others("ItemNose")],
+    useImage: <ActivityImageSetting>`${publicURL}/activity/diaperFaceSit.png`,
+    run: (player, sender, info) => diaperFaceSitRequest(player),
   },
   listeners: {
     "diaper-face-sit": ({ Sender }) => diaperFaceSitFunction(getCharacter(Sender!) ?? Player),

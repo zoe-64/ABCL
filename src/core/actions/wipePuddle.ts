@@ -1,9 +1,10 @@
-import { CombinedAction } from "../../types/types";
+import { ABCLTarget, CombinedAction } from "../../types/types";
+import { checkHasPuddle, checkIsABCL, checkIsRestrained } from "../actionCheck";
+import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
+import { getCharacter, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
 import { syncData } from "../settings";
-import { sendChatLocal } from "../utils";
 const WipePuddleRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("wipe-puddle", undefined, player.MemberNumber);
   WipePuddleFunction(Player);
@@ -20,38 +21,38 @@ export type wipePuddleListeners = {
   "wipe-puddle": undefined;
 };
 
+const InsertCriteria = ComposePrerequisites(checkIsABCL, checkHasPuddle);
+const Criteria = Printable(ComposePrerequisites(InsertCriteria, checkIsRestrained));
+// function InsertCriteria(player: Character): CriteriaResult {
+//   let message = null;
+//   if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+//   if (player.ABCL && player.ABCL.Stats.PuddleSize.value <= 0) message ??= "They have no puddle.";
+//   return CriteriaResult.fromMessage(message);
+// }
+
+// function Criteria(player: Character, silent?: boolean): CriteriaResult {
+//   const result = InsertCriteria?.(player);
+//   let message = result?.message ?? null;
+//   if (Player.IsRestrained()) message ??= "You are restrained.";
+//   if (!silent && message) sendChatLocal(message);
+//   return CriteriaResult.fromMessage(message);
+// }
+
 export const wipePuddle: CombinedAction = {
   activity: {
-    ID: "wipe-puddle",
     Name: "Wipe Puddle",
-    Image: `./Assets/Female3DCG/ItemHandheld/Preview/Towel.png`,
-    Target: ["ItemBoots"],
-    OnClick: (player: Character, group: AssetGroupItemName) => WipePuddleRequest(player),
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-      if (player.ABCL && player.ABCL.Stats.PuddleSize.value <= 0) message ??= "They have no puddle.";
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-      if (Player.IsRestrained()) message ??= "You are restrained.";
-      if (!silent && message) sendChatLocal(message);
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+    Target: [ABCLTarget.Any("ItemBoots")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
+    // TODO need to figure this out
+    // useImage: `./Assets/Female3DCG/ItemHandheld/Preview/Towel.png`,
+    run: (player: Character, sender, info) => WipePuddleRequest(player),
   },
   command: {
     Tag: "wipe-puddle",
     Action: (args, msg, parsed) => {
       const character = targetInputExtractor(parsed) ?? Player;
-      if (!wipePuddle.activity!.Criteria!(character).success) return;
+      if (!Criteria!(character).isOk()) return;
 
       WipePuddleRequest(character);
     },

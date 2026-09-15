@@ -1,10 +1,12 @@
-import { CombinedAction, DiaperSettingValues } from "../../types/types";
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
+import { ABCLTarget, CombinedAction, CriteriaResult, DiaperSettingValues } from "../../types/types";
+import { checkIsABCL, checkIsDiapered, checkIsDiaperLocked, checkIsOnFlatSurface } from "../actionCheck";
+import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
-import { hasDiaper, isDiaperLocked, updateDiaperColor } from "../player/diaper";
+import { updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, getCharacterName, isABCLPlayer, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
+import { getCharacter, getCharacterName, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
 import { syncData } from "../settings";
-import { sendChatLocal } from "../utils";
 
 export const changeDiaperRequest = (player: Character, force?: boolean) => {
   if (!abclPlayer.settings.CanChangeSelf && player.MemberNumber === Player.MemberNumber) {
@@ -43,45 +45,29 @@ export type changeDiaperListeners = {
   "changeDiaper-pending": { force?: boolean };
 };
 
+const InsertCriteria = ComposePrerequisites(checkIsABCL, checkIsDiaperLocked, checkIsDiapered);
+const Criteria = Printable(
+  ComposePrerequisites(
+    InsertCriteria,
+    player => CriteriaResult.OkIf(!(InventoryGet(player, "ItemDevices")?.Asset.Name != "ChangingTable" && Player.IsRestrained()), "You are restrained"),
+    checkIsOnFlatSurface,
+  ),
+);
+
 export const changeDiaper: CombinedAction = {
   activity: {
-    ID: "change-diaper",
     Name: "Change Diaper",
-    Image: `${publicURL}/activity/changeDiaper.svg`,
-    Target: ["ItemPelvis"],
-    OnClick: (player: Character, group: AssetGroupItemName) => changeDiaperRequest(player),
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-      if (isDiaperLocked(player)) message ??= "Diaper is locked.";
-      if (!hasDiaper(player)) message ??= "They are not diapered.";
-
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-
-      const item = InventoryGet(player, "ItemDevices");
-      if (item?.Asset.Name != "ChangingTable" && Player.IsRestrained()) message ??= "You are restrained.";
-      if (!(item && ["Crib", "BondageBench", "MedicalBed", "ChangingTable", "Bed", "床左边", "床右边"].includes(item.Asset.Name)))
-        message ??= "They are not on a changing table or a flat surface.";
-      if (!silent && message) sendChatLocal(message);
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+    MaxProgress: 0,
+    Target: [ABCLTarget.Any("ItemPelvis")],
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
+    useImage: <ActivityImageSetting>`${publicURL}/activity/changeDiaper.svg`,
+    run: (acted, acting, info) => changeDiaperRequest(acted),
   },
   command: {
     Tag: "change-diaper",
     Action: function (args, msg, parsed) {
       const character = targetInputExtractor(parsed) ?? Player;
-      const result = changeDiaper.activity!.Criteria!(character);
-      if (!result.success) return;
+      if (Criteria(character).isErr()) return;
 
       changeDiaperRequest(character);
     },

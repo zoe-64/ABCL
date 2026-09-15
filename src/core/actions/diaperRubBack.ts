@@ -1,8 +1,11 @@
-import { CombinedAction } from "../../types/types";
+import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
+import { ABCLTarget, CombinedAction } from "../../types/types";
+import { checkIsABCL, checkIsDiapered, checkIsRestrained } from "../actionCheck";
+import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
-import { getDiaperVerb, hasDiaper } from "../player/diaper";
+import { getDiaperVerb } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, isABCLPlayer, replace_template, sendABCLAction } from "../player/playerUtils";
+import { getCharacter, replace_template, sendABCLAction } from "../player/playerUtils";
 
 const diaperRubBackRequest = (player: Character) => {
   if (player.MemberNumber !== Player.MemberNumber) return sendDataToAction("diaper-rub-back", undefined, player.MemberNumber);
@@ -28,31 +31,32 @@ export type diaperRubBackListeners = {
   "diaper-rub-back": void;
 };
 
+const InsertCriteria = ComposePrerequisites(checkIsABCL, checkIsDiapered);
+const Criteria = Printable(ComposePrerequisites(InsertCriteria, checkIsRestrained));
+
+// function InsertCriteria(player: Character): CriteriaResult {
+//   let message = null;
+//   if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
+//   if (!hasDiaper(player)) message ??= "They are not diapered.";
+//   return CriteriaResult.fromMessage(message);
+// }
+
+// function Criteria(player: Character, silent?: boolean): CriteriaResult {
+//   const result = InsertCriteria?.(player) ?? null;
+//   let message = result?.toMessage();
+//   if (Player.IsRestrained()) message = "You are restrained.";
+//   return CriteriaResult.fromMessage(message);
+// }
+
 export const diaperRubBack: CombinedAction = {
   activity: {
-    ID: "diaper-rub-back",
     Name: "Diaper Rub Bottom",
-    Image: `${publicURL}/activity/diaperRubBack.png`,
-    Target: ["ItemButt"],
-    OnClick: (player: Character, group: AssetGroupItemName) => diaperRubBackRequest(player),
-    InsertCriteria: function (player: Character) {
-      let message = null;
-      if (!isABCLPlayer(player)) message ??= "They are not an ABCL player.";
-      if (!hasDiaper(player)) message ??= "They are not diapered.";
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
-    Criteria: function (player: Character, silent?: boolean) {
-      const result = this.InsertCriteria?.(player) ?? null;
-      let message = result?.message ?? null;
-      if (Player.IsRestrained()) message = "You are restrained.";
-      return {
-        success: message == null,
-        message: message == null ? undefined : message,
-      };
-    },
+    Target: [ABCLTarget.Others("ItemButt")],
+    MaxProgress: 0,
+    Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
+
+    useImage: <ActivityImageSetting>`${publicURL}/activity/diaperRubBack.png`,
+    run: (player: Character, sender, info) => diaperRubBackRequest(player),
   },
   listeners: {
     "diaper-rub-back": ({ Sender }) => diaperRubBackFunction(getCharacter(Sender!) ?? Player),

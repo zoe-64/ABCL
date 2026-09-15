@@ -1,5 +1,5 @@
-import { HookManager } from "@sugarch/bc-mod-hook-manager";
-import { ABCLActivity, CombinedAction } from "../types/types";
+import { ActivityManager, CustomActivity } from "@sugarch/bc-activity-manager";
+import { ABCLActivity, CombinedAction, CriteriaResult } from "src/types/types";
 import { changeDiaper } from "./actions/changeDiaper";
 import { checkDiaper } from "./actions/checkDiaper";
 import { diaperFaceRub } from "./actions/diaperFaceRub";
@@ -21,88 +21,104 @@ import { toPoop } from "./actions/toPoop";
 import { usePotty } from "./actions/usePotty";
 import { useToilet } from "./actions/useToilet";
 import { wipePuddle } from "./actions/wipePuddle";
-import { waitForElement } from "./utils";
+import { sendChatLocal } from "./utils";
 
-class Activity {
-  constructor(
-    public id: string,
-    public name: string,
-    public image: string,
-    public onClick?: (player: Character, group: AssetGroupItemName) => void,
-    private target?: AssetGroupItemName[],
-    private targetSelf?: AssetGroupItemName[],
-    private criteria?: (player: Character, silent?: boolean) => { success: boolean; message?: string },
-    /* when should this activity be shown in the menu */
-    private insertionCriteria?: (player: Character) => { success: boolean; message?: string },
-  ) {}
-
-  fitsCriteria(player: Character, focusGroup: AssetGroupItemName): boolean {
-    if (!(this.target?.includes(focusGroup) || (this.targetSelf?.includes(focusGroup) && Player.MemberNumber === player?.MemberNumber))) return false;
-    if (this.insertionCriteria?.(player)?.success) return true;
-    return Boolean(!this.criteria || this.criteria(player, true).success);
-  }
-
-  createButton(): HTMLButtonElement {
-    const button = document.createElement("button");
-    button.id = this.id;
-    button.name = `${modIdentifier}_${this.name}`;
-    button.dataset.group = "ItemArms";
-    button.className = `blank-button button button-styling HideOnPopup dialog-grid-button`;
-    button.innerHTML = `<img decoding="async" loading="lazy" src="${this.image}" class="button-image"><span class="button-label button-label-bottom">${this.name}</span>`;
-
-    button.addEventListener("click", e => {
-      const player = CurrentCharacter?.FocusGroup ? CurrentCharacter : Player;
-      const focusGroup = player?.FocusGroup?.Name;
-      if (!this.onClick || !focusGroup) return;
-      if (Boolean(!this.criteria || this.criteria(player).success)) this.onClick(player, focusGroup);
-      DialogLeave();
-    });
-
-    return button;
-  }
-
-  static isInserted(id: string): boolean {
-    return Boolean(document.getElementById(id));
-  }
+export function ComposePrerequisites(...args: ((player: Character) => CriteriaResult)[]): (player: Character) => CriteriaResult {
+  return (player: Character) => {
+    let message = CriteriaResult.ok();
+    for (var a of args) {
+      message = a(player);
+      if (message.isErr()) break;
+    }
+    return message;
+  };
 }
 
-export const initActions = (): void => {
-  HookManager.hookFunction("DialogMenuMapping.activities.GetClickStatus", 1, (args, next) => {
-    const [_C, _clickedObj, _equippedItem] = args;
-    if (!_clickedObj) return null;
-    return next(args);
-  });
+export function Prerequisiter<RestOfArgs extends unknown[]>(
+  f: (acted: Character | PlayerCharacter, ...args: RestOfArgs) => CriteriaResult,
+  ...args: RestOfArgs
+): (prereq: ActivityPrerequisite, acting: Character | PlayerCharacter, acted: Character | PlayerCharacter, group: AssetGroup) => boolean {
+  return (prereq: ActivityPrerequisite, acting: Character | PlayerCharacter, acted: Character | PlayerCharacter, group: AssetGroup) => {
+    return f(acted, ...args).isOk();
+  };
+}
 
-  HookManager.hookFunction("DialogChangeMode", 1, async (args, next) => {
-    const [_mode] = args;
-    next(args);
-    if (_mode !== "activities") return;
-    const player = CurrentCharacter?.FocusGroup ? CurrentCharacter : Player;
-    const activityGrid = await waitForElement("#dialog-activity-grid");
-    const focusGroup = player.FocusGroup?.Name;
-    if (!focusGroup) return;
+export function Printable(f: (player: Character) => CriteriaResult): (player: Character, silent?: boolean) => CriteriaResult {
+  return (player, silent?) => {
+    const res = f(player);
+    if (!silent && res.toMessage()) sendChatLocal(res.toMessage() as unknown as string);
+    return res;
+  };
+}
 
-    for (const { activity } of actions) {
-      if (!activity) continue;
-      const activityInstance = new Activity(
-        activity.ID,
-        activity.Name,
-        activity.Image,
-        activity.OnClick,
-        activity.Target,
-        activity.TargetSelf,
-        activity.Criteria?.bind(activity),
-        activity.InsertCriteria?.bind(activity),
-      );
-      if (activityInstance.fitsCriteria(player, focusGroup)) {
-        if (!Activity.isInserted(activity.ID)) {
-          activityGrid.appendChild(activityInstance.createButton());
-        }
-      }
+export function DoCheckIf(
+  condition: boolean | ((player: Character) => boolean),
+  run: (player: Character) => CriteriaResult,
+): (player: Character) => CriteriaResult {
+  return player => {
+    if (typeof condition === "boolean") {
+      if (condition) return run(player);
+    } else if (condition(player)) {
+      return run(player);
+    }
+    return CriteriaResult.ok();
+  };
+}
+
+const NO_OUTPUT_ACT = "¶¶¶";
+
+function addToDictCache(dict: TextCache, activity: ABCLActivity) {
+  var textCachePush = (k: string, v: string) => (dict.cache[k] = v);
+  activity.Target.forEach(t => {
+    if (t.mode.type === "others") {
+      t.mode.label ??= activity.Name;
+
+      textCachePush("Label-ChatOther-" + t.ItemGroup + "-" + activity.Name, t.mode.label);
+      textCachePush("ChatOther-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
+    } else if (t.mode.type == "self") {
+      t.mode.label ??= activity.Name;
+
+      textCachePush("Label-ChatSelf-" + t.ItemGroup + "-" + activity.Name, t.mode.label);
+      textCachePush("ChatSelf-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
+    } else {
+      t.mode.labelOthers ??= activity.Name;
+      t.mode.labelSelf ??= t.mode.labelOthers;
+
+      textCachePush("Label-ChatOther-" + t.ItemGroup + "-" + activity.Name, t.mode.labelOthers);
+      textCachePush("ChatOther-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
+
+      textCachePush("Label-ChatSelf-" + t.ItemGroup + "-" + activity.Name, t.mode.labelSelf);
+      textCachePush("ChatSelf-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
     }
   });
+}
+
+function ABCLActToSugarch<P extends string = ActivityPrerequisite>(abcl: ABCLActivity<P>): CustomActivity<string, P> {
+  return {
+    activity: {
+      Name: abcl.Name,
+      MaxProgress: abcl.MaxProgress,
+      Prerequisite: abcl.Prerequisite ?? [],
+      Target: abcl.Target.filter(x => x.mode.type === "any" || x.mode.type === "others").map(x => x.ItemGroup),
+      TargetSelf: abcl.Target.filter(x => x.mode.type === "any" || x.mode.type === "self").map(x => x.ItemGroup),
+    },
+    useImage: abcl.useImage,
+    run: abcl.run,
+  };
+}
+
+export function initActions(): void {
+  const activity_dict = ActivityDictionaryLoad();
+
+  activites.forEach(act => {
+    ActivityManager.addCustomActivity(ABCLActToSugarch(act));
+    addToDictCache(activity_dict, act);
+  });
+
   CommandCombine(commands);
-};
+  ActivityManager.init();
+}
+
 export const actions: CombinedAction[] = [
   changeDiaper,
   checkDiaper,
@@ -128,4 +144,7 @@ export const actions: CombinedAction[] = [
 ];
 
 export const commands = actions.reduce((commands, { command }) => (command ? [...commands, command] : commands), [] as ICommand[]);
-export const activites = actions.reduce((activites, { activity }) => (activity ? [...activites, activity] : activites), [] as ABCLActivity[]);
+export const activites = actions.reduce(
+  (activites, { activity }) => (activity ? [...activites, activity] : activites),
+  [] as ABCLActivity<ActivityPrerequisite>[],
+);
