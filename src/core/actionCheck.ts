@@ -49,7 +49,9 @@ export function checkHasPuddle(player: Character): CriteriaResult {
 }
 
 export function checkCanPauseStats(_player: Character): CriteriaResult {
-  return CriteriaResult.OkIf(Player.ABCL.SettingPermissions.PauseStats, "Your parent(s) don't allow you to pause your stats");
+  //                           looks backwards but is actually right
+  //                         vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+  return CriteriaResult.OkIf(!Player.ABCL.SettingPermissions.PauseStats, "Your parent(s) don't allow you to pause your stats");
 }
 
 export function checkHasPotty(player: Character): CriteriaResult {
