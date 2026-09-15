@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkIsABCL, checkIsRestrained, checkIsSelfDiapered } from "../actionCheck";
-import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, Prerequisiter, Printable, RunAction } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
 import { getCharacter, replace_template, sendABCLAction } from "../player/playerUtils";
@@ -52,7 +52,7 @@ export const diaperFaceSit: CombinedAction = {
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     Target: [ABCLTarget.Others("ItemNose")],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperFaceSit.png`,
-    run: (player, sender, info) => diaperFaceSitRequest(player),
+    run: (player, sender, info) => RunAction(info, diaperFaceSitRequest),
   },
   listeners: {
     "diaper-face-sit": ({ Sender }) => diaperFaceSitFunction(getCharacter(Sender!) ?? Player),

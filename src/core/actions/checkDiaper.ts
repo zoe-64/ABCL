@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkCanCheckDiaper, checkIsABCL } from "../actionCheck";
-import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, Prerequisiter, Printable, RunAction } from "../actionLoader";
 import { hasDiaper } from "../player/diaper";
 import { replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
 import { abclStatsWindow, resizeElements } from "../player/ui";
@@ -33,7 +33,7 @@ export const checkDiaper: CombinedAction = {
     MaxProgress: 0,
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperCheck.png`,
-    run: (player, sender, info) => diaperCheckFunction(player),
+    run: (player, sender, info) => RunAction(info, diaperCheckFunction),
   },
   command: {
     Tag: "check-diaper",

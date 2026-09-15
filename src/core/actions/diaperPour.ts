@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkIsABCL, checkIsDiapered, checkIsRestrained } from "../actionCheck";
-import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, Prerequisiter, Printable, RunAction } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
@@ -53,11 +53,11 @@ const Criteria = Printable(ComposePrerequisites(InsertCriteria, checkIsRestraine
 export const diaperPour: CombinedAction = {
   activity: {
     Name: "Pour Water in Diaper",
-    Target: [ABCLTarget.Others("ItemPelvis")],
+    Target: [ABCLTarget.Any("ItemPelvis")],
     MaxProgress: 50,
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperPour.png`,
-    run: (player: Character, sender, info) => diaperPourRequest(player),
+    run: (player, sender, info) => RunAction(info, diaperPourRequest),
   },
   listeners: {
     "diaper-pour": ({ Sender }) => diaperPourFunction(getCharacter(Sender!) ?? Player),

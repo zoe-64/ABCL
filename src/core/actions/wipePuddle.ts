@@ -1,6 +1,6 @@
 import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkHasPuddle, checkIsABCL, checkIsRestrained } from "../actionCheck";
-import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, Prerequisiter, Printable, RunAction } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
 import { getCharacter, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
@@ -46,7 +46,7 @@ export const wipePuddle: CombinedAction = {
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     // TODO need to figure this out
     // useImage: `./Assets/Female3DCG/ItemHandheld/Preview/Towel.png`,
-    run: (player: Character, sender, info) => WipePuddleRequest(player),
+    run: (player, sender, info) => RunAction(info, WipePuddleRequest),
   },
   command: {
     Tag: "wipe-puddle",

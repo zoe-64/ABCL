@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkIsABCL, checkIsDiapered, checkIsRestrained } from "../actionCheck";
-import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, Prerequisiter, Printable, RunAction } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { getDiaperVerb } from "../player/diaper";
 import { abclPlayer } from "../player/player";
@@ -56,7 +56,7 @@ export const diaperRubBack: CombinedAction = {
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
 
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperRubBack.png`,
-    run: (player: Character, sender, info) => diaperRubBackRequest(player),
+    run: (player, sender, info) => RunAction(info, diaperRubBackRequest),
   },
   listeners: {
     "diaper-rub-back": ({ Sender }) => diaperRubBackFunction(getCharacter(Sender!) ?? Player),
