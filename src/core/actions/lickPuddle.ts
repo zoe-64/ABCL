@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkHasPuddle, checkIsABCL } from "../actionCheck";
-import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, Prerequisiter, Printable, RunAction } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
 import { getCharacter, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
@@ -49,7 +49,7 @@ export const lickPuddle: CombinedAction = {
     MaxProgress: 0,
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/lickPuddle.png`,
-    run: (player: Character, sender, info) => lickPuddleRequest(getCharacter(info.TargetCharacter)!),
+    run: (player, sender, info) => RunAction(info, lickPuddleRequest),
   },
   command: {
     Tag: "lick-puddle",

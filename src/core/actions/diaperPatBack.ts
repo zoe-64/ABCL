@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkIsABCL, checkIsDiapered, checkIsRestrained } from "../actionCheck";
-import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, Prerequisiter, Printable, RunAction } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { getDiaperVerb } from "../player/diaper";
 import { getCharacter, replace_template, sendABCLAction } from "../player/playerUtils";
@@ -49,7 +49,7 @@ export const diaperPatBack: CombinedAction = {
     MaxProgress: 50,
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperPatBack.png`,
-    run: (player: Character, sender, info) => diaperPatBackRequest(getCharacter(info.TargetCharacter)!),
+    run: (player, sender, info) => RunAction(info, diaperPatBackRequest),
   },
   listeners: {
     "diaper-pat-back": ({ Sender }) => diaperPatBackFunction(getCharacter(Sender!) ?? Player),

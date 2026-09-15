@@ -1,4 +1,5 @@
 import { ActivityManager, CustomActivity } from "@sugarch/bc-activity-manager";
+import { ActivityInfo } from "@sugarch/bc-mod-types";
 import { ABCLActivity, CombinedAction, CriteriaResult } from "src/types/types";
 import { changeDiaper } from "./actions/changeDiaper";
 import { checkDiaper } from "./actions/checkDiaper";
@@ -21,7 +22,17 @@ import { toPoop } from "./actions/toPoop";
 import { usePotty } from "./actions/usePotty";
 import { useToilet } from "./actions/useToilet";
 import { wipePuddle } from "./actions/wipePuddle";
+import { getCharacter } from "./player/playerUtils";
 import { sendChatLocal } from "./utils";
+
+export function RunAction<Output extends unknown, RestOfArgs extends unknown[]>(
+  info: ActivityInfo,
+  f: (target: Character, ...args: RestOfArgs) => Output,
+  ...args: RestOfArgs
+): Output | undefined {
+  if (Player.MemberNumber === info.TargetCharacter && Player.MemberNumber !== info.SourceCharacter) return;
+  return f(getCharacter(info.TargetCharacter)!, ...args);
+}
 
 export function ComposePrerequisites(...args: ((player: Character) => CriteriaResult)[]): (player: Character) => CriteriaResult {
   return (player: Character) => {

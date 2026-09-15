@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkBladderIsntEmpty, checkIsABCL, checkIsDiapered, checkIsRestrained } from "../actionCheck";
-import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, Prerequisiter, Printable, RunAction } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
 import { getCharacter, replace_template, sendABCLAction } from "../player/playerUtils";
@@ -54,7 +54,7 @@ export const diaperPeeOthersDiaper: CombinedAction = {
     MaxProgress: 0,
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperPeeOthersDiaper.png`,
-    run: (player: Character, sender, info) => diaperPeeOthersDiaperRequest(getCharacter(info.TargetCharacter)!, abclPlayer.stats.BladderValue),
+    run: (player, sender, info) => RunAction(info, diaperPeeOthersDiaperRequest, abclPlayer.stats.BladderValue),
   },
   listeners: {
     "diaper-pee-others-diaper": ({ Sender }, { volume }) => diaperPeeOthersDiaperFunction(getCharacter(Sender!) ?? Player, volume),

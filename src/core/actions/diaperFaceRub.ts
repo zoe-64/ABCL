@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkIsABCL, checkIsRestrained, checkIsSelfDiapered } from "../actionCheck";
-import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, Prerequisiter, Printable, RunAction } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { abclPlayer } from "../player/player";
 import { getCharacter, replace_template, sendABCLAction } from "../player/playerUtils";
@@ -52,7 +52,7 @@ export const diaperFaceRub: CombinedAction = {
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
 
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperFaceRub.png`,
-    run: (player, sender, info) => diaperFaceRubRequest(getCharacter(info.TargetCharacter)!),
+    run: (player, sender, info) => RunAction(info, diaperFaceRubRequest),
   },
 
   listeners: {

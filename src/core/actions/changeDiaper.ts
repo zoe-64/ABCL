@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { ABCLTarget, CombinedAction, CriteriaResult, DiaperSettingValues } from "../../types/types";
 import { checkIsABCL, checkIsDiapered, checkIsDiaperLocked, checkIsOnFlatSurface } from "../actionCheck";
-import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, Prerequisiter, Printable, RunAction } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
@@ -61,7 +61,7 @@ export const changeDiaper: CombinedAction = {
     Target: [ABCLTarget.Any("ItemPelvis")],
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     useImage: <ActivityImageSetting>`${publicURL}/activity/changeDiaper.svg`,
-    run: (acted, acting, info) => changeDiaperRequest(getCharacter(info.TargetCharacter)!),
+    run: (acted, acting, info) => RunAction(info, changeDiaperRequest),
   },
   command: {
     Tag: "change-diaper",

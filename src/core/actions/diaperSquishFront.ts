@@ -1,7 +1,7 @@
 import { ActivityImageSetting } from "@sugarch/bc-activity-manager";
 import { ABCLTarget, CombinedAction } from "../../types/types";
 import { checkIsABCL, checkIsDiapered, checkIsRestrained } from "../actionCheck";
-import { ComposePrerequisites, Prerequisiter, Printable } from "../actionLoader";
+import { ComposePrerequisites, Prerequisiter, Printable, RunAction } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
 import { getDiaperVerb } from "../player/diaper";
 import { getCharacter, replace_template, sendABCLAction } from "../player/playerUtils";
@@ -50,7 +50,7 @@ export const diaperSquishFront: CombinedAction = {
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     MaxProgress: 0,
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperSquishFront.png`,
-    run: (player: Character, sedner, info) => diaperSquishFrontRequest(getCharacter(info.TargetCharacter)!),
+    run: (player, sender, info) => RunAction(info, diaperSquishFrontRequest),
   },
   listeners: {
     "diaper-squish-front": ({ Sender }) => diaperSquishFrontFunction(getCharacter(Sender!) ?? Player),
