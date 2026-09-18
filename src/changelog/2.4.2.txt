@@ -1,2 +1,6 @@
 Fix issue where pausing starts via the command didn't persist
 Added support for LSCG and ABCL activities
+added support for catheters with abcl
+Buttplugs stop bowels from happening until 100% 
+Closed state on catheter stop wettings from happening until 100% 
+Hollow & open state on catheter let it out automatically

@@ -52,7 +52,6 @@ export function getCharacterName(memberNumber: number | undefined): string {
 }
 
 export const isAccidentsAutopiloted = () => {
-  if (document.hidden || document.visibilityState === "hidden") return true;
   return ["Afk", "Brb", "Sleep"].includes(InventoryGet(Player, "Emoticon")?.Property?.Expression ?? "") || Player.ABCL.Settings.AccidentAutopilot;
 };
 
@@ -77,7 +76,7 @@ export function replace_template(text: string, source: Character | null = null, 
   let isPlayerFemale = pronounItem === "She/Her";
 
   let possessive = isPlayerMale ? "His" : isPlayerFemale ? "Her" : "Their";
-  let intensive = isPlayerMale ? "Him" : isPlayerFemale ?  "Her": "Them";
+  let intensive = isPlayerMale ? "Him" : isPlayerFemale ? "Her" : "Them";
   let pronoun = isPlayerMale ? "He" : isPlayerFemale ? "She" : "They";
 
   let opp_pronounItem = !source ? "They/Them" : CharacterPronounDescription(source);

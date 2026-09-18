@@ -4,7 +4,7 @@ import { inModSubscreen } from "src/screens/Settings";
 import { ACCIDENTS_ON_ACTIVITIES, THEME } from "../constants";
 import { ModIdentifier, ModVersion } from "../types/definitions";
 import { HookListener, ListenerTypeMap, PluginServerChatRoomMessage } from "../types/types";
-import { actions } from "./actionLoader";
+import { actions, activityNames } from "./actionLoader";
 import { settingsRemote } from "./actions/sync";
 import { LittlishAPIWrapper } from "./api";
 import { logger } from "./logger";
@@ -111,6 +111,24 @@ const initHooks = async () => {
   });
 
   await waitFor(() => ServerSocket && ServerIsConnected);
+
+  HookManager.hookFunction("ServerSend", 1, (args, next) => {
+    let data = args[1] as ServerChatRoomMessage;
+    if (args[0] !== "ChatRoomChat" || data?.Type !== "Activity") return next(args);
+
+    let { metadata, substitutions } = ChatRoomMessageRunExtractors(data, Player);
+    const activity = metadata?.ActivityName;
+    if (activity == null) return next(args);
+    if (!activityNames.includes(activity)) return;
+
+    let msg = ActivityDictionaryText(data.Content);
+    msg = CommonStringSubstitute(msg, substitutions ?? []);
+    data.Dictionary?.push({
+      Tag: `${TEXT_NOT_FOUND_PREFIX} "ActivityDictionary.csv": ${data.Content}`,
+      Text: msg,
+    });
+    return next(args);
+  });
   HookManager.hookFunction("TextPrefetchFile", 1, (args, next) => {
     if (args[0] !== "Screens/Room/Crafting/Text_Crafting.csv") {
       return next(args);
@@ -124,6 +142,8 @@ const initHooks = async () => {
     cache.cache["DescriptionHollow"] = "Makes the item hollow inside";
     cache.cache["PropertyDiaperDiscolorationProtection"] = "Discoloration Protection";
     cache.cache["DescriptionDiaperDiscolorationProtection"] = "Prevents the diaper from discoloring";
+    cache.cache["PropertyCatheterized"] = "Catheterized";
+    cache.cache["DescriptionCatheterized"] = "Makes the item have a catheter running through it";
     return cache;
   });
   HookManager.hookFunction(
@@ -247,7 +267,6 @@ const initHooks = async () => {
   });
   HookManager.hookFunction("ChatRoomMessageRunExtractors", 1, (args, next) => {
     const result = next(args);
-    const [_message, sender] = args;
     if (result.substitutions == null) return result;
     const sourcePlayer = result.metadata?.SourceCharacter ?? Player;
     const targetPlayer = result.metadata?.TargetCharacter ?? Player;

@@ -48,6 +48,8 @@ export abstract class BaseMiniGame {
 export function MessMinigameResult(victory?: boolean) {
   Player.ABCL.Stats.MinigameStatistics.Mess.Total++;
   incontinenceCheck.resetAllowedCallInterval();
+  ElementRemove("#abcl-chat-button-resist");
+  ElementRemove("#abcl-chat-button-letgo");
   if (victory ?? MiniGameVictory) {
     abclPlayer.stats.Incontinence -= incontinenceOnAccident(abclPlayer.stats.Incontinence) / 2;
     sendChatLocal("You managed to keep it together!");

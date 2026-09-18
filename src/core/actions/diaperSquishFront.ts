@@ -46,7 +46,7 @@ const Criteria = Printable(ComposePrerequisites(InsertCriteria, checkIsRestraine
 export const diaperSquishFront: CombinedAction = {
   activity: {
     Name: "Diaper Squish Crotch",
-    Target: [ABCLTarget.Others("ItemVulva")],
+    Target: [ABCLTarget.Any("ItemVulva")],
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
     MaxProgress: 0,
     useImage: <ActivityImageSetting>`${publicURL}/activity/diaperSquishFront.png`,

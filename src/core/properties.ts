@@ -13,9 +13,14 @@ export const initProperties = () => {
   CraftingPropertyMap.set("DiaperDiscolorationProtection" as CraftingPropertyType, (asset: Asset) => {
     return Object.keys(ABCLdata.Diapers).includes(asset.Group.Name + asset.Name);
   });
+  CraftingPropertyMap.set("Catheterized" as CraftingPropertyType, (asset: Asset) => {
+    return ["ItemVulvaPiercings", "ItemVulva", "ItemPelvis"].includes(asset.Group.Name);
+  });
 
   CraftingEffectsPrerequisite["Hollow" as CraftingPropertyType] = { max: 1 };
   CraftingEffectsPrerequisite["Laxative" as CraftingPropertyType] = { max: 3 };
   CraftingEffectsPrerequisite["Diuretic" as CraftingPropertyType] = { max: 3 };
   CraftingEffectsPrerequisite["DiaperDiscolorationProtection" as CraftingPropertyType] = { max: 1 };
+
+  CraftingEffectsPrerequisite["Catheterized" as CraftingPropertyType] = { max: 1 };
 };

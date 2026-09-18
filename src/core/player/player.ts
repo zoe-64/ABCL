@@ -30,6 +30,33 @@ export const queueUpdatePlayerClothes = createRateLimiter<typeof updatePlayerClo
 const bowelThrottler = new Throttler(120 * 60 * 1000);
 const bladderThrottler = new Throttler(120 * 60 * 1000);
 const regressionThrottler = new Throttler(5 * 60 * 1000);
+
+function getBladderState(player: Character = Player): "blocked" | "open" | "normal" {
+  const catheterizedEffect = CommonClamp(InventoryCraftCount(player, "Catheterized" as CraftingPropertyType, true), 0, 1);
+  const vulvaPiercings = InventoryGet(player, "ItemVulvaPiercings");
+  if (vulvaPiercings && vulvaPiercings.Asset.Name == "Catheter") {
+    if (vulvaPiercings.Property.TypeRecord?.["o"] === 1) return "blocked";
+    return "open";
+  }
+  if (window?.LITTLISH_CLUB?.isRuleActive?.(player, RuleId.PREVENT_RESISTING_URGES)) return "open";
+  if (catheterizedEffect > 0 || vulvaPiercings?.Craft?.Name.toLowerCase().includes("catheter")) return "open";
+
+  return "normal";
+}
+
+function getBowelState(player: Character = Player): "blocked" | "open" | "normal" {
+  const hollowEffect = CommonClamp(InventoryCraftCount(player, "Hollow" as CraftingPropertyType, true), 0, 1);
+  const butt = InventoryGet(player, "ItemButt");
+  const itemDevices = InventoryGet(player, "ItemDevices");
+
+  if (itemDevices?.Asset.Name === "Enema") return "blocked";
+  if (hollowEffect > 0 || butt?.Asset.Name == "HollowButtPlug" || butt?.Craft?.Name.toLowerCase().includes("hollow")) return "open";
+
+  if (window?.LITTLISH_CLUB?.isRuleActive?.(player, RuleId.PREVENT_RESISTING_URGES)) return "open";
+  if (butt) return "blocked";
+  return "normal";
+}
+
 export const abclPlayer = {
   pendingMiniGameTimeout: null as number | null,
   get settings() {
@@ -218,17 +245,22 @@ export const abclPlayer = {
       // maybe a message here
       return isWet ? WetMinigameResult(false) : MessMinigameResult(false);
     }
-    if (!(Math.random() < chance || fullness > limit)) return;
-    if (!force && !incontinenceCheck.check()) return;
-    if (window?.LITTLISH_CLUB?.isRuleActive?.(Player, RuleId.PREVENT_RESISTING_URGES)) {
-      return isWet ? WetMinigameResult(false) : MessMinigameResult(false);
+    if (!force) {
+      if (!(Math.random() < chance || fullness > limit)) return;
+      if (!incontinenceCheck.check()) return;
     }
-    const hollowEffect = CommonClamp(InventoryCraftCount(Player, "Hollow" as CraftingPropertyType, true), 0, 1);
-    const hasHollowPlug = InventoryGet(Player, "ItemButt")?.Asset.Name == "HollowButtPlug";
-    if ((hollowEffect > 0 || hasHollowPlug) && !isWet) {
-      MessMinigameResult(false);
-      return;
+
+    const bowelState = getBowelState();
+    const bladderState = getBladderState();
+
+    if (isWet) {
+      if (bladderState === "blocked") return;
+      if (bladderState === "open") return WetMinigameResult(false);
+    } else {
+      if (bowelState === "blocked") return;
+      if (bowelState === "open") return MessMinigameResult(false);
     }
+
     if (isAccidentsAutoPiloted()) {
       const result = getAccidentAutopilotOutcome(isWet ? "Wet" : "Mess");
       return isWet ? WetMinigameResult(result) : MessMinigameResult(result);

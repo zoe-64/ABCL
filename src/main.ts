@@ -21,14 +21,7 @@ const loop = () => {
   abclPlayer.update();
 };
 HookManager.afterInit(() => {
-  if (CraftingValidationRecord?.Effects == null) return;
-  CraftingValidationRecord.Effects.Validate = function (c, a) {
-    if (!CommonIsObject(c.Effects)) {
-      return false;
-    }
-    if (c.Effects?.Normal) return false;
-    return true;
-  };
+  initProperties();
 });
 
 HookManager.afterPlayerLogin(async () => {
@@ -36,7 +29,6 @@ HookManager.afterPlayerLogin(async () => {
   initSettingsScreen();
   initActions();
   initHooks();
-  initProperties();
   initMinigames();
   initOverlay();
   initApi();

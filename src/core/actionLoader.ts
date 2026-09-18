@@ -80,27 +80,32 @@ const NO_OUTPUT_ACT = "¶¶¶";
 
 function addToDictCache(dict: TextCache, activity: ABCLActivity) {
   var textCachePush = (k: string, v: string) => (dict.cache[k] = v);
-  activity.Target.forEach(t => {
-    if (t.mode.type === "others") {
-      t.mode.label ??= activity.Name;
+  activity.Target.forEach(({ mode, ItemGroup }) => {
+    const type = mode.type === "self" ? "ChatSelf" : "ChatOther";
+    if (mode.type === "any") {
+      mode.labelOthers ??= activity.Name;
+      mode.labelSelf ??= mode.labelOthers;
+      if (ItemGroup === "ItemVulva") {
+        textCachePush(`Label-ChatOther-ItemPenis-${activity.Name}`, mode.labelOthers);
+        textCachePush(`ChatOther-ItemPenis-${activity.Name}`, NO_OUTPUT_ACT);
 
-      textCachePush("Label-ChatOther-" + t.ItemGroup + "-" + activity.Name, t.mode.label);
-      textCachePush("ChatOther-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
-    } else if (t.mode.type == "self") {
-      t.mode.label ??= activity.Name;
+        textCachePush(`Label-ChatSelf-ItemPenis-${activity.Name}`, mode.labelSelf);
+        textCachePush(`ChatSelf-ItemPenis-${activity.Name}`, NO_OUTPUT_ACT);
+      }
+      textCachePush(`Label-ChatOther-${ItemGroup}-${activity.Name}`, mode.labelOthers);
+      textCachePush(`ChatOther-${ItemGroup}-${activity.Name}`, NO_OUTPUT_ACT);
 
-      textCachePush("Label-ChatSelf-" + t.ItemGroup + "-" + activity.Name, t.mode.label);
-      textCachePush("ChatSelf-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
-    } else {
-      t.mode.labelOthers ??= activity.Name;
-      t.mode.labelSelf ??= t.mode.labelOthers;
-
-      textCachePush("Label-ChatOther-" + t.ItemGroup + "-" + activity.Name, t.mode.labelOthers);
-      textCachePush("ChatOther-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
-
-      textCachePush("Label-ChatSelf-" + t.ItemGroup + "-" + activity.Name, t.mode.labelSelf);
-      textCachePush("ChatSelf-" + t.ItemGroup + "-" + activity.Name, NO_OUTPUT_ACT);
+      textCachePush(`Label-ChatSelf-${ItemGroup}-${activity.Name}`, mode.labelSelf);
+      textCachePush(`ChatSelf-${ItemGroup}-${activity.Name}`, NO_OUTPUT_ACT);
+      return;
     }
+    mode.label ??= activity.Name;
+    if (ItemGroup === "ItemVulva") {
+      textCachePush(`Label-${type}-ItemPenis-${activity.Name}`, mode.label);
+      textCachePush(`${type}-ItemPenis-${activity.Name}`, NO_OUTPUT_ACT);
+    }
+    textCachePush(`Label-${type}-${ItemGroup}-${activity.Name}`, mode.label);
+    textCachePush(`${type}-${ItemGroup}-${activity.Name}`, NO_OUTPUT_ACT);
   });
 }
 
@@ -159,3 +164,4 @@ export const activites = actions.reduce(
   (activites, { activity }) => (activity ? [...activites, activity] : activites),
   [] as ABCLActivity<ActivityPrerequisite>[],
 );
+export const activityNames = activites.flatMap(activity => activity.Name);

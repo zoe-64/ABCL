@@ -51,7 +51,7 @@ const Criteria = Printable(ComposePrerequisites(InsertCriteria, checkIsRestraine
 export const diaperRubBack: CombinedAction = {
   activity: {
     Name: "Diaper Rub Bottom",
-    Target: [ABCLTarget.Others("ItemButt")],
+    Target: [ABCLTarget.Any("ItemButt")],
     MaxProgress: 0,
     Prerequisite: [Prerequisiter(InsertCriteria), Prerequisiter(Criteria, true)],
 

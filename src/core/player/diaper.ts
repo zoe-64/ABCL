@@ -244,10 +244,10 @@ export const mentalRegressionOvertime = () => {
 };
 export const incontinenceOnAccident = (incontinence: number) => {
   const stages = [
-    { increase: 0.01, start: 0, end: 0.25 },
-    { increase: 0.005, start: 0.25, end: 0.5 },
-    { increase: 0.0025, start: 0.5, end: 0.75 },
-    { increase: 0.001, start: 0.75, end: 1 },
+    { increase: 0.02, start: 0, end: 0.25 },
+    { increase: 0.02, start: 0.25, end: 0.5 },
+    { increase: 0.015, start: 0.5, end: 0.75 },
+    { increase: 0.01, start: 0.75, end: 1 },
   ];
   for (const { increase, start, end } of stages) {
     if (incontinence >= start && incontinence < end) {
