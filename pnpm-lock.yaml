@@ -66,6 +66,9 @@ importers:
       '@sugarch/bc-mod-hook-manager':
         specifier: ^0.3.4
         version: 0.3.4(bondage-club-mod-sdk@1.2.0)
+      '@sugarch/bc-mod-types':
+        specifier: 0.6.4
+        version: 0.6.4
       '@types/core-js':
         specifier: ^2.5.8
         version: 2.5.8

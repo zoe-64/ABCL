@@ -119,7 +119,7 @@ const initHooks = async () => {
     let { metadata, substitutions } = ChatRoomMessageRunExtractors(data, Player);
     const activity = metadata?.ActivityName;
     if (activity == null) return next(args);
-    if (!activityNames.includes(activity)) return;
+    if (!activityNames.includes(activity)) return next(args);
 
     let msg = ActivityDictionaryText(data.Content);
     msg = CommonStringSubstitute(msg, substitutions ?? []);
