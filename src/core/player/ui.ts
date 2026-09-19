@@ -18,8 +18,8 @@ export const overlay = document.createElement("div");
 overlay.id = `${modIdentifier}-overlay`;
 
 export const resizeElements = () => {
-  ElementPositionFixed(overlay.id, 0, 0, 2000, 1000);
-  ElementPositionFixed("ABCL-stats-panel", 1700, 0, 300, 1000);
+  if (document.getElementById(overlay.id)) ElementPositionFixed(overlay.id, 0, 0, 2000, 1000);
+  if (document.getElementById("ABCL-stats-panel")) ElementPositionFixed("ABCL-stats-panel", 1700, 0, 300, 1000);
 
   const exitButtons = document.querySelectorAll(`.${modIdentifier}-exit-button`);
   for (const exitButton of exitButtons) {
