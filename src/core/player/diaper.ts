@@ -40,8 +40,14 @@ export function hasDiaper(player: Character = Player): boolean {
   // @ts-expect-error Echo slot
   const panties2 = InventoryGet(player, "Panties_笨笨蛋Luzi");
   const suitLower = InventoryGet(player, "SuitLower");
+  // @ts-expect-error Echo slot
+  const suitLower2 = InventoryGet(player, "SuitLower_笨笨蛋Luzi");
   return Boolean(
-    (pelvisItem && isDiaper(pelvisItem)) || (panties && isDiaper(panties)) || (panties2 && isDiaper(panties2)) || (suitLower && isDiaper(suitLower)),
+    (pelvisItem && isDiaper(pelvisItem)) 
+    || (panties && isDiaper(panties)) 
+    || (panties2 && isDiaper(panties2))
+    || (suitLower && isDiaper(suitLower))
+    || (suitLower2 && isDiaper(suitLower2)),
   );
 }
 
@@ -142,6 +148,8 @@ export const updateDiaperColor = (refresh: boolean = true) => {
   setDiaperColor("SuitLower", primaryColor, Player, false);
   // @ts-expect-error Echo slot
   setDiaperColor("Panties_笨笨蛋Luzi", primaryColor, Player, refresh);
+  // @ts-expect-error Echo slot
+  setDiaperColor("SuitLower_笨笨蛋Luzi", primaryColor, Player, refresh);
 };
 
 // Size
@@ -151,6 +159,8 @@ export function getPlayerDiaperSize(player: Character = Player): number {
   const suitLower = InventoryGet(player, "SuitLower");
   // @ts-expect-error Echo slot
   const panties2 = InventoryGet(player, "Panties_笨笨蛋Luzi");
+  // @ts-expect-error Echo slot
+  const suitLower2 = InventoryGet(player, "SuitLower_笨笨蛋Luzi");
 
   let size = 50;
   if (pelvisItem && isDiaper(pelvisItem)) {
@@ -164,6 +174,9 @@ export function getPlayerDiaperSize(player: Character = Player): number {
   }
   if (panties2 && isDiaper(panties2)) {
     size += getDiaperSize(panties2);
+  }
+  if (suitLower2 && isDiaper(suitLower2)) {
+    size += getDiaperSize(suitLower2);
   }
   return size;
 }
@@ -185,11 +198,14 @@ export const getPlayerDiaper = (): {
   const suitLower = InventoryGet(Player, "SuitLower");
   // @ts-expect-error Echo slot
   const panties2 = InventoryGet(Player, "Panties_笨笨蛋Luzi");
-  let diapers: { ItemPelvis: Item | null; Panties: Item | null; Panties_笨笨蛋Luzi: Item | null; SuitLower: Item | null } = {
+  // @ts-expect-error Echo slot
+  const suitLower2 = InventoryGet(Player, "SuitLower_笨笨蛋Luzi");
+  let diapers: { ItemPelvis: Item | null; Panties: Item | null; Panties_笨笨蛋Luzi: Item | null; SuitLower: Item | null; SuitLower_笨笨蛋Luzi: Item | null } = {
     ItemPelvis: null,
     Panties: null,
     Panties_笨笨蛋Luzi: null,
     SuitLower: null,
+    SuitLower_笨笨蛋Luzi: null,
   };
   if (suitLower && isDiaper(suitLower)) {
     diapers["SuitLower"] = suitLower;
@@ -202,6 +218,9 @@ export const getPlayerDiaper = (): {
   }
   if (panties2 && isDiaper(panties2)) {
     diapers["Panties_笨笨蛋Luzi"] = panties2;
+  }
+  if (suitLower2 && isDiaper(suitLower2)) {
+    diapers["SuitLower_笨笨蛋Luzi"] = suitLower2;
   }
   return diapers;
 };
