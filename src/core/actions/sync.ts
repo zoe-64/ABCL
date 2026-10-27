@@ -1,4 +1,4 @@
-import { sendUpdateMyData } from "../hooks";
+import { nameTransformationCache, sendUpdateMyData } from "../hooks";
 import { logger } from "../logger";
 
 import { ChatRoomEvents, ChatRoomRemoteEventEmitter } from "@sugarch/bc-event-handler";
@@ -6,6 +6,7 @@ import { ABCLAdmins } from "src/constants";
 import { ModVersion } from "src/types/definitions";
 import { PartialDeep } from "src/types/types";
 import { LittlishAPIWrapper } from "../api";
+import { getABCLNamePrefix } from "../player/playerUtils";
 import { updateData } from "../settings";
 import { formatDiff, getObjectDiff, sendChatLocal } from "../utils";
 
@@ -70,5 +71,7 @@ settingsRemote.on("sync", (info, { Settings, Stats, Version, SettingPermissions 
     Settings,
   };
 
+  const prefix = getABCLNamePrefix(ChatRoomCharacter[index]);
+  nameTransformationCache.set(CharacterNickname(ChatRoomCharacter[index]), prefix);
   return;
 });

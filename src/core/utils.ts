@@ -7,8 +7,8 @@ import { logger } from "./logger";
 import { syncData } from "./settings";
 
 export const registeredMod = bcModSdk.registerMod({
-  name: modName,
-  fullName: modName,
+  name: bcModName,
+  fullName: bcModName,
   version: modVersion,
   repository: modRepo,
 });

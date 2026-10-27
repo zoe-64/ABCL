@@ -69,8 +69,8 @@ const plugins_debug = (deploySite, destDir) => [
               deploySite.indexOf("localhost") > -1
                 ? loaderFileInfo.name + " (Local)"
                 : deploySite.indexOf("/dev/") > -1
-                ? loaderFileInfo.name + " (Dev)"
-                : loaderFileInfo.name,
+                  ? loaderFileInfo.name + " (Dev)"
+                  : loaderFileInfo.name,
             )
             .replaceAll("__AUTHOR__", loaderFileInfo.author)
             .replaceAll("__LOAD_FLAG__", loadFlag)
@@ -80,7 +80,7 @@ const plugins_debug = (deploySite, destDir) => [
   }),
 
   replace({
-    modName: modInfo.name,
+    bcModName: modInfo.name,
     modVersion: modInfo.version,
     modRepo: modInfo.repo,
     publicURL: `"${deploySite}/assets"`,

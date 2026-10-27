@@ -1,5 +1,8 @@
+import { CONTRIBUTORS } from "src/constants";
+import { LittlishAPIWrapper } from "../api";
 import { sendDataToAction } from "../hooks";
 import { sendChatLocal } from "../utils";
+import { isLeaking } from "./diaper";
 
 // luv you zoi <3
 export const getCharacter = (identifier: string | number | Character): Character | undefined => {
@@ -225,4 +228,50 @@ export function sendABCLAction(action: string, sender: Character | null = null, 
   } else if (target && target.MemberNumber !== Player.MemberNumber) {
     sendDataToAction("onABCLMessage", { message: msg, local: isLocal }, target.MemberNumber);
   }
+}
+
+export function isCaregiver(player: Character): boolean {
+  if (Player.MemberNumber == player.MemberNumber) return false;
+  if (player.ABCL?.Settings.PrefixNamesWithCaregiverTitles) return false;
+  if ((player.ABCL?.Stats.MentalRegression.value ?? 0) > 0.8) return false;
+  if (player.Nickname?.toLowerCase()?.includes("little")) return false;
+  if (player.Nickname?.toLowerCase()?.includes("baby")) return false;
+  if (ChatRoomData?.BlockCategory?.includes("ABDL")) return false;
+  if (LittlishAPIWrapper.isMommyOf(player, Player) || LittlishAPIWrapper.isCaregiverOf(player, Player)) return true;
+  if (player.Title && (["Baby", "LittleOne", "Submissive", "Puppy", "Pet", "Brat"] as TitleName[]).includes(player.Title)) return false;
+  return true;
+}
+
+export function getCaregiverPrefix(player: Character): string {
+  if (!Player.ABCL.Settings.PrefixNamesWithCaregiverTitles || !isCaregiver(player)) {
+    return "";
+  }
+  switch (player.GetPronouns()) {
+    case "SheHer":
+      return "Mommy ";
+    case "HeHim":
+      return "Daddy ";
+    default:
+      return "Caregiver ";
+  }
+}
+
+export function getBadgePrefix(player: Character): string {
+  if (!isABCLPlayer(player)) return "";
+  if (!player.ABCL!.Settings.ShowOwnBadges) return "";
+  if (isLeaking("any", player)) return "🍼 ";
+  return "";
+}
+
+export function getDecoratorPrefix(player: Character): string {
+  if (player.MemberNumber === 164988) return "ი𐑼 ";
+  if (player.MemberNumber != null && CONTRIBUTORS.has(player.MemberNumber)) {
+    return "❀ ";
+  }
+  return "";
+}
+
+export function getABCLNamePrefix(player: Character): string {
+  const prefix = getCaregiverPrefix(player) + getBadgePrefix(player);
+  return prefix + getDecoratorPrefix(player);
 }

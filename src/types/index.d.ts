@@ -12,7 +12,7 @@ interface Window {
 }
 
 declare const modVersion: string;
-declare const modName: string;
+declare const bcModName: string;
 declare const modRepo: string;
 declare const modIdentifier: string;
 declare const publicURL: string;

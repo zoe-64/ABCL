@@ -2,9 +2,10 @@ import { debounce, merge } from "lodash-es";
 import { ABCLOwner } from "src/constants";
 import { ModVersion } from "src/types/definitions";
 import { DiaperSettingValues, MetabolismSettings, PartialDeep } from "../types/types";
-import { sendUpdateMyData } from "./hooks";
+import { nameTransformationCache, sendUpdateMyData } from "./hooks";
 import { logger } from "./logger";
 import { updatePlayerClothes } from "./player/player";
+import { getABCLNamePrefix } from "./player/playerUtils";
 import { getElement, summarizeVersionRange } from "./utils";
 
 export const defaultSettings: ModSettings = {
@@ -175,6 +176,7 @@ export const updateData = (newData: PartialDeep<ModStorageModel>) => {
 export const syncData = debounce(() => {
   const compressed = LZString.compressToBase64(JSON.stringify(Player.ABCL));
   Player.ExtensionSettings.ABCL = compressed;
+  nameTransformationCache.set(CharacterNickname(Player), getABCLNamePrefix(Player));
   ServerPlayerExtensionSettingsSync(modIdentifier);
   sendUpdateMyData();
   updatePlayerClothes();

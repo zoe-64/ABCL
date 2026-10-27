@@ -1,3 +1,4 @@
+import * as types from "@lscg/types";
 import { HookManager } from "@sugarch/bc-mod-hook-manager";
 import bcModSdk from "bondage-club-mod-sdk";
 import { inModSubscreen } from "src/screens/Settings";
@@ -8,12 +9,23 @@ import { actions, activityNames } from "./actionLoader";
 import { settingsRemote } from "./actions/sync";
 import { LittlishAPIWrapper } from "./api";
 import { logger } from "./logger";
-import { applyRandomPacifier, applyRandomPelvisDiaper, getDiaperVerb, getPlayerDiaperSize, hasDiaper, hasPacifier, isLeaking } from "./player/diaper";
+import {
+  applyRandomDiaper,
+  applyRandomPacifier,
+  getDiaperVerb,
+  getPlayerDiaperSize,
+  goddessApplyRandomPelvisDiaper,
+  hasDiaper,
+  hasPacifier,
+} from "./player/diaper";
 import { abclPlayer, shouldABCLActivate } from "./player/player";
-import { isABCLPlayer } from "./player/playerUtils";
+import { getABCLNamePrefix, isABCLPlayer } from "./player/playerUtils";
 import { resizeElements } from "./player/ui";
 import { syncData } from "./settings";
+import { grammar } from "./tracery";
 import { getElement, HookPriority, waitFor } from "./utils";
+types;
+
 export const sendDataToAction = (type: string, data?: any, target?: number) => {
   const ChatRoomMessage: PluginServerChatRoomMessage = {
     Type: "Hidden",
@@ -54,7 +66,6 @@ export const sendUpdateMyData = (target?: number) => {
       Version: ModVersion,
     });
   }
-
   logger.debug({
     message: `Sending updated data to ${target ?? "everyone"}`,
   });
@@ -99,6 +110,8 @@ const receivePacket = (receivedMessage: PluginServerChatRoomMessage) => {
  * This function waits until the server is connected before setting up hooks.
  */
 const activityReplacements: Record<string, string> = {};
+export let LSCG_ABCLModApi: types.LSCGModApi;
+export const nameTransformationCache = new Map<string, string>();
 const initHooks = async () => {
   CommonFetch(publicURL + "/activities.csv").then(async response => {
     if (response.status !== 200) return;
@@ -107,6 +120,43 @@ const initHooks = async () => {
     parsed.forEach(row => {
       if (!row[0] || !row[1]) return;
       activityReplacements[row[0]] = row[1];
+    });
+  });
+
+  (window.LSCG_OnLoad = window.LSCG_OnLoad || []).push(LSCG => {
+    const api = LSCG.getModApi({ id: "abcl", name: "ABCL", version: "1.0.0" });
+    LSCG_ABCLModApi = api;
+    api.spells.registerEffect({
+      name: "blort-spell",
+      label: "Blort Spell",
+      description: "Makes the target mess.",
+      apply(context) {
+        abclPlayer.stats.BowelFullness = 1;
+        abclPlayer.soil(false);
+      },
+    });
+    api.spells.registerEffect({
+      name: "tinkle-spell",
+      label: "Tinkle Spell",
+      description: "Makes the target pee.",
+      apply(context) {
+        abclPlayer.stats.BladderFullness = 1;
+        abclPlayer.wet(false);
+      },
+    });
+    api.spells.registerEffect({
+      name: "diaper-change",
+      label: "Diaper Change Spell",
+      description: "Makes the target get changed, if not padded, they will be now.",
+      apply(context) {
+        if (!hasDiaper(Player)) {
+          context.sendAction(grammar.flatten("#changeDiaper-default-magic-unpadded#"));
+          applyRandomDiaper(Player, false);
+          return;
+        }
+        abclPlayer.changeDiaper(Player, true);
+        context.sendAction(grammar.flatten("#changeDiaper-default-magic#"));
+      },
     });
   });
 
@@ -230,7 +280,7 @@ const initHooks = async () => {
         if (Player.ABCL.Settings.ForceDiapers) {
           setTimeout(() => {
             if (!Player.ABCL.Settings.ForceDiapers || hasDiaper(Player)) return;
-            applyRandomPelvisDiaper();
+            goddessApplyRandomPelvisDiaper();
           }, 5000);
           return next(args);
         }
@@ -319,25 +369,6 @@ const initHooks = async () => {
 
     return result;
   });
-  /* HookManager.hookFunction("PreferenceSubscreenChatClick", 1, (args, next) => {
-    if (MouseIn(1815, 75, 90, 90)) {
-      const theme = Player.ChatSettings?.ColorTheme ?? "Light";
-      if (theme.startsWith("Light") && !!overlay && !overlay.classList.contains("sl-theme-light")) {
-        overlay.classList.remove("sl-theme-dark");
-        overlay.classList.add("sl-theme-light");
-        overlay.style.color = "black";
-        logger.info(`SL theme switching: Light`);
-      }
-      if (theme.startsWith("Dark") && !!overlay && !overlay.classList.contains("sl-theme-dark")) {
-        overlay.classList.remove("sl-theme-light");
-        overlay.classList.add("sl-theme-dark");
-        overlay.style.color = "white";
-        logger.info(`SL theme switching: Dark`);
-      }
-    }
-    return next(args);
-  });
- */
   HookManager.hookFunction("InformationSheetRun", HookPriority.TOP, (args, next) => {
     if (!InformationSheetSelection?.ABCL) return next(args);
     if (window?.bcx?.inBcxSubscreen?.() || window.MPA?.menuLoaded || LittlishAPIWrapper.inModSubscreen()) return next(args);
@@ -346,46 +377,26 @@ const initHooks = async () => {
       (LittlishAPIWrapper.isCaregiverOf(Player, InformationSheetSelection) || LittlishAPIWrapper.isMommyOf(Player, InformationSheetSelection)) &&
       LittlishAPIWrapper.hasAccessRightTo(Player, InformationSheetSelection, "MANAGE_ABCL_SETTINGS")
     ) {
-      DrawButton(1700 - 90 - 20, 700 - 15, 90, 90, "", "White", `${publicURL}/icon-small.png`, modName);
+      DrawButton(1700 - 90 - 20, 700 - 15, 90, 90, "", "White", `${publicURL}/icon-small.png`, bcModName);
     }
     next(args);
   });
-  function isCaregiver(player: Character): boolean {
-    if (Player.MemberNumber == player.MemberNumber) return false;
-    if (player.ABCL?.Settings.PrefixNamesWithCaregiverTitles) return false;
-    if ((player.ABCL?.Stats.MentalRegression.value ?? 0) > 0.8) return false;
-    if (player.Nickname?.toLowerCase()?.includes("little")) return false;
-    if (player.Nickname?.toLowerCase()?.includes("baby")) return false;
-    if (LittlishAPIWrapper.isMommyOf(player, Player) || LittlishAPIWrapper.isCaregiverOf(player, Player)) return true;
-    if (player.Title && (["Baby", "LittleOne", "Submissive", "Puppy", "Pet", "Brat"] as TitleName[]).includes(player.Title)) return false;
-    if (ChatRoomData?.BlockCategory?.includes("ABDL")) return false;
-    return true;
-  }
-  HookManager.hookFunction("CharacterNickname", 1, (args, next) => {
-    const [_C] = args;
-    let nickname = next(args);
-    if (Player.ABCL.Settings.PrefixNamesWithCaregiverTitles && isCaregiver(_C)) {
-      if (_C.GetPronouns() == "SheHer") nickname = "Mommy " + nickname;
-      else if (_C.GetPronouns() == "HeHim") nickname = "Daddy " + nickname;
-      else nickname = "Caregiver " + nickname;
-    }
 
-    if (isABCLPlayer(_C) && !_C.ABCL!.Settings.ShowOwnBadges) {
-      return nickname;
+  HookManager.hookFunction("ChatRoomMessageDisplay", 1, (args, next) => {
+    const result = next(args);
+    const [, , character] = args;
+    const selector = `.ChatMessageChat[data-sender="${character.MemberNumber}"]:last-child .ChatMessageName`;
+    const nameElement = document.querySelector(selector);
+    if (nameElement) {
+      nameElement.textContent = getABCLNamePrefix(character) + CharacterNickname(character);
     }
+    return result;
+  });
 
-    if (isABCLPlayer(_C) && isLeaking("any", _C)) {
-      nickname = "🍼 " + nickname;
-    }
-    //   En,     Maria, Arelia, Lorenzi, Mai,  Loona,  Amy,    Ivy,    JennaWbbb, Lumi
-    if ([155633, 54811, 126467, 178496, 33367, 198473, 149267, 213616, 250801, 257511].includes(_C.MemberNumber ?? -1)) {
-      nickname = "❀ " + nickname;
-    }
-    if (_C.MemberNumber === 164988) {
-      nickname = "ი𐑼 " + nickname;
-    }
-
-    return nickname;
+  HookManager.hookFunction("DrawText", 1, (args, next) => {
+    const prefix = nameTransformationCache.get(args[0]);
+    if (prefix) args[0] = prefix + args[0];
+    return next(args);
   });
 
   HookManager.hookFunction("InformationSheetClick", HookPriority.OBSERVE, (args, next) => {

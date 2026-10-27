@@ -1,0 +1,7 @@
+Added LSCG spells like:
+Blort spell - makes the target mess
+Tinkle spell - makes the target pee
+Change diaper spell - makes the target get changed diaper
+
+Reworked parts of the abcl action/message generation system
+Fixed issues with names that contain badges/prefixes from ABCL
