@@ -4,12 +4,12 @@ import { changeDiaper, changeDiaperRequest } from "./actions/changeDiaper";
 import { checkDiaper, diaperCheckFunction } from "./actions/checkDiaper";
 import { usePotty, usePottyFunction } from "./actions/usePotty";
 import { useToilet, useToiletFunction } from "./actions/useToilet";
-import { sendDataToAction, sendUpdateMyData } from "./hooks";
+import { nameTransformationCache, sendDataToAction, sendUpdateMyData } from "./hooks";
 import {
   averageColor,
   getDiaperVerb,
-  getPlayerDiaper,
   getPlayerDiaperSize,
+  getPlayerUnderwear,
   hasDiaper,
   incontinenceChanceFormula,
   incontinenceLimitFormula,
@@ -28,7 +28,16 @@ import {
   updateDiaperColor,
 } from "./player/diaper";
 import { abclPlayer, incontinenceCheck, queueUpdatePlayerClothes, updatePlayerClothes } from "./player/player";
-import { getCharacter, getCharacterName, isABCLPlayer, replace_template, sendABCLAction, sendStatusMessage } from "./player/playerUtils";
+import {
+  getABCLNamePrefix,
+  getCharacter,
+  getCharacterName,
+  isABCLPlayer,
+  isCaregiver,
+  replace_template,
+  sendABCLAction,
+  sendStatusMessage,
+} from "./player/playerUtils";
 import { clearData, updateData } from "./settings";
 import { getColor, getElement, isColorable } from "./utils";
 
@@ -97,7 +106,7 @@ export function initApi(): void {
       incontinenceLimitFormula,
       updateDiaperColor,
       getPlayerDiaperSize,
-      getPlayerDiaper,
+      getPlayerUnderwear,
       getDiaperVerb,
       setDiaperColor,
       isOwned,
@@ -121,6 +130,9 @@ export function initApi(): void {
       clearData,
       updateData,
       incontinenceCheckThrottle: incontinenceCheck,
+      nameTransformationCache,
+      getABCLNamePrefix,
+      isCaregiver,
     },
   };
 }

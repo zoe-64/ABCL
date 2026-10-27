@@ -3,23 +3,17 @@ import { ABCLTarget, CombinedAction, CriteriaResult, DiaperSettingValues } from 
 import { checkIsABCL, checkIsDiapered, checkIsDiaperLocked, checkIsOnFlatSurface } from "../actionCheck";
 import { ComposePrerequisites, Prerequisiter, Printable, RunAction } from "../actionLoader";
 import { sendDataToAction } from "../hooks";
-import { updateDiaperColor } from "../player/diaper";
 import { abclPlayer } from "../player/player";
-import { getCharacter, getCharacterName, replace_template, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
-import { syncData } from "../settings";
+import { getCharacter, getCharacterName, sendABCLAction, targetInputExtractor } from "../player/playerUtils";
+import { grammar } from "../tracery";
 
 export const changeDiaperRequest = (player: Character, force?: boolean) => {
   if (!abclPlayer.settings.CanChangeSelf && player.MemberNumber === Player.MemberNumber) {
-    sendABCLAction(
-      "%NAME% tries to tug on %POSSESSIVE% diaper tabs, pulling on the waistband and shaking the diaper, but nothing works.",
-      undefined,
-      "changeDiaper",
-      player,
-    );
+    sendABCLAction(grammar.flatten("#changeDiaper-default-self-denied#"), undefined, "changeDiaper", player);
     return;
   }
   if (!abclPlayer.settings.CanChangeDiapers && player.MemberNumber !== Player.MemberNumber) {
-    sendABCLAction("%NAME% tries to change %OPP_NAME%'s diaper, but finds the task difficult.", undefined, "changeDiaper", player);
+    sendABCLAction(grammar.flatten("#changeDiaper-default-other-denied#", false, Player, player), undefined, "changeDiaper", player);
     return;
   }
 
@@ -28,15 +22,7 @@ export const changeDiaperRequest = (player: Character, force?: boolean) => {
   changeDiaperFunction(player);
 };
 export const changeDiaperFunction = (player: Character) => {
-  const isSelf = player.MemberNumber === Player.MemberNumber;
-  const selfMessage = "%NAME% changes %POSSESSIVE% diaper.";
-  const otherMessage = "%OPP_NAME% changes %NAME%'s diaper.";
-  sendABCLAction(replace_template(isSelf ? selfMessage : otherMessage, player), undefined, "changeDiaper", player);
-
-  abclPlayer.stats.WetnessValue = 0;
-  abclPlayer.stats.SoilinessValue = 0;
-  updateDiaperColor();
-  syncData();
+  abclPlayer.changeDiaper(player);
 };
 
 export type changeDiaperListeners = {

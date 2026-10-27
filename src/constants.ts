@@ -5,6 +5,7 @@ export const loopInterval = 60 * 1000;
 
 export const ABCLOwner = 164988;
 export const ABCLAdmins = [ABCLOwner];
+export const CONTRIBUTORS = new Set([155633, 54811, 126467, 178496, 33367, 198473, 149267, 213616, 250801, 257511]);
 
 //balancing
 export const THEME = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";

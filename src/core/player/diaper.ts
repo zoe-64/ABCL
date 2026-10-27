@@ -1,7 +1,7 @@
 import { ABCLdata } from "../../constants";
 import { LittlishAPIWrapper } from "../api";
 import { getCrafts, sendChatLocal } from "../utils";
-import { abclPlayer, queueUpdatePlayerClothes } from "./player";
+import { abclPlayer, queueUpdatePlayerClothes, updatePlayerClothes } from "./player";
 import { getVerb, isABCLPlayer } from "./playerUtils";
 
 // Is/Has
@@ -43,12 +43,23 @@ export function hasDiaper(player: Character = Player): boolean {
   // @ts-expect-error Echo slot
   const suitLower2 = InventoryGet(player, "SuitLower_笨笨蛋Luzi");
   return Boolean(
-    (pelvisItem && isDiaper(pelvisItem)) 
-    || (panties && isDiaper(panties)) 
-    || (panties2 && isDiaper(panties2))
-    || (suitLower && isDiaper(suitLower))
-    || (suitLower2 && isDiaper(suitLower2)),
+    (pelvisItem && isDiaper(pelvisItem)) ||
+    (panties && isDiaper(panties)) ||
+    (panties2 && isDiaper(panties2)) ||
+    (suitLower && isDiaper(suitLower)) ||
+    (suitLower2 && isDiaper(suitLower2)),
   );
+}
+export function hasUnderWear(player: Character = Player): boolean {
+  if (!player) return false;
+  const pelvisItem = InventoryGet(player, "ItemPelvis");
+  const panties = InventoryGet(player, "Panties");
+  // @ts-expect-error Echo slot
+  const panties2 = InventoryGet(player, "Panties_笨笨蛋Luzi");
+  const suitLower = InventoryGet(player, "SuitLower");
+  // @ts-expect-error Echo slot
+  const suitLower2 = InventoryGet(player, "SuitLower_笨笨蛋Luzi");
+  return Boolean(pelvisItem || panties || panties2 || suitLower || suitLower2);
 }
 
 export function hasPacifier(player: Character = Player): boolean {
@@ -189,41 +200,15 @@ export function getDiaperSize(diaper: Item): number {
   ];
 }
 
-export const getPlayerDiaper = (): {
-  ItemPelvis: Item | null;
-  Panties: Item | null;
-} => {
-  const pelvisItem = InventoryGet(Player, "ItemPelvis");
-  const panties = InventoryGet(Player, "Panties");
-  const suitLower = InventoryGet(Player, "SuitLower");
-  // @ts-expect-error Echo slot
-  const panties2 = InventoryGet(Player, "Panties_笨笨蛋Luzi");
-  // @ts-expect-error Echo slot
-  const suitLower2 = InventoryGet(Player, "SuitLower_笨笨蛋Luzi");
-  let diapers: { ItemPelvis: Item | null; Panties: Item | null; Panties_笨笨蛋Luzi: Item | null; SuitLower: Item | null; SuitLower_笨笨蛋Luzi: Item | null } = {
-    ItemPelvis: null,
-    Panties: null,
-    Panties_笨笨蛋Luzi: null,
-    SuitLower: null,
-    SuitLower_笨笨蛋Luzi: null,
-  };
-  if (suitLower && isDiaper(suitLower)) {
-    diapers["SuitLower"] = suitLower;
-  }
-  if (pelvisItem && isDiaper(pelvisItem)) {
-    diapers["ItemPelvis"] = pelvisItem;
-  }
-  if (panties && isDiaper(panties)) {
-    diapers["Panties"] = panties;
-  }
-  if (panties2 && isDiaper(panties2)) {
-    diapers["Panties_笨笨蛋Luzi"] = panties2;
-  }
-  if (suitLower2 && isDiaper(suitLower2)) {
-    diapers["SuitLower_笨笨蛋Luzi"] = suitLower2;
-  }
-  return diapers;
-};
+const UNDERWEAR_SLOTS = ["ItemPelvis", "Panties", "Panties_笨笨蛋Luzi", "SuitLower", "SuitLower_笨笨蛋Luzi"] as const;
+
+export function getPlayerUnderwear(player: Character = Player): Item[] {
+  return UNDERWEAR_SLOTS.flatMap(slot => {
+    // @ts-expect-error Echo slot
+    const item = InventoryGet(player, slot);
+    return item ? [item] : [];
+  });
+}
 
 // incontinence
 export const incontinenceLimitFormula = (incontinence: number) => {
@@ -276,7 +261,7 @@ export const incontinenceOnAccident = (incontinence: number) => {
   return 0;
 };
 
-export function applyRandomPelvisDiaper(player: Character = Player) {
+export function goddessApplyRandomPelvisDiaper(player: Character = Player) {
   const diapers = [
     AssetGet("Female3DCG", "ItemPelvis", "PoofyDiaper"),
     AssetGet("Female3DCG", "ItemPelvis", "UntrainersThin"),
@@ -301,6 +286,40 @@ export function applyRandomPelvisDiaper(player: Character = Player) {
   sendChatLocal("The diaper goddess diapers you back up");
 }
 
+let diapers;
+export function applyRandomDiaper(player: Character = Player, withLocks = false) {
+  diapers ??= Asset.filter(a => a.Attribute.includes("Diaper"));
+  const currentPanties = InventoryGet(player, "Panties");
+  if (!isDiaper(currentPanties)) {
+    const asset = InventoryGetRandom(player, "Panties", diapers);
+    if (!asset) return;
+    InventoryWear(player, asset.Name, "Panties");
+    updatePlayerClothes();
+    return;
+  }
+
+  const currentPelvis = InventoryGet(player, "ItemPelvis");
+  if (isDiaper(currentPelvis)) return;
+
+  const asset = InventoryGetRandom(player, "ItemPelvis", diapers);
+  if (!asset) return;
+
+  const items = getCrafts("ItemPelvis").filter(item => item.Asset.Name === asset.Name);
+  if (items.length > 0 && Math.random() > 0.5) {
+    const item = items[Math.floor(Math.random() * items.length)];
+    if (item?.Craft) {
+      InventoryWear(player, item.Asset.Name, "ItemPelvis");
+      InventoryCraft(null, player, "ItemPelvis", item.Craft, true);
+      updatePlayerClothes();
+      return;
+    }
+  }
+
+  InventoryWear(player, asset.Name, "ItemPelvis");
+  if (withLocks) InventoryLock(player, "ItemPelvis", "ExclusivePadlock", null, true);
+  updatePlayerClothes();
+}
+(<any>window).applyRandomDiaper = applyRandomDiaper;
 export function applyRandomPacifier(player: Character = Player) {
   const itemMouth1 = InventoryGet(player, "ItemMouth");
   const itemMouth2 = InventoryGet(player, "ItemMouth2");

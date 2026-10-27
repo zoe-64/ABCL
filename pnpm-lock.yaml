@@ -32,7 +32,13 @@ importers:
       styled-components:
         specifier: ^6.1.19
         version: 6.4.2(react@19.2.6)
+      tracery-grammar:
+        specifier: ^2.8.4
+        version: 2.8.4
     devDependencies:
+      '@lscg/types':
+        specifier: ^0.9.10
+        version: 0.9.10
       '@rollup/plugin-alias':
         specifier: ^5.1.1
         version: 5.1.1(rollup@4.63.2)
@@ -81,6 +87,9 @@ importers:
       '@types/semver':
         specifier: ^7.8.0
         version: 7.8.0
+      '@types/tracery-grammar':
+        specifier: ^2.7.4
+        version: 2.7.4
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.59.4
         version: 8.59.4(@typescript-eslint/parser@8.59.4(eslint@10.4.0)(typescript@5.9.3))(eslint@10.4.0)(typescript@5.9.3)
@@ -296,6 +305,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@lscg/types@0.9.10':
+    resolution: {integrity: sha512-WJ6d+qItrln8ykQZa1zUSSM30rNoIEIhNHgaWTD28pppDdME9I3Dp+5o0ywPDZLb7WpIxceNI0hzk6jLZi6RoA==}
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     resolution: {integrity: sha512-oTXEIha4SsuXdTA4Iyskj0kpdx2yVXdhd75c2v3xGrHFfVMsbhTPZU/nMPL4sWKo4pBHm3aucLaqGlF696dTyQ==}
@@ -624,6 +636,9 @@ packages:
 
   '@types/semver@7.8.0':
     resolution: {integrity: sha512-1mAINjtQCXXeLkJ9ehXkwOcBpqtLxiVtKhpUf83DdRNdQKV0iXZpaHYqRr7nj+wvxuJzoAmAwXI+sCNMv1CzLQ==}
+
+  '@types/tracery-grammar@2.7.4':
+    resolution: {integrity: sha512-HOgi12CZi99dK8EocxUwnYe7JLrulg2I8tbiW2XTpDsQErSecbH2LCZ8ulC97OAHSDZfC1F18aFZl4hJYR2rNg==}
 
   '@typescript-eslint/eslint-plugin@8.59.4':
     resolution: {integrity: sha512-PegsU+XfyJJNjd4+u/k6f9yTyp0lEXXiPopUNobZcIAUJFGICFLN+sP0Rb3JehVmiij1Ph0dFGYqODoRo/2+6A==}
@@ -2010,6 +2025,9 @@ packages:
     resolution: {integrity: sha512-r0eojU4bI8MnHr8c5bNo7lJDdI2qXlWWJk6a9EAFG7vbhTjElYhBVS3/miuE0uOuoLdb8Mc/rVfsmm6eo5o9GA==}
     hasBin: true
 
+  tracery-grammar@2.8.4:
+    resolution: {integrity: sha512-jUo1Qn1BY6dmlidn8pvbEiVOGVPcw19Qi+6CC+DrS4uJYFfVYLA//KguHU2bDfZrOFxlPkZfN7qf63elYm2pSQ==}
+
   ts-api-utils@2.5.0:
     resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
     engines: {node: '>=18.12'}
@@ -2300,6 +2318,8 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@lscg/types@0.9.10': {}
+
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
 
@@ -2550,6 +2570,8 @@ snapshots:
   '@types/resolve@1.20.2': {}
 
   '@types/semver@7.8.0': {}
+
+  '@types/tracery-grammar@2.7.4': {}
 
   '@typescript-eslint/eslint-plugin@8.59.4(@typescript-eslint/parser@8.59.4(eslint@10.4.0)(typescript@5.9.3))(eslint@10.4.0)(typescript@5.9.3)':
     dependencies:
@@ -3984,6 +4006,8 @@ snapshots:
       is-number: 7.0.0
 
   touch@3.1.1: {}
+
+  tracery-grammar@2.8.4: {}
 
   ts-api-utils@2.5.0(typescript@5.9.3):
     dependencies:

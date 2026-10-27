@@ -1,7 +1,7 @@
 {
   "name": "abcl",
   "displayName": "ABCL",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "An addon for [Bondage Club](https://www.bondageprojects.com/club_game/). Stands for \"Adult baby club lover\"~",
   "repository": {
     "type": "git",
@@ -27,9 +27,11 @@
     "preact": "^10.26.4",
     "rollup-plugin-jsonlint": "^2.1.0",
     "semver": "^7.8.5",
-    "styled-components": "^6.1.19"
+    "styled-components": "^6.1.19",
+    "tracery-grammar": "^2.8.4"
   },
   "devDependencies": {
+    "@lscg/types": "^0.9.10",
     "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.0.0",
@@ -41,11 +43,12 @@
     "@sugarch/bc-asset-manager": "^1.4.1",
     "@sugarch/bc-event-handler": "^1.0.4",
     "@sugarch/bc-mod-hook-manager": "^0.3.4",
+    "@sugarch/bc-mod-types": "0.6.4",
     "@types/core-js": "^2.5.8",
     "@types/css": "^0.0.37",
     "@types/node": "^20.17.30",
     "@types/semver": "^7.8.0",
-    "@sugarch/bc-mod-types": "0.6.4",
+    "@types/tracery-grammar": "^2.7.4",
     "@typescript-eslint/eslint-plugin": "^8.59.4",
     "@typescript-eslint/parser": "^8.59.4",
     "bc-stubs": "^132.0.0",
