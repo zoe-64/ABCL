@@ -53,7 +53,7 @@ export function checkHasPacifier(player: Character): CriteriaResult {
 }
 
 export function checkIsMouthNotBlocked(_player: Character): CriteriaResult {
-  return CriteriaResult.OkIf(!_player.IsMouthBlocked, "Your mouth is blocked.");
+  return CriteriaResult.OkIf(!_player.IsMouthBlocked(), "Your mouth is blocked.");
 }
 
 export function checkCanPauseStats(_player: Character): CriteriaResult {
