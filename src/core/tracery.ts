@@ -69,6 +69,26 @@ const wetting = {
   "wetting-floor-action": ["makes a puddle on the floor", "pees on the floor", "wets the floor"],
 };
 
+const pacifier = {
+  "pacifier-suck-self": [
+    "#character-name# sucks on #pronoun-their# pacifier, a tiny contented hum slipping past the silicone nipple.",
+    "#character-name# nibbles and sucks on #pronoun-their# pacifier, cheeks puffing slightly as #pronoun-they# settle into the rhythm.",
+    "#character-name# gives #pronoun-their# pacifier a slow, soothing suck, staring off into a hazy little daze.",
+    "#character-name# relaxes and sucks on #pronoun-their# pacifier, the familiar rhythm making #pronoun-them# feel sleepy and safe.",
+    "#character-name# gently sucks on #pronoun-their# pacifier, letting #pronoun-themself# sink into a quiet, cozy comfort.",
+  ],
+};
+
+const thumb = {
+  "thumb-suck-self": [
+    "#character-name# slips #pronoun-their# thumb into #pronoun-their# mouth and sucks, the familiar rhythm making #pronoun-them# feel calmer and more settled.",
+    "#character-name# gently sucks on #pronoun-their# thumb, a tiny hum escaping as #pronoun-they# sink into the comforting motion.",
+    "#character-name# nudges #pronoun-their# thumb between #pronoun-their# lips and sucks softly, eyes drifting half-closed in a sleepy, contented haze.",
+    "#character-name# comforts #pronoun-themself# by sucking on #pronoun-their# thumb, cheeks puffing slightly as #pronoun-they# settle into the habit.",
+    "#character-name# brings #pronoun-their# thumb to #pronoun-their# mouth and sucks, the simple motion easing #pronoun-themself# into a quiet little calm.",
+  ],
+};
+
 const changeDiaper = {
   "changeDiaper-default-self-denied": [
     "#character-name# tries to tug on #pronoun-their# diaper tabs, pulling on the waistband and shaking the diaper, but nothing works.",
@@ -148,13 +168,37 @@ const changeDiaper = {
     "in a soft glow",
   ],
 };
+
+const spells = {
+  "fluffy-butt-spell-default": [
+    "#character-name# feels a soft poof and suddenly #pronoun-their# butt is wrapped in a thick, fluffy diaper.",
+    "A puff of sparkles swirls around #character-name#'s waist, leaving #pronoun-them# in a nice thick fluffy diaper.",
+    "#character-name# blinks as #pronoun-their# underwear is replaced by a soft, crinkly diaper.",
+  ],
+  "fill-bowels-spell-default": [
+    "#character-name# feels a sudden pressure build in #pronoun-their# tummy and shifts uncomfortably.",
+    "#character-name# lets out a little groan as #pronoun-their# tummy gurgles and rumbles.",
+    "#character-name# presses a hand to #pronoun-their# tummy as #pronoun-they# suddenly needs to go.",
+    "#character-name# wiggles in place, #pronoun-their# tummy suddenly feeling very full.",
+  ],
+  "fill-bladder-spell-default": [
+    "#character-name# feels a sudden pressure build in #pronoun-their# bladder and presses #pronoun-their# thighs together.",
+    "#character-name# shifts from foot to foot as #pronoun-their# bladder suddenly feels much fuller.",
+    "#character-name# lets out a little whimper, suddenly very aware of how badly #pronoun-they# needs to go.",
+    "#character-name# presses a hand to #pronoun-their# tummy as the urge to pee grows.",
+  ],
+};
+
 let cached: ReturnType<typeof createGrammar> | undefined;
 export const grammar = {
   entries: {
     ...generic,
     ...soiling,
     ...wetting,
+    ...pacifier,
+    ...thumb,
     ...changeDiaper,
+    ...spells,
   } as Record<string, string | string[]>,
   modifiers: {
     if: function (str: string, parameters: string[]) {

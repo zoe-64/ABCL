@@ -1,7 +1,9 @@
 import { diaperRubFrontListeners } from "src/core/actions/diaperRubFront";
 import { changeDiaperListeners } from "../core/actions/changeDiaper";
 import { lickPuddleListeners } from "../core/actions/lickPuddle";
-import { onABCLMessageListeners } from "../core/actions/onABCLMessage";
+import { diaperUsageSoundListeners, onABCLMessageListeners } from "../core/actions/onABCLMessage";
+import { suckPacifierListeners } from "../core/actions/suckPacifier";
+import { suckThumbListeners } from "../core/actions/suckThumb";
 
 import { diaperFaceRubListeners } from "src/core/actions/diaperFaceRub";
 import { diaperFaceSitListeners } from "src/core/actions/diaperFaceSit";
@@ -114,7 +116,10 @@ export type ListenerTypeMap = wipePuddleListeners &
   lickPuddleListeners &
   changeDiaperListeners &
   onABCLMessageListeners &
+  diaperUsageSoundListeners &
   diaperRubFrontListeners &
+  suckPacifierListeners &
+  suckThumbListeners &
   diaperRubBackListeners &
   diaperPatBackListeners &
   diaperPatFrontListeners &
@@ -217,6 +222,7 @@ export interface ABCLActivity<CustomPrereq extends string = ActivityPrerequisite
   Target: ABCLTarget[];
   MaxProgress: number;
   Prerequisite?: ExCustomActivityPrerequisite<CustomPrereq>[];
+  Criteria?: (player: Character, silent?: boolean) => CriteriaResult;
   useImage?: ActivityImageSetting;
   run?: (player: Character, sender: Character, info: ActivityInfo) => void | undefined;
 }

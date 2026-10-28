@@ -38,14 +38,18 @@ interface ModSettings {
     lickPuddle: boolean;
     wetDiaper: boolean;
     wetClothing: boolean;
+    puddle: boolean;
     soilDiaper: boolean;
     soilClothing: boolean;
     usePotty: boolean;
     useToilet: boolean;
     wipePuddle: boolean;
+    suckPacifier: boolean;
+    suckThumb: boolean;
     statusMessages: boolean;
     playerActivity: boolean;
     pauseStats: boolean;
+    punishment: boolean;
   };
   StatusMessages: Partial<Record<keyof ModStats, boolean>>;
   DisableWettingLeaks: boolean;
@@ -67,6 +71,7 @@ interface ModSettings {
   UnPauseStatsWhenDiapered: boolean;
 
   MiniGameAudioMuted: boolean;
+  DiaperUsageSounds: boolean;
   UseNewMiniGame: boolean;
 
   // cruel settings

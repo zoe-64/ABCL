@@ -15,8 +15,11 @@ import { diaperSquishBack } from "./actions/diaperSquishBack";
 import { diaperSquishFront } from "./actions/diaperSquishFront";
 import { lickPuddle } from "./actions/lickPuddle";
 import { makeAWish } from "./actions/makeAWish";
-import { onABCLMessage } from "./actions/onABCLMessage";
+import { diaperUsageSound, onABCLMessage } from "./actions/onABCLMessage";
 import { pauseStats } from "./actions/pauseStats";
+import { suckPacifier } from "./actions/suckPacifier";
+import { suckThumb } from "./actions/suckThumb";
+import { timeoutPunishmentCommand } from "./actions/timeoutPunishment";
 import { toPee } from "./actions/toPee";
 import { toPoop } from "./actions/toPoop";
 import { usePotty } from "./actions/usePotty";
@@ -144,7 +147,10 @@ export const actions: CombinedAction[] = [
   useToilet,
   lickPuddle,
   wipePuddle,
+  suckPacifier,
+  suckThumb,
   onABCLMessage,
+  diaperUsageSound,
   diaperFaceRub,
   diaperFaceSit,
   diaperPatBack,
@@ -157,6 +163,7 @@ export const actions: CombinedAction[] = [
   diaperSquishFront,
   pauseStats,
   makeAWish,
+  timeoutPunishmentCommand,
 ];
 
 export const commands = actions.reduce((commands, { command }) => (command ? [...commands, command] : commands), [] as ICommand[]);

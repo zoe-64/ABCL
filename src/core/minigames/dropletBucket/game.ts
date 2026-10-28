@@ -1,4 +1,4 @@
-import { abclPlayer } from "src/core/player/player";
+import { abclPlayer, incontinenceCheck } from "src/core/player/player";
 import { syncData } from "src/core/settings";
 import { BaseMiniGame } from "../baseMinigame";
 import { AudioManager } from "./audio";
@@ -94,6 +94,7 @@ export class DropletCatchGame extends BaseMiniGame {
 
   Load(): void {
     super.Load();
+    incontinenceCheck.pause();
     this.isPaused = false;
     this.timeLeft = GAME_CONFIG.DEFAULT_TIME;
     this.lives = GAME_CONFIG.DEFAULT_LIVES;
