@@ -1,8 +1,10 @@
 import { HookManager } from "@sugarch/bc-mod-hook-manager";
-import { getRandomInt } from "./utils";
-import { DistractionRushGame } from "./minigames/distractionRush";
 import { BaseMiniGame, MessMinigameResult, WetMinigameResult } from "./minigames/baseMinigame";
+import { DistractionRushGame } from "./minigames/distractionRush";
 import { DropletCatchGame } from "./minigames/dropletBucket/game";
+import { TimeoutLinesGame } from "./minigames/timeoutLines";
+import { incontinenceCheck } from "./player/player";
+import { getRandomInt } from "./utils";
 
 // for minigame text loading
 // @ts-expect-error ts(2345)
@@ -23,6 +25,7 @@ export const initMinigames = () => {
   registerMiniGame(new DistractionRushGame("Wetting"));
   registerMiniGame(new DistractionRushGame("Messes"));
   registerMiniGame(new DropletCatchGame());
+  registerMiniGame(new TimeoutLinesGame());
 };
 export function registerMiniGame<T extends BaseMiniGame>(miniGame: T) {
   var name = miniGame.name;
@@ -68,6 +71,7 @@ export abstract class AccidentMiniGame extends BaseMiniGame {
     return CommonTime() < this.GameStartTime;
   }
   Load(): void {
+    incontinenceCheck.pause();
     DrawFlashScreen("#000000", 750, 1000);
 
     this.GameStartTime = CommonTime() + this.StartDelay;

@@ -5,3 +5,13 @@ Change diaper spell - makes the target get changed diaper
 
 Reworked parts of the abcl action/message generation system
 Fixed issues with names that contain badges/prefixes from ABCL
+
+Added diaper usage sounds
+Added sucking on thumb and pacifier activities
+Added writing timeout mode via /timeout
+Refactored parts of minigame styling
+Added difficulty standing up when regression is above 60%
+Added periodic habits of sucking on pacifier / thumb when regression is above 40%
+Added periodic drooling when regression is above 70%
+
+Added filling bladder and bowel spells

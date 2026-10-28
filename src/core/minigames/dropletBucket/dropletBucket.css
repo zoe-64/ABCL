@@ -1,22 +1,3 @@
-#abcl-minigame.game-container {
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 0.625em 1.875em rgba(0, 0, 0, 0.35);
-  font-family:
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
-  user-select: none;
-  background-color: #1a1a24;
-  height: 95%;
-  margin: 1.25% auto;
-  border: 0.0625em solid hsla(216.5, 78.8%, 61.2%, 0.23);
-  color: #ffffff;
-}
-
 #abcl-minigame.game-container:has(.droplet-canvas) {
   margin: 0 0;
   width: 24em;
@@ -114,8 +95,8 @@
 }
 
 .abcl-distraction-rush-button {
-  background: #3b82f6;
-  color: #ffffff;
+  background: var(--abcl-minigame-button-bg);
+  color: var(--abcl-minigame-button-text);
   border: none;
   padding: 0.625em 1.5em;
   font-size: 1em;

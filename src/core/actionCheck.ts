@@ -1,5 +1,5 @@
 import { CriteriaResult } from "src/types/types";
-import { hasDiaper, isDiaperLocked } from "./player/diaper";
+import { hasDiaper, hasPacifier, isDiaperLocked } from "./player/diaper";
 import { abclPlayer } from "./player/player";
 import { isABCLPlayer } from "./player/playerUtils";
 
@@ -46,6 +46,14 @@ export function checkBladderIsntEmpty(_player: Character): CriteriaResult {
 
 export function checkHasPuddle(player: Character): CriteriaResult {
   return CriteriaResult.OkIf(!!(player?.ABCL && player.ABCL!.Stats.PuddleSize.value > 0), "They have no puddle.");
+}
+
+export function checkHasPacifier(player: Character): CriteriaResult {
+  return CriteriaResult.OkIf(hasPacifier(player), "They are not wearing a pacifier.");
+}
+
+export function checkIsMouthNotBlocked(_player: Character): CriteriaResult {
+  return CriteriaResult.OkIf(!_player.IsMouthBlocked, "Your mouth is blocked.");
 }
 
 export function checkCanPauseStats(_player: Character): CriteriaResult {

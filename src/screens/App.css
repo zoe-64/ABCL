@@ -14,6 +14,26 @@
   --abcl-hover-color: var(--tmd-accent, cyan);
 
   --abcl-warning-color: #ff4646;
+
+  --abcl-minigame-element: var(--tmd-element, #2e2780);
+  --abcl-minigame-bg: color-mix(in srgb, var(--abcl-minigame-element) 100%, transparent);
+  --abcl-minigame-panel: var(--abcl-minigame-element, #2e2780d4);
+  --abcl-minigame-text: var(--tmd-text, #fff);
+  --abcl-minigame-border: var(--tmd-accent, #6466e3);
+  --abcl-minigame-border-width: 0.1em;
+  --abcl-minigame-border-style: solid;
+  --abcl-minigame-button-bg: color-mix(in srgb, var(--tmd-accent, #887eff) 100%, transparent);
+  --abcl-minigame-button-text: var(--abcl-minigame-text, #fff);
+  --abcl-minigame-button-border: var(--abcl-minigame-border, #6466e3);
+  --abcl-minigame-input-bg: ;
+  --abcl-minigame-input-bg: color-mix(in srgb, var(--tmd-element, rgba(24, 35, 63, 0.72)), black 10%);
+  --abcl-minigame-input-text: var(--abcl-minigame-text, #fff);
+  --abcl-minigame-muted-text: rgba(255, 255, 255, 0.7);
+  --abcl-minigame-accent: var(--tmd-accent, #7aa2ff);
+  --abcl-minigame-accent-soft: rgba(122, 162, 255, 0.15);
+  --abcl-minigame-warning: var(--abcl-warning-color, #ff4646);
+  --abcl-minigame-warning-soft: rgba(255, 70, 70, 0.12);
+  --abcl-minigame-shadow: rgba(0, 0, 0, 0.22);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -28,6 +48,23 @@
     --abcl-border: 0.1em solid var(--abcl-border-color);
     --abcl-hover-color: var(--tmd-accent, #005968);
     --abcl-warning-color: #a80000;
+
+    --abcl-minigame-element: var(--tmd-element, #1c1c28);
+    --abcl-minigame-bg: var(--abcl-minigame-element, #1c1c28);
+    --abcl-minigame-panel: var(--abcl-minigame-element, #1c1c28);
+    --abcl-minigame-text: var(--tmd-text, #fff);
+    --abcl-minigame-border: var(--abcl-border-color, #2b2b2b);
+    --abcl-minigame-button-bg: var(--abcl-minigame-element, #1c1c28);
+    --abcl-minigame-button-text: var(--tmd-text, #fff);
+    --abcl-minigame-button-border: var(--abcl-minigame-border, #2b2b2b);
+    --abcl-minigame-input-bg: rgba(15, 23, 42, 0.78);
+    --abcl-minigame-input-text: var(--tmd-text, #fff);
+    --abcl-minigame-muted-text: rgba(255, 255, 255, 0.72);
+    --abcl-minigame-accent: #7aa2ff;
+    --abcl-minigame-accent-soft: rgba(122, 162, 255, 0.12);
+    --abcl-minigame-warning: #a80000;
+    --abcl-minigame-warning-soft: rgba(168, 0, 0, 0.12);
+    --abcl-minigame-shadow: rgba(0, 0, 0, 0.28);
   }
 }
 

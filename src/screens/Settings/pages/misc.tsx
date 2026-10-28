@@ -10,6 +10,7 @@ import { SettingsH2 } from "../settingsPage";
 export default function MiscPage({ setPage }: { setPage: (page: string) => void }): h.JSX.Element {
   const [wetDiaper, setWetDiaper] = useState<boolean>(Player.ABCL.Settings.VisibleMessages.wetDiaper);
   const [wetClothing, setWetClothing] = useState<boolean>(Player.ABCL.Settings.VisibleMessages.wetClothing);
+  const [puddle, setPuddle] = useState<boolean>(Player.ABCL.Settings.VisibleMessages.puddle);
   const [soilDiaper, setSoilDiaper] = useState<boolean>(Player.ABCL.Settings.VisibleMessages.soilDiaper);
   const [soilClothing, setSoilClothing] = useState<boolean>(Player.ABCL.Settings.VisibleMessages.soilClothing);
   const [changeDiaper, setChangeDiaper] = useState<boolean>(Player.ABCL.Settings.VisibleMessages.changeDiaper);
@@ -31,6 +32,7 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
 
   const [wetDiaperLocked, _setWetDiaperLocked] = useState<boolean>(Player.ABCL.SettingPermissions.wetDiaper);
   const [wetClothingLocked, _setWetClothingLocked] = useState<boolean>(Player.ABCL.SettingPermissions.wetClothing);
+  const [puddleLocked, _setPuddleLocked] = useState<boolean>(Player.ABCL.SettingPermissions.puddle);
   const [soilDiaperLocked, _setSoilDiaperLocked] = useState<boolean>(Player.ABCL.SettingPermissions.soilDiaper);
   const [soilClothingLocked, _setSoilClothingLocked] = useState<boolean>(Player.ABCL.SettingPermissions.soilClothing);
   const [changeDiaperLocked, _setChangeDiaperLocked] = useState<boolean>(Player.ABCL.SettingPermissions.changeDiaper);
@@ -59,6 +61,7 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
   const [puddleSize, setPuddleSize] = useState<boolean>(Player.ABCL.Settings.StatusMessages["PuddleSize"] ?? false);
 
   const [showOwnBadges, setShowOwnBadges] = useState<boolean>(Player.ABCL.Settings.ShowOwnBadges);
+  const [diaperUsageSounds, setDiaperUsageSounds] = useState<boolean>(Player.ABCL.Settings.DiaperUsageSounds);
   const [useNewMiniGame, setUseNewMiniGame] = useState<boolean>(Player.ABCL.Settings.UseNewMiniGame);
 
   return (
@@ -68,6 +71,7 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
           setPage("menu");
           Player.ABCL.Settings.VisibleMessages.wetDiaper = wetDiaper;
           Player.ABCL.Settings.VisibleMessages.wetClothing = wetClothing;
+          Player.ABCL.Settings.VisibleMessages.puddle = puddle;
           Player.ABCL.Settings.VisibleMessages.soilDiaper = soilDiaper;
           Player.ABCL.Settings.VisibleMessages.soilClothing = soilClothing;
           Player.ABCL.Settings.VisibleMessages.changeDiaper = changeDiaper;
@@ -94,9 +98,11 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
           Player.ABCL.Settings.StatusMessages["PuddleSize"] = puddleSize;
 
           Player.ABCL.Settings.ShowOwnBadges = showOwnBadges;
+          Player.ABCL.Settings.DiaperUsageSounds = diaperUsageSounds;
 
           Player.ABCL.SettingPermissions.wetDiaper = wetDiaperLocked;
           Player.ABCL.SettingPermissions.wetClothing = wetClothingLocked;
+          Player.ABCL.SettingPermissions.puddle = puddleLocked;
           Player.ABCL.SettingPermissions.soilDiaper = soilDiaperLocked;
           Player.ABCL.SettingPermissions.soilClothing = soilClothingLocked;
           Player.ABCL.SettingPermissions.changeDiaper = changeDiaperLocked;
@@ -127,6 +133,9 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
           </SettingPanel>
           <SettingPanel title="Disable particles">
             <Checkbox checked={disableParticles} setChecked={setDisableParticles} showLock={false} />
+          </SettingPanel>
+          <SettingPanel title="Diaper usage sounds">
+            <Checkbox checked={diaperUsageSounds} setChecked={setDiaperUsageSounds} showLock={false} />
           </SettingPanel>
           <SettingPanel title="Use new Minigame (may not stay forever)">
             <Checkbox checked={useNewMiniGame} setChecked={setUseNewMiniGame} showLock={false} />
@@ -174,6 +183,9 @@ export default function MiscPage({ setPage }: { setPage: (page: string) => void 
           </SettingPanel>
           <SettingPanel title="Wetting Clothes">
             <Checkbox checked={wetClothing} setChecked={setWetClothing} locked={wetClothingLocked && isOwned()} opaqueLock={true} />
+          </SettingPanel>
+          <SettingPanel title="Puddles Formed">
+            <Checkbox checked={puddle} setChecked={setPuddle} locked={puddleLocked && isOwned()} opaqueLock={true} />
           </SettingPanel>
           <SettingPanel title="Soiling Diapers">
             <Checkbox checked={soilDiaper} setChecked={setSoilDiaper} locked={soilDiaperLocked && isOwned()} opaqueLock={true} />

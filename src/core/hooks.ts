@@ -2,7 +2,7 @@ import * as types from "@lscg/types";
 import { HookManager } from "@sugarch/bc-mod-hook-manager";
 import bcModSdk from "bondage-club-mod-sdk";
 import { inModSubscreen } from "src/screens/Settings";
-import { ACCIDENTS_ON_ACTIVITIES, THEME } from "../constants";
+import { ACCIDENTS_ON_ACTIVITIES, MENTAL_REGRESSION_STRUGGLE_STANDING_UP_THRESHOLD, THEME } from "../constants";
 import { ModIdentifier, ModVersion } from "../types/definitions";
 import { HookListener, ListenerTypeMap, PluginServerChatRoomMessage } from "../types/types";
 import { actions, activityNames } from "./actionLoader";
@@ -142,6 +142,35 @@ const initHooks = async () => {
       apply(context) {
         abclPlayer.stats.BladderFullness = 1;
         abclPlayer.wet(false);
+      },
+    });
+    api.spells.registerEffect({
+      name: "fill-bladder",
+      label: "Fill Bladder",
+      description: "Fills the target's bladder by 50% of the remaining capacity.",
+      apply(context) {
+        const current = abclPlayer.stats.BladderFullness;
+        abclPlayer.stats.BladderFullness = Math.min(1, current + (1 - current) / 2);
+        context.sendAction(grammar.flatten("#fill-bladder-spell-default#"));
+      },
+    });
+    api.spells.registerEffect({
+      name: "fill-bowels",
+      label: "Fill Bowels",
+      description: "Fills the target's bowels by 50% of the remaining capacity.",
+      apply(context) {
+        const current = abclPlayer.stats.BowelFullness;
+        abclPlayer.stats.BowelFullness = Math.min(1, current + (1 - current) / 2);
+        context.sendAction(grammar.flatten("#fill-bowels-spell-default#"));
+      },
+    });
+    api.spells.registerEffect({
+      name: "fluffy-butt",
+      label: "Fluffy-Butt Spell",
+      description: "Puts the target in a nice thick fluffy diaper.",
+      apply(context) {
+        applyRandomDiaper(Player, false, "moderate_adult");
+        context.sendAction(grammar.flatten("#fluffy-butt-spell-default#"));
       },
     });
     api.spells.registerEffect({
@@ -399,6 +428,12 @@ const initHooks = async () => {
     return next(args);
   });
 
+  HookManager.hookFunction("PoseCanChangeUnaidedStatus", 1, (args, next) => {
+    const result = next(args);
+    if (result == PoseChangeStatus.ALWAYS && abclPlayer.stats.MentalRegression > MENTAL_REGRESSION_STRUGGLE_STANDING_UP_THRESHOLD)
+      return PoseChangeStatus.ALWAYS_WITH_STRUGGLE;
+    return result;
+  });
   HookManager.hookFunction("InformationSheetClick", HookPriority.OBSERVE, (args, next) => {
     if (!InformationSheetSelection?.ABCL) return next(args);
     if (window.MPA?.menuLoaded || window?.bcx?.inBcxSubscreen?.() || LittlishAPIWrapper.inModSubscreen() || window?.LSCG_REMOTE_WINDOW_OPEN === true)

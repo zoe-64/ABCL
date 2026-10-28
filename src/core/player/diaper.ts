@@ -287,11 +287,23 @@ export function goddessApplyRandomPelvisDiaper(player: Character = Player) {
 }
 
 let diapers;
-export function applyRandomDiaper(player: Character = Player, withLocks = false) {
+
+const getDiaperAssetSize = (asset: Asset): number => {
+  const key = `${asset.DynamicGroupName}${asset.Name}` as keyof typeof ABCLdata.Diapers;
+  const diaper = ABCLdata.Diapers[key];
+  if (!diaper || !("size" in diaper)) return 0;
+  const sizeKey = diaper.size as keyof typeof ABCLdata.DiaperSizeScale;
+  return ABCLdata.DiaperSizeScale[sizeKey] ?? 0;
+};
+
+export function applyRandomDiaper(player: Character = Player, withLocks = false, minSize?: keyof typeof ABCLdata.DiaperSizeScale | number) {
   diapers ??= Asset.filter(a => a.Attribute.includes("Diaper"));
+  const minSizeValue = typeof minSize === "number" ? minSize : minSize ? (ABCLdata.DiaperSizeScale[minSize] ?? 0) : 0;
+  const eligibleDiapers = diapers.filter((asset: Asset) => getDiaperAssetSize(asset) >= minSizeValue);
+
   const currentPanties = InventoryGet(player, "Panties");
   if (!isDiaper(currentPanties)) {
-    const asset = InventoryGetRandom(player, "Panties", diapers);
+    const asset = InventoryGetRandom(player, "Panties", eligibleDiapers);
     if (!asset) return;
     InventoryWear(player, asset.Name, "Panties");
     updatePlayerClothes();
@@ -301,7 +313,7 @@ export function applyRandomDiaper(player: Character = Player, withLocks = false)
   const currentPelvis = InventoryGet(player, "ItemPelvis");
   if (isDiaper(currentPelvis)) return;
 
-  const asset = InventoryGetRandom(player, "ItemPelvis", diapers);
+  const asset = InventoryGetRandom(player, "ItemPelvis", eligibleDiapers);
   if (!asset) return;
 
   const items = getCrafts("ItemPelvis").filter(item => item.Asset.Name === asset.Name);

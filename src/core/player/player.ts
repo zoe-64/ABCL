@@ -1,6 +1,16 @@
 import { RuleId } from "src/types/definitions";
-import { ABCLdata, INCONTINENCE_ON_STATS_OVERFLOW, PUDDLE_MAX_SIZE } from "../../constants";
+import {
+  ABCLdata,
+  DIAPER_USAGE_SOUNDS,
+  INCONTINENCE_ON_STATS_OVERFLOW,
+  MENTAL_REGRESSION_DROOL_THRESHOLD,
+  MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD,
+  PUDDLE_MAX_SIZE,
+} from "../../constants";
 import { MetabolismSettingValues, MiniGameDifficultyToNumber } from "../../types/types";
+import { suckPacifierFunction } from "../actions/suckPacifier";
+import { suckThumbFunction } from "../actions/suckThumb";
+import { sendDataToAction } from "../hooks";
 import { MessMinigameResult, WetMinigameResult } from "../minigames/baseMinigame";
 import { syncData } from "../settings";
 import { grammar } from "../tracery";
@@ -9,6 +19,7 @@ import {
   averageColor,
   getPlayerDiaperSize,
   hasDiaper,
+  hasPacifier,
   incontinenceChanceFormula,
   incontinenceLimitFormula,
   incontinenceOnAccident,
@@ -26,11 +37,32 @@ export const updatePlayerClothes = async (itemGroup?: AssetGroupName) => {
   ChatRoomCharacterItemUpdate(Player, itemGroup);
 };
 
+const playDiaperUsageSound = (type: keyof typeof DIAPER_USAGE_SOUNDS) => {
+  if (!Player.ABCL?.Settings.DiaperUsageSounds) return;
+  if (!Player.AudioSettings?.PlayItem) return;
+
+  const config = DIAPER_USAGE_SOUNDS[type];
+  const clip = config.clips[Math.floor(Math.random() * config.clips.length)];
+  if (!clip) return;
+
+  const audio = new Audio(`${publicURL}/audio/diaper/${type}/${clip}`);
+  audio.volume = Math.min(1, Number(Player.AudioSettings.Volume ?? 1) * config.volume);
+  audio.play().catch(() => {});
+};
+
+const triggerDiaperUsageSound = (type: keyof typeof DIAPER_USAGE_SOUNDS) => {
+  if (!Player.ABCL?.Settings.DiaperUsageSounds) return;
+  sendDataToAction("diaper-usage-sound", { type });
+  playDiaperUsageSound(type);
+};
+
 export const queueUpdatePlayerClothes = createRateLimiter<typeof updatePlayerClothes>(updatePlayerClothes, 1 * 1000);
 
 const bowelThrottler = new Throttler(120 * 60 * 1000);
 const bladderThrottler = new Throttler(120 * 60 * 1000);
 const regressionThrottler = new Throttler(5 * 60 * 1000);
+const regressedSelfSoothingThrottler = new Throttler(4 * 60 * 1000);
+const droolThrottler = new Throttler(2 * 60 * 1000);
 
 function getBladderState(player: Character = Player): "blocked" | "open" | "normal" {
   const catheterizedEffect = CommonClamp(InventoryCraftCount(player, "Catheterized" as CraftingPropertyType, true), 0, 1);
@@ -104,6 +136,17 @@ export const abclPlayer = {
     if (regressionThrottler.check()) {
       abclPlayer.stats.MentalRegression += mentalRegressionOvertime();
     }
+    if (abclPlayer.stats.MentalRegression > MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD && regressedSelfSoothingThrottler.check()) {
+      if (hasPacifier(Player)) {
+        suckPacifierFunction(Player);
+      } else if (!Player.IsRestrained() && !Player.IsMouthBlocked()) {
+        suckThumbFunction(Player);
+      }
+    }
+    if (abclPlayer.stats.MentalRegression > MENTAL_REGRESSION_DROOL_THRESHOLD && droolThrottler.check()) {
+      CharacterSetFacialExpression(Player, "Fluids", "DroolMedium", 20);
+      droolThrottler.allowedCallInterval = 2 * 60 * 1000 + Math.random() * 60 * 1000;
+    }
     if (bladderThrottler.check() && Player.ABCL.Settings.PeeMetabolism !== "Disabled") {
       const diureticCount = CommonClamp(InventoryCraftCount(Player, "Diuretic" as CraftingPropertyType, true), 0, 5);
 
@@ -128,6 +171,7 @@ export const abclPlayer = {
         undefined,
         "changeDiaper",
       );
+    playDiaperUsageSound("changing");
     abclPlayer.stats.WetnessValue = 0;
     abclPlayer.stats.SoilinessValue = 0;
     updateDiaperColor();
@@ -157,8 +201,16 @@ export const abclPlayer = {
     }
     if (!silent) sendABCLAction(grammar.flatten(actionKey), undefined, "wetClothing");
 
+    const previousPuddleSize = abclPlayer.stats.PuddleSize;
     abclPlayer.stats.PuddleSize += abclPlayer.stats.BladderValue;
     abclPlayer.stats.BladderValue = 0;
+
+    if (!silent && previousPuddleSize === 0 && abclPlayer.stats.PuddleSize > 0) {
+      sendABCLAction(grammar.flatten("#wetting-floor-action#"), undefined, "puddle");
+      //triggerDiaperUsageSound("puddle");
+    }
+    if (hasDiaper()) triggerDiaperUsageSound("diaper_wetting");
+    else triggerDiaperUsageSound("misc_wetting");
 
     if (Player.ABCL.Settings.DisableClothingStains) return;
     const wetColor = "#96936C";
@@ -227,6 +279,7 @@ export const abclPlayer = {
       actionMessage = "#wetting-default-on-potty-with-diaper#";
     }
     if (!silent) sendABCLAction(grammar.flatten(actionMessage), undefined, "wetDiaper");
+    if (hasDiaper()) triggerDiaperUsageSound("diaper_wetting");
 
     abclPlayer.stats.BladderValue -= absorbedVolume;
     abclPlayer.stats.WetnessValue += absorbedVolume;
@@ -246,6 +299,7 @@ export const abclPlayer = {
       actionMessage = "#soiling-default-on-potty-with-diaper#";
     }
     if (!silent) sendABCLAction(grammar.flatten(actionMessage), undefined, "soilDiaper");
+    if (!silent && hasDiaper()) triggerDiaperUsageSound("diaper_soiling");
 
     abclPlayer.stats.BowelValue -= absorbedVolume;
     abclPlayer.stats.SoilinessValue += absorbedVolume * 4; // soiling should be more impactful
