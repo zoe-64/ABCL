@@ -9,8 +9,12 @@ const soiling = {
   // Core building blocks
   "soiling-verb": ["soils", "poops in", "soils in", "makes a mess in"],
   "soiling-undies-action": ["#soiling-verb# #pronoun-their# #character-undies#"],
-  "soiling-reaction-state": ["warmth", "smell", "heat", "weight"],
-  "soiling-reaction": ["feels the #soiling-reaction-state# of #pronoun-their# #character-undies#"],
+  "soiling-reaction": [
+    "feels a warmth spread through #pronoun-their# #character-undies#",
+    "feels a warmth settle into #pronoun-their# #character-undies#",
+    "feels #pronoun-their# #character-undies# grow heavier",
+    "smells the mess in #pronoun-their# #character-undies#",
+  ],
   "soiling-emote": ["#soiling-undies-action# and #soiling-reaction#"],
   "soiling-clothes": ["soils #pronoun-their# clothes"],
 
@@ -37,8 +41,12 @@ const wetting = {
   // Core building blocks
   "wetting-verb": ["wets", "soaks", "pees in", "lets go in", "leaks in"],
   "wetting-undies-action": ["#wetting-verb# #pronoun-their# #character-undies#"],
-  "wetting-reaction-state": ["warmth", "heat", "weight", "dampness"],
-  "wetting-reaction": ["feels the #wetting-reaction-state# of #pronoun-their# #character-undies#"],
+  "wetting-reaction": [
+    "feels a warmth spread through #pronoun-their# #character-undies#",
+    "feels a warmth settle into #pronoun-their# #character-undies#",
+    "feels #pronoun-their# #character-undies# grow damp",
+    "feels #pronoun-their# #character-undies# grow heavier",
+  ],
   "wetting-emote": ["#wetting-undies-action# and #wetting-reaction#"],
   "wetting-clothes": ["#wetting-verb# #pronoun-their# clothes"],
 
