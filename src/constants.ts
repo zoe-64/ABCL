@@ -19,6 +19,7 @@ export const PUDDLE_MAX_SIZE = 250;
 export const MENTAL_REGRESSION_STRUGGLE_STANDING_UP_THRESHOLD = 0.6; // when standing up becomes harder
 export const MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD = 0.4;
 export const MENTAL_REGRESSION_DROOL_THRESHOLD = 0.7;
+export const MENTAL_REGRESSION_SUCKING_RESIST_FAIL_THRESHOLD = 0.8; // auto-sucking verify button always fails at/above this regression
 export const ACCIDENTS_ON_ACTIVITIES: Partial<Record<Activity["Name"], { wetting?: number; messing?: number }>> = {
   Tickle: { wetting: 0.1, messing: 0.01 },
   TickleItem: { wetting: 0.18, messing: 0.01 },

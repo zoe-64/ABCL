@@ -1,11 +1,12 @@
 import { RuleId } from "src/types/definitions";
 import {
-    ABCLdata,
-    DIAPER_USAGE_SOUNDS,
-    INCONTINENCE_ON_STATS_OVERFLOW,
-    MENTAL_REGRESSION_DROOL_THRESHOLD,
-    MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD,
-    PUDDLE_MAX_SIZE,
+  ABCLdata,
+  DIAPER_USAGE_SOUNDS,
+  INCONTINENCE_ON_STATS_OVERFLOW,
+  MENTAL_REGRESSION_DROOL_THRESHOLD,
+  MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD,
+  MENTAL_REGRESSION_SUCKING_RESIST_FAIL_THRESHOLD,
+  PUDDLE_MAX_SIZE,
 } from "../../constants";
 import { MetabolismSettingValues, MiniGameDifficultyToNumber } from "../../types/types";
 import { suckPacifierFunction } from "../actions/suckPacifier";
@@ -16,17 +17,17 @@ import { syncData } from "../settings";
 import { grammar } from "../tracery";
 import { createRateLimiter, getColor, isColorable, Saver, sendChatLocal, Throttler } from "../utils";
 import {
-    averageColor,
-    getPlayerDiaperSize,
-    hasDiaper,
-    hasPacifier,
-    incontinenceChanceFormula,
-    incontinenceLimitFormula,
-    incontinenceOnAccident,
-    isDiaper,
-    mentalRegressionOnAccident,
-    mentalRegressionOvertime,
-    updateDiaperColor,
+  averageColor,
+  getPlayerDiaperSize,
+  hasDiaper,
+  hasPacifier,
+  incontinenceChanceFormula,
+  incontinenceLimitFormula,
+  incontinenceOnAccident,
+  isDiaper,
+  mentalRegressionOnAccident,
+  mentalRegressionOvertime,
+  updateDiaperColor,
 } from "./diaper";
 import { getAccidentAutopilotOutcome, isAccidentsAutopiloted as isAccidentsAutoPiloted, sendABCLAction, sendStatusMessage } from "./playerUtils";
 import { abclStatsWindow } from "./ui";
@@ -63,6 +64,91 @@ const bladderThrottler = new Throttler(120 * 60 * 1000);
 const regressionThrottler = new Throttler(5 * 60 * 1000);
 const regressedSelfSoothingThrottler = new Throttler(4 * 60 * 1000);
 const droolThrottler = new Throttler(2 * 60 * 1000);
+
+const AUTO_SUCK_VERIFY_TIMEOUT = 15 * 1000;
+const AUTO_SUCK_HOLD_DURATION = 5 * 1000;
+let autoSuckVerifyTimeout: number | null = null;
+
+const clearAutoSuckVerify = () => {
+  if (autoSuckVerifyTimeout) {
+    clearTimeout(autoSuckVerifyTimeout);
+    autoSuckVerifyTimeout = null;
+  }
+  ElementRemove("#abcl-chat-button-verify-adult");
+};
+
+const promptAutoSuckVerification = (suck: () => void) => {
+  if (!ServerPlayerIsInChatRoom()) return suck();
+  clearAutoSuckVerify();
+
+  const alwaysFails = abclPlayer.stats.MentalRegression >= MENTAL_REGRESSION_SUCKING_RESIST_FAIL_THRESHOLD;
+  const doSuck = () => {
+    clearAutoSuckVerify();
+    suck();
+  };
+
+  autoSuckVerifyTimeout = setTimeout(doSuck, AUTO_SUCK_VERIFY_TIMEOUT);
+
+  const trickButton = Math.random() < 0.25;
+  const buttonLabel = trickButton ? "Verify you are a baby" : "Verify you aren't a baby";
+  const message = trickButton
+    ? "You feel the urge to suck. Press down on this button to verify that you are a baby!"
+    : "You feel the urge to suck. Press down on this button to verify that you aren't a baby!";
+
+  const button = ElementButton.Create("abcl-chat-button-verify-adult", null, null, {
+    button: {
+      classList: ["abcl-chat-button"],
+      children: [buttonLabel],
+    },
+  });
+  ChatRoomSendLocal(
+    ElementCreate({
+      tag: "div",
+      children: [message, button],
+    }).outerHTML,
+  );
+
+  const buttonEl = document.querySelector("#abcl-chat-button-verify-adult");
+  if (!buttonEl) return;
+
+  let holdTimer: number | null = null;
+
+  const startHold = () => {
+    if (!autoSuckVerifyTimeout) return;
+    buttonEl.textContent = "Hold it down...";
+    holdTimer = setTimeout(() => {
+      holdTimer = null;
+      if (!autoSuckVerifyTimeout) return;
+      if (alwaysFails) {
+        sendChatLocal("You try to hold the button down, but your thumb (or pacifier) finds its way to your mouth instead...");
+        doSuck();
+        return;
+      }
+      if (trickButton) {
+        sendChatLocal("You hold the button down and verify that you are a baby. Good baby.");
+        doSuck();
+        return;
+      }
+      clearAutoSuckVerify();
+      sendChatLocal("You hold the button down and resist the urge. For now.");
+    }, AUTO_SUCK_HOLD_DURATION);
+  };
+
+  const cancelHold = () => {
+    if (holdTimer) {
+      clearTimeout(holdTimer);
+      holdTimer = null;
+      if (autoSuckVerifyTimeout) buttonEl.textContent = buttonLabel;
+    }
+  };
+
+  buttonEl.addEventListener("mousedown", startHold);
+  buttonEl.addEventListener("touchstart", startHold);
+  buttonEl.addEventListener("mouseup", cancelHold);
+  buttonEl.addEventListener("mouseleave", cancelHold);
+  buttonEl.addEventListener("touchend", cancelHold);
+  buttonEl.addEventListener("touchcancel", cancelHold);
+};
 
 function getBladderState(player: Character = Player): "blocked" | "open" | "normal" {
   const catheterizedEffect = CommonClamp(InventoryCraftCount(player, "Catheterized" as CraftingPropertyType, true), 0, 1);
@@ -141,11 +227,14 @@ export const abclPlayer = {
       abclPlayer.stats.MentalRegression > MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD &&
       regressedSelfSoothingThrottler.check()
     ) {
-      if (hasPacifier(Player)) {
-        suckPacifierFunction(Player);
-      } else if (!Player.IsRestrained() && !Player.IsMouthBlocked()) {
-        suckThumbFunction(Player);
-      }
+      const suck = () => {
+        if (hasPacifier(Player)) {
+          suckPacifierFunction(Player);
+        } else if (!Player.IsRestrained() && !Player.IsMouthBlocked()) {
+          suckThumbFunction(Player);
+        }
+      };
+      promptAutoSuckVerification(suck);
     }
     if (!Player.ABCL.Settings.DisableAutoDrool && abclPlayer.stats.MentalRegression > MENTAL_REGRESSION_DROOL_THRESHOLD && droolThrottler.check()) {
       CharacterSetFacialExpression(Player, "Fluids", "DroolMedium", 20);
