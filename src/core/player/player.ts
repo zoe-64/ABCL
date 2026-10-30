@@ -599,7 +599,7 @@ export const abclPlayer = {
     // bladder
     set BladderValue(value: number) {
       if (value < 0) value = 0;
-      if (value > this.BladderSize) value = this.BladderSize;
+      if (value > this.BladderSize * 2) value = this.BladderSize * 2;
       sendStatusMessage("Bladder", this.BladderValue, value, this.BladderSize);
       Player.ABCL.Stats.Bladder.value = value;
       abclStatsWindow.update();
@@ -648,7 +648,7 @@ export const abclPlayer = {
     // bowel
     set BowelValue(value: number) {
       if (value < 0) value = 0;
-      if (value > this.BowelSize) value = this.BowelSize;
+      if (value > this.BowelSize * 2) value = this.BowelSize * 2;
       sendStatusMessage("Bowel", this.BowelValue, value, this.BowelSize);
       Player.ABCL.Stats.Bowel.value = value;
       abclStatsWindow.update();

@@ -130,8 +130,10 @@ const initHooks = async () => {
       name: "blort-spell",
       label: "Blort Spell",
       description: "Makes the target mess.",
+      options: [{ type: "number", key: "strength", label: "Blort strength (%)", min: 1, max: 200, step: 1, default: 50 }] as const,
       apply(context) {
-        abclPlayer.stats.BowelFullness = 1;
+        const strength = (context.options.strength as number) / 100;
+        abclPlayer.stats.BowelFullness = strength;
         abclPlayer.soil(false);
       },
     });
@@ -139,28 +141,34 @@ const initHooks = async () => {
       name: "tinkle-spell",
       label: "Tinkle Spell",
       description: "Makes the target pee.",
+      options: [{ type: "number", key: "strength", label: "Tinkle strength (%)", min: 1, max: 200, step: 1, default: 50 }] as const,
       apply(context) {
-        abclPlayer.stats.BladderFullness = 1;
+        const strength = (context.options.strength as number) / 100;
+        abclPlayer.stats.BladderFullness = strength;
         abclPlayer.wet(false);
       },
     });
     api.spells.registerEffect({
       name: "fill-bladder",
       label: "Fill Bladder",
-      description: "Fills the target's bladder by 50% of the remaining capacity.",
+      description: "Fills the target's bladder by a certain amount.",
+      options: [{ type: "number", key: "strength", label: "Fill amount (%)", min: 1, max: 200, step: 1, default: 50 }] as const,
       apply(context) {
         const current = abclPlayer.stats.BladderFullness;
-        abclPlayer.stats.BladderFullness = Math.min(1, current + (1 - current) / 2);
+        const strength = (context.options.strength as number) / 100;
+        abclPlayer.stats.BladderFullness = current + strength;
         context.sendAction(grammar.flatten("#fill-bladder-spell-default#"));
       },
     });
     api.spells.registerEffect({
       name: "fill-bowels",
       label: "Fill Bowels",
-      description: "Fills the target's bowels by 50% of the remaining capacity.",
+      description: "Fills the target's bowels by a certain amount.",
+      options: [{ type: "number", key: "strength", label: "Fill amount (%)", min: 1, max: 200, step: 1, default: 50 }] as const,
       apply(context) {
         const current = abclPlayer.stats.BowelFullness;
-        abclPlayer.stats.BowelFullness = Math.min(1, current + (1 - current) / 2);
+        const strength = (context.options.strength as number) / 100;
+        abclPlayer.stats.BowelFullness = current + strength;
         context.sendAction(grammar.flatten("#fill-bowels-spell-default#"));
       },
     });
@@ -178,6 +186,78 @@ const initHooks = async () => {
       label: "Diaper Change Spell",
       description: "Makes the target get changed, if not padded, they will be now.",
       apply(context) {
+        if (!hasDiaper(Player)) {
+          context.sendAction(grammar.flatten("#changeDiaper-default-magic-unpadded#"));
+          applyRandomDiaper(Player, false);
+          return;
+        }
+        abclPlayer.changeDiaper(Player, true);
+        context.sendAction(grammar.flatten("#changeDiaper-default-magic#"));
+      },
+    });
+
+    if (!LSCG.capabilities.has("hypno.instructions")) return;
+    api.hypno.registerInstruction({
+      name: "blort-spell",
+      label: "Blort Spell",
+      description: "Makes the target mess.",
+      options: [{ type: "number", key: "strength", label: "Blort strength (%)", min: 1, max: 200, step: 1, default: 50 }] as const,
+      perform(context) {
+        const strength = (context.options.strength as number) / 100;
+        abclPlayer.stats.BowelFullness = strength;
+        abclPlayer.soil(false);
+      },
+    });
+
+    api.hypno.registerInstruction({
+      name: "tinkle-spell",
+      label: "Tinkle Spell",
+      description: "Makes the target pee.",
+      options: [{ type: "number", key: "strength", label: "Tinkle strength (%)", min: 1, max: 200, step: 1, default: 50 }] as const,
+      perform(context) {
+        const strength = (context.options.strength as number) / 100;
+        abclPlayer.stats.BladderFullness = strength;
+        abclPlayer.wet(false);
+      },
+    });
+    api.hypno.registerInstruction({
+      name: "fill-bladder",
+      label: "Fill Bladder",
+      description: "Fills the target's bladder by a certain amount.",
+      options: [{ type: "number", key: "strength", label: "Fill amount (%)", min: 1, max: 200, step: 1, default: 50 }] as const,
+      perform(context) {
+        const current = abclPlayer.stats.BladderFullness;
+        const strength = (context.options.strength as number) / 100;
+        abclPlayer.stats.BladderFullness = current + strength;
+        context.sendAction(grammar.flatten("#fill-bladder-spell-default#"));
+      },
+    });
+    api.hypno.registerInstruction({
+      name: "fill-bowels",
+      label: "Fill Bowels",
+      description: "Fills the target's bowels by a certain amount.",
+      options: [{ type: "number", key: "strength", label: "Fill amount (%)", min: 1, max: 200, step: 1, default: 50 }] as const,
+      perform(context) {
+        const current = abclPlayer.stats.BowelFullness;
+        const strength = (context.options.strength as number) / 100;
+        abclPlayer.stats.BowelFullness = current + strength;
+        context.sendAction(grammar.flatten("#fill-bowels-spell-default#"));
+      },
+    });
+    api.hypno.registerInstruction({
+      name: "fluffy-butt",
+      label: "Fluffy-Butt Spell",
+      description: "Puts the target in a nice thick fluffy diaper.",
+      perform(context) {
+        applyRandomDiaper(Player, false, "moderate_adult");
+        context.sendAction(grammar.flatten("#fluffy-butt-spell-default#"));
+      },
+    });
+    api.hypno.registerInstruction({
+      name: "diaper-change",
+      label: "Diaper Change Spell",
+      description: "Makes the target get changed, if not padded, they will be now.",
+      perform(context) {
         if (!hasDiaper(Player)) {
           context.sendAction(grammar.flatten("#changeDiaper-default-magic-unpadded#"));
           applyRandomDiaper(Player, false);

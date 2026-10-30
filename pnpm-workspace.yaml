@@ -1,3 +1,4 @@
 minimumReleaseAgeExclude:
   - bc-stubs@131.0.0-Alpha.1
   - bc-stubs@132.0.0
+  - '@lscg/types@0.9.15'

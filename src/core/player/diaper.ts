@@ -77,9 +77,9 @@ export const isWearingBabyClothes = () => {
 };
 // Color
 export function averageColor(color_1: string, color_2: string, ratio: number = 0.5): BCColor {
-  let rgb_1 = DrawHexToRGB(color_1);
-  let rgb_2 = DrawHexToRGB(color_2);
-  let avgRgb: RGBColor = {
+  const rgb_1 = DrawHexToRGB(color_1 as HexColor);
+  const rgb_2 = DrawHexToRGB(color_2 as HexColor);
+  const avgRgb: RGBColor = {
     r: Math.round(rgb_1.r * ratio + rgb_2.r * (1 - ratio)),
     g: Math.round(rgb_1.g * ratio + rgb_2.g * (1 - ratio)),
     b: Math.round(rgb_1.b * ratio + rgb_2.b * (1 - ratio)),

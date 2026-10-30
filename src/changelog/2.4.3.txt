@@ -1,7 +1,10 @@
-Added LSCG spells like:
+Added LSCG spells and suggestions like:
 Blort spell - makes the target mess
 Tinkle spell - makes the target pee
+Fill bladder spell - makes the target fill their bladder
+Fill bowel spell - makes the target fill their bowel
 Change diaper spell - makes the target get changed diaper
++ one extra
 
 Reworked parts of the abcl action/message generation system
 Fixed issues with names that contain badges/prefixes from ABCL
@@ -13,5 +16,3 @@ Refactored parts of minigame styling
 Added difficulty standing up when regression is above 60%
 Added periodic habits of sucking on pacifier / thumb when regression is above 40%
 Added periodic drooling when regression is above 70%
-
-Added filling bladder and bowel spells
