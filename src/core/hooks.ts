@@ -430,7 +430,11 @@ const initHooks = async () => {
 
   HookManager.hookFunction("PoseCanChangeUnaidedStatus", 1, (args, next) => {
     const result = next(args);
-    if (result == PoseChangeStatus.ALWAYS && abclPlayer.stats.MentalRegression > MENTAL_REGRESSION_STRUGGLE_STANDING_UP_THRESHOLD)
+    if (
+      result == PoseChangeStatus.ALWAYS &&
+      !Player.ABCL.Settings.DisableWeakLegs &&
+      abclPlayer.stats.MentalRegression > MENTAL_REGRESSION_STRUGGLE_STANDING_UP_THRESHOLD
+    )
       return PoseChangeStatus.ALWAYS_WITH_STRUGGLE;
     return result;
   });
