@@ -81,6 +81,11 @@ interface ModSettings {
   ForcePacifiers: boolean;
   PrefixNamesWithCaregiverTitles: boolean;
   HideStats: boolean;
+
+  // automatic behavior settings
+  DisableAutoDrool: boolean;
+  DisableWeakLegs: boolean;
+  DisableAutoSucking: boolean;
 }
 interface ModStats {
   PuddleSize: {

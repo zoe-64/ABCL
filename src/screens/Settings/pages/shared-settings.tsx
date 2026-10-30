@@ -1,5 +1,6 @@
 import { useState } from "preact/hooks";
 import { JSX } from "preact/jsx-runtime";
+import { MENTAL_REGRESSION_DROOL_THRESHOLD, MENTAL_REGRESSION_STRUGGLE_STANDING_UP_THRESHOLD, MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD } from "src/constants";
 import { settingsRemote } from "src/core/actions/sync";
 import { LittlishAPIWrapper } from "src/core/api";
 import { getElement, sendChatLocal } from "src/core/utils";
@@ -89,6 +90,15 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
   const [HideStats, setHideStats] = useState<boolean>(selectedCharacter.ABCL.Settings.HideStats);
   const [hideStatsLocked, setHideStatsLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.HideStats);
 
+  const [DisableAutoDrool, setDisableAutoDrool] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableAutoDrool);
+  const [disableAutoDroolLocked, setDisableAutoDroolLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.DisableAutoDrool);
+
+  const [DisableWeakLegs, setDisableWeakLegs] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableWeakLegs);
+  const [disableWeakLegsLocked, setDisableWeakLegsLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.DisableWeakLegs);
+
+  const [DisableAutoSucking, setDisableAutoSucking] = useState<boolean>(selectedCharacter.ABCL.Settings.DisableAutoSucking);
+  const [disableAutoSuckingLocked, setDisableAutoSuckingLocked] = useState<boolean>(selectedCharacter.ABCL.SettingPermissions.DisableAutoSucking);
+
   return (
     <div>
       <button
@@ -104,7 +114,8 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
             OnDiaperChange, DisableClothingStains, DisableDiaperStains, AccidentsByActivities, DisableWettingLeaks,
             DisableSoilingLeaks, CanChangeSelf, CanChangeDiapers, CanUseBathroomWithDiaper, CanCheckDiaperWithRestraints,
             CanUseToilet, CanUsePotty, MiniGameDifficulty, IncontinenceOnlyIncrease, MentalRegressionOnlyIncrease,
-            ForceDiapers, ForcePacifiers, PrefixNamesWithCaregiverTitles, HideStats
+            ForceDiapers, ForcePacifiers, PrefixNamesWithCaregiverTitles, HideStats,
+            DisableAutoDrool, DisableWeakLegs, DisableAutoSucking
           };
           const permissions: PartialDeep<Record<SettingKeys, boolean>> = {
             PauseStats: pauseStatsLocked,
@@ -131,6 +142,9 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
             ForcePacifiers: forcePacifiersLocked,
             PrefixNamesWithCaregiverTitles: prefixNamesWithCaregiverTitlesLocked,
             HideStats: hideStatsLocked,
+            DisableAutoDrool: disableAutoDroolLocked,
+            DisableWeakLegs: disableWeakLegsLocked,
+            DisableAutoSucking: disableAutoSuckingLocked,
           };
           if (
             CommonDeepEqual({ ...selectedCharacter.ABCL.Settings, ...settings }, selectedCharacter.ABCL.Settings) &&
@@ -304,6 +318,15 @@ export default function SharedSettingsPage({ setPage, selectedCharacter }: { set
         </SettingPanel>
         <SettingPanel title="Hide Stats">
           <Checkbox checked={HideStats} setChecked={setHideStats} locked={hideStatsLocked} setLocked={setHideStatsLocked} />
+        </SettingPanel>
+        <SettingPanel title={`Disable Automatic Drooling (at ${Math.round(MENTAL_REGRESSION_DROOL_THRESHOLD * 100)}% mental regression)`}>
+          <Checkbox checked={DisableAutoDrool} setChecked={setDisableAutoDrool} locked={disableAutoDroolLocked} setLocked={setDisableAutoDroolLocked} />
+        </SettingPanel>
+        <SettingPanel title={`Disable Weak Legs (at ${Math.round(MENTAL_REGRESSION_STRUGGLE_STANDING_UP_THRESHOLD * 100)}% mental regression)`}>
+          <Checkbox checked={DisableWeakLegs} setChecked={setDisableWeakLegs} locked={disableWeakLegsLocked} setLocked={setDisableWeakLegsLocked} />
+        </SettingPanel>
+        <SettingPanel title={`Disable Automatic Pacifier/Thumb Sucking (at ${Math.round(MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD * 100)}% mental regression)`}>
+          <Checkbox checked={DisableAutoSucking} setChecked={setDisableAutoSucking} locked={disableAutoSuckingLocked} setLocked={setDisableAutoSuckingLocked} />
         </SettingPanel>
       </Group>
       <div style={{ height: "10em" }}></div>

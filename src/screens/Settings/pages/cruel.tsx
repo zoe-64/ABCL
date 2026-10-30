@@ -4,6 +4,11 @@ import { useState } from "preact/hooks";
 import { isOwned } from "src/core/player/diaper";
 import { Group, Stack } from "src/screens/components/positionComponents";
 import { SettingPanel } from "src/screens/components/settingPanel";
+import {
+  MENTAL_REGRESSION_DROOL_THRESHOLD,
+  MENTAL_REGRESSION_STRUGGLE_STANDING_UP_THRESHOLD,
+  MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD,
+} from "../../../constants";
 import { Checkbox } from "../../components/checkbox";
 import { SettingsH2 } from "../settingsPage";
 
@@ -28,6 +33,15 @@ export default function CruelPage({ setPage }: { setPage: (page: string) => void
   const [hideStats, setHideStats] = useState<boolean>(Player.ABCL.Settings.HideStats);
   const [hideStatsLocked, _setHideStatsLocked] = useState<boolean>(Player.ABCL.SettingPermissions.HideStats);
 
+  const [disableAutoDrool, setDisableAutoDrool] = useState<boolean>(Player.ABCL.Settings.DisableAutoDrool);
+  const [disableAutoDroolLocked, _setDisableAutoDroolLocked] = useState<boolean>(Player.ABCL.SettingPermissions.DisableAutoDrool);
+
+  const [disableWeakLegs, setDisableWeakLegs] = useState<boolean>(Player.ABCL.Settings.DisableWeakLegs);
+  const [disableWeakLegsLocked, _setDisableWeakLegsLocked] = useState<boolean>(Player.ABCL.SettingPermissions.DisableWeakLegs);
+
+  const [disableAutoSucking, setDisableAutoSucking] = useState<boolean>(Player.ABCL.Settings.DisableAutoSucking);
+  const [disableAutoSuckingLocked, _setDisableAutoSuckingLocked] = useState<boolean>(Player.ABCL.SettingPermissions.DisableAutoSucking);
+
   return (
     <Stack className="ABCL-settings-section">
       <SettingsH2>Cruel section of ABCL</SettingsH2>
@@ -41,6 +55,9 @@ export default function CruelPage({ setPage }: { setPage: (page: string) => void
           Player.ABCL.Settings.ForcePacifiers = forcePacifiers;
           Player.ABCL.Settings.PrefixNamesWithCaregiverTitles = prefixNamesWithCaregiverTitles;
           Player.ABCL.Settings.HideStats = hideStats;
+          Player.ABCL.Settings.DisableAutoDrool = disableAutoDrool;
+          Player.ABCL.Settings.DisableWeakLegs = disableWeakLegs;
+          Player.ABCL.Settings.DisableAutoSucking = disableAutoSucking;
         }}
         className="ABCL-exit-button"
       ></button>
@@ -77,6 +94,15 @@ export default function CruelPage({ setPage }: { setPage: (page: string) => void
         </SettingPanel>
         <SettingPanel title="Hide Stats">
           <Checkbox checked={hideStats} setChecked={setHideStats} locked={hideStatsLocked && isOwned()} opaqueLock={true} />
+        </SettingPanel>
+        <SettingPanel title={`Disable Automatic Drooling (at ${Math.round(MENTAL_REGRESSION_DROOL_THRESHOLD * 100)}% mental regression)`}>
+          <Checkbox checked={disableAutoDrool} setChecked={setDisableAutoDrool} locked={disableAutoDroolLocked && isOwned()} opaqueLock={true} />
+        </SettingPanel>
+        <SettingPanel title={`Disable Weak Legs (at ${Math.round(MENTAL_REGRESSION_STRUGGLE_STANDING_UP_THRESHOLD * 100)}% mental regression)`}>
+          <Checkbox checked={disableWeakLegs} setChecked={setDisableWeakLegs} locked={disableWeakLegsLocked && isOwned()} opaqueLock={true} />
+        </SettingPanel>
+        <SettingPanel title={`Disable Automatic Pacifier/Thumb Sucking (at ${Math.round(MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD * 100)}% mental regression)`}>
+          <Checkbox checked={disableAutoSucking} setChecked={setDisableAutoSucking} locked={disableAutoSuckingLocked && isOwned()} opaqueLock={true} />
         </SettingPanel>
       </Group>
       <div style={{ height: "10em" }}></div>

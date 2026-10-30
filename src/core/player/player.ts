@@ -1,11 +1,11 @@
 import { RuleId } from "src/types/definitions";
 import {
-  ABCLdata,
-  DIAPER_USAGE_SOUNDS,
-  INCONTINENCE_ON_STATS_OVERFLOW,
-  MENTAL_REGRESSION_DROOL_THRESHOLD,
-  MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD,
-  PUDDLE_MAX_SIZE,
+    ABCLdata,
+    DIAPER_USAGE_SOUNDS,
+    INCONTINENCE_ON_STATS_OVERFLOW,
+    MENTAL_REGRESSION_DROOL_THRESHOLD,
+    MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD,
+    PUDDLE_MAX_SIZE,
 } from "../../constants";
 import { MetabolismSettingValues, MiniGameDifficultyToNumber } from "../../types/types";
 import { suckPacifierFunction } from "../actions/suckPacifier";
@@ -16,17 +16,17 @@ import { syncData } from "../settings";
 import { grammar } from "../tracery";
 import { createRateLimiter, getColor, isColorable, Saver, sendChatLocal, Throttler } from "../utils";
 import {
-  averageColor,
-  getPlayerDiaperSize,
-  hasDiaper,
-  hasPacifier,
-  incontinenceChanceFormula,
-  incontinenceLimitFormula,
-  incontinenceOnAccident,
-  isDiaper,
-  mentalRegressionOnAccident,
-  mentalRegressionOvertime,
-  updateDiaperColor,
+    averageColor,
+    getPlayerDiaperSize,
+    hasDiaper,
+    hasPacifier,
+    incontinenceChanceFormula,
+    incontinenceLimitFormula,
+    incontinenceOnAccident,
+    isDiaper,
+    mentalRegressionOnAccident,
+    mentalRegressionOvertime,
+    updateDiaperColor,
 } from "./diaper";
 import { getAccidentAutopilotOutcome, isAccidentsAutopiloted as isAccidentsAutoPiloted, sendABCLAction, sendStatusMessage } from "./playerUtils";
 import { abclStatsWindow } from "./ui";
@@ -136,14 +136,18 @@ export const abclPlayer = {
     if (regressionThrottler.check()) {
       abclPlayer.stats.MentalRegression += mentalRegressionOvertime();
     }
-    if (abclPlayer.stats.MentalRegression > MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD && regressedSelfSoothingThrottler.check()) {
+    if (
+      !Player.ABCL.Settings.DisableAutoSucking &&
+      abclPlayer.stats.MentalRegression > MENTAL_REGRESSION_SUCKING_HABIT_THRESHOLD &&
+      regressedSelfSoothingThrottler.check()
+    ) {
       if (hasPacifier(Player)) {
         suckPacifierFunction(Player);
       } else if (!Player.IsRestrained() && !Player.IsMouthBlocked()) {
         suckThumbFunction(Player);
       }
     }
-    if (abclPlayer.stats.MentalRegression > MENTAL_REGRESSION_DROOL_THRESHOLD && droolThrottler.check()) {
+    if (!Player.ABCL.Settings.DisableAutoDrool && abclPlayer.stats.MentalRegression > MENTAL_REGRESSION_DROOL_THRESHOLD && droolThrottler.check()) {
       CharacterSetFacialExpression(Player, "Fluids", "DroolMedium", 20);
       droolThrottler.allowedCallInterval = 2 * 60 * 1000 + Math.random() * 60 * 1000;
     }

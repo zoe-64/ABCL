@@ -72,6 +72,11 @@ export const defaultSettings: ModSettings = {
   ForcePacifiers: false,
   PrefixNamesWithCaregiverTitles: false,
   HideStats: false,
+
+  // automatic behavior settings
+  DisableAutoDrool: false,
+  DisableWeakLegs: false,
+  DisableAutoSucking: false,
 };
 
 export const defaultStats: ModStats = {
@@ -171,6 +176,11 @@ export const defaultSettingPermissions: ModStorageModel["SettingPermissions"] = 
   ForcePacifiers: false,
   PrefixNamesWithCaregiverTitles: false,
   HideStats: false,
+
+  // automatic behavior settings
+  DisableAutoDrool: false,
+  DisableWeakLegs: false,
+  DisableAutoSucking: false,
 };
 
 const defaultData: ModStorageModel = {
