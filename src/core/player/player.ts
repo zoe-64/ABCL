@@ -116,9 +116,13 @@ const promptAutoSuckVerification = (suck: () => void) => {
   const startHold = () => {
     if (!autoSuckVerifyTimeout) return;
     buttonEl.textContent = "Hold it down...";
+    buttonEl.classList.add("abcl-progress-button");
     holdTimer = setTimeout(() => {
       holdTimer = null;
       if (!autoSuckVerifyTimeout) return;
+      buttonEl.classList.remove("abcl-progress-button");
+      buttonEl.classList.add("abcl-progress-button", "complete");
+      buttonEl.textContent = "Complete!";
       if (alwaysFails) {
         sendChatLocal("You try to hold the button down, but your thumb (or pacifier) finds its way to your mouth instead...");
         doSuck();
@@ -138,6 +142,7 @@ const promptAutoSuckVerification = (suck: () => void) => {
     if (holdTimer) {
       clearTimeout(holdTimer);
       holdTimer = null;
+      buttonEl.classList.remove("abcl-progress-button", "complete");
       if (autoSuckVerifyTimeout) buttonEl.textContent = buttonLabel;
     }
   };

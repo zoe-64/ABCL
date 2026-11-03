@@ -264,6 +264,7 @@ export function getBadgePrefix(player: Character): string {
 }
 
 export function getDecoratorPrefix(player: Character): string {
+  if (!player.ABCL!.Settings.ShowOwnBadges) return "";
   if (player.MemberNumber === 164988) return "ი𐑼 ";
   if (player.MemberNumber != null && CONTRIBUTORS.has(player.MemberNumber)) {
     return "❀ ";
