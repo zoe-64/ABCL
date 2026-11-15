@@ -478,17 +478,41 @@ const initHooks = async () => {
 
     return result;
   });
-  HookManager.hookFunction("InformationSheetRun", HookPriority.TOP, (args, next) => {
+  HookManager.hookFunction("InformationSheetLoad", HookPriority.TOP, async (args, next) => {
     if (!InformationSheetSelection?.ABCL) return next(args);
-    if (window?.bcx?.inBcxSubscreen?.() || window.MPA?.menuLoaded || LittlishAPIWrapper.inModSubscreen()) return next(args);
-
     if (
-      (LittlishAPIWrapper.isCaregiverOf(Player, InformationSheetSelection) || LittlishAPIWrapper.isMommyOf(Player, InformationSheetSelection)) &&
-      LittlishAPIWrapper.hasAccessRightTo(Player, InformationSheetSelection, "MANAGE_ABCL_SETTINGS")
-    ) {
-      DrawButton(1700 - 90 - 20, 700 - 15, 90, 90, "", "White", `${publicURL}/icon-small.png`, bcModName);
-    }
-    next(args);
+      !(
+        (LittlishAPIWrapper.isCaregiverOf(Player, InformationSheetSelection) || LittlishAPIWrapper.isMommyOf(Player, InformationSheetSelection)) &&
+        LittlishAPIWrapper.hasAccessRightTo(Player, InformationSheetSelection, "MANAGE_ABCL_SETTINGS")
+      )
+    )
+      return next(args);
+    console.log("x");
+    const x = await next(args);
+    ElementButton.Create(
+      "abcl-remote-settings-button",
+      async () => {
+        getElement(document.body, "#ABCL-settings-page").classList.remove(`ABCL-hidden`);
+        resizeElements();
+        await CommonSetScreen("Character", "Preference");
+        PreferenceSubscreen = PreferenceSubscreens.find(s => s.name === "Extensions") ?? null;
+        PreferenceSubscreen?.load?.();
+        const mod = PreferenceExtensionsDisplay.find(e => e.Button === "ABCL Settings");
+        if (!mod) return;
+        mod.click();
+        getElement<HTMLButtonElement>(document.body, "#ABCL-shared-settings-button").click();
+      },
+      {
+        image: `${publicURL}/icon-small.png`,
+        tooltip: bcModName,
+      },
+      {
+        button: {
+          parent: ElementWrap("information-sheet-screen-aside-r"),
+        },
+      },
+    );
+    return x;
   });
 
   HookManager.hookFunction("ChatRoomMessageDisplay", 1, (args, next) => {
@@ -518,29 +542,6 @@ const initHooks = async () => {
     )
       return PoseChangeStatus.ALWAYS_WITH_STRUGGLE;
     return result;
-  });
-  HookManager.hookFunction("InformationSheetClick", HookPriority.OBSERVE, (args, next) => {
-    if (!InformationSheetSelection?.ABCL) return next(args);
-    if (window.MPA?.menuLoaded || window?.bcx?.inBcxSubscreen?.() || LittlishAPIWrapper.inModSubscreen() || window?.LSCG_REMOTE_WINDOW_OPEN === true)
-      return next(args);
-    if (
-      (LittlishAPIWrapper.isCaregiverOf(Player, InformationSheetSelection) || LittlishAPIWrapper.isMommyOf(Player, InformationSheetSelection)) &&
-      LittlishAPIWrapper.hasAccessRightTo(Player, InformationSheetSelection, "MANAGE_ABCL_SETTINGS") &&
-      MouseIn(1700 - 90 - 10, 800 - 100, 90, 90)
-    ) {
-      getElement(document.body, "#ABCL-settings-page").classList.remove(`ABCL-hidden`);
-      resizeElements();
-      (async () => {
-        await CommonSetScreen("Character", "Preference");
-        PreferenceSubscreen = PreferenceSubscreens.find(s => s.name === "Extensions") ?? null;
-        PreferenceSubscreen?.load?.();
-        const mod = PreferenceExtensionsDisplay.find(e => e.Button === "ABCL Settings");
-        if (!mod) return;
-        mod.click();
-        getElement<HTMLButtonElement>(document.body, "#ABCL-shared-settings-button").click();
-      })();
-    }
-    next(args);
   });
 
   HookManager.hookFunction("InformationSheetExit", HookPriority.OBSERVE, (args, next) => {

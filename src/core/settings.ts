@@ -213,12 +213,12 @@ export const loadOrGenerateData = async () => {
         SettingPermissions: {},
         Version: ModVersion,
       };
-  if (data.LastVersion !== ModVersion) {
+  if (data.LastVersion.trim() != ModVersion.trim()) {
     summarizeVersionRange("https://github.com/zoe-64/ABCL/src/changelog", data.Version, ModVersion).then(result => {
       if (!result) return;
       setTimeout(() => {
         ServerAccountBeep({
-          Message: `ABCL Updated! ${data.Version} -> ${ModVersion}\nSee settings for full changelog.\n\n${result.combinedText}`,
+          Message: `ABCL Updated! ${data.LastVersion} -> ${ModVersion}\nSee settings for full changelog.\n\n${result.combinedText}`,
           MemberNumber: ABCLOwner,
           MemberName: "Zoe - author of ABCL",
           ChatRoomSpace: "",

@@ -16,3 +16,6 @@ Refactored parts of minigame styling
 Added difficulty standing up when regression is above 60%
 Added periodic habits of sucking on pacifier / thumb when regression is above 40%
 Added periodic drooling when regression is above 70%
+
+Temporarily moved button in profile view to fix R134 issue
+Fixed some issues where pouring into diapers caused puddles when it was disabled

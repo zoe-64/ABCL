@@ -548,6 +548,7 @@ export const abclPlayer = {
     set PuddleSize(value: number) {
       if (value < 0) value = 0;
       if (value > PUDDLE_MAX_SIZE) value = PUDDLE_MAX_SIZE;
+      if (abclPlayer.settings.DisableWettingLeaks && value > 0) return;
       sendStatusMessage("PuddleSize", Player.ABCL.Stats.PuddleSize.value, value, PUDDLE_MAX_SIZE);
       Player.ABCL.Stats.PuddleSize.value = value;
       syncData();
@@ -564,6 +565,7 @@ export const abclPlayer = {
       if (Player.ABCL.Settings.MentalRegressionOnlyIncrease && value < Player.ABCL.Stats.MentalRegression.value) {
         return;
       }
+      if (abclPlayer.settings.MentalRegressionModifier == "Disabled" && value > 0) return;
       sendStatusMessage("MentalRegression", Player.ABCL.Stats.MentalRegression.value, value, 1);
       Player.ABCL.Stats.MentalRegression.value = value;
       abclStatsWindow.update();

@@ -153,3 +153,13 @@
   animation: none;
   background: #80ff8b;
 }
+
+#abcl-remote-settings-button {
+  height: var(--menu-button-size);
+  width: var(--menu-button-size);
+  pointer-events: all;
+}
+
+#information-sheet-screen-aside-r {
+  padding-top: none;
+}
