@@ -92,14 +92,14 @@
     "Panties_笨笨蛋LuziBulkyDiaper": {
       // Bulky Diaper
       //"color": [0, 1],
-      "gradients": [4],
+      "gradients": [5, 6],
 
       "size": "light_adult"
     },
     "Panties_笨笨蛋LuziPoofyDiaper": {
       // Poofy Diaper
       //"color": [1, 0],
-      "gradients": [4],
+      "gradients": [5, 6],
       "size": "light_adult"
     },
     "Panties_笨笨蛋LuziUntrainersThin": {
@@ -117,7 +117,7 @@
     "Panties_笨笨蛋LuziLatexDiaper": {
       // Latex Diaper
       //"color": [0],
-      "gradients": [2],
+      "gradients": [3],
       "size": "moderate_adult"
     },
     "SuitDiaperSuit": {
@@ -154,33 +154,33 @@
     "PantiesBulkyDiaper": {
       // Bulky Diaper
       //"color": [0, 1],
-      "gradients": [4],
+      "gradients": [5, 6],
 
       "size": "light_adult"
     },
     "ItemPelvisBulkyDiaper": {
       // Bulky Chastity Diaper
       //"color": [1, 0],
-      "gradients": [4],
+      "gradients": [5, 6],
 
       "size": "moderate_adult"
     },
     "PantiesPoofyDiaper": {
       // Poofy Diaper
       //"color": [1, 0],
-      "gradients": [4],
+      "gradients": [5, 6],
       "size": "light_adult"
     },
     "ItemPelvisPoofyDiaper 1": {
       // Poofy Chastity Diaper + property
       //"color": [1, 0],
-      "gradients": [4],
+      "gradients": [5, 6],
       "size": "heavy_adult"
     },
     "ItemPelvisPoofyDiaper": {
       // Poofy Chastity Diaper
       //"color": [1, 0],
-      "gradients": [4],
+      "gradients": [5, 6],
       "size": "moderate_adult"
     },
     "ItemPelvisDiaperHarness": {
@@ -207,14 +207,14 @@
     },
     "ItemPelvisLatexDiaper": {
       // Latex Chastity Diaper
-      "gradients": [2],
+      "gradients": [3],
       //"color": [0],
       "size": "moderate_adult"
     },
     "PantiesLatexDiaper": {
       // Latex Diaper
       //"color": [0],
-      "gradients": [2],
+      "gradients": [3],
       "size": "moderate_adult"
     }
   }
